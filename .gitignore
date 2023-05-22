@@ -1,0 +1,16 @@
+# venv
+/pyvenv.cfg
+/bin
+/lib
+/lib64
+/share
+/include
+
+# Django setup
+/db.sqlite3
+/manage.py
+/*/settings/local.py
+/staticfiles
+
+# Node
+/node_modules
