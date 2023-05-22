@@ -1,0 +1,33 @@
+{% load i18n %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="/static/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
+  </head>
+  <body>
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom bg-dark text-white">
+      <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-white text-decoration-none">
+        Photolith
+      </a>
+
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{% url 'admin:index' %}" class="nav-link px-2 text-white">{% translate "Admin" %}</a></li>
+      </ul>
+
+      <div class="col-md-3 text-end">
+        <button type="button" class="btn btn-outline-primary me-2">{% translate "Login" %}</button>
+        <button type="button" class="btn btn-primary">{% translate "Sign-up" %}</button>
+      </div>
+    </header>
+    <main class="{% block contentclass %}container{% endblock contentclass %}">
+    {% block content %}
+    {% endblock content %}
+    </main>
+  </body>
+</html>

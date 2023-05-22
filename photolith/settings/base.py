@@ -38,7 +38,9 @@ ROOT_URLCONF = "photolith.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -93,7 +95,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_ROOT = BASE_DIR.parent / "staticfiles"
 STATIC_URL = "/static/"
-STATICFILES_DIRS = (BASE_DIR.parent / "node_modules",)
+STATICFILES_DIRS = (
+    BASE_DIR.parent / "node_modules",
+)
 
 
 # Default primary key field type

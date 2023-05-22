@@ -26,4 +26,12 @@ test: compile
 lint: lib/.requirements-dev.txt
 	./bin/black $(PROJECT)
 
-.PHONY: all compile test lint
+node_modules/.package.json: package.json
+	npm ci
+	touch $@
+
+start: node_modules/.package.json
+	./manage.py collectstatic --noinput
+	./manage.py runserver 0.0.0.0:8000
+
+.PHONY: all compile test lint start
