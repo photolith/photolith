@@ -28,6 +28,7 @@ lint: lib/.requirements-dev.txt
 
 node_modules/.package.json: package.json
 	npm ci
+	npm run fetch
 	touch $@
 
 start: node_modules/.package.json
