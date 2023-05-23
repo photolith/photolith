@@ -23,11 +23,17 @@ compile: lib/.requirements.txt ./manage.py
 test: compile
 	./manage.py test
 
-lint: lib/.requirements-dev.txt
+lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/black $(PROJECT)
+	npm run lint
 
 node_modules/.package.json: package.json
-	npm ci
+	npm ci --production
+	npm run fetch
+	touch $@
+
+node_modules/.package-dev.json: package.json
+	npm ci --include=dev
 	npm run fetch
 	touch $@
 

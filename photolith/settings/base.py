@@ -96,6 +96,7 @@ USE_TZ = True
 STATIC_ROOT = BASE_DIR.parent / "staticfiles"
 STATIC_URL = "/static/"
 STATICFILES_DIRS = (
+    BASE_DIR.parent / "client/dist",
     BASE_DIR.parent / "node_modules",
 )
 
