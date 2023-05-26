@@ -14,7 +14,7 @@
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
   </head>
   <body>
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom bg-dark text-white">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 border-bottom bg-dark text-white">
       <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-white text-decoration-none">
         Photolith
       </a>
@@ -29,7 +29,9 @@
         <button type="button" class="btn btn-primary">{% translate "Sign-up" %}</button>
       </div>
     </header>
-    <main class="{% block contentclass %}container{% endblock contentclass %}">
+    {% block pre_content %}
+    {% endblock pre_content %}
+    <main class="mt-4 {% block contentclass %}container{% endblock contentclass %}">
     {% block content %}
     {% endblock content %}
     </main>

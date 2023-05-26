@@ -1,3 +1,5 @@
+import { init as initIngestSelect } from './ingest_select';
+
 window.addEventListener('DOMContentLoaded', (event) => {
-  // Startup all components
+  initIngestSelect(window);
 });
