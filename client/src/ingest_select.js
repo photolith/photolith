@@ -40,7 +40,7 @@ function newSelection (elIngestSelect, phViewer, val) {
   }
 
   return fs.next().then((f) => {
-    // TODO: Load image
+    phViewer.load(f);
   });
 }
 
