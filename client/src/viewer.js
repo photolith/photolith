@@ -124,7 +124,6 @@ class PhViewer {
         ]
       }));
     }
-    console.log([phFilters, img.filters]); // TODO:
 
     img.applyFilters();
     this.fabCanvas.renderAll();
