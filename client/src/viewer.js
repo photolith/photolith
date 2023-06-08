@@ -109,6 +109,17 @@ class PhViewer {
       }));
     }
 
+    if (phFilters.laplace) {
+      img.filters.push(new fabric.Image.filters.Convolute({
+        matrix: [
+          -1, -1, -1,
+          -1, 8, -1,
+          -1, -1, -1
+        ]
+      }));
+    }
+    console.log([phFilters, img.filters]); // TODO:
+
     img.applyFilters();
     this.fabCanvas.renderAll();
   }
@@ -143,6 +154,10 @@ export function init (window) {
             <div class="mb-3">
               <label class="form-label" for="${idPrefix}-gamma-input">Gamma:</label>
               <input type="range" name="gamma" class="form-range" id="${idPrefix}-gamma-input" min="0.01" max="2.2" value="1" step="0.01" />
+            </div>
+            <div class="mb-3 form-check">
+              <input class="form-check-input" type="checkbox" name="laplace" id="${idPrefix}-laplace-input">
+              <label class="form-check-label" for="${idPrefix}-laplace-input">Edge detection</label>
             </div>
           </form>
         </div>
