@@ -24,7 +24,9 @@ class PhViewer {
 
       // vpt: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix
       // Or [zoomLevel, 0, 0, zoomLevel, newLeft, newTop]
-      if (this.getWidth() > img.width * zoom) {
+      if (!img) {
+        vpt[4] = 0;
+      } else if (this.getWidth() > img.width * zoom) {
         // Image smaller than canvas, invert logic
         if (vpt[4] < 0) {
           vpt[4] = 0;
@@ -36,7 +38,9 @@ class PhViewer {
       } else if (img && vpt[4] < this.getWidth() - img.width * zoom) {
         vpt[4] = this.getWidth() - img.width * zoom;
       }
-      if (this.getHeight() > img.height * zoom) {
+      if (!img) {
+        vpt[5] = 0;
+      } else if (this.getHeight() > img.height * zoom) {
         // Image smaller than canvas, invert logic
         if (vpt[5] < 0) {
           vpt[5] = 0;
@@ -97,7 +101,9 @@ class PhViewer {
     const img = this.fabCanvas.backgroundImage;
     const phFilters = formson.form_to_object(this.elForm);
 
+    if (!img) return; // No image loaded
     img.filters = [];
+
     if (phFilters.gamma && phFilters.gamma !== '1') {
       phFilters.gamma = parseFloat(phFilters.gamma);
       img.filters.push(new fabric.Image.filters.Gamma({
