@@ -168,11 +168,11 @@ export function init (window) {
         </button>
         <div class="dropdown-menu">
           <form class="px-1">
-            <div class="mb-3">
-              <label class="form-label" for="${idPrefix}-gamma-input">Gamma:</label>
+            <div>
+              <label for="${idPrefix}-gamma-input">Gamma:</label>
               <input type="range" name="gamma" class="form-range" id="${idPrefix}-gamma-input" min="0.01" max="2.2" value="1" step="0.01" />
             </div>
-            <div class="mb-3 form-check">
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" name="laplace" id="${idPrefix}-laplace-input">
               <label class="form-check-label" for="${idPrefix}-laplace-input">Edge detection</label>
             </div>
