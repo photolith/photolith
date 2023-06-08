@@ -113,6 +113,18 @@ class PhViewer {
     if (!img) return; // No image loaded
     img.filters = [];
 
+    if (phFilters.brightness && phFilters.brightness !== '0') {
+      img.filters.push(new fabric.Image.filters.Brightness({
+        brightness: parseFloat(phFilters.brightness),
+      }));
+    }
+
+    if (phFilters.contrast && phFilters.contrast !== '0') {
+      img.filters.push(new fabric.Image.filters.Contrast({
+        contrast: parseFloat(phFilters.contrast),
+      }));
+    }
+
     if (phFilters.gamma && phFilters.gamma !== '1') {
       phFilters.gamma = parseFloat(phFilters.gamma);
       img.filters.push(new fabric.Image.filters.Gamma({
@@ -121,6 +133,18 @@ class PhViewer {
           phFilters.gamma,
           phFilters.gamma
         ]
+      }));
+    }
+
+    if (phFilters.saturation && phFilters.saturation !== '0') {
+      img.filters.push(new fabric.Image.filters.Saturation({
+        saturation: parseFloat(phFilters.saturation),
+      }));
+    }
+
+    if (phFilters.vibrance && phFilters.vibrance !== '0') {
+      img.filters.push(new fabric.Image.filters.Vibrance({
+        vibrance: parseFloat(phFilters.vibrance),
       }));
     }
 
@@ -169,8 +193,24 @@ export function init (window) {
         <div class="dropdown-menu">
           <form class="px-1">
             <div>
+              <label for="${idPrefix}-brightness-input">Brightness:</label>
+              <input type="range" name="brightness" class="form-range" id="${idPrefix}-brightness-input" min="-1" max="1" value="0" step="0.01" />
+            </div>
+            <div>
+              <label for="${idPrefix}-contrast-input">Contrast:</label>
+              <input type="range" name="contrast" class="form-range" id="${idPrefix}-contrast-input" min="-1" max="1" value="0" step="0.01" />
+            </div>
+            <div>
               <label for="${idPrefix}-gamma-input">Gamma:</label>
               <input type="range" name="gamma" class="form-range" id="${idPrefix}-gamma-input" min="0.01" max="2.2" value="1" step="0.01" />
+            </div>
+            <div>
+              <label for="${idPrefix}-saturation-input">Saturation:</label>
+              <input type="range" name="saturation" class="form-range" id="${idPrefix}-saturation-input" min="-1" max="1" value="0" step="0.01" />
+            </div>
+            <div>
+              <label for="${idPrefix}-vibrance-input">Vibrance:</label>
+              <input type="range" name="vibrance" class="form-range" id="${idPrefix}-vibrance-input" min="-1" max="1" value="0" step="0.01" />
             </div>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="laplace" id="${idPrefix}-laplace-input">
