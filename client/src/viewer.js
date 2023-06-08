@@ -54,6 +54,11 @@ class PhViewer {
       }
     };
 
+    window.addEventListener("resize", function (event) {
+      this.fabCanvas.setWidth(elContainer.clientWidth);
+      this.fabCanvas.setHeight(elContainer.clientHeight);
+    }.bind(this.fabCanvas));
+
     this.fabCanvas.on('after:render', function (opt) {
       fabCanvas.upperCanvasEl.parentNode.classList.remove('rendering');
     });
