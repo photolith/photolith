@@ -1,15 +1,15 @@
 {
   "dependencies": {
     "bootstrap": "5.2.3",
-    "esbuild": "0.17.19"
+    "esbuild": "0.17.19",
+    "fabric": "^5.3.0",
+    "formson": "^0.9.1"
   },
   "scripts": {
     "collectstatic": "./manage.py collectstatic --noinput",
     "build-css": "esbuild ./client/src/app.css --bundle --minify --sourcemap --outfile=./client/dist/app.css",
     "build-js": "esbuild ./client/src/app.js --bundle --minify --sourcemap --outfile=./client/dist/app.js",
     "build": "npm run build-js && npm run build-css && npm run collectstatic",
-    "fetch-comment": "No official NPM, may also want to build to get wasm: https://docs.opencv.org/3.4/d4/da1/tutorial_js_setup.html",
-    "fetch": "wget -cO node_modules/opencv.4.7.0.js https://docs.opencv.org/4.7.0/opencv.js",
     "lint": "semistandard --fix",
     "end": ""
   },

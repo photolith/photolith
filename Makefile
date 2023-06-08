@@ -29,12 +29,10 @@ lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 
 node_modules/.package.json: package.json
 	npm ci --production
-	npm run fetch
 	touch $@
 
 node_modules/.package-dev.json: package.json
 	npm ci --include=dev
-	npm run fetch
 	touch $@
 
 start: node_modules/.package.json
