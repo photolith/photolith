@@ -54,6 +54,10 @@ class PhViewer {
       }
     };
 
+    this.fabCanvas.on('after:render', function (opt) {
+      fabCanvas.upperCanvasEl.parentNode.classList.remove('rendering');
+    });
+
     this.fabCanvas.on('mouse:wheel', function (opt) {
       const delta = opt.e.deltaY;
       let zoom = this.getZoom();
@@ -125,8 +129,11 @@ class PhViewer {
       }));
     }
 
-    img.applyFilters();
-    this.fabCanvas.renderAll();
+    fabCanvas.upperCanvasEl.parentNode.classList.add('rendering');
+    window.setTimeout(() => {
+      img.applyFilters();
+      this.fabCanvas.renderAll();
+    }, 10);
   }
 
   load (blob) {
