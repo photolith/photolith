@@ -59,7 +59,7 @@ class PhViewer {
     }.bind(this));
 
     this.fabCanvas.on('after:render', function (opt) {
-      fabCanvas.upperCanvasEl.parentNode.classList.remove('rendering');
+      this.upperCanvasEl.parentNode.classList.remove('rendering');
     });
 
     this.fabCanvas.on('mouse:wheel', function (opt) {
@@ -114,13 +114,13 @@ class PhViewer {
 
     if (phFilters.brightness && phFilters.brightness !== '0') {
       img.filters.push(new fabric.Image.filters.Brightness({
-        brightness: parseFloat(phFilters.brightness),
+        brightness: parseFloat(phFilters.brightness)
       }));
     }
 
     if (phFilters.contrast && phFilters.contrast !== '0') {
       img.filters.push(new fabric.Image.filters.Contrast({
-        contrast: parseFloat(phFilters.contrast),
+        contrast: parseFloat(phFilters.contrast)
       }));
     }
 
@@ -137,13 +137,13 @@ class PhViewer {
 
     if (phFilters.saturation && phFilters.saturation !== '0') {
       img.filters.push(new fabric.Image.filters.Saturation({
-        saturation: parseFloat(phFilters.saturation),
+        saturation: parseFloat(phFilters.saturation)
       }));
     }
 
     if (phFilters.vibrance && phFilters.vibrance !== '0') {
       img.filters.push(new fabric.Image.filters.Vibrance({
-        vibrance: parseFloat(phFilters.vibrance),
+        vibrance: parseFloat(phFilters.vibrance)
       }));
     }
 
@@ -157,7 +157,7 @@ class PhViewer {
       }));
     }
 
-    fabCanvas.upperCanvasEl.parentNode.classList.add('rendering');
+    this.fabCanvas.upperCanvasEl.parentNode.classList.add('rendering');
     window.setTimeout(() => {
       img.applyFilters();
       this.fabCanvas.renderAll();
