@@ -13,9 +13,8 @@ class PhViewer {
     }
 
     this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'));
-    const elContainer = this.elViewer.parentNode;
-    this.fabCanvas.setWidth(elContainer.clientWidth);
-    this.fabCanvas.setHeight(elContainer.clientHeight);
+    this.fabCanvas.setWidth(this.elViewer.clientWidth);
+    this.fabCanvas.setHeight(this.elViewer.clientHeight);
 
     this.fabCanvas.phLimitViewport = function () {
       const vpt = this.viewportTransform;
@@ -54,10 +53,10 @@ class PhViewer {
       }
     };
 
-    window.addEventListener("resize", function (event) {
-      this.fabCanvas.setWidth(elContainer.clientWidth);
-      this.fabCanvas.setHeight(elContainer.clientHeight);
-    }.bind(this.fabCanvas));
+    window.addEventListener('resize', function (event) {
+      this.fabCanvas.setWidth(this.elViewer.clientWidth);
+      this.fabCanvas.setHeight(this.elViewer.clientHeight);
+    }.bind(this));
 
     this.fabCanvas.on('after:render', function (opt) {
       fabCanvas.upperCanvasEl.parentNode.classList.remove('rendering');

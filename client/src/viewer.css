@@ -1,6 +1,6 @@
 .ph-viewer {
   width: 100%;
-  height: 500px;
+  height: 40vw;
   overflow: hidden;
   position: relative; /* Contain dropdown */
 }
