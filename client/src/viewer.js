@@ -16,6 +16,14 @@ class PhViewer {
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
 
+    this.fabCanvas.phFitViewport = function (obj) {
+      const zoom = Math.min(
+        this.height / obj.height,
+        this.width / obj.width
+      );
+      this.setViewportTransform([zoom, 0, 0, zoom, (this.width - obj.width * zoom) / 2, (this.height - obj.height * zoom) / 2]);
+    };
+
     this.fabCanvas.phLimitViewport = function () {
       const vpt = this.viewportTransform;
       const zoom = this.getZoom();
@@ -170,6 +178,10 @@ class PhViewer {
         selectable: false
       });
       this.fabCanvas.setBackgroundImage(img);
+
+      // Zoom viewport to fit image
+      this.fabCanvas.phFitViewport(img);
+
       this.refreshFilters();
     });
   }
