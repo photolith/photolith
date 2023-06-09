@@ -21,4 +21,32 @@
 
   <div class="ph-viewer ph-cropper" id="image-viewer"></div>
 
+  <form onsubmit="return false"><!--TODO: -->
+    <div class="row">
+      <div class="col">
+        <div class="mb-3">
+          <label for="cruise-input" class="form-label">{% translate "Cruise ID" %}</label>
+          <input type="text" name="cruise" class="form-control" id="cruise-input" />
+        </div>
+        <div class="mb-3">
+          <label for="station-input" class="form-label">{% translate "Station ID" %}</label>
+          <input type="text" name="station" class="form-control" id="station-input" />
+        </div>
+        <div class="mb-3">
+          <label for="individual-input" class="form-label">{% translate "Individual" %}</label>
+          <input type="text" name="individual" class="form-control" id="individual-input" />
+        </div>
+      </div>
+      <div class="col">
+        {% translate "Downloaded data" %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col" style="text-align: right;">
+        <button class="btn btn-success" onclick="document.querySelector('#image-viewer').phViewer.shiftBoundingBox() ; form.individual.value = parseInt(form.individual.value, 10) + 1">{% translate "Save & Next" %}</button>
+      </div>
+    </div>
+  </form>
+
 {% endblock content %}
