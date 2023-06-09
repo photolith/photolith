@@ -82,10 +82,14 @@ class PhViewer {
 
     this.fabCanvas.on('mouse:down', function (opt) {
       const evt = opt.e;
-      this.isDragging = true;
-      this.selection = false;
-      this.lastPosX = evt.clientX;
-      this.lastPosY = evt.clientY;
+
+      if (!opt.target) {
+        // Mouse down not on an object, drag canvas
+        this.isDragging = true;
+        this.selection = false;
+        this.lastPosX = evt.clientX;
+        this.lastPosY = evt.clientY;
+      }
     });
     this.fabCanvas.on('mouse:move', function (opt) {
       if (this.isDragging) {
@@ -187,6 +191,56 @@ class PhViewer {
   }
 }
 
+class PhCropper extends PhViewer {
+  constructor (elViewer) {
+    super(elViewer);
+    this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
+  }
+
+  boundingBox () {
+    if (this.fabCanvas.getObjects().length > 0) return this.fabCanvas.getObjects()[0];
+    const boundingBox = new fabric.Rect({
+      fill: 'rgba(50,255,255,0.3)',
+      width: this.fabCanvas.width,
+      height: this.fabCanvas.height,
+      hasBorders: false,
+      hasControls: true,
+      lockRotation: true,
+      stroke: 'rgba(50,255,255,0)',
+      transparentCorners: false
+    });
+    boundingBox.setControlsVisibility({ mtr: false });
+    this.fabCanvas.add(boundingBox);
+    return boundingBox;
+  }
+
+  shiftBoundingBox () {
+    const boundingBox = this.boundingBox();
+
+    if (boundingBox.left + boundingBox.width * 2 > this.fabCanvas.backgroundImage.width) {
+      // Falling of right edge, skip down to next line
+      boundingBox.top += boundingBox.height + boundingBox.height * 0.1;
+      boundingBox.left = 0;
+    } else {
+      // Shunt to right
+      boundingBox.left += boundingBox.width + boundingBox.width * 0.1;
+    }
+    this.fabCanvas.requestRenderAll();
+  }
+
+  load (blob) {
+    return super.load(blob).then(() => {
+      const boundingBox = this.boundingBox();
+
+      boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
+      boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
+      boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
+      boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
+      this.fabCanvas.setActiveObject(boundingBox);
+    });
+  }
+}
+
 export function init (window) {
   window.document.querySelectorAll('div.ph-viewer').forEach((elViewer) => {
     const idPrefix = 'ph-viewer-' + (Math.random() + 1).toString(36).slice(2);
@@ -231,6 +285,8 @@ export function init (window) {
         </div>
       </div>
     `;
+
+    if (elViewer.classList.contains('ph-cropper')) return new PhCropper(elViewer);
     return new PhViewer(elViewer);
   });
 }
