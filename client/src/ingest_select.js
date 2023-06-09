@@ -24,23 +24,32 @@ class LocalFileSet {
       if (this.files) return this.files;
       return promptFile(undefined, true);
     }).then((files) => {
-      const f = files.shift();
-      return f;
+      this.files = files;
+      return { f: files.shift(), remaining: files.length };
     });
   }
 }
 
-function newSelection (elIngestSelect, phViewer, val) {
-  let fs;
-
+function newSelection (elSelect, val) {
   if (val[0] === 'fileselect') {
-    fs = new LocalFileSet();
+    elSelect.fs = new LocalFileSet();
   } else {
     throw new Error('Unknown select type ' + val.join(':'));
   }
 
-  return fs.next().then((f) => {
-    phViewer.load(f);
+  return elSelect.fs;
+}
+
+function nextSelection (elSelect, phViewer) {
+  return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
+    if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
+
+    if (f) {
+      elSelect.options[0].text = `[ ${f.name}${remaining > 0 ? `, +${remaining}...` : ''} ]`;
+      phViewer.load(f);
+    } else {
+      elSelect.options[0].text = elSelect.options[0].phOrigText;
+    }
   });
 }
 
@@ -51,8 +60,15 @@ export function init (window) {
     elSelect.addEventListener('change', (event) => {
       const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
 
-      newSelection(elIngestSelect, elViewer.phViewer, elSelect.value.split(':'));
+      newSelection(elSelect, elSelect.value.split(':'));
+      if (elSelect.fs) nextSelection(elSelect, elViewer.phViewer);
       elSelect.selectedIndex = 0;
+    });
+    elIngestSelect.querySelector(':scope .ph-ingest-next').addEventListener('click', (event) => {
+      const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
+
+      event.preventDefault();
+      if (elSelect.fs) nextSelection(elSelect, elViewer.phViewer);
     });
   });
 }
