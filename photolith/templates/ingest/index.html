@@ -47,7 +47,7 @@
 
     <div class="row">
       <div class="col" style="text-align: right;">
-        <button class="btn btn-success" onclick="document.querySelector('#image-viewer').phViewer.shiftBoundingBox() ; form.individual.value = parseInt(form.individual.value, 10) + 1">{% translate "Save & Next" %}</button>
+        <button class="btn btn-success" onclick="document.querySelector('#image-viewer').phViewer.shiftBoundingBox() ; form.individual.value = isFinite(parseInt(form.individual.value, 10)) ? parseInt(form.individual.value, 10) + 1 : 1">{% translate "Save & Next" %}</button>
       </div>
     </div>
   </form>
