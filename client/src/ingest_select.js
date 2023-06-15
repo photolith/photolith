@@ -1,3 +1,9 @@
+class NullFileSet {
+  next () {
+    return Promise.resolve({ f: null, remaining: 0 });
+  }
+}
+
 class LocalFileSet {
   next () {
     // https://stackoverflow.com/a/62818263
@@ -30,20 +36,19 @@ class LocalFileSet {
   }
 }
 
-function newSelection (elSelect, val) {
-  if (val[0] === 'fileselect') {
-    elSelect.fs = new LocalFileSet();
-  } else {
-    throw new Error('Unknown select type ' + val.join(':'));
-  }
+function newFileSet (val) {
+  val = val.split(':');
 
-  return elSelect.fs;
+  if (val[0] === 'null') return new NullFileSet();
+  if (val[0] === 'fileselect') return new LocalFileSet();
+  throw new Error('Unknown select type ' + val.join(':'));
 }
 
 function nextSelection (elSelect, phViewer) {
   return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
     if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
 
+    elSelect.selectedIndex = 0;
     if (f) {
       elSelect.options[0].text = `[ ${f.name}${remaining > 0 ? `, +${remaining}...` : ''} ]`;
       phViewer.load(f);
@@ -56,19 +61,19 @@ function nextSelection (elSelect, phViewer) {
 export function init (window) {
   window.document.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
     const elSelect = elIngestSelect.querySelector(':scope select');
+    const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
+    const elNextButton = elIngestSelect.querySelector(':scope .ph-ingest-next');
+
+    elSelect.fs = newFileSet('null');
 
     elSelect.addEventListener('change', (event) => {
-      const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
-
-      newSelection(elSelect, elSelect.value.split(':'));
-      if (elSelect.fs) nextSelection(elSelect, elViewer.phViewer);
-      elSelect.selectedIndex = 0;
+      elSelect.fs = newFileSet(elSelect.value);
+      nextSelection(elSelect, elViewer.phViewer);
     });
-    elIngestSelect.querySelector(':scope .ph-ingest-next').addEventListener('click', (event) => {
-      const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
 
+    elNextButton.addEventListener('click', (event) => {
       event.preventDefault();
-      if (elSelect.fs) nextSelection(elSelect, elViewer.phViewer);
+      nextSelection(elSelect, elViewer.phViewer);
     });
   });
 }
