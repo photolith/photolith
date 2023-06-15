@@ -51,10 +51,10 @@ function nextSelection (elSelect, phViewer) {
     elSelect.selectedIndex = 0;
     if (f) {
       elSelect.options[0].text = `[ ${f.name}${remaining > 0 ? `, +${remaining}...` : ''} ]`;
-      phViewer.load(f);
     } else {
       elSelect.options[0].text = elSelect.options[0].phOrigText;
     }
+    phViewer.load(f); // NB: If null will unload image
   });
 }
 

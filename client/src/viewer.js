@@ -177,6 +177,13 @@ class PhViewer {
   }
 
   load (blob) {
+    if (!blob) {
+      return new Promise((resolve) => {
+        this.fabCanvas.setBackgroundImage(undefined);
+        resolve();
+      });
+    }
+
     return window.createImageBitmap(blob).then((origBitmap) => {
       const img = new fabric.Image(origBitmap, {
         selectable: false
@@ -232,11 +239,15 @@ class PhCropper extends PhViewer {
     return super.load(blob).then(() => {
       const boundingBox = this.boundingBox();
 
-      boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
-      boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
-      boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
-      boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
-      this.fabCanvas.setActiveObject(boundingBox);
+      if (!this.fabCanvas.backgroundImage) {
+        this.fabCanvas.remove(boundingBox);
+      } else {
+        boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
+        boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
+        boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
+        boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
+        this.fabCanvas.setActiveObject(boundingBox);
+      }
     });
   }
 }
