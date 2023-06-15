@@ -115,6 +115,10 @@ class PhViewer {
       if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
       this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 600);
     };
+    this.elForm.onreset = (event) => {
+      if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
+      this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 10);
+    };
   }
 
   refreshFilters () {
@@ -291,6 +295,9 @@ export function init (window) {
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="laplace" id="${idPrefix}-laplace-input">
               <label class="form-check-label" for="${idPrefix}-laplace-input">Edge detection</label>
+            </div>
+            <div class="text-end px-1">
+              <input type="reset" class="btn btn-sm btn-secondary" value="Reset" />
             </div>
           </form>
         </div>
