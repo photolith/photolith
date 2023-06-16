@@ -10,10 +10,12 @@
     "build-css": "esbuild ./client/src/app.css --bundle --minify --sourcemap --outfile=./client/dist/app.css",
     "build-js": "esbuild ./client/src/app.js --bundle --minify --sourcemap --outfile=./client/dist/app.js",
     "build": "npm run build-js && npm run build-css && npm run collectstatic",
-    "lint": "semistandard --fix",
+    "lint": "semistandard --fix && stylelint client/src/*.css",
     "end": ""
   },
   "devDependencies": {
-    "semistandard": "^16.0.1"
+    "semistandard": "^16.0.1",
+    "stylelint": "^15.7.0",
+    "stylelint-config-standard": "^33.0.0"
   }
 }

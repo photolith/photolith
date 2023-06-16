@@ -35,6 +35,7 @@
 .ph-viewer .spinner {
   visibility: hidden;
 }
+
 .ph-viewer .rendering ~ .spinner {
   visibility: visible;
 }
