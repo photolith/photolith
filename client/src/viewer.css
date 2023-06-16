@@ -31,3 +31,10 @@
 .ph-viewer .rendering {
   filter: blur(10px);
 }
+
+.ph-viewer .spinner {
+  visibility: hidden;
+}
+.ph-viewer .rendering ~ .spinner {
+  visibility: visible;
+}

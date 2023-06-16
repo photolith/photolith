@@ -302,6 +302,7 @@ export function init (window) {
           </form>
         </div>
       </div>
+      <div class="spinner spinner-border text-light" style="position: absolute; top:calc(50% - 5rem); left: calc(50% - 5rem); width: 10rem; height: 10rem;" role="status"><span class="visually-hidden">Loading...</span></div>
     `;
 
     if (elViewer.classList.contains('ph-cropper')) return new PhCropper(elViewer);
