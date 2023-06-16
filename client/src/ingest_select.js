@@ -11,7 +11,7 @@ class LocalFileSet {
     this.input = document.createElement('input');
     this.input.type = 'file';
     this.input.multiple = true;
-    this.input.accept = undefined;
+    this.input.accept = 'image/*';
   }
 
   next () {
