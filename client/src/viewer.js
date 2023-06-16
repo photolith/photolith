@@ -4,7 +4,6 @@ const formson = require('formson');
 class PhViewer {
   constructor (elViewer) {
     this.elViewer = elViewer;
-    elViewer.phViewer = this;
     this.elForm = this.elViewer.querySelector(':scope form');
 
     if (fabric.isWebglSupported()) {
@@ -119,6 +118,10 @@ class PhViewer {
       if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
       this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 10);
     };
+
+    this.elViewer.addEventListener('load_file', (event) => {
+      this.load(event.detail.file);
+    });
   }
 
   refreshFilters () {
@@ -254,6 +257,12 @@ class PhCropper extends PhViewer {
       }
     });
   }
+}
+
+export function loadFile (elViewer, f) {
+  elViewer.dispatchEvent(new window.CustomEvent('load_file', {
+    detail: { file: f }
+  }));
 }
 
 export function init (window) {

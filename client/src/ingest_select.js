@@ -1,3 +1,5 @@
+import { loadFile } from './viewer';
+
 class Cancelled extends Error { }
 
 class NullFileSet {
@@ -51,7 +53,7 @@ function newFileSet (val) {
   throw new Error('Unknown select type ' + val.join(':'));
 }
 
-function nextSelection (elSelect, phViewer) {
+function nextSelection (elSelect, elViewer) {
   return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
     if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
 
@@ -60,7 +62,7 @@ function nextSelection (elSelect, phViewer) {
     } else {
       elSelect.options[0].text = elSelect.options[0].phOrigText;
     }
-    phViewer.load(f); // NB: If null will unload image
+    loadFile(elViewer, f); // NB: If null will unload image
   }).catch((err) => {
     if (err instanceof Cancelled) {
       // File select cancelled, don't change anything.
@@ -82,12 +84,12 @@ export function init (window) {
       if (elSelect.fs) elSelect.fs.close();
       elSelect.fs = newFileSet(elSelect.value);
       elSelect.selectedIndex = 0;
-      nextSelection(elSelect, elViewer.phViewer);
+      nextSelection(elSelect, elViewer);
     });
 
     elNextButton.addEventListener('click', (event) => {
       event.preventDefault();
-      nextSelection(elSelect, elViewer.phViewer);
+      nextSelection(elSelect, elViewer);
     });
   });
 }
