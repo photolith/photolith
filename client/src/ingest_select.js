@@ -4,6 +4,8 @@ class NullFileSet {
   next () {
     return Promise.resolve({ f: null, remaining: 0 });
   }
+
+  close () { }
 }
 
 class LocalFileSet {
@@ -12,6 +14,10 @@ class LocalFileSet {
     this.input.type = 'file';
     this.input.multiple = true;
     this.input.accept = 'image/*';
+  }
+
+  close () {
+    if (this.reject) this.reject(new Cancelled());
   }
 
   next () {
@@ -73,6 +79,7 @@ export function init (window) {
     elSelect.fs = newFileSet('null');
 
     elSelect.addEventListener('change', (event) => {
+      if (elSelect.fs) elSelect.fs.close();
       elSelect.fs = newFileSet(elSelect.value);
       elSelect.selectedIndex = 0;
       nextSelection(elSelect, elViewer.phViewer);
