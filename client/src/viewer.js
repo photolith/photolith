@@ -15,6 +15,15 @@ class PhViewer {
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
 
+    this.fabCanvas.phGetObjectById = function (wantedId) {
+      const objs = this.getObjects();
+
+      for (let i = 0; i < objs.length; i++) {
+        if (objs[i].id === wantedId) return objs[i];
+      }
+      return undefined;
+    };
+
     this.fabCanvas.phFitViewport = function (obj) {
       const zoom = Math.min(
         this.height / obj.height,
@@ -212,8 +221,8 @@ class PhCropper extends PhViewer {
   }
 
   boundingBox () {
-    if (this.fabCanvas.getObjects().length > 0) return this.fabCanvas.getObjects()[0];
-    const boundingBox = new fabric.Rect({
+    const boundingBox = this.fabCanvas.phGetObjectById('bounding_box') || new fabric.Rect({
+      id: 'bounding_box',
       fill: 'rgba(50,255,255,0.3)',
       width: this.fabCanvas.width,
       height: this.fabCanvas.height,
