@@ -1,4 +1,5 @@
 import { fabric } from 'fabric';
+import EditableLine from './viewer/editable_line';
 const formson = require('formson');
 
 class PhViewer {
@@ -30,6 +31,7 @@ class PhViewer {
         this.width / obj.width
       );
       this.setViewportTransform([zoom, 0, 0, zoom, (this.width - obj.width * zoom) / 2, (this.height - obj.height * zoom) / 2]);
+      this.getObjects().forEach((o) => o.fire('phCanvasZoom', zoom));
     };
 
     this.fabCanvas.phLimitViewport = function () {
@@ -84,6 +86,7 @@ class PhViewer {
       zoom *= 0.999 ** delta;
       this.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
       this.phLimitViewport();
+      this.getObjects().forEach((o) => o.fire('phCanvasZoom', zoom));
       opt.e.preventDefault();
       opt.e.stopPropagation();
     });
@@ -237,6 +240,14 @@ class PhCropper extends PhViewer {
     return boundingBox;
   }
 
+  scaleLine () {
+    const obj = this.fabCanvas.phGetObjectById('scale_line') || new EditableLine({
+      id: 'scale_line'
+    });
+    this.fabCanvas.add(obj);
+    return obj;
+  }
+
   shiftBoundingBox () {
     const boundingBox = this.boundingBox();
 
@@ -254,14 +265,21 @@ class PhCropper extends PhViewer {
   load (blob) {
     return super.load(blob).then(() => {
       const boundingBox = this.boundingBox();
+      const scaleLine = this.scaleLine();
 
       if (!this.fabCanvas.backgroundImage) {
         this.fabCanvas.remove(boundingBox);
+        this.fabCanvas.remove(scaleLine);
       } else {
         boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
         boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
         boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
         boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
+        scaleLine.phSetPoints([
+          new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10),
+          new fabric.Point(this.fabCanvas.backgroundImage.width / 6, this.fabCanvas.backgroundImage.height / 10)
+        ]);
+
         this.fabCanvas.setActiveObject(boundingBox);
       }
     });
