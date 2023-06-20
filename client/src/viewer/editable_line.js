@@ -35,11 +35,8 @@ export default function (props) {
         objectCaching: false // NB: So we can update obj.radius
       });
       obj.hasControls = false;
-      obj.on('moving', (event) => {
-        const points = Array.apply(null, Array(poly.points.length));
-        points[idx] = new fabric.Point(obj.left, obj.top);
-        poly.phSetPoints(points);
-      });
+      obj.phNodeIdx = idx;
+      obj.on('moving', poly.phUpdateNode.bind(poly, obj));
       this.phNodes.push(obj);
       this.canvas.add(obj);
     }
@@ -60,7 +57,19 @@ export default function (props) {
 
     // Fill in any gaps in newPoints with absolute position of existing
     newPoints = newPoints.map((p, i) => {
-      return p === undefined ? new fabric.Point(this.phNodes[i].left, this.phNodes[i].top) : newPoints[i];
+      if (p === undefined) {
+        return new fabric.Point(this.phNodes[i].left, this.phNodes[i].top);
+      }
+      if (p === null) {
+        return null;
+      }
+      return p;
+    }).filter((p, i) => {
+      // Remove any nodes filtered with null
+      if (p !== null) return true;
+      this.canvas.remove(this.phNodes[i]);
+      this.phNodes.splice(i, 1);
+      return false;
     });
     if (newPoints.length === 0) return;
 
@@ -88,6 +97,30 @@ export default function (props) {
       return fabric.util.transformPoint(p, canvasToPoly);
     });
     if (this.canvas) this.canvas.requestRenderAll();
+  };
+
+  // Helper to append point to existing list of nodes
+  poly.phAddNode = function (newPoint) {
+    const points = Array.apply(null, Array(poly.points.length));
+    points.push(newPoint);
+    return poly.phSetPoints(points);
+  };
+
+  // Update location of a moved node
+  poly.phUpdateNode = function (phNode) {
+    const points = Array.apply(null, Array(poly.points.length));
+    points[this.phNodeIdx] = new fabric.Point(phNode.left, phNode.top);
+    poly.phSetPoints(points);
+  };
+
+  // Remove pointer to phNode
+  poly.phRemoveNode = function (phNode) {
+    const points = Array.apply(null, Array(poly.points.length));
+
+    if (phNode.phNodeIdx === undefined) return;
+
+    points[phNode.phNodeIdx] = null;
+    return poly.phSetPoints(points);
   };
 
   poly.on('moving', (event) => {
