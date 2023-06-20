@@ -10,7 +10,8 @@ export default function (props) {
     fill: 'transparent',
     stroke: 'rgba(50,255,255,0.6)',
     objectCaching: false, // NB: Otherwise updating points array doesn't work
-    selectable: false
+    selectable: false,
+    evented: false // NB: Without, the poly's area still allows you to drag-select
   }, props));
   poly.cornerStyle = 'circle';
   poly.cornerColor = 'rgba(0,0,255,0.5)';
