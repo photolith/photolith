@@ -280,8 +280,8 @@ class PhCropper extends PhViewer {
         boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
         boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
         scaleLine.phSetPoints([
-          new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10),
-          new fabric.Point(this.fabCanvas.backgroundImage.width / 6, this.fabCanvas.backgroundImage.height / 10)
+          new fabric.Point(this.fabCanvas.backgroundImage.width / 10, this.fabCanvas.backgroundImage.height / 10),
+          new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10)
         ]);
 
         this.fabCanvas.setActiveObject(boundingBox);
