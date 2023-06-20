@@ -8,7 +8,7 @@ export default function (props) {
     left: 0,
     top: 0,
     fill: 'transparent',
-    stroke: 'green',
+    stroke: 'rgba(50,255,255,0.6)',
     objectCaching: false, // NB: Otherwise updating points array doesn't work
     selectable: false
   }, props));
@@ -29,7 +29,7 @@ export default function (props) {
         strokeWidth: props.strokeWidth,
         radius: props.radius,
         fill: 'transparent',
-        stroke: 'yellow',
+        stroke: 'rgba(50,255,255,1)',
         originX: 'center',
         originY: 'center',
         objectCaching: false // NB: So we can update obj.radius
