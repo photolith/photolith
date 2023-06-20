@@ -221,6 +221,10 @@ class PhCropper extends PhViewer {
   constructor (elViewer) {
     super(elViewer);
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
+
+    this.elViewer.addEventListener('shift_bb', (event) => {
+      this.shiftBoundingBox();
+    });
   }
 
   boundingBox () {
