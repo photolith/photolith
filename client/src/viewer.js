@@ -240,7 +240,7 @@ class PhCropper extends PhViewer {
       transparentCorners: false
     });
     boundingBox.setControlsVisibility({ mtr: false });
-    this.fabCanvas.add(boundingBox);
+    if (!boundingBox.canvas) this.fabCanvas.add(boundingBox);
     return boundingBox;
   }
 
@@ -248,7 +248,7 @@ class PhCropper extends PhViewer {
     const obj = this.fabCanvas.phGetObjectById('scale_line') || new EditableLine({
       id: 'scale_line'
     });
-    this.fabCanvas.add(obj);
+    if (!obj.canvas) this.fabCanvas.add(obj);
     return obj;
   }
 
@@ -272,8 +272,7 @@ class PhCropper extends PhViewer {
       const scaleLine = this.scaleLine();
 
       if (!this.fabCanvas.backgroundImage) {
-        this.fabCanvas.remove(boundingBox);
-        this.fabCanvas.remove(scaleLine);
+        this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
       } else {
         boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
         boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
