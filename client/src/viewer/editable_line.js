@@ -22,39 +22,6 @@ export default function (props) {
   poly.phNodes = [];
 
   poly.phSetPoints = function (newPoints) {
-    // Add any missing phNodes
-    while (this.phNodes.length < newPoints.length) {
-      const idx = this.phNodes.length;
-      const obj = new fabric.Circle({
-        strokeWidth: props.strokeWidth,
-        radius: props.radius,
-        fill: 'transparent',
-        stroke: 'rgba(50,255,255,1)',
-        originX: 'center',
-        originY: 'center',
-        objectCaching: false // NB: So we can update obj.radius
-      });
-      obj.hasControls = false;
-      obj.phNodeIdx = idx;
-      obj.on('moving', poly.phUpdateNode.bind(poly, obj));
-      this.phNodes.push(obj);
-      this.canvas.add(obj);
-    }
-
-    // Remove any extraneous phNodes
-    while (this.phNodes.length > newPoints.length) {
-      this.canvas.remove(this.phNodes.pop());
-    }
-
-    // Make sure each phNode & line is scaled for current zoom level
-    this.phNodes.forEach((obj) => {
-      obj.strokeWidth = props.strokeWidth / this.canvas.getZoom();
-      obj.radius = props.radius / this.canvas.getZoom();
-      obj.width = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
-      obj.height = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
-    });
-    this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
-
     // Fill in any gaps in newPoints with absolute position of existing
     newPoints = newPoints.map((p, i) => {
       if (p === undefined) {
@@ -72,6 +39,32 @@ export default function (props) {
       return false;
     });
     if (newPoints.length === 0) return;
+
+    // Add any missing phNodes
+    while (this.phNodes.length < newPoints.length) {
+      const idx = this.phNodes.length;
+      const obj = new fabric.Circle({
+        strokeWidth: props.strokeWidth,
+        radius: props.radius,
+        fill: 'transparent',
+        stroke: 'rgba(50,255,255,1)',
+        originX: 'center',
+        originY: 'center',
+        objectCaching: false // NB: So we can update obj.radius
+      });
+      // NB: We have to set position before canvas.add()
+      obj.setPositionByOrigin(newPoints[idx], 'center', 'center');
+      obj.hasControls = false;
+      obj.phNodeIdx = idx;
+      obj.on('moving', poly.phUpdateNode.bind(poly, obj));
+      this.phNodes.push(obj);
+      this.canvas.add(obj);
+    }
+
+    // Remove any extraneous phNodes
+    while (this.phNodes.length > newPoints.length) {
+      this.canvas.remove(this.phNodes.pop());
+    }
 
     // Work out new limits of polyline
     const newLimits = newPoints.reduce((acc, p) => {
@@ -96,6 +89,16 @@ export default function (props) {
 
       return fabric.util.transformPoint(p, canvasToPoly);
     });
+
+    // Make sure each phNode & line is scaled for current zoom level
+    this.phNodes.forEach((obj) => {
+      obj.strokeWidth = props.strokeWidth / this.canvas.getZoom();
+      obj.radius = props.radius / this.canvas.getZoom();
+      obj.width = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
+      obj.height = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
+    });
+    this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
+
     if (this.canvas) this.canvas.requestRenderAll();
   };
 
