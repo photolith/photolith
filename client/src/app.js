@@ -1,4 +1,5 @@
 import { init as initIngestSelect } from './ingest_select';
+import { init as initIngestForm } from './ingest_form';
 import { init as initViewer } from './viewer';
 
 import HafroMetadataApi from './metadata_api/hafro';
@@ -6,6 +7,7 @@ window.HafroMetadataApi = HafroMetadataApi;
 
 window.addEventListener('DOMContentLoaded', (event) => {
   initIngestSelect(window);
+  initIngestForm(window);
   initViewer(window);
 });
 

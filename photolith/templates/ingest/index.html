@@ -24,7 +24,7 @@
 
   <div class="ph-viewer ph-cropper" id="image-viewer"></div>
 
-  <form onsubmit="return false"><!--TODO: -->
+  <form class="ingest-form mt-2">
     <div class="row">
       <div class="col">
         <div class="mb-3">
@@ -32,27 +32,29 @@
           <input type="number" name="scale" class="form-control" id="scale-input" value="10" />
         </div>
         <div class="mb-3">
-          <label for="cruise-input" class="form-label">{% translate "Cruise ID" %}</label>
-          <input type="text" name="cruise" class="form-control" id="cruise-input" />
+          <label for="sample-input" class="form-label">{% translate "Sample ID" %}</label>
+          <input type="text" name="sample" class="form-control" id="sample-input" />
         </div>
         <div class="mb-3">
-          <label for="station-input" class="form-label">{% translate "Station ID" %}</label>
-          <input type="text" name="station" class="form-control" id="station-input" />
+          <label for="individual-input" class="form-label">{% translate "Individual ID" %}</label>
+          <select name="individual" class="form-select" readonly="readonly"></select>
         </div>
-        <div class="mb-3">
-          <label for="individual-input" class="form-label">{% translate "Individual" %}</label>
-          <input type="text" name="individual" class="form-control" id="individual-input" />
+        <div class="col" style="text-align: right;">
+          <button name="saveAndNext" class="btn btn-success" disabled="disabled">{% translate "Save & Next" %}</button>
         </div>
       </div>
-      <div class="col">
-        {% translate "Downloaded data" %}
+      <div class="col" style="position: relative;">
+        <div style="overflow-y: scroll; position: absolute; top: 0; right: 0.75rem; bottom: 0; left: 0.75rem; width: auto">
+          <input type="hidden" name="individualData" value="">
+          <table class="table table-striped individual-data" style="">
+            <thead><tr><th>{% translate "Key" %}</th><th>{% translate "Value" %}</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <div class="row">
-      <div class="col" style="text-align: right;">
-        <button class="btn btn-success" onclick="document.querySelector('#image-viewer').dispatchEvent(new window.CustomEvent('shift_bb')) ; form.individual.value = isFinite(parseInt(form.individual.value, 10)) ? parseInt(form.individual.value, 10) + 1 : 1">{% translate "Save & Next" %}</button>
-      </div>
     </div>
   </form>
 
