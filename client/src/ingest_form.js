@@ -41,7 +41,7 @@ function formRefresh (event) {
       return;
     }
 
-    return window.mApi.individualDetail(event.target.value).then((ids) => {
+    return window.mApi.individualDetail(elForm.sample.value, event.target.value).then((ids) => {
       elForm.individualData.value = JSON.stringify(ids);
       elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
         <td>${htmlEscape(k)}</td>
