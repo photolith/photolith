@@ -105,7 +105,7 @@ STATICFILES_DIRS = (
 
 # Settings export (i.e. Javascript configuration)
 CLIENTSIDE_CONFIG = """
-window.mApi = new HafroMetadataApi('/static');
+window.mApi = new DummyMetadataApi();
 """
 SETTINGS_EXPORT = ["CLIENTSIDE_CONFIG"]
 
