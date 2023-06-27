@@ -35,7 +35,7 @@ node_modules/.package-dev.json: package.json
 	npm ci --include=dev
 	touch $@
 
-start: node_modules/.package.json
+start: manage.py node_modules/.package.json
 	./manage.py collectstatic --noinput
 	./manage.py runserver 0.0.0.0:8000
 
