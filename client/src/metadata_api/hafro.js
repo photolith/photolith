@@ -26,7 +26,7 @@ export default class MetadataApi {
     });
   }
 
-  individualDetail (measureId) {
+  individualDetail (_, measureId) {
     const intMeasureId = parseInt(measureId, 10);
     if (!isFinite(intMeasureId)) return Promise.reject(new Error(`Invalid measure ID: ${measureId}`));
 
