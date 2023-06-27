@@ -48,6 +48,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django_settings_export.settings_export",
             ],
         },
     },
@@ -101,6 +102,12 @@ STATICFILES_DIRS = (
     BASE_DIR.parent / "api_samples",
 )
 
+
+# Settings export (i.e. Javascript configuration)
+CLIENTSIDE_CONFIG = """
+window.mApi = new HafroMetadataApi('/static');
+"""
+SETTINGS_EXPORT = ["CLIENTSIDE_CONFIG"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
