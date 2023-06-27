@@ -98,6 +98,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = (
     BASE_DIR.parent / "client/dist",
     BASE_DIR.parent / "node_modules",
+    BASE_DIR.parent / "api_samples",
 )
 
 

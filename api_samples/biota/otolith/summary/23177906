@@ -1,0 +1,12 @@
+{
+    "sampleId": 532894,
+    "measureId": 23177906,
+    "speciesId": 1,
+    "speciesName": "Þorskur",
+    "length": 73.0,
+    "_links": {
+        "self": {
+            "href": "http://localhost:6030/biota/otolith/23177906/detail"
+        }
+    }
+}

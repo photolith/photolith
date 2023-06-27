@@ -1,0 +1,93 @@
+{
+    "measureId": 23177904,
+    "sampleId": 532894,
+    "serialNo": 11,
+    "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 69.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+            "sexualMaturityId": 1
+        },
+        "maturity": {},
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 1
+    },
+    "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "_links": {
+            "Attributes": {
+                "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+            },
+            "Distribution": {
+                "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+            },
+            "Sources": {
+                "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+            },
+            "Taxonomic Classification": {
+                "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+            },
+            "Taxonomic Record": {
+                "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+            },
+            "Taxonomic synonyms": {
+                "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+            }
+        }
+    },
+    "sampleResponse": {
+        "sampleId": 532894,
+        "station": {
+            "id": 334544,
+            "number": 22,
+            "stationDate": "2022-11-24T00:00:00Z",
+            "note": "Kvarnað - mæling og kvörnun",
+            "cruise": {
+                "id": 20345,
+                "name": "EF64-2022",
+                "type": "FISH",
+                "departure": "2022-01-01T00:00:00Z",
+                "arrival": "2022-12-31T00:00:00Z",
+                "project": "Eftirlit",
+                "projectLeader": "Arnold Peter Leader",
+                "stations": []
+            },
+            "vessel": {
+                "href": "http://localhost:6060/channel/vessel/1281"
+            },
+            "port": {
+                "href": "http://localhost:6060/channel/port/93"
+            }
+        },
+        "gear": {
+            "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+            "sampleCategoryNo": 1,
+            "descr": "Sýni tekin af eftirlitsmanni",
+            "valid": "1",
+            "engDescr": "Samples collected by inspectors"
+        },
+        "device": {},
+        "meshSize": 155,
+        "towNo": 7,
+        "timeMeasure": 302,
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 6
+    }
+}
