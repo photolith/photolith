@@ -196,12 +196,9 @@ class PhViewer {
   }
 
   load (blob) {
-    if (!blob) {
-      return new Promise((resolve) => {
-        this.fabCanvas.setBackgroundImage(undefined);
-        resolve();
-      });
-    }
+    this.fabCanvas.setBackgroundImage(undefined);
+    this.fabCanvas.requestRenderAll();
+    if (!blob) return Promise.resolve();
 
     return window.createImageBitmap(blob).then((origBitmap) => {
       const img = new fabric.Image(origBitmap, {
@@ -268,6 +265,7 @@ class PhCropper extends PhViewer {
 
   load (blob) {
     return super.load(blob).then(() => {
+    }).finally(() => { // NB: Set-up bounding box even if loading failed
       const boundingBox = this.boundingBox();
       const scaleLine = this.scaleLine();
 
