@@ -223,8 +223,6 @@ class PhCropper extends PhViewer {
     super(elViewer);
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
 
-    this.elViewer.addEventListener('shift_bb', (event) => {
-      this.shiftBoundingBox();
     this.fabCanvas.on('object:added', this.syncForm.bind(this));
     this.fabCanvas.on('object:modified', this.syncForm.bind(this));
     this.fabCanvas.on('object:removed', this.syncForm.bind(this));
@@ -338,6 +336,9 @@ export function init (window) {
 
     if (elViewer.hasAttribute('data-sync-form')) {
       v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
+      v.elSyncForm.addEventListener('advance_individual', (event) => {
+        v.shiftBoundingBox();
+      });
     }
     return v;
   });

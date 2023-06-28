@@ -59,7 +59,7 @@ export function init (window) {
       if (elForm.individual.selectedIndex < elForm.individual.options.length - 1) {
         elForm.individual.selectedIndex++;
         formRefresh({ target: elForm.individual });
-        document.querySelector('#image-viewer').dispatchEvent(new window.CustomEvent('shift_bb'));
+        elForm.dispatchEvent(new window.CustomEvent('advance_individual'));
       }
     });
   });
