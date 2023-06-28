@@ -2,6 +2,11 @@ function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 
+function langSelect (obj) {
+  // NB: If it doesn't have either 'is' or 'en' property, it's probably a string already
+  return obj[document.documentElement.lang] || obj.en || obj;
+}
+
 function formRefresh (event) {
   const elForm = event.target.form;
 
@@ -40,7 +45,7 @@ function formRefresh (event) {
       elForm.individualData.value = JSON.stringify(ids);
       elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
         <td>${htmlEscape(k)}</td>
-        <td><code>${htmlEscape(ids[k])}</code></td>
+        <td><code>${htmlEscape(langSelect(ids[k]))}</code></td>
       </tr>`).join('\n');
     }).catch((err) => {
       elForm.individualData.value = '';

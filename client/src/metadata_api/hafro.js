@@ -41,8 +41,11 @@ export default class MetadataApi {
         length: od.measureDTO.length,
         sex: od.measureDTO.sexNo,
         maturity: od.measureDTO.sexualMaturity.sexualMaturityId,
-        species: od.speciesDTO.name,
-
+        species: {
+          id: od.speciesDTO.id,
+          en: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`,
+          is: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`
+        },
         cruise: od.sampleResponse.station.cruise.name,
         station: od.sampleResponse.station.number,
         gear: od.sampleResponse.gear.isscfgNo,

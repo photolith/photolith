@@ -1,3 +1,8 @@
+const species = [
+  { id: 1, en: 'Cod [COD]', is: 'Þorskur [COD]' },
+  { id: 2, en: 'Greenland Halibut [GLH]', is: 'Grálúða [GLH]' }
+];
+
 export default class MetadataApi {
   sampleDetail (sampleId) {
     const intSampleId = parseInt(sampleId, 10);
@@ -26,7 +31,7 @@ export default class MetadataApi {
         length: Math.floor(Math.random() * 100),
         sex: Math.floor(Math.random() * 2),
         maturity: Math.floor(Math.random() * 2),
-        species: 'COD'
+        species: species[Math.floor(Math.random() * species.length)]
       };
     });
   }
