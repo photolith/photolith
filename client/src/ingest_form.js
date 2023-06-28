@@ -64,9 +64,11 @@ export function init (window) {
 
       if (elForm.individual.selectedIndex < elForm.individual.options.length - 1) {
         elForm.individual.selectedIndex++;
-        formRefresh({ target: elForm.individual });
         elForm.dispatchEvent(new window.CustomEvent('advance_individual'));
+      } else {
+        elForm.individual.selectedIndex = -1;
       }
+      formRefresh({ target: elForm.individual });
     });
   });
 }
