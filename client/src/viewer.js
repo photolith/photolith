@@ -225,6 +225,40 @@ class PhCropper extends PhViewer {
 
     this.elViewer.addEventListener('shift_bb', (event) => {
       this.shiftBoundingBox();
+    this.fabCanvas.on('object:added', this.syncForm.bind(this));
+    this.fabCanvas.on('object:modified', this.syncForm.bind(this));
+    this.fabCanvas.on('object:removed', this.syncForm.bind(this));
+  }
+
+  syncForm (opt) {
+    function roundPoint (p) {
+      return [Math.round(p.x), Math.round(p.y)];
+    }
+
+    const setForm = (name, value) => {
+      if (!this.elSyncForm.elements[name]) return;
+      this.elSyncForm.elements[name].value = value === null ? '' : JSON.stringify(value);
+    };
+
+    // If part of an event, null whatever received the event, so removals propogate
+    if (opt && opt.target.id) setForm(opt.target.id, null);
+
+    this.fabCanvas.getObjects().forEach((obj) => {
+      if (!obj.id) {
+        // Ignore unnamed objects
+      } else if (obj instanceof fabric.Polyline) {
+        const objToCanvas = obj.calcTransformMatrix();
+
+        setForm(obj.id, obj.points.map((p) => {
+          return roundPoint(fabric.util.transformPoint(p, objToCanvas));
+        }));
+      } else if (obj instanceof fabric.Rect) {
+        const ac = obj.calcACoords();
+
+        setForm(obj.id, [roundPoint(ac.tl), roundPoint(ac.br)]);
+      } else {
+        throw new Error("Don't know how to translate " + obj.id);
+      }
     });
   }
 
@@ -284,6 +318,7 @@ class PhCropper extends PhViewer {
           new fabric.Point(this.fabCanvas.backgroundImage.width / 10, this.fabCanvas.backgroundImage.height / 10),
           new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10)
         ]);
+        this.syncForm();
 
         this.fabCanvas.setActiveObject(boundingBox);
       }
@@ -299,7 +334,11 @@ export function loadFile (elViewer, f) {
 
 export function init (window) {
   window.document.querySelectorAll('div.ph-viewer').forEach((elViewer) => {
-    if (elViewer.classList.contains('ph-cropper')) return new PhCropper(elViewer);
-    return new PhViewer(elViewer);
+    const v = elViewer.classList.contains('ph-cropper') ? new PhCropper(elViewer) : new PhViewer(elViewer);
+
+    if (elViewer.hasAttribute('data-sync-form')) {
+      v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
+    }
+    return v;
   });
 }
