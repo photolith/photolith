@@ -5,8 +5,8 @@ function htmlEscape (s) {
 function formRefresh (event) {
   const elForm = event.target.form;
 
-  // Can progress iff we have a sample ID & individual ID
-  elForm.saveAndNext.disabled = !(elForm.sample.value && elForm.individual.value);
+  // Can progress iff all form elements are filled in
+  elForm.saveAndNext.disabled = !!Array.from(elForm.elements).find((el) => !el.value);
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
@@ -46,6 +46,12 @@ function formRefresh (event) {
       elForm.individualData.value = '';
       elIndividualDataBody.innerHTML = '';
       throw err;
+    }).finally(() => {
+      elForm.individualData.dispatchEvent(new window.UIEvent('change', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      }));
     });
   }
 }
