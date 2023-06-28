@@ -14,11 +14,6 @@ function formRefresh (event) {
       elForm.individual.innerHTML = sd.individuals.map((ind, i) => {
         return new window.Option(ind.title, ind.id, i === 0, i === 0).outerHTML;
       });
-      elForm.individual.dispatchEvent(new window.UIEvent('change', {
-        view: window,
-        bubbles: true,
-        cancelable: true
-      }));
     }).catch((err) => {
       elForm.individual.innerHTML = '';
       throw err;
@@ -63,6 +58,7 @@ export function init (window) {
 
       if (elForm.individual.selectedIndex < elForm.individual.options.length - 1) {
         elForm.individual.selectedIndex++;
+        formRefresh({ target: elForm.individual });
         document.querySelector('#image-viewer').dispatchEvent(new window.CustomEvent('shift_bb'));
       }
     });
