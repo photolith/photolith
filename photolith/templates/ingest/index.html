@@ -36,19 +36,15 @@
           <label for="sample-input" class="form-label">{% translate "Sample ID" %}</label>
           <input type="text" name="sample" class="form-control" id="sample-input" />
         </div>
-        <div class="mb-3">
-          <label for="individual-input" class="form-label">{% translate "Individual ID" %}</label>
-          <select name="individual" class="form-select" readonly="readonly"></select>
-        </div>
         <div class="col" style="text-align: right;">
-          <button name="saveAndNext" value="y" class="btn btn-success" disabled="disabled">{% translate "Save & Next" %}</button>
+          <button name="save" value="y" class="btn btn-success" disabled="disabled">{% translate "Save" %}</button>
         </div>
       </div>
       <div class="col" style="position: relative;">
         <div style="overflow-y: scroll; position: absolute; top: 0; right: 0.75rem; bottom: 0; left: 0.75rem; width: auto">
-          <input type="hidden" name="bounding_box" value="" />
           <input type="hidden" name="scale_line" value="" />
-          <input type="hidden" name="individualData" value="">
+          <input type="hidden" name="selected_individual" value="" />
+          <div class="individuals"></div>
           <table class="table table-striped individual-data" style="">
             <thead><tr><th>{% translate "Key" %}</th><th>{% translate "Value" %}</th></tr></thead>
             <tbody></tbody>

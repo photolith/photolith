@@ -226,6 +226,25 @@ class PhCropper extends PhViewer {
     this.fabCanvas.on('object:added', this.syncForm.bind(this));
     this.fabCanvas.on('object:modified', this.syncForm.bind(this));
     this.fabCanvas.on('object:removed', this.syncForm.bind(this));
+    this.fabCanvas.on({
+      'selection:created': this.selection.bind(this),
+      'selection:updated': this.selection.bind(this)
+    });
+  }
+
+  selection (opt) {
+    for (let i = 0; i < opt.selected.length; i++) {
+      const m = (opt.selected[i].id || '').match(/^individual\.(.*)\.bounding_box$/);
+
+      if (m) {
+        this.elSyncForm.selected_individual.value = m[1];
+        this.elSyncForm.selected_individual.dispatchEvent(new window.UIEvent('change', {
+          view: window,
+          bubbles: true,
+          cancelable: true
+        }));
+      }
+    }
   }
 
   syncForm (opt) {
@@ -258,21 +277,67 @@ class PhCropper extends PhViewer {
     });
   }
 
-  boundingBox () {
-    const boundingBox = this.fabCanvas.phGetObjectById('bounding_box') || new fabric.Rect({
-      id: 'bounding_box',
-      fill: 'rgba(50,255,255,0.3)',
-      width: this.fabCanvas.width,
-      height: this.fabCanvas.height,
+  boundingBox (id, title) {
+    const objId = `individual.${id}.bounding_box`;
+
+    // http://fabricjs.com/docs/fabric.Textbox.html
+    const obj = this.fabCanvas.phGetObjectById(objId) || new fabric.Textbox(title.toString(), {
+      id: objId,
+      fontFamily: 'Arial',
+      fontSize: 90,
+      fontWeight: 'bold',
+      backgroundColor: 'rgba(50,255,255,0.3)',
+      stroke: 'rgba(50,255,255,1)',
+      fill: 'black',
+      textAlign: 'center',
+      editable: false,
       hasBorders: false,
       hasControls: true,
       lockRotation: true,
-      stroke: 'rgba(50,255,255,0)',
       transparentCorners: false
     });
-    boundingBox.setControlsVisibility({ mtr: false });
-    if (!boundingBox.canvas) this.fabCanvas.add(boundingBox);
-    return boundingBox;
+
+    obj.setControlsVisibility({ mtr: false });
+    if (!obj.canvas) {
+      this.fabCanvas.add(obj);
+
+      // Set initial position based on boundingBoxCount
+      this.boundingBoxCount++;
+      const countWidth = 5; const countHeight = 5;
+      const marginWidth = this.fabCanvas.backgroundImage.width / 7;
+      const marginHeight = this.fabCanvas.backgroundImage.height / 7;
+      const boxWidth = (this.fabCanvas.backgroundImage.width - marginWidth * 2) / countWidth;
+      const boxHeight = (this.fabCanvas.backgroundImage.height - marginHeight * 2) / countHeight;
+
+      obj.set({
+        left: marginWidth + (this.boundingBoxCount % countWidth) * boxWidth,
+        top: marginHeight + Math.min(Math.floor(this.boundingBoxCount / countWidth), countHeight) * boxHeight,
+        width: boxWidth * 0.9,
+        height: boxHeight * 0.8,
+        fontSize: boxHeight * 0.8,
+        scaleX: 1,
+        scaleY: 1
+      });
+
+      obj.on('scaling', (opt) => {
+        const obj = opt.transform.target;
+
+        // Instead of scaling the text, change the fontSize to suit
+        // NB: Ideally the final value of fontSize would take into account the width too, but close enough
+        obj.set({
+          width: obj.width * (obj.scaleX || 1),
+          height: obj.height * (obj.scaleY || 1),
+          fontSize: obj.fontSize * (obj.scaleY || 1),
+          scaleX: 1,
+          scaleY: 1
+        });
+      });
+      obj.on('select', (opt) => {
+
+      });
+    }
+
+    return obj;
   }
 
   scaleLine () {
@@ -283,42 +348,29 @@ class PhCropper extends PhViewer {
     return obj;
   }
 
-  shiftBoundingBox () {
-    const boundingBox = this.boundingBox();
-
-    if (boundingBox.left + boundingBox.width * 2 > this.fabCanvas.backgroundImage.width) {
-      // Falling of right edge, skip down to next line
-      boundingBox.top += boundingBox.height + boundingBox.height * 0.1;
-      boundingBox.left = 0;
-    } else {
-      // Shunt to right
-      boundingBox.left += boundingBox.width + boundingBox.width * 0.1;
-    }
-    this.fabCanvas.requestRenderAll();
-  }
-
   load (blob) {
     return super.load(blob).then(() => {
     }).finally(() => { // NB: Set-up bounding box even if loading failed
-      const boundingBox = this.boundingBox();
-      const scaleLine = this.scaleLine();
+      this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
+      this.boundingBoxCount = -1;
 
-      if (!this.fabCanvas.backgroundImage) {
-        this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
-      } else {
-        boundingBox.left = this.fabCanvas.backgroundImage.width / 5;
-        boundingBox.top = this.fabCanvas.backgroundImage.height / 5;
-        boundingBox.width = this.fabCanvas.backgroundImage.width / 10;
-        boundingBox.height = this.fabCanvas.backgroundImage.height / 10;
+      if (this.fabCanvas.backgroundImage) {
+        const scaleLine = this.scaleLine();
+
         scaleLine.phSetPoints([
           new fabric.Point(this.fabCanvas.backgroundImage.width / 10, this.fabCanvas.backgroundImage.height / 10),
           new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10)
         ]);
-        this.syncForm();
-
-        this.fabCanvas.setActiveObject(boundingBox);
       }
     });
+  }
+
+  loadIndividuals (ids) {
+    this.fabCanvas.getObjects().forEach((o) => {
+      if ((o.id || '').match(/^individual\.(.*)\.bounding_box$/)) this.fabCanvas.remove(o);
+    });
+    ids.forEach((i) => this.boundingBox(i.id, i.title));
+    this.syncForm();
   }
 }
 
@@ -334,8 +386,8 @@ export function init (window) {
 
     if (elViewer.hasAttribute('data-sync-form')) {
       v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
-      v.elSyncForm.addEventListener('advance_individual', (event) => {
-        v.shiftBoundingBox();
+      v.elSyncForm.addEventListener('load_individuals', (event) => {
+        v.loadIndividuals(event.detail);
       });
     }
     return v;

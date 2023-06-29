@@ -29,26 +29,16 @@ export default class MetadataApi {
       return {
         individuals: measures.map((_, i) => ({
           id: sampleId * 100 + i,
-          title: i
+          title: i,
+          slideLabel: [
+            sampleId,
+            'AB123'
+          ].join(' '),
+          length: Math.floor(Math.random() * 100),
+          sex: randomChoice(sex),
+          maturity: randomChoice(maturity),
+          species: randomChoice(species)
         }))
-      };
-    });
-  }
-
-  individualDetail (sampleId, measureId) {
-    const intMeasureId = parseInt(measureId, 10);
-    if (!isFinite(intMeasureId)) return Promise.reject(new Error(`Invalid measure ID: ${measureId}`));
-
-    return Promise.resolve().then((od) => {
-      return {
-        slideLabel: [
-          sampleId,
-          measureId
-        ].join(' '),
-        length: Math.floor(Math.random() * 100),
-        sex: randomChoice(sex),
-        maturity: randomChoice(maturity),
-        species: randomChoice(species)
       };
     });
   }

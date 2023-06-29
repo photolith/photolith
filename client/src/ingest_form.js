@@ -11,19 +11,28 @@ function formRefresh (event) {
   const elForm = event.target.form;
 
   // Can progress iff all form elements are filled in
-  elForm.saveAndNext.disabled = !!Array.from(elForm.elements).find((el) => !el.value);
+  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => !el.value);
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
     return window.mApi.sampleDetail(event.target.value).then((sd) => {
-      elForm.individual.innerHTML = sd.individuals.map((ind, i) => {
-        return new window.Option(ind.title, ind.id, i === 0, i === 0).outerHTML;
+      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind) => {
+        return `
+          <input type="hidden" name="individual.${ind.id}.data" value="">
+          <input type="hidden" name="individual.${ind.id}.bounding_box" value="">
+        `;
+      }).join('\n');
+      sd.individuals.forEach((ind) => {
+        elForm[`individual.${ind.id}.data`].value = JSON.stringify(ind);
       });
+      elForm.selected_individual.value = '';
+      elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: sd.individuals }));
     }).catch((err) => {
-      elForm.individual.innerHTML = '';
+      elForm.querySelector(':scope .individuals').innerHTML = '';
+      elForm.selected_individual.value = '';
       throw err;
     }).finally(() => {
-      elForm.individual.dispatchEvent(new window.UIEvent('change', {
+      elForm.selected_individual.dispatchEvent(new window.UIEvent('change', {
         view: window,
         bubbles: true,
         cancelable: true
@@ -31,33 +40,14 @@ function formRefresh (event) {
     });
   }
 
-  if (event.target.name === 'individual') {
+  if (event.target.name === 'selected_individual') {
     const elIndividualDataBody = elForm.querySelector(':scope .individual-data tbody');
+    const ids = JSON.parse((elForm[`individual.${event.target.value}.data`] || {}).value || '{}');
 
-    if (!event.target.value) {
-      // No individuals, so nothing should be selected
-      elForm.individualData.value = '';
-      elIndividualDataBody.innerHTML = '';
-      return;
-    }
-
-    return window.mApi.individualDetail(elForm.sample.value, event.target.value).then((ids) => {
-      elForm.individualData.value = JSON.stringify(ids);
-      elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
-        <td>${htmlEscape(k)}</td>
-        <td><code>${htmlEscape(langSelect(ids[k]))}</code></td>
-      </tr>`).join('\n');
-    }).catch((err) => {
-      elForm.individualData.value = '';
-      elIndividualDataBody.innerHTML = '';
-      throw err;
-    }).finally(() => {
-      elForm.individualData.dispatchEvent(new window.UIEvent('change', {
-        view: window,
-        bubbles: true,
-        cancelable: true
-      }));
-    });
+    elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
+      <td>${htmlEscape(k)}</td>
+      <td><code>${htmlEscape(langSelect(ids[k]))}</code></td>
+    </tr>`).join('\n');
   }
 }
 
@@ -66,13 +56,6 @@ export function init (window) {
     elForm.addEventListener('change', formRefresh);
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
-
-      if (elForm.individual.selectedIndex < elForm.individual.options.length - 1) {
-        elForm.individual.selectedIndex++;
-        elForm.dispatchEvent(new window.CustomEvent('advance_individual'));
-      } else {
-        elForm.individual.selectedIndex = -1;
-      }
       formRefresh({ target: elForm.individual });
     });
   });
