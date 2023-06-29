@@ -250,12 +250,10 @@ class PhCropper extends PhViewer {
         setForm(obj.id, obj.points.map((p) => {
           return roundPoint(fabric.util.transformPoint(p, objToCanvas));
         }));
-      } else if (obj instanceof fabric.Rect) {
+      } else {
         const ac = obj.calcACoords();
 
         setForm(obj.id, [roundPoint(ac.tl), roundPoint(ac.br)]);
-      } else {
-        throw new Error("Don't know how to translate " + obj.id);
       }
     });
   }
