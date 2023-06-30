@@ -132,10 +132,6 @@ class PhViewer {
     };
 
     this.elViewer.addEventListener('load_file', (event) => {
-      const elDl = this.elViewer.querySelector(':scope .download-link');
-
-      elDl.href = event.detail.file ? URL.createObjectURL(event.detail.file) : '#';
-      elDl.download = event.detail.file ? event.detail.file.name : undefined;
       this.load(event.detail.file);
     });
   }
@@ -214,6 +210,11 @@ class PhViewer {
       this.fabCanvas.phFitViewport(img);
 
       this.refreshFilters();
+    }).finally(() => {
+      const elDl = this.elViewer.querySelector(':scope .download-link');
+
+      elDl.href = blob && this.fabCanvas.backgroundImage ? URL.createObjectURL(blob) : '#';
+      elDl.download = blob && this.fabCanvas.backgroundImage ? blob.name : undefined;
     });
   }
 }
