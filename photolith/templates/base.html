@@ -34,7 +34,7 @@
         <div class="text-end">
         {% if user.is_authenticated %}
           <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle me-2" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-outline-primary dropdown-toggle me-2" type="button" id="header-menu" data-bs-toggle="dropdown" aria-expanded="false">
               <!-- https://icons.getbootstrap.com/icons/person-circle/ -->
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
@@ -42,7 +42,7 @@
               </svg>
               <span class="ms-1">{{ user.username }}</span>
             </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <ul class="dropdown-menu" aria-labelledby="header-menu">
               <li><a class="dropdown-item" href="https://github.com/photolith/photolith/issues">{% translate 'Issues' %}</a></li>
               {% if user.is_superuser %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">{% translate 'Site administration' %}</a></li>{% endif %}
               <li><hr class="dropdown-divider"></li>
