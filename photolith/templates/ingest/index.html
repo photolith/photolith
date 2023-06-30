@@ -4,11 +4,10 @@
 {% block contentclass %}container-fluid{% endblock contentclass %}
 {% block pre_content %}
 
-<div class="ph-ingest-select d-flex flex-wrap align-items-center justify-content-center py-3 border-bottom" style="background: #eee"
-     data-viewer="#image-viewer">
+<div class="ph-ingest-select d-flex flex-wrap align-items-center justify-content-center py-3 border-bottom" style="background: #eee">
   <label for="image-source-select" class="col-md-3 me-md-5 col-form-label text-end">Choose an image source:</label>
   <div class="col-md-5 me-md-5">
-  <select id="image-source-select" class="form-select">
+  <select id="image-source-select" class="form-select" data-sync-form="form.ingest-form">
     <option value="" selected>{% translate "Choose..." %}</option>
     {% for s in image_sources %}
       <option value="{{ s.name }}">{{ s.description }}</option>
@@ -22,10 +21,11 @@
 {% endblock pre_content %}
 {% block content %}
 
-  <div class="ph-viewer ph-cropper" id="image-viewer" data-sync-form="form.ingest-form">{% include "../snippet/viewer.html" %}</div>
+  <div class="ph-viewer ph-cropper" data-sync-form="form.ingest-form">{% include "../snippet/viewer.html" %}</div>
 
   <form class="ingest-form mt-2">
     {% csrf_token %}
+    <input type="hidden" name="image_file" >
     <div class="row">
       <div class="col">
         <div class="mb-3">

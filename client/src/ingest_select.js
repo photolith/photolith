@@ -1,9 +1,12 @@
-import { loadFile } from './viewer';
 import { parse } from 'content-disposition-header';
 
 class Cancelled extends Error { }
 
 class NullFileSet {
+  constructor () {
+    this.name = 'null:';
+  }
+
   next () {
     return Promise.resolve({ f: null, remaining: 0 });
   }
@@ -13,6 +16,7 @@ class NullFileSet {
 
 class LocalFileSet {
   constructor () {
+    this.name = 'fileselect:';
     this.input = document.createElement('input');
     this.input.type = 'file';
     this.input.multiple = true;
@@ -48,6 +52,7 @@ class LocalFileSet {
 
 class ServerFileSet {
   constructor (photoDir) {
+    this.name = `server:${photoDir}:`;
     this.photoDir = photoDir;
     this.prev = null;
   }
@@ -89,7 +94,9 @@ function newFileSet (val) {
   throw new Error('Unknown select type ' + val.join(':'));
 }
 
-function nextSelection (elSelect, elViewer) {
+function nextSelection (elSelect) {
+  const elSyncForm = window.document.querySelector(elSelect.getAttribute('data-sync-form'));
+
   return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
     if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
 
@@ -98,7 +105,13 @@ function nextSelection (elSelect, elViewer) {
     } else {
       elSelect.options[0].text = elSelect.options[0].phOrigText;
     }
-    loadFile(elViewer, f); // NB: If null will unload image
+
+    elSyncForm.dispatchEvent(new window.CustomEvent('load_file', {
+      detail: {
+        fileset: elSelect.fs.name,
+        file: f
+      }
+    }));
   }).catch((err) => {
     if (err instanceof Cancelled) {
       // File select cancelled, don't change anything.
@@ -111,7 +124,6 @@ function nextSelection (elSelect, elViewer) {
 export function init (window) {
   window.document.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
     const elSelect = elIngestSelect.querySelector(':scope select');
-    const elViewer = window.document.querySelector(elIngestSelect.getAttribute('data-viewer'));
     const elNextButton = elIngestSelect.querySelector(':scope .ph-ingest-next');
 
     elSelect.fs = newFileSet('null');
@@ -120,12 +132,12 @@ export function init (window) {
       if (elSelect.fs) elSelect.fs.close();
       elSelect.fs = newFileSet(elSelect.value);
       elSelect.selectedIndex = 0;
-      nextSelection(elSelect, elViewer);
+      nextSelection(elSelect);
     });
 
     elNextButton.addEventListener('click', (event) => {
       event.preventDefault();
-      nextSelection(elSelect, elViewer);
+      nextSelection(elSelect);
     });
   });
 }

@@ -373,12 +373,6 @@ class PhCropper extends PhViewer {
   }
 }
 
-export function loadFile (elViewer, f) {
-  elViewer.dispatchEvent(new window.CustomEvent('load_file', {
-    detail: { file: f }
-  }));
-}
-
 export function init (window) {
   window.document.querySelectorAll('div.ph-viewer').forEach((elViewer) => {
     const v = elViewer.classList.contains('ph-cropper') ? new PhCropper(elViewer) : new PhViewer(elViewer);
@@ -387,6 +381,9 @@ export function init (window) {
       v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
       v.elSyncForm.addEventListener('load_individuals', (event) => {
         v.loadIndividuals(event.detail);
+      });
+      v.elSyncForm.addEventListener('load_file', (event) => {
+        v.load(event.detail.file);
       });
     }
     return v;

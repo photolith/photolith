@@ -57,5 +57,9 @@ export function init (window) {
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
     });
+    elForm.addEventListener('load_file', (event) => {
+      elForm.image_file.value = event.detail.file ? event.detail.fileset + event.detail.file.name : '';
+      elForm.image_file.phBlob = event.detail.file || undefined;
+    });
   });
 }
