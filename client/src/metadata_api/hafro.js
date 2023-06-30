@@ -22,8 +22,8 @@ export default class MetadataApi {
           const od = ods[i];
 
           return {
-            id: m.measureId,
-            title: m.serialNo,
+            id: m.measureId.toString(),
+            title: m.serialNo.toString(),
             slideLabel: [
               od.sampleResponse.sampleId,
                 `${od.sampleResponse.station.cruise.name}/${od.sampleResponse.station.number}`,

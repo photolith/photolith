@@ -28,8 +28,8 @@ export default class MetadataApi {
     return Promise.resolve(Array.from(Array(20))).then((measures) => {
       return {
         individuals: measures.map((_, i) => ({
-          id: sampleId * 100 + i,
-          title: i,
+          id: (sampleId * 100 + i).toString(),
+          title: i.toString(),
           slideLabel: [
             sampleId,
             'AB123'
