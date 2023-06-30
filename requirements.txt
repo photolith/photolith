@@ -3,3 +3,6 @@ django==4.2
 psycopg2==2.9.6
 
 django-settings-export==1.2.1
+
+django-crispy-forms==2.0
+crispy-bootstrap5==0.7
