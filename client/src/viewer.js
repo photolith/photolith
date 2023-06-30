@@ -234,7 +234,7 @@ class PhCropper extends PhViewer {
 
   selection (opt) {
     for (let i = 0; i < opt.selected.length; i++) {
-      const m = (opt.selected[i].id || '').match(/^individual\.(.*)\.bounding_box$/);
+      const m = (opt.selected[i].id || '').match(/^individuals\[(.*)\]\[bounding_box\]$/);
 
       if (m) {
         this.elSyncForm.selected_individual.value = m[1];
@@ -277,9 +277,7 @@ class PhCropper extends PhViewer {
     });
   }
 
-  boundingBox (id, title) {
-    const objId = `individual.${id}.bounding_box`;
-
+  boundingBox (objId, title) {
     // http://fabricjs.com/docs/fabric.Textbox.html
     const obj = this.fabCanvas.phGetObjectById(objId) || new fabric.Textbox(title.toString(), {
       id: objId,
@@ -367,9 +365,9 @@ class PhCropper extends PhViewer {
 
   loadIndividuals (ids) {
     this.fabCanvas.getObjects().forEach((o) => {
-      if ((o.id || '').match(/^individual\.(.*)\.bounding_box$/)) this.fabCanvas.remove(o);
+      if ((o.id || '').match(/^individuals\[(.*)\]\[bounding_box\]$/)) this.fabCanvas.remove(o);
     });
-    ids.forEach((i) => this.boundingBox(i.id, i.title));
+    ids.forEach((ind, i) => this.boundingBox(`individuals[${i}][bounding_box]`, ind.title));
     this.syncForm();
   }
 }

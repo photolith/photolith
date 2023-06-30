@@ -16,14 +16,14 @@ function formRefresh (event) {
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
     return window.mApi.sampleDetail(event.target.value).then((sd) => {
-      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind) => {
+      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, i) => {
         return `
-          <input type="hidden" name="individual.${ind.id}.data" value="">
-          <input type="hidden" name="individual.${ind.id}.bounding_box" value="">
+          <input type="hidden" name="individuals[${i}][data]" value="">
+          <input type="hidden" name="individuals[${i}][bounding_box]" value="">
         `;
       }).join('\n');
-      sd.individuals.forEach((ind) => {
-        elForm[`individual.${ind.id}.data`].value = JSON.stringify(ind);
+      sd.individuals.forEach((ind, i) => {
+        elForm[`individuals[${i}][data]`].value = JSON.stringify(ind);
       });
       elForm.selected_individual.value = '';
       elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: sd.individuals }));
@@ -42,7 +42,7 @@ function formRefresh (event) {
 
   if (event.target.name === 'selected_individual') {
     const elIndividualDataBody = elForm.querySelector(':scope .individual-data tbody');
-    const ids = JSON.parse((elForm[`individual.${event.target.value}.data`] || {}).value || '{}');
+    const ids = JSON.parse((elForm[`individuals[${event.target.value}][data]`] || {}).value || '{}');
 
     elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
       <td>${htmlEscape(k)}</td>
@@ -56,7 +56,6 @@ export function init (window) {
     elForm.addEventListener('change', formRefresh);
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      formRefresh({ target: elForm.individual });
     });
   });
 }
