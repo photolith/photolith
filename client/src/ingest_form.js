@@ -11,7 +11,7 @@ function formRefresh (event) {
   const elForm = event.target.form;
 
   // Can progress iff all form elements are filled in
-  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => !el.value);
+  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selected_individual' && !el.value);
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
