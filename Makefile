@@ -33,6 +33,7 @@ node_modules/.package.json: package.json
 
 node_modules/.package-dev.json: package.json
 	npm ci --include=dev
+	touch node_modules/.package.json
 	touch $@
 
 start: manage.py node_modules/.package.json
