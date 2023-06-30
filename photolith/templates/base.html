@@ -18,16 +18,20 @@
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
   </head>
   <body>
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 border-bottom bg-dark text-white">
-      <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-white text-decoration-none">
-        Photolith
-      </a>
 
-      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="{% url 'ingest:index' %}" class="nav-link px-2 text-white">{% translate "Ingest" %}</a></li>
-      </ul>
+  <header class="p-3 bg-dark text-white">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+          <span class="ms-5 me-5"><span class="text-info">Ph</span><span class="text-white">otolith</span></span>
+        </a>
 
-      <div class="col-md-3 text-end">
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{% url 'home:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'home' %}text-secondary{% else %}text-white{% endif %}">{% translate "Home" %}</a></li>
+          <li><a href="{% url 'ingest:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'ingest' %}text-secondary{% else %}text-white{% endif %}">{% translate "Ingest" %}</a></li>
+        </ul>
+
+        <div class="text-end">
         {% if user.is_authenticated %}
           <div class="dropdown">
             <button class="btn btn-outline-primary dropdown-toggle me-2" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,8 +57,10 @@
         {% else %}
           <a href="/accounts/login/" type="button" class="btn btn-outline-primary me-2">{% translate "Login" %}</a>
         {% endif %}
+        </div>
       </div>
-    </header>
+    </div>
+  </header>
     <div id="alert-container" class="position-absolute end-0 mx-2 my-2" style="z-index: 1;"></div>
     {% block pre_content %}
     {% endblock pre_content %}
