@@ -2,6 +2,7 @@ import numbers
 import json
 import re
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.views import View
@@ -10,7 +11,9 @@ from ..errors import json_errors
 from ..models import Image, Individual, MetaNumeric, MetaChar, MetaTx, Taxonomy
 
 
-class UploadView(View):
+class UploadView(PermissionRequiredMixin, View):
+    permission_required = ("photolith.add_individual",)
+
     @json_errors
     def post(self, *args, **kwargs):
         image = Image.objects.get(href=self.request.POST["image_href"])

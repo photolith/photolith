@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
 from django.utils.translation import ngettext
@@ -11,7 +12,8 @@ from django.views.generic import TemplateView
 from .photo_dir import get_next_photo, list_photo_dirs
 
 
-class IndexView(TemplateView):
+class IndexView(PermissionRequiredMixin, TemplateView):
+    permission_required = ("photolith.add_individual",)
     template_name = "ingest/index.html"
 
     def image_sources(self):
@@ -33,7 +35,9 @@ class IndexView(TemplateView):
         return context
 
 
-class NextPhotoView(View):
+class NextPhotoView(PermissionRequiredMixin, View):
+    permission_required = ("photolith.view_image",)
+
     def get(self, *args, **kwargs):
         f = get_next_photo(
             settings.INGEST_ROOT,

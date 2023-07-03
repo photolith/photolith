@@ -7,6 +7,7 @@ import uuid
 import PIL.Image
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.forms.models import model_to_dict
 from django.http import FileResponse, JsonResponse
 from django.views import View
@@ -15,7 +16,9 @@ from ..errors import json_errors
 from ..models import Image
 
 
-class UploadView(View):
+class UploadView(PermissionRequiredMixin, View):
+    permission_required = ("photolith.add_image",)
+
     @json_errors
     def post(self, *args, **kwargs):
         mimetype = self.request.content_type
