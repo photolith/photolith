@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("photolith.home.urls", namespace="home")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
+    path("media/", include("photolith.media.urls", namespace="media")),
 ]

@@ -135,3 +135,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # FTP upload
 INGEST_ROOT = BASE_DIR.parent / "ingest_root"
+
+# Image storage
+MEDIA_ROOT = BASE_DIR.parent / "media"
