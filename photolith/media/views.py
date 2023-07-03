@@ -1,4 +1,6 @@
 import json
+import os
+import os.path
 import pathlib
 import uuid
 
@@ -9,10 +11,12 @@ from django.forms.models import model_to_dict
 from django.http import FileResponse, JsonResponse
 from django.views import View
 
+from ..errors import json_errors
 from ..models import Image
 
 
 class UploadView(View):
+    @json_errors
     def post(self, *args, **kwargs):
         mimetype = self.request.content_type
         if mimetype == "image/jpeg":
@@ -24,20 +28,25 @@ class UploadView(View):
         with open(pathlib.Path(settings.MEDIA_ROOT) / file_name, "wb") as f:
             f.write(self.request.read())
 
-        if mimetype == "image/jpeg":
-            PIL.Image.open(pathlib.Path(settings.MEDIA_ROOT) / file_name).verify()
+        try:
+            if mimetype == "image/jpeg":
+                PIL.Image.open(pathlib.Path(settings.MEDIA_ROOT) / file_name).verify()
 
-        image = Image(
-            created_by=self.request.user,
-            href="/media/%s" % file_name,
-            orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
-            mimetype=mimetype,
-            scale_line=json.loads(
-                self.request.META.get("HTTP_X_PHOTOLITH_SCALE_LINE", "None")
-            ),
-            scale_mm=self.request.META.get("HTTP_X_PHOTOLITH_SCALE_MM", None),
-        )
-        image.save()
+            image = Image(
+                created_by=self.request.user,
+                href="/media/%s" % file_name,
+                orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
+                mimetype=mimetype,
+                scale_line=json.loads(
+                    self.request.META.get("HTTP_X_PHOTOLITH_SCALE_LINE", "None")
+                ),
+                scale_mm=self.request.META.get("HTTP_X_PHOTOLITH_SCALE_MM", None),
+            )
+            image.save()
+        except Exception as e:
+            if file_name and os.path.isfile(file_name):
+                os.remove(file_name)
+            raise e
         return JsonResponse(model_to_dict(image))
 
 
