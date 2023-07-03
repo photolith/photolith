@@ -1,3 +1,5 @@
+import { jsonFetch } from './json_fetch';
+
 function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
@@ -57,7 +59,7 @@ function formSubmit (elForm) {
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
 
     // Image not already uploaded, so upload it
-    return window.fetch('/media/upload/', {
+    return jsonFetch('/media/upload/', {
       method: 'POST',
       body: elForm.image_file.phBlob,
       headers: {
@@ -67,7 +69,7 @@ function formSubmit (elForm) {
         'X-Photolith-scale-line': elForm.scale_line.value,
         'X-Photolith-scale-mm': elForm.scale.value
       }
-    }).then((response) => response.json()).then((data) => {
+    }).then((data) => {
       elForm.image_href.value = data.href;
     });
   });
