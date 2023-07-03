@@ -21,6 +21,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path("", include("photolith.home.urls", namespace="home")),
+    path("individual/", include("photolith.individual.urls", namespace="individual")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
     path("media/", include("photolith.media.urls", namespace="media")),
 ]
