@@ -1,6 +1,11 @@
 import functools
+import logging
+
 
 from django.http import FileResponse, JsonResponse
+
+
+logger = logging.getLogger(__name__)
 
 
 def json_errors(func):
@@ -9,6 +14,7 @@ def json_errors(func):
         try:
             return func(request, *args, **kwargs)
         except Exception as e:
+            logger.exception(e)
             return JsonResponse(
                 dict(
                     error_class=e.__class__.__name__,
