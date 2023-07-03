@@ -1,6 +1,5 @@
 import { fabric } from 'fabric';
 import EditableLine from './viewer/editable_line';
-const formson = require('formson');
 
 class PhViewer {
   constructor (elViewer) {
@@ -138,7 +137,7 @@ class PhViewer {
 
   refreshFilters () {
     const img = this.fabCanvas.backgroundImage;
-    const phFilters = formson.form_to_object(this.elForm);
+    const phFilters = Object.fromEntries(new FormData(this.elForm));
 
     if (!img) return; // No image loaded
     img.filters = [];
