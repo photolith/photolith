@@ -1,3 +1,4 @@
+import { displayAlert } from './alert';
 import { jsonFetch } from './json_fetch';
 
 function htmlEscape (s) {
@@ -17,7 +18,7 @@ function formRefresh (event) {
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
-    return window.mApi.sampleDetail(event.target.value).then((sd) => {
+    return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
       elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, i) => {
         return `
           <input type="hidden" name="individuals[${i}][data]" value="">
@@ -72,12 +73,24 @@ function formSubmit (elForm) {
     }).then((data) => {
       elForm.image_href.value = data.href;
     });
+  }).then(() => {
+    return jsonFetch('/individual/upload/', {
+      method: 'POST',
+      body: new FormData(elForm)
+    });
+  }).then((createdInds) => {
+    displayAlert('success', `Uploaded ${createdInds.created_individuals.length} individuals`);
+    elForm.reset();
   });
 }
 
 export function init (window) {
   window.document.querySelectorAll('form.ingest-form').forEach((elForm) => {
     elForm.addEventListener('change', formRefresh);
+    elForm.addEventListener('reset', (event) => {
+      // Give the form a chance to reset, then refresh the sample field (triggering everything else to refresh)
+      window.setTimeout(() => formRefresh({ target: elForm.sample }), 10);
+    });
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
       formSubmit(elForm);
