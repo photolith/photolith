@@ -11,7 +11,7 @@ function formRefresh (event) {
   const elForm = event.target.form;
 
   // Can progress iff all form elements are filled in
-  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selected_individual' && !el.value);
+  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selected_individual' && el.name !== 'image_href' && !el.value);
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
@@ -51,15 +51,39 @@ function formRefresh (event) {
   }
 }
 
+function formSubmit (elForm) {
+  return Promise.resolve().then(() => {
+    if (elForm.image_href.value) return;
+    if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
+
+    // Image not already uploaded, so upload it
+    return window.fetch('/media/upload/', {
+      method: 'POST',
+      body: elForm.image_file.phBlob,
+      headers: {
+        'X-CSRFToken': elForm.csrfmiddlewaretoken.value,
+        'X-Photolith-fileset': elForm.image_file.value,
+        'X-Photolith-filename': elForm.image_file.phBlob.name,
+        'X-Photolith-scale-line': elForm.scale_line.value,
+        'X-Photolith-scale-mm': elForm.scale.value
+      }
+    }).then((response) => response.json()).then((data) => {
+      elForm.image_href.value = data.href;
+    });
+  });
+}
+
 export function init (window) {
   window.document.querySelectorAll('form.ingest-form').forEach((elForm) => {
     elForm.addEventListener('change', formRefresh);
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
+      formSubmit(elForm);
     });
     elForm.addEventListener('load_file', (event) => {
-      elForm.image_file.value = event.detail.file ? event.detail.fileset + event.detail.file.name : '';
+      elForm.image_file.value = event.detail.file ? event.detail.fileset : '';
       elForm.image_file.phBlob = event.detail.file || undefined;
+      elForm.image_href.value = '';
     });
   });
 }
