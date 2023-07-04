@@ -1,6 +1,8 @@
 import { fabric } from 'fabric';
 import EditableLine from './viewer/editable_line';
 
+const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
+
 class PhViewer {
   constructor (elViewer) {
     this.elViewer = elViewer;
@@ -284,8 +286,8 @@ class PhCropper extends PhViewer {
       fontFamily: 'Arial',
       fontSize: 90,
       fontWeight: 'bold',
-      backgroundColor: 'rgba(50,255,255,0.3)',
-      stroke: 'rgba(50,255,255,1)',
+      backgroundColor: `rgba(${rgbHighlight},0.3)`,
+      stroke: `rgba(${rgbHighlight},1)`,
       fill: 'black',
       textAlign: 'center',
       editable: false,
@@ -340,7 +342,10 @@ class PhCropper extends PhViewer {
 
   scaleLine () {
     const obj = this.fabCanvas.phGetObjectById('scale_line') || new EditableLine({
-      id: 'scale_line'
+      id: 'scale_line',
+      stroke: `rgba(${rgbHighlight}, 0.6)`
+    }, {
+      stroke: `rgba(${rgbHighlight}, 1)`
     });
     if (!obj.canvas) this.fabCanvas.add(obj);
     return obj;

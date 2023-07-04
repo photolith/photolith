@@ -2,13 +2,13 @@
 {% load i18n %}
 
 {% block content %}
-<div class="card">
+<div class="card bg-light bg-gradient">
   <div class="card-body">
     <h4 class="card-title">{% translate 'You are logged out' %}</h4>
 
     <p class="mt-5 mb-5"></p>
 
-    <a href="{% url 'login' %}" class="btn btn-primary btn-block">{% translate 'Log in again' %}</a>
+    <a href="{% url 'login' %}" class="btn btn-info btn-block">{% translate 'Log in again' %}</a>
   </div>
 </div>
 {% endblock %}

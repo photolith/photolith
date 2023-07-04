@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block content %}
-<div class="card">
+<div class="card bg-light bg-gradient">
   <div class="card-body">
     <h4 class="card-title">{% translate 'Log in to your account' %}</h4>
 
@@ -13,8 +13,8 @@
 
       {{ form|crispy }}
 
-      <button type="submit" class="btn btn-primary btn-block">{% translate 'Log in' %}</button>
-      <a href="/accounts/password_reset/" class="btn btn-secondary btn-block">{% translate 'Forgot Password?' %}</a>
+      <button type="submit" class="btn btn-info btn-block">{% translate 'Log in' %}</button>
+      <a href="/accounts/password_reset/" class="btn btn-outline-dark btn-block">{% translate 'Forgot Password?' %}</a>
     </form>
   </div>
 </div>

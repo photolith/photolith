@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
 
-export default function (props) {
+export default function (props, circleProps) {
   props.strokeWidth = props.strokeWidth || 3;
   props.radius = props.radius || 10;
 
@@ -8,7 +8,7 @@ export default function (props) {
     left: 0,
     top: 0,
     fill: 'transparent',
-    stroke: 'rgba(50,255,255,0.6)',
+    stroke: 'orangered',
     objectCaching: false, // NB: Otherwise updating points array doesn't work
     selectable: false,
     evented: false // NB: Without, the poly's area still allows you to drag-select
@@ -44,15 +44,15 @@ export default function (props) {
     // Add any missing phNodes
     while (this.phNodes.length < newPoints.length) {
       const idx = this.phNodes.length;
-      const obj = new fabric.Circle({
+      const obj = new fabric.Circle(Object.assign({}, {
         strokeWidth: props.strokeWidth,
         radius: props.radius,
         fill: 'transparent',
-        stroke: 'rgba(50,255,255,1)',
+        stroke: 'orangered',
         originX: 'center',
         originY: 'center',
         objectCaching: false // NB: So we can update obj.radius
-      });
+      }, circleProps));
       // NB: We have to set position before canvas.add()
       obj.setPositionByOrigin(newPoints[idx], 'center', 'center');
       obj.hasControls = false;

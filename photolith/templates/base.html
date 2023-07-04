@@ -23,7 +23,7 @@
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-          <span class="me-lg-5"><span class="text-info">Ph</span><span class="text-white">otolith</span></span>
+          <span class="me-lg-5"><span class="text-info fw-bold">Ph</span><span class="text-white">otolith</span></span>
         </a>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -34,7 +34,7 @@
         <div class="text-end">
         {% if user.is_authenticated %}
           <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle me-2" type="button" id="header-menu" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-outline-info dropdown-toggle me-2" type="button" id="header-menu" data-bs-toggle="dropdown" aria-expanded="false">
               <!-- https://icons.getbootstrap.com/icons/person-circle/ -->
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
@@ -56,7 +56,7 @@
             </ul>
           </div>
         {% else %}
-          <a href="/accounts/login/" type="button" class="btn btn-outline-primary me-2">{% translate "Login" %}</a>
+          <a href="/accounts/login/" type="button" class="btn btn-outline-info me-2">{% translate "Login" %}</a>
         {% endif %}
         </div>
       </div>
