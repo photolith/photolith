@@ -1,3 +1,5 @@
+import numbers
+
 from django.conf import settings
 from django.db import models
 from django.conf import settings
@@ -33,6 +35,66 @@ class Individual(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    @property
+    def data(self):
+        out = {}
+        for m in MetaNumeric.objects.filter(individual=self):
+            out[m.key] = m.value
+        for m in MetaChar.objects.filter(individual=self):
+            out[m.key] = m.value
+        for m in MetaTx.objects.filter(individual=self):
+            out[m.key] = m.value.dict
+        return out
+
+    @data.setter
+    def data(self, new_value):
+        for k, v in new_value.items():
+            if isinstance(v, numbers.Number):
+                self.metanumeric_set.add(
+                    MetaNumeric(
+                        individual=self,
+                        key=k,
+                        value=float(v),
+                    ),
+                    bulk=False,
+                )
+
+            elif isinstance(v, str):
+                self.metachar_set.add(
+                    MetaChar(
+                        individual=self,
+                        key=k,
+                        value=str(v),
+                    ),
+                    bulk=False,
+                )
+
+            elif isinstance(v, dict):
+                tx, created = Taxonomy.objects.get_or_create(key=k, identifier=v["id"])
+                v["key"] = k
+                tx.dict = v
+                tx.save()
+                self.metatx_set.add(
+                    MetaTx(
+                        individual=self,
+                        key=k,
+                        value=tx,
+                    ),
+                    bulk=False,
+                )
+
+            else:
+                raise ValueError("Unknown type of %s: %s" % (k, str(v)))
+
+    def data_save(self):
+        for tx in self.metanumeric_set.all():
+            tx.save()
+        for tx in self.metachar_set.all():
+            tx.save()
+        for tx in self.metatx_set.all():
+            tx.save()
+            tx.value.save()
 
 
 class MetaNumeric(models.Model):
@@ -75,3 +137,19 @@ class Taxonomy(models.Model):
     identifier = models.IntegerField(null=True)
     str_en = models.CharField(max_length=255, blank=False, null=False)
     str_is = models.CharField(max_length=255, blank=False, null=False)
+
+    @property
+    def dict(self):
+        out = dict(id=self.identifier)
+        for f in self._meta._get_fields():
+            if f.name.startswith("str_"):
+                out[f.name.replace("str_", "")] = getattr(self, f.name)
+        return out
+
+    @dict.setter
+    def dict(self, new_dict):
+        for k, v in new_dict.items():
+            if k == "id":
+                self.identifier = v
+            elif hasattr(self, "str_%s" % k):
+                setattr(self, "str_%s" % k, v)

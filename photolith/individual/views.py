@@ -1,4 +1,3 @@
-import numbers
 import json
 import re
 
@@ -35,40 +34,8 @@ class UploadView(PermissionRequiredMixin, View):
             ind.save()
             created_inds.append(ind)
 
-            for k, v in ind_data.items():
-                if isinstance(v, numbers.Number):
-                    MetaNumeric(
-                        individual=ind,
-                        key=k,
-                        value=float(v),
-                    ).save()
-
-                elif isinstance(v, str):
-                    MetaChar(
-                        individual=ind,
-                        key=k,
-                        value=v,
-                    ).save()
-
-                elif isinstance(v, dict):
-                    v["key"] = k
-                    tx, created = Taxonomy.objects.get_or_create(
-                        key=k, identifier=v["id"]
-                    )
-                    for lang in v.keys():
-                        if lang == "id":
-                            continue
-                        setattr(tx, "str_%s" % lang, v[lang])
-                    tx.save()
-
-                    MetaTx(
-                        individual=ind,
-                        key=k,
-                        value=tx,
-                    ).save()
-
-                else:
-                    raise ValueError("Unknown type of %s: %s" % (k, str(v)))
+            ind.data = ind_data
+            ind.data_save()
         return JsonResponse(
             dict(
                 created_individuals=[model_to_dict(ind) for ind in created_inds],
