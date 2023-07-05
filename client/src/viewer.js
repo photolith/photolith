@@ -372,7 +372,10 @@ class PhCropper extends PhViewer {
     this.fabCanvas.getObjects().forEach((o) => {
       if ((o.id || '').match(/^individuals\[(.*)\]\[bounding_box\]$/)) this.fabCanvas.remove(o);
     });
-    ids.forEach((ind, i) => this.boundingBox(`individuals[${i}][bounding_box]`, ind.title));
+    ids.forEach((ind, i) => {
+      const obj = this.boundingBox(`individuals[${i}][bounding_box]`, ind.title);
+      if (i === 0) this.fabCanvas.setActiveObject(obj);
+    });
     this.syncForm();
   }
 }
