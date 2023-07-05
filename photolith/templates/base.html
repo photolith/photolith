@@ -50,7 +50,7 @@
               <li>
                 <form action="/accounts/logout/" method="post" id="logout_form">
                   {% csrf_token %}
-                  <input type="submit" value="Log out" class="btn btn-link dropdown-item" style="border-radius:0" />
+                  <input type="submit" value="{% translate 'Log out' %}" class="btn btn-link dropdown-item" style="border-radius:0" />
                 </form>
               </li>
             </ul>
