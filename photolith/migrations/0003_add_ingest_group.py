@@ -1,7 +1,10 @@
+from django.core.management.sql import emit_post_migrate_signal
 from django.db import models, migrations
 
 
 def apply_migration(apps, schema_editor):
+    # Make sure permissions are created, see https://gist.github.com/solace/6a8ac71539220b1f13a95bd559f2c4bd
+    emit_post_migrate_signal(2, False, "default")
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
 
@@ -26,6 +29,8 @@ def revert_migration(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("photolith", "0002_individual_taxonomy_metatx_metanumeric_metachar"),
+        # See https://gist.github.com/solace/6a8ac71539220b1f13a95bd559f2c4bd
+        ("contenttypes", "__latest__"),
     ]
 
     operations = [migrations.RunPython(apply_migration, revert_migration)]
