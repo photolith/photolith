@@ -45,6 +45,16 @@
             <ul class="dropdown-menu" aria-labelledby="header-menu">
               <li><a class="dropdown-item" href="https://github.com/photolith/photolith/issues">{% translate 'Issues' %}</a></li>
               {% if user.is_superuser %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">{% translate 'Site administration' %}</a></li>{% endif %}
+
+              <li><hr class="dropdown-divider"></li>
+              {% get_available_languages as LANGUAGES %}
+              {% for lang in LANGUAGES %}
+                <li><form action="/i18n/setlang/" method="post">{% csrf_token %}
+                  <input type="hidden" name="language" value="{{ lang.0 }}" />
+                  <input type="submit" name="submit" value="{{ lang.1 }}" class="btn btn-link dropdown-item" style="border-radius:0" />
+                </form></li>
+              {% endfor %}
+
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{% url 'password_change' %}">{% translate 'Change password' %}</a></li>
               <li>
