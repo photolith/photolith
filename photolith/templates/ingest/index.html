@@ -4,16 +4,16 @@
 {% block contentclass %}container-fluid{% endblock contentclass %}
 {% block pre_content %}
 
-<div class="ph-ingest-select d-flex flex-wrap align-items-center justify-content-center py-3 border-bottom" style="background: #eee">
-  <label for="image-source-select" class="col-md-3 me-md-5 col-form-label text-end">Choose an image source:</label>
-  <div class="col-md-5 me-md-5">
+<div class="ph-ingest-select d-flex flex-wrap border-bottom justify-content-center px-sm-5 py-3" style="background: #eee">
+  <label for="image-source-select" class="col-form-label">Choose an image source:</label>
+  <div class="flex-grow-1 mx-5">
   <select id="image-source-select" class="form-select" data-sync-form="form.ingest-form">
     <option value="" selected>{% translate "Choose..." %}</option>
     {% for s in image_sources %}
       <option value="{{ s.name }}">{{ s.description }}</option>
     {% endfor %}
   </select></div>
-  <div class="col-md-3">
+  <div class="">
     <button class="btn ph-ingest-next ml-2" style="background-color: #ccc">{% translate "Next Image" %} &gt;</button>
   </div>
 </div>
