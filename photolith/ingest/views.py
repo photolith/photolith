@@ -27,7 +27,7 @@ class IndexView(PermissionRequiredMixin, TemplateView):
                 name="server:%s" % d,
                 description=_("Uploaded by %(photo_dir)s") % dict(photo_dir=d),
             )
-        yield dict(name="fileselect:", description=_("Upload file from computer"))
+        yield dict(name="fileselect:", description=_("Upload files from computer"))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
