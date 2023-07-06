@@ -9,6 +9,7 @@ const metaLabels = {
     species: 'Species',
     cruise: 'Cruise',
     station: 'Station',
+    stationDate: 'Station Date',
     gear: 'Gear',
     meshSize: 'Mesh Size'
   },
@@ -22,6 +23,7 @@ const metaLabels = {
     species: 'Tegundir',
     cruise: 'Sigling',
     station: 'Stöð',
+    stationDate: 'Stöðvardagur',
     gear: 'Gír',
     meshSize: 'Möskvastærð'
   }
@@ -73,6 +75,7 @@ export default class MetadataApi {
             },
             cruise: od.sampleResponse.station.cruise.name,
             station: od.sampleResponse.station.number,
+            stationDate: od.sampleResponse.station.stationDate,
             gear: od.sampleResponse.gear.isscfgNo,
             meshSize: od.sampleResponse.meshSize
           };

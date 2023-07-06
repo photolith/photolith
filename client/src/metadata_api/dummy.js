@@ -25,6 +25,11 @@ const metaLabels = {
     sex: 'Sex',
     maturity: 'Maturity',
     species: 'Species',
+    cruise: 'Cruise',
+    station: 'Station',
+    stationDate: 'Station Date',
+    gear: 'Gear',
+    meshSize: 'Mesh Size'
   },
   is: {
     id: 'ID',
@@ -34,6 +39,11 @@ const metaLabels = {
     sex: 'Kynlíf',
     maturity: 'Þroska',
     species: 'Tegundir',
+    cruise: 'Sigling',
+    station: 'Stöð',
+    stationDate: 'Stöðvardagur',
+    gear: 'Gír',
+    meshSize: 'Möskvastærð'
   }
 };
 
@@ -57,12 +67,18 @@ export default class MetadataApi {
           title: i.toString(),
           slideLabel: [
             sampleId,
-            'AB123'
+            'TB2-2021/95',
+            '10'
           ].join(' '),
           length: Math.floor(Math.random() * 100),
           sex: randomChoice(sex),
           maturity: randomChoice(maturity),
-          species: randomChoice(species)
+          species: randomChoice(species),
+          cruise: 'TB2-2021',
+          station: '95',
+          stationDate: '2021-10-23T00:00:00Z',
+          gear: '0312',
+          meshSize: 40
         }))
       };
     });
