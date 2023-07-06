@@ -70,6 +70,10 @@ export function init (window) {
       // https://datatables.net/reference/api/row().child
       const row = table.row(e.target.closest('tr'));
 
+      // No row node found, was a click on a child row
+      if (!row.node()) return;
+
+      // Create child row if not already present
       if (!row.child() || row.child().length === 0) {
         row.child(childRow(row.data()));
       }
