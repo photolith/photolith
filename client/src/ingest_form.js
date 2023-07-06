@@ -67,7 +67,7 @@ function formSubmit (elForm) {
       elForm.image_href.value = data.href;
     });
   }).then(() => {
-    return jsonFetch('/individual/upload/', {
+    return jsonFetch('/ingest/upload/', {
       method: 'POST',
       body: new FormData(elForm)
     });

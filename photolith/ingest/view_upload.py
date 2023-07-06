@@ -10,6 +10,7 @@ from ..errors import json_errors
 from ..models import Image, Individual, MetaNumeric, MetaChar, MetaTx, Taxonomy
 
 
+# TODO: Why is this here, and not under ingest/views?
 class UploadView(PermissionRequiredMixin, View):
     permission_required = ("photolith.add_individual",)
 

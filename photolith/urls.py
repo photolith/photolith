@@ -22,7 +22,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path("", include("photolith.home.urls", namespace="home")),
-    path("individual/", include("photolith.individual.urls", namespace="individual")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
     path("media/", include("photolith.media.urls", namespace="media")),
     path("search/", include("photolith.search.urls", namespace="search")),
