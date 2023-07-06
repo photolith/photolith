@@ -16,11 +16,36 @@ const maturity = [
   { id: 5, en: 'Mature', is: 'Þroskaður' }
 ];
 
+const metaLabels = {
+  en: {
+    id: 'ID',
+    title: 'Title',
+    slideLabel: 'Slide Label',
+    length: 'Length',
+    sex: 'Sex',
+    maturity: 'Maturity',
+    species: 'Species',
+  },
+  is: {
+    id: 'ID',
+    title: 'Titill',
+    slideLabel: 'Skyggnumerki',
+    length: 'Lengd',
+    sex: 'Kynlíf',
+    maturity: 'Þroska',
+    species: 'Tegundir',
+  }
+};
+
 function randomChoice (ar) {
   return ar[Math.floor(Math.random() * ar.length)];
 }
 
 export default class MetadataApi {
+  metaLabels (lang) {
+    return metaLabels[lang] || metaLabels.en;
+  }
+
   sampleDetail (sampleId) {
     const intSampleId = parseInt(sampleId, 10);
     if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));

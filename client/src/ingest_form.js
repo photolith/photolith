@@ -1,14 +1,6 @@
 import { displayAlert } from './alert';
 import { jsonFetch } from './json_fetch';
-
-function htmlEscape (s) {
-  return (new window.Option(s)).innerHTML;
-}
-
-function langSelect (obj) {
-  // NB: If it doesn't have either 'is' or 'en' property, it's probably a string already
-  return obj[document.documentElement.lang] || obj.en || obj;
-}
+import { renderMetaLabel, renderMetaCell } from './meta';
 
 function formRefresh (event) {
   const elForm = event.target.form;
@@ -46,10 +38,11 @@ function formRefresh (event) {
   if (event.target.name === 'selected_individual') {
     const elIndividualDataBody = elForm.querySelector(':scope .individual-data tbody');
     const ids = JSON.parse((elForm[`individuals[${event.target.value}][data]`] || {}).value || '{}');
+    const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
 
-    elIndividualDataBody.innerHTML = Object.keys(ids).map((k) => `<tr>
-      <td>${htmlEscape(k)}</td>
-      <td><code>${htmlEscape(langSelect(ids[k]))}</code></td>
+    elIndividualDataBody.innerHTML = Object.keys(metaLabels).map((k) => `<tr>
+      <td>${renderMetaLabel(metaLabels[k])}</td>
+      <td>${renderMetaCell(ids[k], 'display', ids, undefined)}</td>
     </tr>`).join('\n');
   }
 }

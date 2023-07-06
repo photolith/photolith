@@ -1,3 +1,32 @@
+const metaLabels = {
+  en: {
+    id: 'ID',
+    title: 'Title',
+    slideLabel: 'Slide Label',
+    length: 'Length',
+    sex: 'Sex',
+    maturity: 'Maturity',
+    species: 'Species',
+    cruise: 'Cruise',
+    station: 'Station',
+    gear: 'Gear',
+    meshSize: 'Mesh Size'
+  },
+  is: {
+    id: 'ID',
+    title: 'Titill',
+    slideLabel: 'Skyggnumerki',
+    length: 'Lengd',
+    sex: 'Kynlíf',
+    maturity: 'Þroska',
+    species: 'Tegundir',
+    cruise: 'Sigling',
+    station: 'Stöð',
+    gear: 'Gír',
+    meshSize: 'Möskvastærð'
+  }
+};
+
 export default class MetadataApi {
   constructor (baseHref) {
     this.baseHref = baseHref;
@@ -10,6 +39,10 @@ export default class MetadataApi {
       }
       return resp.json();
     });
+  }
+
+  metaLabels (lang) {
+    return metaLabels[lang] || metaLabels.en;
   }
 
   sampleDetail (sampleId) {
