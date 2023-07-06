@@ -25,4 +25,5 @@ urlpatterns = [
     path("individual/", include("photolith.individual.urls", namespace="individual")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
     path("media/", include("photolith.media.urls", namespace="media")),
+    path("search/", include("photolith.search.urls", namespace="search")),
 ]

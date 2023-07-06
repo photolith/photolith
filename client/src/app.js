@@ -1,6 +1,7 @@
 import { displayAlert } from './alert';
 import { init as initIngestSelect } from './ingest_select';
 import { init as initIngestForm } from './ingest_form';
+import { init as initSearch } from './search';
 import { init as initViewer } from './viewer';
 
 import DummyMetadataApi from './metadata_api/dummy';
@@ -11,6 +12,7 @@ window.HafroMetadataApi = HafroMetadataApi;
 window.addEventListener('DOMContentLoaded', (event) => {
   initIngestSelect(window);
   initIngestForm(window);
+  initSearch(window);
   initViewer(window);
 });
 
