@@ -26,12 +26,15 @@ class PhViewer {
       return undefined;
     };
 
-    this.fabCanvas.phFitViewport = function (obj) {
+    this.fabCanvas.phFitBoundingBox = function (boundingBox) {
       const zoom = Math.min(
-        this.height / obj.height,
-        this.width / obj.width
+        this.height / (boundingBox[1][1] - boundingBox[0][1]),
+        this.width / (boundingBox[1][0] - boundingBox[0][0])
       );
-      this.setViewportTransform([zoom, 0, 0, zoom, (this.width - obj.width * zoom) / 2, (this.height - obj.height * zoom) / 2]);
+      const totalX = (boundingBox[1][0] + boundingBox[0][0]);
+      const totalY = (boundingBox[1][1] + boundingBox[0][1]);
+
+      this.setViewportTransform([zoom, 0, 0, zoom, (this.width - totalX * zoom) / 2, (this.height - totalY * zoom) / 2]);
       this.getObjects().forEach((o) => o.fire('phCanvasZoom', zoom));
     };
 
@@ -196,7 +199,7 @@ class PhViewer {
     }, 10);
   }
 
-  load (blob) {
+  load (blob, boundingBox) {
     this.fabCanvas.setBackgroundImage(undefined);
     this.fabCanvas.requestRenderAll();
     if (!blob) return Promise.resolve();
@@ -207,8 +210,8 @@ class PhViewer {
       });
       this.fabCanvas.setBackgroundImage(img);
 
-      // Zoom viewport to fit image
-      this.fabCanvas.phFitViewport(img);
+      // Zoom viewport to fit boundingBox, or Image
+      this.fabCanvas.phFitBoundingBox(boundingBox || [[0, 0], [img.width, img.height]]);
 
       this.refreshFilters();
     }).finally(() => {
@@ -351,8 +354,8 @@ class PhCropper extends PhViewer {
     return obj;
   }
 
-  load (blob) {
-    return super.load(blob).then(() => {
+  load (blob, boundingBox) {
+    return super.load(blob, boundingBox).then(() => {
     }).finally(() => { // NB: Set-up bounding box even if loading failed
       this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
       this.boundingBoxCount = -1;
@@ -390,7 +393,7 @@ export function init (window) {
         v.loadIndividuals(event.detail);
       });
       v.elSyncForm.addEventListener('load_file', (event) => {
-        v.load(event.detail.file);
+        v.load(event.detail.file, event.detail.bounding_box);
       });
     }
     return v;
