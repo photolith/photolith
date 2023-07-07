@@ -39,8 +39,13 @@ class IndividualAdmin(admin.ModelAdmin):
 
     def image_preview(self, obj):
         return mark_safe(
-            '<img src="%s" style="max-width: 100%%; max-height: 300px;" />'
-            % escape(obj.image.href)
+            """<script>
+            window.addEventListener('DOMContentLoaded', function (event) {
+                this.append(window.croppedImageViewer('%s', %s, 'height: 300px;'));
+            }.bind(document.currentScript.parentElement))
+            </script>
+            """
+            % (obj.image.href, json.dumps(obj.bounding_box))
         )
 
     image_preview.short_description = "Preview"
