@@ -1,9 +1,6 @@
-import os
-
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import FileResponse, HttpResponse
-from django.shortcuts import render
 from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View

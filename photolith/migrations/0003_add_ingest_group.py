@@ -1,5 +1,5 @@
 from django.core.management.sql import emit_post_migrate_signal
-from django.db import models, migrations
+from django.db import migrations
 
 
 def apply_migration(apps, schema_editor):

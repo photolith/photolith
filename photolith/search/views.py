@@ -1,6 +1,3 @@
-import os
-
-from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 from django.forms.models import model_to_dict

@@ -24,6 +24,7 @@ test: compile
 	./manage.py test
 
 lint: lib/.requirements-dev.txt node_modules/.package-dev.json
+	./bin/autoflake -r  --imports django,requests photolith/ | patch -p1
 	./bin/black $(PROJECT)
 	npm run lint
 
