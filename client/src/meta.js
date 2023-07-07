@@ -16,3 +16,14 @@ export function renderMetaCell (data, type, row, meta) {
 export function renderMetaLabel (metaLabel) {
   return htmlEscape(metaLabel);
 }
+
+export function populateIndividualData (indData, elTableBody) {
+  const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
+
+  if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
+
+  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => `<tr>
+    <td>${renderMetaLabel(metaLabels[k])}</td>
+    <td>${renderMetaCell(indData[k], 'display', indData, undefined)}</td>
+  </tr>`).join('\n');
+}

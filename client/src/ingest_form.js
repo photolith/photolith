@@ -1,6 +1,6 @@
 import { displayAlert } from './alert';
 import { jsonFetch } from './json_fetch';
-import { renderMetaLabel, renderMetaCell } from './meta';
+import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
   const elForm = event.target.form;
@@ -36,14 +36,8 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'selected_individual') {
-    const elIndividualDataBody = elForm.querySelector(':scope .individual-data tbody');
     const ids = JSON.parse((elForm[`individuals[${event.target.value}][data]`] || {}).value || '{}');
-    const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
-
-    elIndividualDataBody.innerHTML = Object.keys(metaLabels).map((k) => `<tr>
-      <td>${renderMetaLabel(metaLabels[k])}</td>
-      <td>${renderMetaCell(ids[k], 'display', ids, undefined)}</td>
-    </tr>`).join('\n');
+    populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'));
   }
 }
 
