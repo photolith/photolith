@@ -23,24 +23,6 @@ export default function (props, circleProps) {
   poly.phNodes = [];
 
   poly.phSetPoints = function (newPoints) {
-    // Fill in any gaps in newPoints with absolute position of existing
-    newPoints = newPoints.map((p, i) => {
-      if (p === undefined) {
-        return new fabric.Point(this.phNodes[i].left, this.phNodes[i].top);
-      }
-      if (p === null) {
-        return null;
-      }
-      return p;
-    }).filter((p, i) => {
-      // Remove any nodes filtered with null
-      if (p !== null) return true;
-      this.canvas.remove(this.phNodes[i]);
-      this.phNodes.splice(i, 1);
-      return false;
-    });
-    if (newPoints.length === 0) return;
-
     // Add any missing phNodes
     while (this.phNodes.length < newPoints.length) {
       const idx = this.phNodes.length;
@@ -56,7 +38,6 @@ export default function (props, circleProps) {
       // NB: We have to set position before canvas.add()
       obj.setPositionByOrigin(newPoints[idx], 'center', 'center');
       obj.hasControls = false;
-      obj.phNodeIdx = idx;
       obj.on('moving', poly.phUpdateNode.bind(poly, obj));
       this.phNodes.push(obj);
       this.canvas.add(obj);
@@ -66,6 +47,7 @@ export default function (props, circleProps) {
     while (this.phNodes.length > newPoints.length) {
       this.canvas.remove(this.phNodes.pop());
     }
+    if (this.phNodes.length === 0) return;
 
     // Work out new limits of polyline
     const newLimits = newPoints.reduce((acc, p) => {
@@ -87,6 +69,7 @@ export default function (props, circleProps) {
     const canvasToPoly = fabric.util.invertTransform(this.calcTransformMatrix());
     this.points = newPoints.map((p, i) => {
       this.phNodes[i].setPositionByOrigin(p, 'center', 'center');
+      this.phNodes[i].phNodeIdx = i;
 
       return fabric.util.transformPoint(p, canvasToPoly);
     });
@@ -105,38 +88,45 @@ export default function (props, circleProps) {
 
   // Helper to append point to existing list of nodes
   poly.phAddNode = function (newPoint) {
-    const points = Array.apply(null, Array(poly.points.length));
-    points.push(newPoint);
+    let i;
+    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+
+    // Find first point that is further than the origin than our point, splice in new point here.
+    for (i = 0; i < points.length; i++) {
+      if (points[i].distanceFrom(points[0]) > newPoint.distanceFrom(points[0])) break;
+    }
+    points.splice(i, 0, newPoint);
+
     return poly.phSetPoints(points);
   };
 
   // Update location of a moved node
-  poly.phUpdateNode = function (phNode) {
-    const points = Array.apply(null, Array(poly.points.length));
-    points[this.phNodeIdx] = new fabric.Point(phNode.left, phNode.top);
+  poly.phUpdateNode = function (phNode, opt) {
+    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+
     poly.phSetPoints(points);
   };
 
   // Remove pointer to phNode
   poly.phRemoveNode = function (phNode) {
-    const points = Array.apply(null, Array(poly.points.length));
+    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
 
-    if (phNode.phNodeIdx === undefined) return;
+    // Remove point at given index
+    points.splice(phNode.phNodeIdx, 1);
 
-    points[phNode.phNodeIdx] = null;
     return poly.phSetPoints(points);
   };
 
   poly.on('moving', (event) => {
     // Refresh points based on their new position
-    const points = Array.apply(null, Array((poly.points || []).length));
-    poly.phSetPoints(points);
+    const points = poly.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    return poly.phSetPoints(points);
   });
 
   poly.on('phCanvasZoom', (event) => {
     // Refresh points to correct for any zoom error
-    const points = Array.apply(null, Array((poly.points || []).length));
-    poly.phSetPoints(points);
+    const points = poly.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    return poly.phSetPoints(points);
   });
 
   // Wait for a bit, zoom to init canvas
