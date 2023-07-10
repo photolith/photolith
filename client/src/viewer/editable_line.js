@@ -1,5 +1,18 @@
 import { fabric } from 'fabric';
 
+// Return point between (p1) & (p2) that's closest to (newPoint)
+function betweenPoints (p1, p2, newPoint) {
+  // One of the points undefined probably means we fell of either end when iterating
+  if (p1 === undefined || p2 === undefined) return newPoint;
+
+  if (p1.distanceFrom(p2) / newPoint.distanceFrom(p2) < 1) {
+    // Try p2 -> p1 first, don't go beyond p1
+    return p1;
+  }
+  // Find point along line between p1 & p2 that is same ratio of distances as given point
+  return p1.lerp(p2, Math.min(newPoint.distanceFrom(p1) / p2.distanceFrom(p1), 1));
+}
+
 export default function (props, circleProps) {
   props.strokeWidth = props.strokeWidth || 3;
   props.radius = props.radius || 10;
@@ -87,7 +100,7 @@ export default function (props, circleProps) {
   };
 
   // Helper to append point to existing list of nodes
-  poly.phAddNode = function (newPoint) {
+  poly.phAddNode = function (newPoint, opt) {
     let i;
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
 
@@ -95,15 +108,18 @@ export default function (props, circleProps) {
     for (i = 0; i < points.length; i++) {
       if (points[i].distanceFrom(points[0]) > newPoint.distanceFrom(points[0])) break;
     }
-    points.splice(i, 0, newPoint);
+    points.splice(i, 0, opt.e.ctrlKey ? newPoint : betweenPoints(points[i - 1], points[i], newPoint));
 
-    return poly.phSetPoints(points);
+    poly.phSetPoints(points);
+    this.canvas.setActiveObject(this.phNodes[i]);
   };
 
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
 
+    // Snap to line between siblings unless ctrl is held
+    if (!opt.e.ctrlKey) points[phNode.phNodeIdx] = betweenPoints(points[phNode.phNodeIdx - 1], points[phNode.phNodeIdx + 1], points[phNode.phNodeIdx]);
     poly.phSetPoints(points);
   };
 
@@ -114,7 +130,8 @@ export default function (props, circleProps) {
     // Remove point at given index
     points.splice(phNode.phNodeIdx, 1);
 
-    return poly.phSetPoints(points);
+    poly.phSetPoints(points);
+    this.canvas.setActiveObject(this.phNodes[phNode.phNodeIdx - 1]);
   };
 
   poly.on('moving', (event) => {
