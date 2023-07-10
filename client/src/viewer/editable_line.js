@@ -13,9 +13,11 @@ function betweenPoints (p1, p2, newPoint) {
   return p1.lerp(p2, Math.min(newPoint.distanceFrom(p1) / p2.distanceFrom(p1), 1));
 }
 
-export default function (props, circleProps) {
+export default function (props = {}, circleProps = {}, endcapRadius) {
   props.strokeWidth = props.strokeWidth || 3;
-  props.radius = props.radius || 10;
+  circleProps.strokeWidth = circleProps.strokeWidth || props.strokeWidth;
+  circleProps.radius = circleProps.radius || 10;
+  endcapRadius = endcapRadius || 3;
 
   const poly = new fabric.Polyline([], Object.assign({}, {
     left: 0,
@@ -40,8 +42,6 @@ export default function (props, circleProps) {
     while (this.phNodes.length < newPoints.length) {
       const idx = this.phNodes.length;
       const obj = new fabric.Circle(Object.assign({}, {
-        strokeWidth: props.strokeWidth,
-        radius: props.radius,
         fill: 'transparent',
         stroke: 'orangered',
         originX: 'center',
@@ -88,11 +88,11 @@ export default function (props, circleProps) {
     });
 
     // Make sure each phNode & line is scaled for current zoom level
-    this.phNodes.forEach((obj) => {
-      obj.strokeWidth = props.strokeWidth / this.canvas.getZoom();
-      obj.radius = props.radius / this.canvas.getZoom();
-      obj.width = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
-      obj.height = ((props.radius + props.strokeWidth) * 2) / this.canvas.getZoom();
+    this.phNodes.forEach((obj, i) => {
+      const endCap = i === 0 || i === (this.phNodes.length - 1);
+      obj.strokeWidth = circleProps.strokeWidth / this.canvas.getZoom();
+      obj.radius = (endCap ? endcapRadius : circleProps.radius) / this.canvas.getZoom();
+      obj.width = obj.height = (obj.radius + obj.strokeWidth) * 2;
     });
     this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
 
