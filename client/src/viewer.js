@@ -238,16 +238,17 @@ class PhCropper extends PhViewer {
   }
 
   selection (opt) {
-    for (let i = 0; i < opt.selected.length; i++) {
-      const m = (opt.selected[i].id || '').match(/^individuals\[(.*)\]\[bounding_box\]$/);
+    if (!this.elSyncForm || !this.elSyncForm.selected) return;
 
-      if (m) {
-        this.elSyncForm.selected_individual.value = m[1];
-        this.elSyncForm.selected_individual.dispatchEvent(new window.UIEvent('change', {
+    for (let i = 0; i < opt.selected.length; i++) {
+      if (opt.selected[i].id) {
+        this.elSyncForm.selected.value = opt.selected[i].id;
+        this.elSyncForm.selected.dispatchEvent(new window.UIEvent('change', {
           view: window,
           bubbles: true,
           cancelable: true
         }));
+        return;
       }
     }
   }

@@ -6,7 +6,7 @@ function formRefresh (event) {
   const elForm = event.target.form;
 
   // Can progress iff all form elements are filled in
-  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selected_individual' && el.name !== 'image_href' && !el.value);
+  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selected' && el.name !== 'image_href' && !el.value);
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
@@ -20,14 +20,14 @@ function formRefresh (event) {
       sd.individuals.forEach((ind, i) => {
         elForm[`individuals[${i}][data]`].value = JSON.stringify(ind);
       });
-      elForm.selected_individual.value = '';
+      elForm.selected.value = '';
       elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: sd.individuals }));
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
-      elForm.selected_individual.value = '';
+      elForm.selected.value = '';
       throw err;
     }).finally(() => {
-      elForm.selected_individual.dispatchEvent(new window.UIEvent('change', {
+      elForm.selected.dispatchEvent(new window.UIEvent('change', {
         view: window,
         bubbles: true,
         cancelable: true
@@ -35,8 +35,8 @@ function formRefresh (event) {
     });
   }
 
-  if (event.target.name === 'selected_individual') {
-    const ids = JSON.parse((elForm[`individuals[${event.target.value}][data]`] || {}).value || '{}');
+  if (event.target.name === 'selected') {
+    const ids = JSON.parse((elForm[event.target.value.replace(/\[bounding_box\]/, '[data]')] || {}).value || '{}');
     populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'));
   }
 }
