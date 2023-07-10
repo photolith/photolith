@@ -11,7 +11,7 @@ export function init (window) {
 
     function childRow (row) {
       const el = document.createElement('DIV');
-      el.append(croppedImageViewer(row.image, row.bounding_box, 'height: 300px;'));
+      el.prepend(croppedImageViewer(row.image, row.bounding_box, 'width: 50%;'));
       return el;
     }
 

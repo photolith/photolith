@@ -1,8 +1,11 @@
 export function croppedImageViewer (href, boundingBox, canvasStyle) {
-  const elCanvas = document.createElement('CANVAS');
+  const elViewer = document.createElement('DIV');
+  elViewer.innerHTML = '<canvas style="max-width: 100%; max-height: 100%;">';
   const elImage = new window.Image();
+  const elCanvas = elViewer.firstChild;
 
-  elCanvas.setAttribute('style', canvasStyle || '');
+  elViewer.setAttribute('style', canvasStyle || '');
+  elViewer.setAttribute('class', 'ph-cropped-viewer rendering');
 
   // Size canvas to natural size of cropped area (CSS will worry about scaling)
   elCanvas.width = boundingBox[1][0] - boundingBox[0][0];
@@ -26,8 +29,9 @@ export function croppedImageViewer (href, boundingBox, canvasStyle) {
       elCanvas.height
     );
     elImage.src = '';
+    elViewer.classList.remove('rendering');
   };
   elImage.src = href;
 
-  return elCanvas;
+  return elViewer;
 }
