@@ -232,6 +232,7 @@ class PhSyncingViewer extends PhViewer {
     this.fabCanvas.on('object:modified', this.syncForm.bind(this));
     this.fabCanvas.on('object:removed', this.syncForm.bind(this));
     this.fabCanvas.on({
+      'selection:cleared': this.selection.bind(this),
       'selection:created': this.selection.bind(this),
       'selection:updated': this.selection.bind(this)
     });
@@ -240,12 +241,17 @@ class PhSyncingViewer extends PhViewer {
   selection (opt) {
     if (!this.elSyncForm || !this.elSyncForm.selection) return;
 
-    for (let i = 0; i < opt.selected.length; i++) {
+    let newVal = '';
+    for (let i = 0; i < (opt.selected || []).length; i++) {
       if (opt.selected[i].id) {
-        this.elSyncForm.selection.value = opt.selected[i].id;
-        this.elSyncForm.selection.dispatchEvent(changeEvent(999));
-        return;
+        newVal = opt.selected[i].id;
+        break;
       }
+    }
+
+    if (this.elSyncForm.selection.value !== newVal) {
+      this.elSyncForm.selection.value = newVal;
+      this.elSyncForm.selection.dispatchEvent(changeEvent(999));
     }
   }
 
