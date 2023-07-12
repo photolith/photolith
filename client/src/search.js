@@ -36,6 +36,10 @@ export function init (window) {
           render: renderMetaCell
         };
       }),
+      createdRow: function (row, data, dataIndex) {
+        // Get bootstrap to add a hand cursor
+        row.setAttribute('role', 'button');
+      },
       searching: false
     });
 
