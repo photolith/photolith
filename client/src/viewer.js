@@ -224,12 +224,11 @@ class PhViewer {
   }
 }
 
-class PhCropper extends PhViewer {
+class PhSyncingViewer extends PhViewer {
   constructor (elViewer) {
     super(elViewer);
-    this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
 
-    this.fabCanvas.on('object:added', this.syncForm.bind(this));
+    this.fabCanvas.on('object:added', this.reverseSyncForm.bind(this));
     this.fabCanvas.on('object:modified', this.syncForm.bind(this));
     this.fabCanvas.on('object:removed', this.syncForm.bind(this));
     this.fabCanvas.on({
@@ -244,40 +243,67 @@ class PhCropper extends PhViewer {
     for (let i = 0; i < opt.selected.length; i++) {
       if (opt.selected[i].id) {
         this.elSyncForm.selected.value = opt.selected[i].id;
-        this.elSyncForm.selected.dispatchEvent(changeEvent());
+        this.elSyncForm.selected.dispatchEvent(changeEvent(999));
         return;
       }
     }
   }
 
   syncForm (opt) {
+    const obj = opt.target;
+    let newVal;
+
+    // No point without an associated form element
+    if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
+    const formEl = this.elSyncForm.elements[obj.id];
+
     function roundPoint (p) {
       return [Math.round(p.x), Math.round(p.y)];
     }
 
-    const setForm = (name, value) => {
-      if (!this.elSyncForm.elements[name]) return;
-      this.elSyncForm.elements[name].value = value === null ? '' : JSON.stringify(value);
-    };
+    if (obj instanceof fabric.Polyline) {
+      const objToCanvas = obj.calcTransformMatrix();
 
-    // If part of an event, null whatever received the event, so removals propogate
-    if (opt && opt.target.id) setForm(opt.target.id, null);
+      newVal = obj.points.map((p) => {
+        return roundPoint(fabric.util.transformPoint(p, objToCanvas));
+      });
+    } else {
+      const ac = obj.calcACoords();
 
-    this.fabCanvas.getObjects().forEach((obj) => {
-      if (!obj.id) {
-        // Ignore unnamed objects
-      } else if (obj instanceof fabric.Polyline) {
-        const objToCanvas = obj.calcTransformMatrix();
+      newVal = [roundPoint(ac.tl), roundPoint(ac.br)];
+    }
 
-        setForm(obj.id, obj.points.map((p) => {
-          return roundPoint(fabric.util.transformPoint(p, objToCanvas));
-        }));
-      } else {
-        const ac = obj.calcACoords();
+    newVal = newVal === undefined ? '' : JSON.stringify(newVal);
+    if (formEl.value !== newVal) {
+      formEl.value = newVal;
+      formEl.dispatchEvent(changeEvent(999));
+    }
+  }
 
-        setForm(obj.id, [roundPoint(ac.tl), roundPoint(ac.br)]);
-      }
-    });
+  reverseSyncForm (opt) {
+    const obj = opt.target;
+
+    // No point without an associated form element
+    if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
+    const formEl = this.elSyncForm.elements[obj.id];
+
+    const val = formEl.value ? JSON.parse(formEl.value) : undefined;
+
+    if (val === undefined) {
+      // Empty value --> form hasn't been populated yet. Do opposite
+      this.syncForm({ target: obj });
+    } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
+      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])));
+    } else {
+      throw new Error(`Cannot apply value to ${obj.id}`);
+    }
+  }
+}
+
+class PhCropper extends PhSyncingViewer {
+  constructor (elViewer) {
+    super(elViewer);
+    this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
   }
 
   boundingBox (objId, title) {
@@ -300,8 +326,6 @@ class PhCropper extends PhViewer {
 
     obj.setControlsVisibility({ mtr: false });
     if (!obj.canvas) {
-      this.fabCanvas.add(obj);
-
       // Set initial position based on boundingBoxCount
       this.boundingBoxCount++;
       const countWidth = 5; const countHeight = 5;
@@ -333,9 +357,8 @@ class PhCropper extends PhViewer {
           scaleY: 1
         });
       });
-      obj.on('select', (opt) => {
 
-      });
+      this.fabCanvas.add(obj);
     }
 
     return obj;
@@ -377,7 +400,6 @@ class PhCropper extends PhViewer {
       const obj = this.boundingBox(`individuals[${i}][bounding_box]`, ind.title);
       if (i === 0) this.fabCanvas.setActiveObject(obj);
     });
-    this.syncForm();
   }
 }
 
@@ -389,6 +411,10 @@ export function init (window) {
       v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
       v.elSyncForm.addEventListener('load_individuals', (event) => {
         v.loadIndividuals(event.detail);
+      });
+      v.elSyncForm.addEventListener('change', (event) => {
+        if (event.detail === 999) return; // Break loops
+        v.reverseSyncForm({ target: v.fabCanvas.phGetObjectById(event.target.name) });
       });
       v.elSyncForm.addEventListener('load_file', (event) => {
         v.load(event.detail.file, event.detail.bounding_box);

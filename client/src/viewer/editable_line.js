@@ -96,7 +96,10 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     });
     this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
 
-    if (this.canvas) this.canvas.requestRenderAll();
+    if (this.canvas) {
+      this.canvas.fire('object:modified', { target: this });
+      this.canvas.requestRenderAll();
+    }
   };
 
   // Helper to append point to existing list of nodes
