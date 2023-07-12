@@ -83,6 +83,7 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     this.points = newPoints.map((p, i) => {
       this.phNodes[i].setPositionByOrigin(p, 'center', 'center');
       this.phNodes[i].phNodeIdx = i;
+      this.phNodes[i].id = `${this.id}[${i}]`;
 
       return fabric.util.transformPoint(p, canvasToPoly);
     });

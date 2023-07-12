@@ -15,6 +15,9 @@ export function init (window) {
       el.innerHTML = `
         <div class="col-5" style="line-height: 0"></div>
         <div class="col-7">
+          <div class="text-end">
+            <a href="/annotate/${row.id}/${document.location.search}" class="btn btn-info">${elSearchTable.getAttribute('data-i18n-new-annotation')}</a>
+          </div>
         </div>
       `;
       el.firstElementChild.prepend(croppedImageViewer(row.image, row.bounding_box));

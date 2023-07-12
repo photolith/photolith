@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Annotate Individual" %}{% endblock title %}
+{% block contentclass %}container-fluid{% endblock contentclass %}
+
+{% block pre_content %}
+{{ ind_dict|json_script:"individual_json" }}
+{% endblock pre_content %}
+
+{% block content %}
+
+<div class="ph-viewer ph-annotate mb-2" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item" role="presentation"><button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadata-tab-pane" type="button" role="tab" aria-controls="metadata-tab-pane" aria-selected="true">
+    {% translate 'Individual Metadata' %}
+  </button></li>
+  <li class="nav-item" role="presentation"><button class="nav-link" id="existing-tab" data-bs-toggle="tab" data-bs-target="#existing-tab-pane" type="button" role="tab" aria-controls="existing-tab-pane" aria-selected="true">
+    {% translate 'Existing Annotations' %}
+  </button></li>
+  <li class="nav-item" role="presentation"><button class="nav-link active" id="editor-tab" data-bs-toggle="tab" data-bs-target="#editor-tab-pane" type="button" role="tab" aria-controls="editor-tab-pane" aria-selected="true">
+    {% translate 'Annotate' %}
+  </button></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane" id="metadata-tab-pane" role="tabpanel" aria-labelledby="metadata-tab" tabindex="0">
+
+    <table class="table table-striped individual-data" style="">
+      <thead><tr><th>{% translate "Key" %}</th><th>{% translate "Value" %}</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+  <div class="tab-pane" id="existing-tab-pane" role="tabpanel" aria-labelledby="existing-tab" tabindex="0">
+
+    <table class="table table-striped annotation-data" style="">
+      <thead><tr>
+        <th>{% translate "Date" %}</th>
+        <th>{% translate "Author" %}</th>
+        <th>{% translate "Age" %}</th>
+        <th>{% translate "Rating" %}</th>
+        <th>{% translate "Notes" %}</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn btn-info btn-block" disabled>{% translate 'Copy full annotation' %}</button>
+    <button class="btn btn-info btn-block" disabled>{% translate 'Copy line only' %}</button>
+
+  </div>
+  <div class="tab-pane show active" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
+
+    <form class="annotate-form mt-2 row">
+      {% csrf_token %}
+      <input type="hidden" name="selection" value="" />
+      <div class="col">
+
+        <div class="mb-3">
+          <label for="age-input" class="form-label">{% translate "Age reading" %}</label>
+          <input type="number" name="age" class="form-control" id="age-input" value="10" />
+        </div>
+        <div class="mb-3">
+          <label for="rating-select" class="form-label">{% translate "Image rating" %}</label>
+          <select name="rating" class="form-select" id="rating-select">
+            {% for r in rating %}
+              <option value="{{ r.id }}">{% translate r.title %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="notes-textarea" class="form-label">{% translate "Notes" %}</label>
+          <textarea name="notes" class="form-control" id="notes-textarea"></textarea>
+        </div>
+        <div class="col" style="text-align: right;">
+          <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success" disabled="disabled">
+        </div>
+
+      </div>
+      <div class="col">
+
+        <input type="hidden" name="annotate_poly" value="[]">
+        <table id="annotate_poly_table" class="table table-striped point-data" style="">
+          <thead><tr>
+            <th>{% translate "Point" %}</th>
+            <th>{% translate "Distance (mm)" %}</th>
+            <th>{% translate "Cumulative (mm)" %}</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock content %}
