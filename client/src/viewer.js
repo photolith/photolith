@@ -238,12 +238,12 @@ class PhSyncingViewer extends PhViewer {
   }
 
   selection (opt) {
-    if (!this.elSyncForm || !this.elSyncForm.selected) return;
+    if (!this.elSyncForm || !this.elSyncForm.selection) return;
 
     for (let i = 0; i < opt.selected.length; i++) {
       if (opt.selected[i].id) {
-        this.elSyncForm.selected.value = opt.selected[i].id;
-        this.elSyncForm.selected.dispatchEvent(changeEvent(999));
+        this.elSyncForm.selection.value = opt.selected[i].id;
+        this.elSyncForm.selection.dispatchEvent(changeEvent(999));
         return;
       }
     }

@@ -25,6 +25,7 @@
 
   <form class="ingest-form mt-2">
     {% csrf_token %}
+    <input type="hidden" name="selection" value="" />
     <input type="hidden" name="image_file" >
     <input type="hidden" name="image_href" >
     <div class="row">
@@ -44,7 +45,6 @@
       <div class="col" style="position: relative;">
         <div style="overflow-y: scroll; position: absolute; top: 0; right: 0.75rem; bottom: 0; left: 0.75rem; width: auto">
           <input type="hidden" name="scale_line" value="" />
-          <input type="hidden" name="selected" value="" />
           <div class="individuals"></div>
           <table class="table table-striped individual-data" style="">
             <thead><tr><th>{% translate "Key" %}</th><th>{% translate "Value" %}</th></tr></thead>
