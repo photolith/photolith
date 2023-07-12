@@ -1,4 +1,5 @@
 import { displayAlert } from './alert';
+import { changeEvent } from './events';
 import { jsonFetch } from './json_fetch';
 import { populateIndividualData } from './meta';
 
@@ -27,11 +28,7 @@ function formRefresh (event) {
       elForm.selected.value = '';
       throw err;
     }).finally(() => {
-      elForm.selected.dispatchEvent(new window.UIEvent('change', {
-        view: window,
-        bubbles: true,
-        cancelable: true
-      }));
+      elForm.selected.dispatchEvent(changeEvent());
     });
   }
 

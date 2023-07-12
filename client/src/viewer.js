@@ -1,4 +1,5 @@
 import { fabric } from 'fabric';
+import { changeEvent } from './events';
 import EditableLine from './viewer/editable_line';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
@@ -243,11 +244,7 @@ class PhCropper extends PhViewer {
     for (let i = 0; i < opt.selected.length; i++) {
       if (opt.selected[i].id) {
         this.elSyncForm.selected.value = opt.selected[i].id;
-        this.elSyncForm.selected.dispatchEvent(new window.UIEvent('change', {
-          view: window,
-          bubbles: true,
-          cancelable: true
-        }));
+        this.elSyncForm.selected.dispatchEvent(changeEvent());
         return;
       }
     }
