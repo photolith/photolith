@@ -11,7 +11,13 @@ export function init (window) {
 
     function childRow (row) {
       const el = document.createElement('DIV');
-      el.prepend(croppedImageViewer(row.image, row.bounding_box, 'width: 50%;'));
+      el.className = 'row align-items-end';
+      el.innerHTML = `
+        <div class="col-5" style="line-height: 0"></div>
+        <div class="col-7">
+        </div>
+      `;
+      el.firstElementChild.prepend(croppedImageViewer(row.image, row.bounding_box));
       return el;
     }
 
