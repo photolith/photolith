@@ -55,7 +55,7 @@ export function init (window) {
       }));
       elForm.annotate_poly.value = JSON.stringify([
         [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
-        [indData.bounding_box[0][0], indData.bounding_box[0][1]]
+        [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
       ]);
       elForm.annotate_poly.dispatchEvent(changeEvent());
     });
