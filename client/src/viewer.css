@@ -42,6 +42,7 @@
 .rendering > * {
   filter: blur(10px);
   transform: scale(1.03);
+  overflow: hidden;
 }
 
 .rendering::after {
