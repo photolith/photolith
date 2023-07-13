@@ -2,7 +2,7 @@ import numbers
 
 from django.conf import settings
 from django.db import models
-from django.conf import settings
+from django.utils.translation import gettext as _
 
 
 class Image(models.Model):
@@ -153,3 +153,27 @@ class Taxonomy(models.Model):
                 self.identifier = v
             elif hasattr(self, "str_%s" % k):
                 setattr(self, "str_%s" % k, v)
+
+
+class Annotation(models.Model):
+    """
+    A user's annotations and verdict of an individual
+    """
+
+    class Rating(models.IntegerChoices):
+        POOR = 0, _("Unreadable")
+        ACCEPTABLE = 50, _("Average")
+        GOOD = 100, _("Perfect")
+
+    individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    rating = models.PositiveSmallIntegerField(
+        _("Image rating"), null=True, choices=Rating.choices
+    )
+    age = models.IntegerField(_("Age reading"), null=True)
+    comment = models.TextField(_("Notes"), null=False, default="")
+    bisect_poly = models.JSONField(null=True)
