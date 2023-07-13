@@ -73,10 +73,13 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
             bottom: Math.max(acc.bottom, p.y)
           };
     }, null);
-    this.left = newLimits.left;
-    this.top = newLimits.top;
-    this.width = newLimits.right - newLimits.left;
-    this.height = newLimits.bottom - newLimits.top;
+    this.set({
+      left: newLimits.left,
+      top: newLimits.top,
+      width: newLimits.right - newLimits.left,
+      height: newLimits.bottom - newLimits.top
+    });
+    this.setCoords(); // http://fabricjs.com/fabric-gotchas
 
     // Reposition nodes & polyline points
     const canvasToPoly = fabric.util.invertTransform(this.calcTransformMatrix());
