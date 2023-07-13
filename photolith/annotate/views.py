@@ -1,14 +1,48 @@
+from django.core.exceptions import BadRequest
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.views.generic import TemplateView
+from django.shortcuts import redirect
+from django.views.generic.edit import FormView
 
 
 from ..errors import json_errors
-from ..models import Individual
+from ..forms import AnnotationForm
+from ..models import Individual, Annotation
 
 
-class AnnotateView(PermissionRequiredMixin, TemplateView):
+class AnnotateView(PermissionRequiredMixin, FormView):
     permission_required = ("photolith.view_individual",)
     template_name = "annotate/annotate.html"
+    form_class = AnnotationForm
+
+    def form_valid(self, form):
+        obj = form.save()
+        if not obj.created_by:
+            obj.created_by = self.request.user
+        obj.save()
+        return redirect(
+            "annotate:annotate_existing",
+            individual_id=self.kwargs["individual_id"],
+            annotation_id=obj.id,
+        )
+
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+
+        if "annotation_id" in self.kwargs:
+            obj = Annotation.objects.get(id=self.kwargs["annotation_id"])
+            if obj.individual_id != self.kwargs["individual_id"]:
+                raise BadRequest(
+                    "Annotation %s is for individual %d, not %d"
+                    % (str(obj), obj.individual_id, self.kwargs["individual_id"])
+                )
+            if (
+                not self.request.user.is_superuser
+                and obj.created_by != self.request.user
+            ):
+                raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
+            kw["instance"] = obj
+
+        return kw
 
     def get_individual(self, individual_id):
         ind = Individual.objects.get(id=individual_id)
@@ -22,12 +56,6 @@ class AnnotateView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ind_dict"] = self.get_individual(kwargs["individual_id"])
-        context["rating"] = [
-            dict(id=1, title="1: Image unreadable"),
-            dict(id=2, title="2: "),
-            dict(id=3, title="3: "),
-            dict(id=4, title="4: "),
-            dict(id=5, title="5: Image clear"),
-        ]
+        context["individual_id"] = int(self.kwargs["individual_id"])
+        context["ind_dict"] = self.get_individual(context["individual_id"])
         return context

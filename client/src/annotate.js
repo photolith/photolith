@@ -1,7 +1,6 @@
 import { fabric } from 'fabric';
 
 import { populateIndividualData } from './meta';
-import { changeEvent } from './events';
 
 function formRefresh (event) {
   if (event.target.name === 'bisect_poly') {
@@ -40,6 +39,14 @@ export function init (window) {
       new fabric.Point(indData.scale_line[1][0], indData.scale_line[1][1])
     );
 
+    // If server-side returned null for bisect_poly, populate an intial value
+    elForm.bisect_poly.value = elForm.bisect_poly.value === 'null'
+      ? JSON.stringify([
+        [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
+        [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
+      ])
+      : elForm.bisect_poly.value;
+
     elForm.addEventListener('change', formRefresh);
 
     populateIndividualData(indData.data);
@@ -53,11 +60,6 @@ export function init (window) {
           bounding_box: indData.bounding_box
         }
       }));
-      elForm.bisect_poly.value = JSON.stringify([
-        [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
-        [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
-      ]);
-      elForm.bisect_poly.dispatchEvent(changeEvent());
     });
   });
 }

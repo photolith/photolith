@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% load i18n %}
 {% block title %}{% translate "Annotate Individual" %}{% endblock title %}
 {% block contentclass %}container-fluid{% endblock contentclass %}
@@ -50,35 +51,33 @@
   </div>
   <div class="tab-pane show active" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
 
-    <form class="annotate-form mt-2 row">
+    <form action="{{ request.path }}" method="POST" class="annotate-form mt-2 row">
       {% csrf_token %}
       <input type="hidden" name="selection" value="" />
       <div class="col">
 
+        {% if form.errors %}
+          <div class="mb-3 alert alert-danger">
+            {{form.errors}}
+          </div>
+        {% endif %}
         <div class="mb-3">
-          <label for="age-input" class="form-label">{% translate "Age reading" %}</label>
-          <input type="number" name="age" class="form-control" id="age-input" value="10" />
+          {{ form.age|as_crispy_field }}
         </div>
         <div class="mb-3">
-          <label for="rating-select" class="form-label">{% translate "Image rating" %}</label>
-          <select name="rating" class="form-select" id="rating-select">
-            {% for r in rating %}
-              <option value="{{ r.id }}">{% translate r.title %}</option>
-            {% endfor %}
-          </select>
+          {{ form.rating|as_crispy_field }}
         </div>
         <div class="mb-3">
-          <label for="notes-textarea" class="form-label">{% translate "Notes" %}</label>
-          <textarea name="notes" class="form-control" id="notes-textarea"></textarea>
+          {{ form.comment|as_crispy_field }}
         </div>
         <div class="col" style="text-align: right;">
-          <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success" disabled="disabled">
+          <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success">
         </div>
 
       </div>
       <div class="col">
 
-        <input type="hidden" name="bisect_poly" value="[]">
+        {{ form.bisect_poly|as_crispy_field }}
         <table id="bisect_poly_table" class="table table-striped point-data" style="">
           <thead><tr>
             <th>{% translate "Point" %}</th>
