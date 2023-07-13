@@ -4,13 +4,13 @@ import { populateIndividualData } from './meta';
 import { changeEvent } from './events';
 
 function formRefresh (event) {
-  if (event.target.name === 'annotate_poly') {
-    const elTableBody = window.document.querySelector('#annotate_poly_table tbody');
+  if (event.target.name === 'bisect_poly') {
+    const elTableBody = window.document.querySelector('#bisect_poly_table tbody');
     const pointData = JSON.parse(event.target.value || '[]').map((p) => new fabric.Point(p[0], p[1]));
     let totalDist = 0;
 
     // Find currently selected point
-    let selectedIdx = event.target.form.selection.value.match(/^annotate_poly\[(\d+)\]$/);
+    let selectedIdx = event.target.form.selection.value.match(/^bisect_poly\[(\d+)\]$/);
     selectedIdx = selectedIdx ? parseInt(selectedIdx[1], 10) : null;
 
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
@@ -27,7 +27,7 @@ function formRefresh (event) {
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh({ target: event.target.form.annotate_poly });
+    formRefresh({ target: event.target.form.bisect_poly });
   }
 }
 
@@ -53,11 +53,11 @@ export function init (window) {
           bounding_box: indData.bounding_box
         }
       }));
-      elForm.annotate_poly.value = JSON.stringify([
+      elForm.bisect_poly.value = JSON.stringify([
         [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
         [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
       ]);
-      elForm.annotate_poly.dispatchEvent(changeEvent());
+      elForm.bisect_poly.dispatchEvent(changeEvent());
     });
   });
 }

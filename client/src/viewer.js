@@ -411,8 +411,8 @@ class PhCropper extends PhSyncingViewer {
 
 class PhAnnotate extends PhSyncingViewer {
   annotatePoly () {
-    const obj = this.fabCanvas.phGetObjectById('annotate_poly') || new EditableLine({
-      id: 'annotate_poly',
+    const obj = this.fabCanvas.phGetObjectById('bisect_poly') || new EditableLine({
+      id: 'bisect_poly',
       stroke: `rgba(${rgbHighlight}, 0.6)`
     }, {
       stroke: `rgba(${rgbHighlight}, 1)`
