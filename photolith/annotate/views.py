@@ -15,7 +15,8 @@ class AnnotateView(PermissionRequiredMixin, FormView):
     form_class = AnnotationForm
 
     def form_valid(self, form):
-        obj = form.save()
+        obj = form.save(commit=False)
+        obj.individual_id = self.kwargs["individual_id"]
         if not obj.created_by:
             obj.created_by = self.request.user
         obj.save()
