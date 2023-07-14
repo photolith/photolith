@@ -1,5 +1,6 @@
 import { fabric } from 'fabric';
 
+import { changeEvent } from './events';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
@@ -30,6 +31,30 @@ function formRefresh (event) {
   }
 }
 
+function allAnnotationsClick (elForm, event) {
+  if (event.target.tagName === 'BUTTON') {
+    const elScript = this.querySelector('tbody > tr.table-info script.bisect_poly');
+    let bisectPoly = elScript ? JSON.parse(elScript.textContent) : undefined;
+    if (!bisectPoly) return;
+
+    if (event.target.classList.contains('ph-copy-line')) {
+      // Strip out everything in the middle
+      bisectPoly = [bisectPoly[0], bisectPoly[bisectPoly.length - 1]];
+    }
+
+    elForm.bisect_poly.value = JSON.stringify(bisectPoly);
+    elForm.bisect_poly.dispatchEvent(changeEvent());
+  } else {
+    const elTr = event.target.closest('tbody > tr');
+    if (!elTr) return;
+
+    Array.from(elTr.parentElement.children).forEach((el) => {
+      el.classList.remove('table-info');
+    });
+    elTr.classList.add('table-info');
+  }
+}
+
 export function init (window) {
   window.document.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('individual_json').textContent);
@@ -48,6 +73,8 @@ export function init (window) {
       : elForm.bisect_poly.value;
 
     elForm.addEventListener('change', formRefresh);
+
+    document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
     populateIndividualData(indData.data);
     return window.fetch(indData.href).then((resp) => {
