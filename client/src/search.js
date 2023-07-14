@@ -20,7 +20,7 @@ export function init (window) {
           </div>
         </div>
       `;
-      el.firstElementChild.prepend(croppedImageViewer(row.image, row.bounding_box));
+      el.firstElementChild.prepend(croppedImageViewer(row.image__href, row.bounding_box));
       return el;
     }
 
