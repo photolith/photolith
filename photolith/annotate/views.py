@@ -17,8 +17,8 @@ class AnnotateView(PermissionRequiredMixin, FormView):
     def form_valid(self, form):
         obj = form.save(commit=False)
         obj.individual_id = self.kwargs["individual_id"]
-        if not obj.created_by:
-            obj.created_by = self.request.user
+        if not obj.edit_allowed(self.request.user):
+            raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
         obj.save()
         return redirect(
             "annotate:annotate_existing",
@@ -36,10 +36,7 @@ class AnnotateView(PermissionRequiredMixin, FormView):
                     "Annotation %s is for individual %d, not %d"
                     % (str(obj), obj.individual_id, self.kwargs["individual_id"])
                 )
-            if (
-                not self.request.user.is_superuser
-                and obj.created_by != self.request.user
-            ):
+            if not obj.edit_allowed(self.request.user):
                 raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
             kw["instance"] = obj
 

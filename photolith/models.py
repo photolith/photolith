@@ -177,3 +177,9 @@ class Annotation(models.Model):
     age = models.IntegerField(_("Age reading"), null=True)
     comment = models.TextField(_("Notes"), null=False, default="")
     bisect_poly = models.JSONField(null=True)
+
+    def edit_allowed(self, user):
+        """True iff (user) is allowed to edit this annotation. Assign user if one not already assigned"""
+        if not self.created_by:
+            self.created_by = user
+        return user.is_superuser or created_by == user
