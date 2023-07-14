@@ -52,8 +52,16 @@ class AnnotateView(PermissionRequiredMixin, FormView):
             scale_mm=ind.image.scale_mm,
         )
 
+    def get_all_annotations(self, individual_id):
+        return Annotation.objects.filter(
+            individual_id=individual_id,
+        ).order_by("-created_at")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["annotation_id"] = self.kwargs.get("annotation_id", None)
         context["individual_id"] = int(self.kwargs["individual_id"])
         context["ind_dict"] = self.get_individual(context["individual_id"])
+        context["all_annotations"] = self.get_all_annotations(context["individual_id"])
+        context["Annotation"] = Annotation
         return context

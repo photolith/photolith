@@ -167,15 +167,22 @@ class Annotation(models.Model):
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Created by"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_at = models.DateTimeField(
+        _("Created at"), auto_now_add=True, editable=False
+    )
+    modified_at = models.DateTimeField(
+        _("Last modified"), auto_now=True, editable=False
+    )
     rating = models.PositiveSmallIntegerField(
         _("Image rating"), null=True, choices=Rating.choices
     )
     age = models.IntegerField(_("Age reading"), null=True)
-    comment = models.TextField(_("Notes"), null=False, default="")
+    comment = models.TextField(_("Comments"), null=False, default="")
     bisect_poly = models.JSONField(null=True)
 
     def edit_allowed(self, user):

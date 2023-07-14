@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load i18n %}
+{% load verbose_name %}
 {% block title %}{% translate "Annotate Individual" %}{% endblock title %}
 {% block contentclass %}container-fluid{% endblock contentclass %}
 
@@ -35,18 +36,31 @@
   </div>
   <div class="tab-pane" id="existing-tab-pane" role="tabpanel" aria-labelledby="existing-tab" tabindex="0">
 
-    <table class="table table-striped annotation-data" style="">
-      <thead><tr>
-        <th>{% translate "Date" %}</th>
-        <th>{% translate "Author" %}</th>
-        <th>{% translate "Age" %}</th>
-        <th>{% translate "Rating" %}</th>
-        <th>{% translate "Notes" %}</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-    <button class="btn btn-info btn-block" disabled>{% translate 'Copy full annotation' %}</button>
-    <button class="btn btn-info btn-block" disabled>{% translate 'Copy line only' %}</button>
+    <div class="ph-all-annotations">
+      <table class="table table-striped" style="">
+        <thead><tr>
+          <th class="text-nowrap">{{ Annotation|verbose_name:"created_at" }}</th>
+          <th class="text-nowrap">{{ Annotation|verbose_name:"created_by" }}</th>
+          <th class="text-nowrap">{{ Annotation|verbose_name:"age" }}</th>
+          <th class="text-nowrap">{{ Annotation|verbose_name:"rating" }}</th>
+          <th class="text-nowrap">{{ Annotation|verbose_name:"comment" }}</th>
+        </tr></thead>
+        <tbody>{% for a in all_annotations %}
+          <tr role="button" class="{% if forloop.first %}table-info{% endif %}">
+            <script class="bisect_poly" type="application/json">{{ a.bisect_poly }}</script></td>
+            <td class="text-nowrap"><code>{{ a.created_at }}</code></td>
+            <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
+            <td class="text-nowrap"><code>{{ a.age }}</code></td>
+            <td class="text-nowrap"><code>{{ a.rating }}</code></td>
+            <td width="100%"><code>{{ a.comment }}</code></td>
+          </tr>
+        {% endfor %}</tbody>
+      </table>
+      {% if annotation_id is None %}
+        <button class="btn btn-info btn-block ph-copy-full">{% translate 'Copy full annotation' %}</button>
+        <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy line only' %}</button>
+      {% endif %}
+    </div>
 
   </div>
   <div class="tab-pane show active" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
