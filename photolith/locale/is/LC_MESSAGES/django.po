@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 15:59+0000\n"
+"POT-Creation-Date: 2023-07-17 16:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -172,6 +172,10 @@ msgstr ""
 
 #: photolith/templates/ingest/index.html:3
 msgid "Image Ingest"
+msgstr ""
+
+#: photolith/templates/ingest/index.html:8
+msgid "Choose an image source:"
 msgstr ""
 
 #: photolith/templates/ingest/index.html:11
