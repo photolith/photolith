@@ -4,14 +4,15 @@ import { init as initIngestForm } from './ingest_form';
 import { init as initSearch } from './search';
 import { init as initAnnotate } from './annotate';
 import { init as initViewer } from './viewer';
-import { croppedImageViewer } from './cropped_viewer';
+import { init as initCroppedViewer } from './cropped_viewer';
 
 import DummyMetadataApi from './metadata_api/dummy';
 import HafroMetadataApi from './metadata_api/hafro';
 window.DummyMetadataApi = DummyMetadataApi;
 window.HafroMetadataApi = HafroMetadataApi;
 
-window.croppedImageViewer = croppedImageViewer;
+// Expose for admin interface to use
+window.initCroppedViewer = initCroppedViewer;
 
 window.addEventListener('DOMContentLoaded', (event) => {
   initIngestSelect(window);

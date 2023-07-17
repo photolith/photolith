@@ -41,11 +41,20 @@ class IndividualAdmin(admin.ModelAdmin):
         return mark_safe(
             """<script>
             window.addEventListener('DOMContentLoaded', function (event) {
-                this.append(window.croppedImageViewer('%s', %s, 'height: 300px;'));
+                const elViewer = document.createElement('DIV');
+                elViewer.className = 'ph-cropped-viewer';
+                elViewer.style.height = '300px';
+                elViewer.setAttribute('data-src', '%s');
+                elViewer.setAttribute('data-bounding-box', '%s');
+                this.append(elViewer);
+                window.initCroppedImageViewer(this);
             }.bind(document.currentScript.parentElement))
             </script>
             """
-            % (obj.image.href, json.dumps(obj.bounding_box))
+            % (
+                obj.image.href.replace("'", "\\'"),
+                json.dumps(obj.bounding_box).replace("'", "\\'"),
+            )
         )
 
     image_preview.short_description = "Preview"

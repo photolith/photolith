@@ -1,7 +1,7 @@
 // https://datatables.net/download/npm
 import DataTable from 'datatables.net-bs5';
 
-import { croppedImageViewer } from './cropped_viewer';
+import { init as initCroppedViewer } from './cropped_viewer';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
 export function init (window) {
@@ -13,14 +13,18 @@ export function init (window) {
       const el = document.createElement('DIV');
       el.className = 'row align-items-end';
       el.innerHTML = `
-        <div class="col-5" style="line-height: 0"></div>
+        <div class="col-5" style="line-height: 0">
+           <div class="ph-cropped-viewer"
+                data-src="${row.image__href}"
+                data-bounding-box="${row.bounding_box}"></div>
+        </div>
         <div class="col-7">
           <div class="text-end">
             <a href="/annotate/${row.id}/${document.location.search}" class="btn btn-info">${elSearchTable.getAttribute('data-i18n-new-annotation')}</a>
           </div>
         </div>
       `;
-      el.firstElementChild.prepend(croppedImageViewer(row.image__href, row.bounding_box));
+      initCroppedViewer(el);
       return el;
     }
 
