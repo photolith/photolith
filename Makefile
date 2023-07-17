@@ -41,4 +41,10 @@ start: manage.py node_modules/.package.json
 	./manage.py collectstatic --noinput
 	./manage.py runserver 0.0.0.0:8000
 
-.PHONY: all compile test lint start
+makemessages: manage.py
+	./manage.py makemessages --all --ignore=site-packages
+
+compilemessages: manage.py
+	./manage.py compilemessages --ignore=site-packages
+
+.PHONY: all compile test lint start makemessages compilemessages
