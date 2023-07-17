@@ -22,8 +22,8 @@ manage.py: lib/.requirements.txt
 $(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/django.po
 	./manage.py compilemessages --ignore=site-packages --ignore=registration
 
-compile: lib/.requirements.txt ./manage.py $(LOCALE_FILES:.po=.mo)
-	./manage.py collectstatic --noinput
+compile: lib/.requirements.txt ./manage.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
+	npm run build
 
 test: compile
 	./manage.py test
@@ -42,7 +42,7 @@ node_modules/.package-dev.json: package.json
 	touch node_modules/.package.json
 	touch $@
 
-start: compile node_modules/.package.json
+start: compile
 	./manage.py runserver 0.0.0.0:8000
 
 makemessages: manage.py
