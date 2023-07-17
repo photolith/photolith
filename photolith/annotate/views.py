@@ -65,3 +65,9 @@ class AnnotateView(PermissionRequiredMixin, FormView):
         context["all_annotations"] = self.get_all_annotations(context["individual_id"])
         context["Annotation"] = Annotation
         return context
+
+
+class AnnotateSnippetView(AnnotateView):
+    permission_required = ("photolith.view_individual",)
+    template_name = "annotate/snippet.html"
+    # As above, but an HTML snippet for the search form

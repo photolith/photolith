@@ -13,4 +13,9 @@ urlpatterns = [
         views.AnnotateView.as_view(),
         name="annotate_existing",
     ),
+    path(
+        "<int:individual_id>/snippet/",
+        views.AnnotateSnippetView.as_view(),
+        name="annotate_snippet",
+    ),
 ]

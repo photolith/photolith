@@ -12,3 +12,13 @@ export function jsonFetch (resource, options) {
     });
   });
 }
+
+export function htmlFetch (resource, options = {}) {
+  options.headers = options.headers || {};
+  options.headers.Accept = 'application/html';
+  return window.fetch(resource, options).then((response) => {
+    if (response.ok) return response.text();
+
+    throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
+  });
+}

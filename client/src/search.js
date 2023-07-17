@@ -2,31 +2,13 @@
 import DataTable from 'datatables.net-bs5';
 
 import { init as initCroppedViewer } from './cropped_viewer';
+import { htmlFetch } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
 export function init (window) {
   window.document.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels(lang);
-
-    function childRow (row) {
-      const el = document.createElement('DIV');
-      el.className = 'row align-items-end';
-      el.innerHTML = `
-        <div class="col-5" style="line-height: 0">
-           <div class="ph-cropped-viewer"
-                data-src="${row.image__href}"
-                data-bounding-box="${row.bounding_box}"></div>
-        </div>
-        <div class="col-7">
-          <div class="text-end">
-            <a href="/annotate/${row.id}/${document.location.search}" class="btn btn-info">${elSearchTable.getAttribute('data-i18n-new-annotation')}</a>
-          </div>
-        </div>
-      `;
-      initCroppedViewer(el);
-      return el;
-    }
 
     // https://datatables.net/reference/option/%24.fn.dataTable.ext.errMode
     DataTable.ext.errMode = 'throw';
@@ -59,7 +41,11 @@ export function init (window) {
 
       // Create child row if not already present
       if (!row.child() || row.child().length === 0) {
-        row.child(childRow(row.data()));
+        row.child('<div><div class="rendering" style="width: 10rem; height: 10rem; margin: auto;"></div></div>');
+        htmlFetch('/annotate/' + row.data().id + '/snippet/').then((html) => {
+          row.child(html);
+          initCroppedViewer(row.child()[0]);
+        });
       }
 
       // Open/close row

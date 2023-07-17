@@ -1,0 +1,32 @@
+{% comment %}NB: AJAX snippet, so not inheriting from base{% endcomment %}
+{% load i18n %}
+{% load verbose_name %}
+<div class="row">
+  <div class="col-5" style="line-height: 0">
+    <div class="ph-cropped-viewer" data-src="{{ ind_dict.href }}" data-bounding-box="{{ ind_dict.bounding_box }}"></div>
+  </div>
+  <div class="col-7">
+    <table class="table table-striped" style="">
+      <thead><tr>
+        <th class="text-nowrap">{{ Annotation|verbose_name:"created_at" }}</th>
+        <th class="text-nowrap">{{ Annotation|verbose_name:"created_by" }}</th>
+        <th class="text-nowrap">{{ Annotation|verbose_name:"age" }}</th>
+        <th class="text-nowrap">{{ Annotation|verbose_name:"rating" }}</th>
+        <th class="text-nowrap">{{ Annotation|verbose_name:"comment" }}</th>
+      </tr></thead>
+      <tbody>{% for a in all_annotations %}
+        <tr role="button">
+          <script class="bisect_poly" type="application/json">{{ a.bisect_poly }}</script></td>
+          <td class="text-nowrap"><code>{{ a.created_at }}</code></td>
+          <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
+          <td class="text-nowrap"><code>{{ a.age }}</code></td>
+          <td class="text-nowrap"><code>{{ a.rating }}</code></td>
+          <td width="100%"><code>{{ a.comment }}</code></td>
+        </tr>
+      {% endfor %}</tbody>
+    </table>
+    <div class="text-end">
+      <a href="/annotate/{{ individual_id }}/" class="btn btn-info">{% translate "New annotation" %}</a>
+    </div>
+  </div>  
+</div>
