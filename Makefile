@@ -42,9 +42,9 @@ start: manage.py node_modules/.package.json
 	./manage.py runserver 0.0.0.0:8000
 
 makemessages: manage.py
-	./manage.py makemessages --all --ignore=site-packages
+	./manage.py makemessages --all --ignore=site-packages --ignore=registration
 
 compilemessages: manage.py
-	./manage.py compilemessages --ignore=site-packages
+	./manage.py compilemessages --ignore=site-packages --ignore=registration
 
 .PHONY: all compile test lint start makemessages compilemessages

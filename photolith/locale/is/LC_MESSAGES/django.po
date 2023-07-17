@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 16:08+0000\n"
+"POT-Creation-Date: 2023-07-17 16:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,19 +157,6 @@ msgstr ""
 msgid "Site administration"
 msgstr ""
 
-#: photolith/templates/base.html:60
-#: photolith/templates/registration/password_change_form.html:14
-msgid "Change password"
-msgstr ""
-
-#: photolith/templates/base.html:64
-msgid "Log out"
-msgstr ""
-
-#: photolith/templates/base.html:70
-msgid "Login"
-msgstr ""
-
 #: photolith/templates/ingest/index.html:3
 msgid "Image Ingest"
 msgstr ""
@@ -192,95 +179,6 @@ msgstr ""
 
 #: photolith/templates/ingest/index.html:38
 msgid "Sample ID"
-msgstr ""
-
-#: photolith/templates/registration/logged_out.html:7
-msgid "You are logged out"
-msgstr ""
-
-#: photolith/templates/registration/logged_out.html:11
-msgid "Log in again"
-msgstr ""
-
-#: photolith/templates/registration/login.html:8
-msgid "Log in to your account"
-msgstr ""
-
-#: photolith/templates/registration/login.html:16
-#: photolith/templates/registration/password_reset_complete.html:12
-#: photolith/templates/registration/password_reset_confirm.html:12
-msgid "Log in"
-msgstr ""
-
-#: photolith/templates/registration/login.html:17
-msgid "Forgotten your password or username?"
-msgstr ""
-
-#: photolith/templates/registration/password_change_done.html:8
-#: photolith/templates/registration/password_change_form.html:8
-msgid "Password change"
-msgstr ""
-
-#: photolith/templates/registration/password_change_done.html:10
-msgid "Your password was changed."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_complete.html:8
-#: photolith/templates/registration/password_reset_confirm.html:8
-#: photolith/templates/registration/password_reset_done.html:8
-#: photolith/templates/registration/password_reset_form.html:8
-msgid "Password reset"
-msgstr ""
-
-#: photolith/templates/registration/password_reset_complete.html:10
-#: photolith/templates/registration/password_reset_confirm.html:10
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_done.html:10
-msgid ""
-"We’ve emailed you instructions for setting your password, if an account "
-"exists with the email you entered. You should receive them shortly."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_done.html:12
-msgid ""
-"If you don’t receive an email, please make sure you’ve entered the address "
-"you registered with, and check your spam folder."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_email.html:2
-#, python-format
-msgid ""
-"You're receiving this email because you requested a password reset for your "
-"user account at %(site_name)s."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_email.html:4
-msgid "Please go to the following page and choose a new password:"
-msgstr ""
-
-#: photolith/templates/registration/password_reset_email.html:8
-msgid "Your username, in case you’ve forgotten:"
-msgstr ""
-
-#: photolith/templates/registration/password_reset_email.html:10
-msgid "Thanks for using our site!"
-msgstr ""
-
-#: photolith/templates/registration/password_reset_email.html:12
-#, python-format
-msgid "The %(site_name)s team"
-msgstr ""
-
-#: photolith/templates/registration/password_reset_form.html:10
-msgid ""
-"Forgotten your password? Enter your email address below, and we’ll email "
-"instructions for setting a new one."
-msgstr ""
-
-#: photolith/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
 msgstr ""
 
 #: photolith/templates/search/index.html:3

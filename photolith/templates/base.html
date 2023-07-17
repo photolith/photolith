@@ -57,17 +57,11 @@
               {% endfor %}
 
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% url 'password_change' %}">{% translate 'Change password' %}</a></li>
-              <li>
-                <form action="/accounts/logout/" method="post" id="logout_form">
-                  {% csrf_token %}
-                  <input type="submit" value="{% translate 'Log out' %}" class="btn btn-link dropdown-item" style="border-radius:0" />
-                </form>
-              </li>
+              {% include "registration/snippet_menu.html" %}
             </ul>
           </div>
         {% else %}
-          <a href="/accounts/login/" type="button" class="btn btn-outline-info me-2">{% translate "Login" %}</a>
+          {% include "registration/snippet_login.html" %}
         {% endif %}
         </div>
       </div>

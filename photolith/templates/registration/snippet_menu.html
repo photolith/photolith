@@ -1,0 +1,9 @@
+{% load i18n %}
+{% comment %}NB: Here so we don't trigger the makemessages machinations, translations are included with Django{% endcomment %}
+<li><a class="dropdown-item" href="{% url 'password_change' %}">{% translate 'Change password' %}</a></li>
+<li>
+  <form action="/accounts/logout/" method="post" id="logout_form">
+    {% csrf_token %}
+    <input type="submit" value="{% translate 'Log out' %}" class="btn btn-link dropdown-item" style="border-radius:0" />
+  </form>
+</li>
