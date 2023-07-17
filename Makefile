@@ -1,4 +1,5 @@
 PROJECT=photolith
+LOCALE_FILES=$(wildcard $(PROJECT)/locale/*/LC_MESSAGES/django.po)
 
 all: test
 
@@ -18,7 +19,10 @@ manage.py: lib/.requirements.txt
 	sed -i 's|#!/usr/bin/env python|#!$(shell pwd)/bin/python|' manage.py
 	rm -r /tmp/manage-py
 
-compile: lib/.requirements.txt ./manage.py
+$(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/django.po
+	./manage.py compilemessages --ignore=site-packages --ignore=registration
+
+compile: lib/.requirements.txt ./manage.py $(LOCALE_FILES:.po=.mo)
 	./manage.py collectstatic --noinput
 
 test: compile
@@ -44,7 +48,4 @@ start: compile node_modules/.package.json
 makemessages: manage.py
 	./manage.py makemessages --all --ignore=site-packages --ignore=registration
 
-compilemessages: manage.py
-	./manage.py compilemessages --ignore=site-packages --ignore=registration
-
-.PHONY: all compile test lint start makemessages compilemessages
+.PHONY: all compile test lint start makemessages
