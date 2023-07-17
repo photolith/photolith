@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<div class="ph-viewer ph-annotate mb-2" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
+<div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_dict.href }}" data-bounding-box="{{ ind_dict.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
 
 <ul class="nav nav-tabs" role="tablist">
   <li class="nav-item" role="presentation"><button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadata-tab-pane" type="button" role="tab" aria-controls="metadata-tab-pane" aria-selected="true">

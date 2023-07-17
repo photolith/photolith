@@ -462,6 +462,15 @@ export function init (window) {
         v.load(event.detail.file, event.detail.bounding_box);
       });
     }
+
+    if (elViewer.hasAttribute('data-src')) {
+      window.fetch(elViewer.getAttribute('data-src')).then((resp) => {
+        if (!resp.ok) throw new Error(resp.statusText);
+        return resp.blob();
+      }).then((blob) => {
+        v.load(blob, JSON.parse(elViewer.getAttribute('data-bounding-box') || 'null'));
+      });
+    }
     return v;
   });
 }

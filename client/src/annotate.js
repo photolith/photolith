@@ -77,16 +77,5 @@ export function init (window) {
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
     populateIndividualData(indData.data);
-    return window.fetch(indData.href).then((resp) => {
-      if (!resp.ok) throw new Error(resp);
-      return resp.blob();
-    }).then((blob) => {
-      elForm.dispatchEvent(new window.CustomEvent('load_file', {
-        detail: {
-          file: blob,
-          bounding_box: indData.bounding_box
-        }
-      }));
-    });
   });
 }
