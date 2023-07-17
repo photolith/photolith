@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 16:25+0000\n"
+"POT-Creation-Date: 2023-07-17 16:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,14 +68,6 @@ msgstr "Aldurslestur"
 
 #: photolith/models.py:185
 msgid "Comments"
-msgstr ""
-
-#: photolith/settings/base.py:105
-msgid "Icelandic"
-msgstr ""
-
-#: photolith/settings/base.py:106
-msgid "English"
 msgstr ""
 
 #: photolith/templates/annotate/annotate.html:5

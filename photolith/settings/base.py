@@ -94,7 +94,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language_info
 
 LANGUAGE_CODE = "en"
 TIME_ZONE = "UTC"
@@ -102,8 +102,11 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
-    ("is", _("Icelandic")),
-    ("en", _("English")),
+    (lang, get_language_info(lang)["name_translated"])
+    for lang in (
+        "is",
+        "en",
+    )
 ]
 LOCALE_PATHS = [BASE_DIR / "locale/"]
 
