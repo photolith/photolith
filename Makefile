@@ -19,6 +19,7 @@ manage.py: lib/.requirements.txt
 	rm -r /tmp/manage-py
 
 compile: lib/.requirements.txt ./manage.py
+	./manage.py collectstatic --noinput
 
 test: compile
 	./manage.py test
@@ -37,8 +38,7 @@ node_modules/.package-dev.json: package.json
 	touch node_modules/.package.json
 	touch $@
 
-start: manage.py node_modules/.package.json
-	./manage.py collectstatic --noinput
+start: compile node_modules/.package.json
 	./manage.py runserver 0.0.0.0:8000
 
 makemessages: manage.py
