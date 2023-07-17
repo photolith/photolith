@@ -10,7 +10,7 @@ from ..models import Individual, Annotation
 
 
 class AnnotateView(PermissionRequiredMixin, FormView):
-    permission_required = ("photolith.view_individual",)
+    permission_required = ("photolith.view_annotation",)
     template_name = "annotate/annotate.html"
     form_class = AnnotationForm
 
