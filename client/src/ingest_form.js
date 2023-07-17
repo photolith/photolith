@@ -1,6 +1,6 @@
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
-import { jsonFetch } from './json_fetch';
+import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
