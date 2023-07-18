@@ -22,6 +22,10 @@ export function init (parent) {
           data: 'data.' + k,
           defaultContent: '',
           title: renderMetaLabel(metaLabels[k]),
+          // https://datatables.net/reference/option/columns.createdCell
+          createdCell: function (td, cellData) {
+            if (typeof cellData === 'number') td.classList.add('text-end');
+          },
           render: renderMetaCell
         };
       }),

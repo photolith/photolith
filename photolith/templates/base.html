@@ -1,7 +1,8 @@
 {% load i18n %}
+{% load get_format %}
 {% get_current_language as LANGUAGE_CODE %}
 <!doctype html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="{{ LANGUAGE_CODE }}" data-thousand-separator="{% get_format "THOUSAND_SEPARATOR" %}" data-decimal-separator="{% get_format "DECIMAL_SEPARATOR" %}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">

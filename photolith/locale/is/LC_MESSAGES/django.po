@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 16:47+0000\n"
+"POT-Creation-Date: 2023-07-18 15:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,27 +125,27 @@ msgstr "Uppsafnað (mm)"
 msgid "New annotation"
 msgstr "Ný athugasemd"
 
-#: photolith/templates/base.html:18
+#: photolith/templates/base.html:19
 msgid "Photolith"
 msgstr ""
 
-#: photolith/templates/base.html:30
+#: photolith/templates/base.html:31
 msgid "Home"
 msgstr "Heim"
 
-#: photolith/templates/base.html:31
+#: photolith/templates/base.html:32
 msgid "Ingest"
 msgstr "Inntaka"
 
-#: photolith/templates/base.html:32
+#: photolith/templates/base.html:33
 msgid "Search"
 msgstr "Leit"
 
-#: photolith/templates/base.html:47
+#: photolith/templates/base.html:48
 msgid "Issues"
 msgstr "Mál"
 
-#: photolith/templates/base.html:48
+#: photolith/templates/base.html:49
 msgid "Site administration"
 msgstr "Vefstjórn"
 
