@@ -3,7 +3,25 @@ import json
 from django.utils.html import escape, mark_safe
 from django.contrib import admin
 
-from .models import Image, Individual
+from .models import Image, Individual, Annotation
+
+
+def image_preview_html(href, bounding_box):
+    return mark_safe(
+        """<script>
+        window.addEventListener('DOMContentLoaded', function (event) {
+            const elViewer = document.createElement('DIV');
+            elViewer.className = 'ph-cropped-viewer';
+            elViewer.style.height = '300px';
+            elViewer.setAttribute('data-src', '%s');
+            elViewer.setAttribute('data-bounding-box', '%s');
+            this.append(elViewer);
+            window.initCroppedViewer(this);
+        }.bind(document.currentScript.parentElement))
+        </script>
+        """
+        % (href.replace("'", "\\'"), bounding_box.replace("'", "\\'"))
+    )
 
 
 class IndividualInline(admin.StackedInline):
@@ -38,23 +56,9 @@ class IndividualAdmin(admin.ModelAdmin):
     image_href.short_description = "Image"
 
     def image_preview(self, obj):
-        return mark_safe(
-            """<script>
-            window.addEventListener('DOMContentLoaded', function (event) {
-                const elViewer = document.createElement('DIV');
-                elViewer.className = 'ph-cropped-viewer';
-                elViewer.style.height = '300px';
-                elViewer.setAttribute('data-src', '%s');
-                elViewer.setAttribute('data-bounding-box', '%s');
-                this.append(elViewer);
-                window.initCroppedImageViewer(this);
-            }.bind(document.currentScript.parentElement))
-            </script>
-            """
-            % (
-                obj.image.href.replace("'", "\\'"),
-                json.dumps(obj.bounding_box).replace("'", "\\'"),
-            )
+        return image_preview_html(
+            obj.image.href,
+            json.dumps(obj.bounding_box),
         )
 
     image_preview.short_description = "Preview"
@@ -72,3 +76,26 @@ class IndividualAdmin(admin.ModelAdmin):
                 "<td>%s</td><td>%s</td>" % (k, v) for k, v in obj.data.items()
             )
         )
+
+
+@admin.register(Annotation)
+class AnnotationAdmin(admin.ModelAdmin):
+    list_display = ["individual", "age", "rating", "created_by", "created_at"]
+    fields = [
+        "individual",
+        "image_preview",
+        "age",
+        "rating",
+        "comment",
+        "created_by",
+        "created_at",
+    ]
+    readonly_fields = ["individual", "image_preview", "created_at"]
+
+    def image_preview(self, obj):
+        return image_preview_html(
+            obj.individual.image.href,
+            json.dumps(obj.individual.bounding_box),
+        )
+
+    image_preview.short_description = "Preview"
