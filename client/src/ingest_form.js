@@ -32,6 +32,11 @@ function formRefresh (event) {
     });
   }
 
+  if (event.target.name === 'image_file') {
+    // Image file changed, so image_href is no longer valid
+    elForm.image_href.value = '';
+  }
+
   if (event.target.name === 'selection') {
     const ids = JSON.parse((elForm[event.target.value.replace(/\[bounding_box\]/, '[data]')] || {}).value || '{}');
     populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'));
@@ -78,11 +83,6 @@ export function init (window) {
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
       formSubmit(elForm);
-    });
-    elForm.addEventListener('load_file', (event) => {
-      elForm.image_file.value = event.detail.file ? event.detail.fileset : '';
-      elForm.image_file.phBlob = event.detail.file || undefined;
-      elForm.image_href.value = '';
     });
   });
 }

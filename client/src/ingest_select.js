@@ -1,5 +1,7 @@
 import { parse } from 'content-disposition-header';
 
+import { changeEvent } from './events';
+
 class Cancelled extends Error { }
 
 class NullFileSet {
@@ -97,6 +99,10 @@ function newFileSet (val) {
 function nextSelection (elSelect) {
   const elSyncForm = window.document.querySelector(elSelect.getAttribute('data-sync-form'));
 
+  elSyncForm.image_file.value = '';
+  elSyncForm.image_file.phBlob = null;
+  elSyncForm.image_file.dispatchEvent(changeEvent());
+
   return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
     if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
 
@@ -106,12 +112,9 @@ function nextSelection (elSelect) {
       elSelect.options[0].text = elSelect.options[0].phOrigText;
     }
 
-    elSyncForm.dispatchEvent(new window.CustomEvent('load_file', {
-      detail: {
-        fileset: elSelect.fs.name,
-        file: f
-      }
-    }));
+    elSyncForm.image_file.value = elSelect.fs.name;
+    elSyncForm.image_file.phBlob = f;
+    elSyncForm.image_file.dispatchEvent(changeEvent());
   }).catch((err) => {
     if (err instanceof Cancelled) {
       // File select cancelled, don't change anything.

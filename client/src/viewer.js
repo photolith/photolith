@@ -457,10 +457,16 @@ export function init (window) {
       });
       v.elSyncForm.addEventListener('change', (event) => {
         if (event.detail === 999) return; // Break loops
+        if (event.target.name === 'image_file') {
+          if (!event.target.phBlob) {
+            // No blob, so start of load
+            v.startRendering();
+          } else {
+            v.load(event.target.phBlob);
+          }
+          return;
+        }
         v.reverseSyncForm({ target: v.fabCanvas.phGetObjectById(event.target.name) });
-      });
-      v.elSyncForm.addEventListener('load_file', (event) => {
-        v.load(event.detail.file, event.detail.bounding_box);
       });
     }
 
