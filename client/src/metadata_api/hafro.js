@@ -74,7 +74,7 @@ export default class MetadataApi {
               is: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`
             },
             cruise: od.sampleResponse.station.cruise.name,
-            station: od.sampleResponse.station.number,
+            station: od.sampleResponse.station.number.toString(),
             stationDate: od.sampleResponse.station.stationDate,
             gear: od.sampleResponse.gear.isscfgNo,
             meshSize: od.sampleResponse.meshSize
