@@ -135,10 +135,6 @@ class PhViewer {
       if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
       this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 10);
     };
-
-    this.elViewer.addEventListener('load_file', (event) => {
-      this.load(event.detail.file);
-    });
   }
 
   refreshFilters () {
