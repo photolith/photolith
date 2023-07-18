@@ -82,7 +82,8 @@ class PhViewer {
     }.bind(this));
 
     this.fabCanvas.on('after:render', function (opt) {
-      this.upperCanvasEl.parentNode.classList.remove('rendering');
+      // NB: Don't clear rendering if we're mid-file-load
+      if (this.backgroundImage) this.upperCanvasEl.parentNode.classList.remove('rendering');
     });
 
     this.fabCanvas.on('mouse:wheel', function (opt) {
@@ -189,7 +190,7 @@ class PhViewer {
       }));
     }
 
-    this.fabCanvas.upperCanvasEl.parentNode.classList.add('rendering');
+    this.startRendering();
     window.setTimeout(() => {
       img.applyFilters();
       this.fabCanvas.renderAll();
@@ -217,6 +218,10 @@ class PhViewer {
       elDl.href = blob && this.fabCanvas.backgroundImage ? URL.createObjectURL(blob) : '#';
       elDl.download = blob && this.fabCanvas.backgroundImage ? blob.name : undefined;
     });
+  }
+
+  startRendering () {
+    this.fabCanvas.upperCanvasEl.parentNode.classList.add('rendering');
   }
 }
 
@@ -460,6 +465,7 @@ export function init (window) {
     }
 
     if (elViewer.hasAttribute('data-src')) {
+      v.startRendering();
       window.fetch(elViewer.getAttribute('data-src')).then((resp) => {
         if (!resp.ok) throw new Error(resp.statusText);
         return resp.blob();
