@@ -446,8 +446,8 @@ class PhAnnotate extends PhSyncingViewer {
   }
 }
 
-export function init (window) {
-  window.document.querySelectorAll('div.ph-viewer').forEach((elViewer) => {
+export function init (parent) {
+  parent.querySelectorAll('div.ph-viewer').forEach((elViewer) => {
     const v = elViewer.classList.contains('ph-annotate') ? new PhAnnotate(elViewer) : elViewer.classList.contains('ph-cropper') ? new PhCropper(elViewer) : new PhViewer(elViewer);
 
     if (elViewer.hasAttribute('data-sync-form')) {

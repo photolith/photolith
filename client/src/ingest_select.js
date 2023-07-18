@@ -124,8 +124,8 @@ function nextSelection (elSelect) {
   });
 }
 
-export function init (window) {
-  window.document.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
+export function init (parent) {
+  parent.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
     const elSelect = elIngestSelect.querySelector(':scope select');
     const elNextButton = elIngestSelect.querySelector(':scope .ph-ingest-next');
 

@@ -55,8 +55,8 @@ function allAnnotationsClick (elForm, event) {
   }
 }
 
-export function init (window) {
-  window.document.querySelectorAll('form.annotate-form').forEach((elForm) => {
+export function init (parent) {
+  parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('individual_json').textContent);
 
     // Ratio to convert annotation point distance into mm

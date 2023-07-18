@@ -15,11 +15,11 @@ window.HafroMetadataApi = HafroMetadataApi;
 window.initCroppedViewer = initCroppedViewer;
 
 window.addEventListener('DOMContentLoaded', (event) => {
-  initIngestSelect(window);
-  initIngestForm(window);
-  initSearch(window);
-  initAnnotate(window);
-  initViewer(window);
+  initIngestSelect(window.document);
+  initIngestForm(window.document);
+  initSearch(window.document);
+  initAnnotate(window.document);
+  initViewer(window.document);
 });
 
 window.addEventListener('unhandledrejection', (event) => {

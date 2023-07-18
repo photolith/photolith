@@ -73,8 +73,8 @@ function formSubmit (elForm) {
   });
 }
 
-export function init (window) {
-  window.document.querySelectorAll('form.ingest-form').forEach((elForm) => {
+export function init (parent) {
+  parent.querySelectorAll('form.ingest-form').forEach((elForm) => {
     elForm.addEventListener('change', formRefresh);
     elForm.addEventListener('reset', (event) => {
       // Give the form a chance to reset, then refresh the sample field (triggering everything else to refresh)

@@ -5,8 +5,8 @@ import { init as initCroppedViewer } from './cropped_viewer';
 import { htmlFetch } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
-export function init (window) {
-  window.document.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
+export function init (parent) {
+  parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels(lang);
 
