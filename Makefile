@@ -48,4 +48,6 @@ start: compile
 makemessages: manage.py
 	./manage.py makemessages --all --ignore=site-packages --ignore=registration
 
+precommit: lint makemessages
+
 .PHONY: all compile test lint start makemessages
