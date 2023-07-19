@@ -65,6 +65,7 @@ export function init (parent) {
           // https://datatables.net/reference/option/columns.createdCell
           createdCell: function (td, cellData) {
             if (typeof cellData === 'number') td.classList.add('text-end');
+            td.classList.add('text-nowrap');
           },
           render: renderMetaCell
         };
