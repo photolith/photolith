@@ -5,7 +5,44 @@ import { init as initCroppedViewer } from './cropped_viewer';
 import { htmlFetch } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
+export function populateFilter (elForm) {
+  const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
+  const elBody = elForm.querySelector('.offcanvas-body');
+  const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
+  const searchParams = new URLSearchParams(window.location.search);
+
+  elBody.innerHTML = Object.keys(metaLabels).map((k) => {
+    const controlId = 'filter-' + k + '-control';
+    const mf = metaFields[k];
+    let controlHtml;
+
+    // If no metaFields, then we can't filter this
+    if (!mf) return '';
+
+    if (mf.filter_name.startsWith('ch')) {
+      controlHtml = `<input type="text" name="${mf.filter_name}" value="${searchParams.get(mf.filter_name) || ''}" class="form-control" id="${controlId}">`;
+    } else if (mf.filter_name.startsWith('nm')) {
+      controlHtml = `<div class="input-group">
+          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control" id="${controlId}">
+          <span class="input-group-text">..</span>
+          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control" id="${controlId}-2">
+        </div>`;
+    } else if (mf.filter_name.startsWith('tx')) {
+      controlHtml = `<select name="${mf.filter_name}" class="form-select" id="${controlId}">
+          <option value="" ${!searchParams.get(mf.filter_name) ? 'selected' : ''}>---</option>
+          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.get(mf.filter_name) === tx.id.toString() ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang]}</option>`)}
+        </select>`;
+    }
+
+    return `<div class="mb-3">
+        <label for="${controlId}" class="form-label">${metaLabels[k]}</label>
+        ${controlHtml}
+      </div>`;
+  }).join('\n\n');
+}
+
 export function init (parent) {
+  parent.querySelectorAll('form.filter-form').forEach(populateFilter);
   parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels(lang);
