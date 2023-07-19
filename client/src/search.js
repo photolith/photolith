@@ -1,5 +1,6 @@
 // https://datatables.net/download/npm
 import DataTable from 'datatables.net-bs5';
+import TomSelect from 'tom-select';
 
 import { init as initCroppedViewer } from './cropped_viewer';
 import { htmlFetch } from './fetch';
@@ -28,9 +29,8 @@ export function populateFilter (elForm) {
           <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control" id="${controlId}-2">
         </div>`;
     } else if (mf.filter_name.startsWith('tx')) {
-      controlHtml = `<select name="${mf.filter_name}" class="form-select" id="${controlId}">
-          <option value="" ${!searchParams.get(mf.filter_name) ? 'selected' : ''}>---</option>
-          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.get(mf.filter_name) === tx.id.toString() ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang]}</option>`)}
+      controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
+          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(mf.filter_name).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang]}</option>`)}
         </select>`;
     }
 
@@ -39,6 +39,9 @@ export function populateFilter (elForm) {
         ${controlHtml}
       </div>`;
   }).join('\n\n');
+
+  elBody.querySelectorAll(':scope select').forEach((el) => new TomSelect(el, {
+  }));
 }
 
 export function init (parent) {
