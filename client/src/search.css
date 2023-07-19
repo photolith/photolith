@@ -3,3 +3,11 @@ table.dataTable tr.dt-hasChild td {
   border-bottom: none!important;
 }
 /* stylelint-enable selector-class-pattern */
+
+.pagination {
+  --bs-pagination-active-bg: var(--bs-info);
+  --bs-pagination-active-color: #000;
+  --bs-pagination-active-border-color: var(--bs-info);
+  --bs-pagination-color: #09a4c3;
+  --bs-pagination-hover-color: #09a4c3;
+}
