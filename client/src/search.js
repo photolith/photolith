@@ -15,7 +15,7 @@ export function init (parent) {
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
       language: { url: lang !== 'en' ? `/static/datatables.net-plugins/i18n/${lang}.json` : undefined },
-      ajaxSource: '/search/data/',
+      ajaxSource: '/search/data/' + window.document.location.search,
       columns: Object.keys(metaLabels).map((k) => {
         // https://datatables.net/reference/option/columns
         return {
