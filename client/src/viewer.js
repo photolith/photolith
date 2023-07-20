@@ -18,15 +18,6 @@ class PhViewer {
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
 
-    this.fabCanvas.phGetObjectById = function (wantedId) {
-      const objs = this.getObjects();
-
-      for (let i = 0; i < objs.length; i++) {
-        if (objs[i].id === wantedId) return objs[i];
-      }
-      return undefined;
-    };
-
     this.fabCanvas.phFitBoundingBox = function (boundingBox) {
       const zoom = Math.min(
         this.height / (boundingBox[1][1] - boundingBox[0][1]),
@@ -315,7 +306,7 @@ class PhCropper extends PhSyncingViewer {
 
   boundingBox (objId, title) {
     // http://fabricjs.com/docs/fabric.Textbox.html
-    const obj = this.fabCanvas.phGetObjectById(objId) || new fabric.Textbox(title.toString(), {
+    const obj = new fabric.Textbox(title.toString(), {
       id: objId,
       fontFamily: 'Arial',
       fontSize: 90,
@@ -372,7 +363,7 @@ class PhCropper extends PhSyncingViewer {
   }
 
   scaleLine () {
-    const obj = this.fabCanvas.phGetObjectById('scale_line') || new EditableLine({
+    const obj = new EditableLine({
       id: 'scale_line',
       stroke: `rgba(${rgbHighlight}, 0.6)`
     }, {
@@ -412,7 +403,7 @@ class PhCropper extends PhSyncingViewer {
 
 class PhAnnotate extends PhSyncingViewer {
   annotatePoly () {
-    const obj = this.fabCanvas.phGetObjectById('bisect_poly') || new EditableLine({
+    const obj = new EditableLine({
       id: 'bisect_poly',
       stroke: `rgba(${rgbHighlight}, 0.6)`
     }, {
@@ -466,7 +457,8 @@ export function init (parent) {
           }
           return;
         }
-        v.reverseSyncForm({ target: v.fabCanvas.phGetObjectById(event.target.name) });
+
+        v.reverseSyncForm({ target: v.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
       });
     }
 
