@@ -93,7 +93,7 @@ function newFileSet (val) {
   if (val[0] === 'null') return new NullFileSet();
   if (val[0] === 'fileselect') return new LocalFileSet();
   if (val[0] === 'server') return new ServerFileSet(val[1]);
-  throw new Error('Unknown select type ' + val.join(':'));
+  throw new Error('Unknown fileset type ' + val.join(':'));
 }
 
 function nextSelection (elSelect) {
@@ -125,8 +125,8 @@ function nextSelection (elSelect) {
 }
 
 export function init (parent) {
-  parent.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
-    const elSelect = elIngestSelect.querySelector(':scope select');
+  parent.querySelectorAll('.ph-ingest-select-bar').forEach((elSelectBar) => {
+    const elSelect = elSelectBar.querySelector(':scope select');
 
     elSelect.fs = newFileSet('null');
 
@@ -137,7 +137,7 @@ export function init (parent) {
       nextSelection(elSelect);
     });
 
-    elIngestSelect.querySelector(':scope *[data-action=next]').addEventListener('click', (event) => {
+    elSelectBar.querySelector(':scope *[data-action=next]').addEventListener('click', (event) => {
       event.preventDefault();
       nextSelection(elSelect);
     });

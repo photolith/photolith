@@ -1,5 +1,5 @@
 import { displayAlert } from './alert';
-import { init as initIngestSelect } from './ingest_select';
+import { init as initIngestSelectBar } from './ingest_selectbar';
 import { init as initIngestForm } from './ingest_form';
 import { init as initSearch } from './search';
 import { init as initAnnotate } from './annotate';
@@ -16,7 +16,7 @@ window.HafroMetadataApi = HafroMetadataApi;
 window.initCroppedViewer = initCroppedViewer;
 
 window.addEventListener('DOMContentLoaded', (event) => {
-  initIngestSelect(window.document);
+  initIngestSelectBar(window.document);
   initIngestForm(window.document);
   initSearch(window.document);
   initAnnotate(window.document);
