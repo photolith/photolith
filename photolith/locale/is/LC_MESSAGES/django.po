@@ -8,7 +8,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-19 16:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,202 +17,202 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
-#: photolith/ingest/views.py:18
+#: photolith/ingest/views.py
 #, python-format
 msgid "(%(count)d photo)"
 msgid_plural "(%(count)d photos)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: photolith/ingest/views.py:25
+#: photolith/ingest/views.py
 #, python-format
 msgid "Uploaded by %(photo_dir)s"
 msgstr "Hlaðið upp af %(photo_dir)s"
 
-#: photolith/ingest/views.py:27
+#: photolith/ingest/views.py
 msgid "Upload files from computer"
 msgstr "Sækja skrár úr tölvunni"
 
-#: photolith/models.py:164
+#: photolith/models.py
 msgid "Unreadable"
 msgstr "Ólæsilegt"
 
-#: photolith/models.py:165
+#: photolith/models.py
 msgid "Average"
 msgstr "Meðaltal"
 
-#: photolith/models.py:166
+#: photolith/models.py
 msgid "Perfect"
 msgstr "Fullkomið"
 
-#: photolith/models.py:171
+#: photolith/models.py
 msgid "Created by"
 msgstr "Búið til af"
 
-#: photolith/models.py:176
+#: photolith/models.py
 msgid "Created at"
 msgstr "Búið til kl"
 
-#: photolith/models.py:179
+#: photolith/models.py
 msgid "Last modified"
 msgstr "Síðast breytt"
 
-#: photolith/models.py:182
+#: photolith/models.py
 msgid "Image rating"
 msgstr "Myndeinkunn"
 
-#: photolith/models.py:184 photolith/tests/test_templatetags_verbose_name.py:11
+#: photolith/models.py:184 photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"
 msgstr "Aldurslestur"
 
-#: photolith/models.py:185
+#: photolith/models.py
 msgid "Comments"
 msgstr "Athugasemdir"
 
-#: photolith/templates/annotate/annotate.html:5
+#: photolith/templates/annotate/annotate.html
 msgid "Annotate Individual"
 msgstr "Athugasemd Einstaklingur"
 
-#: photolith/templates/annotate/annotate.html:18
+#: photolith/templates/annotate/annotate.html
 msgid "Individual Metadata"
 msgstr "Einstök lýsigögn"
 
-#: photolith/templates/annotate/annotate.html:21
+#: photolith/templates/annotate/annotate.html
 msgid "Existing Annotations"
 msgstr "Núverandi skýringar"
 
-#: photolith/templates/annotate/annotate.html:24
+#: photolith/templates/annotate/annotate.html
 msgid "Annotate"
 msgstr "Athugasemd"
 
-#: photolith/templates/annotate/annotate.html:32
-#: photolith/templates/ingest/index.html:50
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/ingest/index.html
 msgid "Key"
 msgstr "Lykill"
 
-#: photolith/templates/annotate/annotate.html:32
-#: photolith/templates/ingest/index.html:50
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/ingest/index.html
 msgid "Value"
 msgstr "Gildi"
 
-#: photolith/templates/annotate/annotate.html:60
+#: photolith/templates/annotate/annotate.html
 msgid "Copy full annotation"
 msgstr "Afritaðu alla athugasemdina"
 
-#: photolith/templates/annotate/annotate.html:61
+#: photolith/templates/annotate/annotate.html
 msgid "Copy line only"
 msgstr "Aðeins afrita línu"
 
-#: photolith/templates/annotate/annotate.html:88
-#: photolith/templates/ingest/index.html:42
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/ingest/index.html
 msgid "Save"
 msgstr "Vista"
 
-#: photolith/templates/annotate/annotate.html:97
+#: photolith/templates/annotate/annotate.html
 msgid "Point"
 msgstr "Punktur"
 
-#: photolith/templates/annotate/annotate.html:98
+#: photolith/templates/annotate/annotate.html
 msgid "Distance (mm)"
 msgstr "Fjarlægð (mm)"
 
-#: photolith/templates/annotate/annotate.html:99
+#: photolith/templates/annotate/annotate.html
 msgid "Cumulative (mm)"
 msgstr "Uppsafnað (mm)"
 
-#: photolith/templates/annotate/snippet.html:30
+#: photolith/templates/annotate/snippet.html
 msgid "New annotation"
 msgstr "Ný athugasemd"
 
-#: photolith/templates/base.html:20
+#: photolith/templates/base.html
 msgid "Photolith"
 msgstr ""
 
-#: photolith/templates/base.html:32
+#: photolith/templates/base.html
 msgid "Home"
 msgstr "Heim"
 
-#: photolith/templates/base.html:33
+#: photolith/templates/base.html
 msgid "Ingest"
 msgstr "Inntaka"
 
-#: photolith/templates/base.html:34
+#: photolith/templates/base.html
 msgid "Search"
 msgstr "Leit"
 
-#: photolith/templates/base.html:49
+#: photolith/templates/base.html
 msgid "Issues"
 msgstr "Mál"
 
-#: photolith/templates/base.html:50
+#: photolith/templates/base.html
 msgid "Site administration"
 msgstr "Vefstjórn"
 
-#: photolith/templates/ingest/index.html:3
+#: photolith/templates/ingest/index.html
 msgid "Image Ingest"
 msgstr "Myndtaka"
 
-#: photolith/templates/ingest/index.html:8
+#: photolith/templates/ingest/index.html
 msgid "Choose an image source:"
 msgstr "Veldu myndheimild:"
 
-#: photolith/templates/ingest/index.html:11
+#: photolith/templates/ingest/index.html
 msgid "Choose..."
 msgstr "Veldu..."
 
-#: photolith/templates/ingest/index.html:17
+#: photolith/templates/ingest/index.html
 msgid "Next Image"
 msgstr "Næsta mynd"
 
-#: photolith/templates/ingest/index.html:34
+#: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
 msgstr "Kvarðarlengd (mm)"
 
-#: photolith/templates/ingest/index.html:38
+#: photolith/templates/ingest/index.html
 msgid "Sample ID"
 msgstr "Sýnishorn"
 
-#: photolith/templates/search/index.html:3
+#: photolith/templates/search/index.html
 msgid "Individual Search"
 msgstr "Einstaklingsleit"
 
-#: photolith/templates/search/index.html:7
-#: photolith/templates/search/index.html:20
+#: photolith/templates/search/index.html
+#: photolith/templates/search/index.html
 msgid "Filter results"
 msgstr ""
 
-#: photolith/templates/search/index.html:26
+#: photolith/templates/search/index.html
 msgid "Apply"
 msgstr ""
 
-#: photolith/templates/search/index.html:27
+#: photolith/templates/search/index.html
 msgid "Clear filters"
 msgstr ""
 
-#: photolith/templates/snippet/viewer.html:15
+#: photolith/templates/snippet/viewer.html
 msgid "Brightness"
 msgstr "Birtustig"
 
-#: photolith/templates/snippet/viewer.html:19
+#: photolith/templates/snippet/viewer.html
 msgid "Contrast"
 msgstr "Andstæða"
 
-#: photolith/templates/snippet/viewer.html:23
+#: photolith/templates/snippet/viewer.html
 msgid "Gamma"
 msgstr ""
 
-#: photolith/templates/snippet/viewer.html:27
+#: photolith/templates/snippet/viewer.html
 msgid "Saturation"
 msgstr "Mettun"
 
-#: photolith/templates/snippet/viewer.html:31
+#: photolith/templates/snippet/viewer.html
 msgid "Vibrance"
 msgstr "Fjör"
 
-#: photolith/templates/snippet/viewer.html:36
+#: photolith/templates/snippet/viewer.html
 msgid "Edge detection"
 msgstr "Kantgreining"
 
-#: photolith/templates/snippet/viewer.html:46
+#: photolith/templates/snippet/viewer.html
 msgid "Reset"
 msgstr "Núllstilla"

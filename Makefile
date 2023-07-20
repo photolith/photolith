@@ -47,6 +47,8 @@ start: compile
 
 makemessages: manage.py
 	./manage.py makemessages --all --ignore=site-packages --ignore=registration
+	sed -i '/POT-Creation-Date/d' photolith/locale/*/LC_MESSAGES/django.po
+	sed -Ei 's/:[0-9]+$$//' photolith/locale/*/LC_MESSAGES/django.po
 
 precommit: lint makemessages
 
