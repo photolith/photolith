@@ -256,7 +256,11 @@ class PhSyncingViewer extends PhViewer {
     const formEl = this.elSyncForm.elements[obj.id];
 
     function roundPoint (p) {
-      return [Math.round(p.x), Math.round(p.y)];
+      const out = [Math.round(p.x), Math.round(p.y)];
+      // If outside bounds, return undefined instead of the point
+      if (out[0] < 0 || out[0] > obj.canvas.backgroundImage.width) return undefined;
+      if (out[1] < 0 || out[1] > obj.canvas.backgroundImage.height) return undefined;
+      return out;
     }
 
     if (obj instanceof fabric.Polyline) {
@@ -270,6 +274,9 @@ class PhSyncingViewer extends PhViewer {
 
       newVal = [roundPoint(ac.tl), roundPoint(ac.br)];
     }
+
+    // If any of the points of this object are out-of-bounds, consider the whole thing out-of-bounds
+    if (newVal.indexOf(undefined) > -1) newVal = undefined;
 
     newVal = newVal === undefined ? '' : JSON.stringify(newVal);
     if (formEl.value !== newVal) {

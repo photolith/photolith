@@ -24,7 +24,11 @@ class UploadView(PermissionRequiredMixin, View):
             ind_data = json.loads(self.request.POST[post_key])
             ind_bounding_box = json.loads(
                 self.request.POST[post_key.replace("[data]", "[bounding_box]")]
+                or "null"
             )
+            if not ind_bounding_box:
+                # Ignore individuals that don't have a bounding box
+                continue
 
             ind = Individual(
                 image=image,
