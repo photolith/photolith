@@ -127,7 +127,6 @@ function nextSelection (elSelect) {
 export function init (parent) {
   parent.querySelectorAll('.ph-ingest-select').forEach((elIngestSelect) => {
     const elSelect = elIngestSelect.querySelector(':scope select');
-    const elNextButton = elIngestSelect.querySelector(':scope .ph-ingest-next');
 
     elSelect.fs = newFileSet('null');
 
@@ -138,7 +137,7 @@ export function init (parent) {
       nextSelection(elSelect);
     });
 
-    elNextButton.addEventListener('click', (event) => {
+    elIngestSelect.querySelector(':scope *[data-action=next]').addEventListener('click', (event) => {
       event.preventDefault();
       nextSelection(elSelect);
     });
