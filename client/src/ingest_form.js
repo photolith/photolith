@@ -63,6 +63,7 @@ function formSubmit (elForm) {
       elForm.image_href.value = data.href;
     });
   }).then(() => {
+    elForm.classList.add('rendering');
     return jsonFetch('/ingest/upload/', {
       method: 'POST',
       body: new FormData(elForm)
@@ -70,6 +71,8 @@ function formSubmit (elForm) {
   }).then((createdInds) => {
     displayAlert('success', `Uploaded ${createdInds.created_individuals.length} individuals`);
     elForm.reset();
+  }).finally(() => {
+    elForm.classList.remove('rendering');
   });
 }
 
