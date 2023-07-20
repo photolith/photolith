@@ -74,6 +74,18 @@ msgid "Annotate Individual"
 msgstr "Athugasemd Einstaklingur"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Prev"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Return to search"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Next"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
 msgid "Individual Metadata"
 msgstr "Einstök lýsigögn"
 

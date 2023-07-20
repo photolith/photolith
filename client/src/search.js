@@ -89,6 +89,11 @@ export function init (parent) {
         row.child('<div><div class="rendering" style="width: 10rem; height: 10rem; margin: auto;"></div></div>');
         htmlFetch('/annotate/' + row.data().id + '/snippet/').then((html) => {
           row.child(html);
+          row.child()[0].querySelectorAll('a[href^="/annotate/"]').forEach((el) => {
+            // Add current search querystring to any annotate links
+            // NB: Django doesn't have this when generating the snippet
+            el.href += document.location.search;
+          });
           initCroppedViewer(row.child()[0]);
         });
       }

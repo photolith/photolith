@@ -6,6 +6,22 @@
 {% block contentclass %}container-fluid{% endblock contentclass %}
 
 {% block pre_content %}
+
+<div class="ph-annotate-select-bar d-flex flex-wrap border-bottom justify-content-center px-sm-5 py-3" style="background: #eee">
+  <div class="">
+    <button data-action="prev" class="btn ml-2" style="background-color: #ccc">&lt; {% translate "Prev" %}</button>
+  </div>
+  <div class="flex-grow-1 mx-5">
+    <select class="form-select" data-sync-form="form.ingest-form">
+      {% comment %}NB: disabled so we don't flash this item before JS has populated{% endcomment %}
+      <option value="/search/?{{ request.GET.urlencode }}" disabled>{% translate "Return to search" %}</option>
+    </select>
+  </div>
+  <div class="">
+    <button data-action="next" class="btn ml-2" style="background-color: #ccc">{% translate "Next" %} &gt;</button>
+  </div>
+</div>
+
 {{ ind_dict|json_script:"individual_json" }}
 {% endblock pre_content %}
 
