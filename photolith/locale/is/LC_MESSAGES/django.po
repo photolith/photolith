@@ -61,7 +61,7 @@ msgstr "Síðast breytt"
 msgid "Image rating"
 msgstr "Myndeinkunn"
 
-#: photolith/models.py:184 photolith/tests/test_templatetags_verbose_name.py
+#: photolith/models.py photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"
 msgstr "Aldurslestur"
 
