@@ -47,6 +47,10 @@ export default class MetadataApi {
     return metaLabels[lang] || metaLabels.en;
   }
 
+  individualTitle (ind, lang) {
+    return ind.slideLabel + ' -- ' + ind.title;
+  }
+
   sampleDetail (sampleId) {
     const intSampleId = parseInt(sampleId, 10);
     if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));
