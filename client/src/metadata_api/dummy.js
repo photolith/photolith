@@ -56,6 +56,11 @@ export default class MetadataApi {
     return metaLabels[lang] || metaLabels.en;
   }
 
+  /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
+  individualLabel (ind) {
+    return ind.title;
+  }
+
   individualTitle (ind, lang) {
     return ind.slideLabel + ' -- ' + ind.title;
   }

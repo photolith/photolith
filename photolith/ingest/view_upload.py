@@ -1,5 +1,4 @@
 import json
-import re
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.forms.models import model_to_dict
@@ -19,11 +18,11 @@ class UploadView(PermissionRequiredMixin, View):
 
         created_inds = []
         for post_key in self.request.POST.keys():
-            if not re.fullmatch(r"individuals\[\d+\]\[data\]", post_key):
+            if not post_key.startswith("data:"):
                 continue
             ind_data = json.loads(self.request.POST[post_key])
             ind_bounding_box = json.loads(
-                self.request.POST[post_key.replace("[data]", "[bounding_box]")]
+                self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
             if not ind_bounding_box:

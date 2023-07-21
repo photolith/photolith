@@ -397,13 +397,21 @@ class PhCropper extends PhSyncingViewer {
     });
   }
 
-  loadIndividuals (ids) {
+  loadIndividuals () {
+    let setActive = false;
+
     this.fabCanvas.getObjects().forEach((o) => {
-      if ((o.id || '').match(/^individuals\[(.*)\]\[bounding_box\]$/)) this.fabCanvas.remove(o);
+      if ((o.id || '').match(/^bounding_box:(.*)$/)) this.fabCanvas.remove(o);
     });
-    ids.forEach((ind, i) => {
-      const obj = this.boundingBox(`individuals[${i}][bounding_box]`, ind.title);
-      if (i === 0) this.fabCanvas.setActiveObject(obj);
+    Array.from(this.elSyncForm.elements).forEach((el) => {
+      const m = el.name.match(/^bounding_box:(.*)$/);
+
+      if (!m) return;
+      const obj = this.boundingBox(el.name, m[1]);
+      if (!setActive) {
+        this.fabCanvas.setActiveObject(obj);
+        setActive = true;
+      }
     });
   }
 }
@@ -451,7 +459,7 @@ export function init (parent) {
     if (elViewer.hasAttribute('data-sync-form')) {
       v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
       v.elSyncForm.addEventListener('load_individuals', (event) => {
-        v.loadIndividuals(event.detail);
+        v.loadIndividuals();
       });
       v.elSyncForm.addEventListener('change', (event) => {
         if (event.detail === 999) return; // Break loops

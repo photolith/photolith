@@ -8,26 +8,29 @@ function formRefresh (event) {
 
   // Can progress iff there's at least one individual bounding_box to upload
   elForm.save.disabled = !Array.from(elForm.elements).find((el) => {
-    return el.name.endsWith('[bounding_box]') && el.value;
+    return el.name.startsWith('bounding_box:') && el.value;
   });
 
   if (event.target.name === 'sample') {
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
-    elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: [] }));
+    elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
-      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, i) => {
+      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind) => {
+        const label = window.mApi.individualLabel(ind);
         return `
-          <input type="hidden" name="individuals[${i}][data]" value="">
-          <input type="hidden" name="individuals[${i}][bounding_box]" value="">
+          <input type="hidden" name="data:${label}" value="">
+          <input type="hidden" name="bounding_box:${label}" value="">
         `;
       }).join('\n');
-      sd.individuals.forEach((ind, i) => {
-        elForm[`individuals[${i}][data]`].value = JSON.stringify(ind);
+      sd.individuals.forEach((ind) => {
+        const label = window.mApi.individualLabel(ind);
+
+        elForm[`data:${label}`].value = JSON.stringify(ind);
       });
       elForm.selection.value = '';
-      elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: sd.individuals }));
+      elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
       elForm.selection.value = '';
@@ -43,7 +46,7 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'selection') {
-    const ids = JSON.parse((elForm[event.target.value.replace(/\[bounding_box\]/, '[data]')] || {}).value || '{}');
+    const ids = JSON.parse((elForm[event.target.value.replace(/^bounding_box:/, 'data:')] || {}).value || '{}');
     populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'));
   }
 }
