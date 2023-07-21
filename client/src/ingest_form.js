@@ -12,6 +12,9 @@ function formRefresh (event) {
   });
 
   if (event.target.name === 'sample') {
+    // Clear out old individuals first
+    elForm.querySelector(':scope .individuals').innerHTML = '';
+    elForm.dispatchEvent(new window.CustomEvent('load_individuals', { detail: [] }));
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
       elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, i) => {
