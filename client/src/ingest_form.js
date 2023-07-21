@@ -6,8 +6,10 @@ import { populateIndividualData } from './meta';
 function formRefresh (event) {
   const elForm = event.target.form;
 
-  // Can progress iff all form elements are filled in
-  elForm.save.disabled = !!Array.from(elForm.elements).find((el) => el.name !== 'selection' && el.name !== 'image_href' && !el.value);
+  // Can progress iff there's at least one individual bounding_box to upload
+  elForm.save.disabled = !Array.from(elForm.elements).find((el) => {
+    return el.name.endsWith('[bounding_box]') && el.value;
+  });
 
   if (event.target.name === 'sample') {
     // Update rest of form to match new sample
