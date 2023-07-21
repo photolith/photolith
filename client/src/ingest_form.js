@@ -43,6 +43,9 @@ function formRefresh (event) {
   if (event.target.name === 'image_file') {
     // Image file changed, so image_href is no longer valid
     elForm.image_href.value = '';
+
+    // If there's an image, we'll be able to fill in form
+    elForm.querySelector('fieldset').disabled = !event.target.value;
   }
 
   if (event.target.name === 'selection') {
