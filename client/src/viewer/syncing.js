@@ -1,9 +1,9 @@
 import { fabric } from 'fabric';
 
 import { changeEvent } from '../events';
-import { PhViewer } from './base';
+import { PhFilteringViewer } from './filtering';
 
-export class PhSyncingViewer extends PhViewer {
+export class PhSyncingViewer extends PhFilteringViewer {
   constructor (elViewer) {
     super(elViewer);
 
