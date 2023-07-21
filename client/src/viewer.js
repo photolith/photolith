@@ -7,24 +7,7 @@ export function init (parent) {
     const v = elViewer.classList.contains('ph-annotate') ? new PhAnnotate(elViewer) : elViewer.classList.contains('ph-cropper') ? new PhCropper(elViewer) : new PhViewer(elViewer);
 
     if (elViewer.hasAttribute('data-sync-form')) {
-      v.elSyncForm = document.querySelector(elViewer.getAttribute('data-sync-form'));
-      v.elSyncForm.addEventListener('load_individuals', (event) => {
-        v.loadIndividuals();
-      });
-      v.elSyncForm.addEventListener('change', (event) => {
-        if (event.detail === 999) return; // Break loops
-        if (event.target.name === 'image_file') {
-          if (!event.target.phBlob) {
-            // No blob, so start of load
-            v.startRendering();
-          } else {
-            v.load(event.target.phBlob);
-          }
-          return;
-        }
-
-        v.reverseSyncForm({ target: v.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
-      });
+      v.setSyncForm(document.querySelector(elViewer.getAttribute('data-sync-form')));
     }
 
     if (elViewer.hasAttribute('data-src')) {

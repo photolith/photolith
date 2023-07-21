@@ -34,6 +34,29 @@ export class PhSyncingViewer extends PhFilteringViewer {
     }
   }
 
+  setSyncForm (el) {
+    this.elSyncForm = el;
+
+    this.elSyncForm.addEventListener('load_individuals', (event) => {
+      this.loadIndividuals();
+    });
+
+    this.elSyncForm.addEventListener('change', (event) => {
+      if (event.detail === 999) return; // Break loops
+      if (event.target.name === 'image_file') {
+        if (!event.target.phBlob) {
+          // No blob, so start of load
+          this.startRendering();
+        } else {
+          this.load(event.target.phBlob);
+        }
+        return;
+      }
+
+      this.reverseSyncForm({ target: this.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
+    });
+  }
+
   syncForm (opt) {
     const obj = opt.target;
     let newVal;
