@@ -1,16 +1,28 @@
 import { fabric } from 'fabric';
 
-// Return point between (p1) & (p2) that's closest to (newPoint)
-function betweenPoints (p1, p2, newPoint) {
-  // One of the points undefined probably means we fell of either end when iterating
-  if (p1 === undefined || p2 === undefined) return newPoint;
+function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
+  // Treat originPoint as origin, get delta of linePoint & newPoint
+  const lineDelta = linePoint.subtract(originPoint);
+  const newDelta = newPoint.subtract(originPoint);
+  const lineDist2 = Math.pow(lineDelta.x, 2) + Math.pow(lineDelta.y, 2);
+  const newDist2 = Math.pow(newDelta.x, 2) + Math.pow(newDelta.y, 2);
 
-  if (p1.distanceFrom(p2) / newPoint.distanceFrom(p2) < 1) {
-    // Try p2 -> p1 first, don't go beyond p1
-    return p1;
-  }
-  // Find point along line between p1 & p2 that is same ratio of distances as given point
-  return p1.lerp(p2, Math.min(newPoint.distanceFrom(p1) / p2.distanceFrom(p1), 1));
+  // Don't let newPoint go beyond (for mid-points), or behind linePoint (for end-points)
+  if (notBeyondDp && newDist2 > lineDist2) return linePoint;
+  if (!notBeyondDp && newDist2 < lineDist2) return linePoint;
+
+  // Angle between lineDelta & newDelta
+  const angleDelta = Math.atan2(lineDelta.y, lineDelta.x) - Math.atan2(newDelta.y, newDelta.x);
+
+  // Angle shouldn't be obtuse (i.e. newPoint is "behind" originPoint)
+  if (Math.abs(angleDelta) > Math.PI / 2 && Math.abs(angleDelta) < (Math.PI * 3 / 2)) return originPoint;
+
+  // Rotate newDelta to cancel difference, add to originPoint
+  const sinus = Math.sin(angleDelta); const cosinus = Math.cos(angleDelta);
+  return originPoint.add(new fabric.Point(
+    newDelta.x * cosinus - newDelta.y * sinus,
+    newDelta.x * sinus + newDelta.y * cosinus
+  ));
 }
 
 export default function (props = {}, circleProps = {}, endcapRadius) {
@@ -115,7 +127,15 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     for (i = 0; i < points.length; i++) {
       if (points[i].distanceFrom(points[0]) > newPoint.distanceFrom(points[0])) break;
     }
-    points.splice(i, 0, opt.e.ctrlKey ? newPoint : betweenPoints(points[i - 1], points[i], newPoint));
+    if (opt.e.ctrlKey) {
+      // ctrl held, no snapping to point
+    } else if (i === points.length) {
+      // Beyond end of line, use 2 previous points
+      if (points.length > 1) newPoint = snapLine(points[points.length - 2], points[points.length - 1], newPoint, true);
+    } else {
+      newPoint = snapLine(points[i - 1], points[i], newPoint, true);
+    }
+    points.splice(i, 0, newPoint);
 
     poly.phSetPoints(points);
     this.canvas.setActiveObject(this.phNodes[i]);
@@ -126,7 +146,17 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
 
     // Snap to line between siblings unless ctrl is held
-    if (!opt.e.ctrlKey) points[phNode.phNodeIdx] = betweenPoints(points[phNode.phNodeIdx - 1], points[phNode.phNodeIdx + 1], points[phNode.phNodeIdx]);
+    if (opt.e.ctrlKey) {
+      // ctrl held, no snapping to point
+    } else if (phNode.phNodeIdx === 0) {
+      // Start: Snap to line formed by previous point
+      if (points.length > 2) points[phNode.phNodeIdx] = snapLine(points[2], points[1], points[0]);
+    } else if (phNode.phNodeIdx === points.length - 1) {
+      // End: Snap to line formed by previous point
+      if (points.length > 2) points[phNode.phNodeIdx] = snapLine(points[points.length - 3], points[points.length - 2], points[phNode.phNodeIdx]);
+    } else {
+      points[phNode.phNodeIdx] = points[phNode.phNodeIdx] = snapLine(points[phNode.phNodeIdx - 1], points[phNode.phNodeIdx + 1], points[phNode.phNodeIdx], true);
+    }
     poly.phSetPoints(points);
   };
 
