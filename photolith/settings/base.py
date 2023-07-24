@@ -70,6 +70,11 @@ DATABASES = {
 }
 
 
+# Allow Nginx to tell us what the scheme was
+# so CSRF-checks can do is_secure() + Host = HTTP_ORIGIN in _origin_verified()
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+
 # Authentication
 LOGIN_REDIRECT_URL = "/"
 
