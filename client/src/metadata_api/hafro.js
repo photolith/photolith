@@ -16,15 +16,15 @@ const metaLabels = {
   is: {
     id: 'ID',
     title: 'Titill',
-    slideLabel: 'Skyggnumerki',
+    slideLabel: 'Upplýsingar á gleri',
     length: 'Lengd',
-    sex: 'Kynlíf',
-    maturity: 'Þroska',
-    species: 'Tegundir',
-    cruise: 'Sigling',
+    sex: 'Kyn',
+    maturity: 'Kynþroski',
+    species: 'Tegund',
+    cruise: 'Leiðangur',
     station: 'Stöð',
-    stationDate: 'Stöðvardagur',
-    gear: 'Gír',
+    stationDate: 'Dags',
+    gear: 'Veiðarfæri',
     meshSize: 'Möskvastærð'
   }
 };
