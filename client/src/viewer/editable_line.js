@@ -164,6 +164,9 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   poly.phRemoveNode = function (phNode) {
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
 
+    // Deleting sole point would remove the line
+    if (points.length < 2) return;
+
     // Remove point at given index
     points.splice(phNode.phNodeIdx, 1);
 
