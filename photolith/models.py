@@ -39,11 +39,11 @@ class Individual(models.Model):
     @property
     def data(self):
         out = {}
-        for m in MetaNumeric.objects.filter(individual=self):
+        for m in self.metanumeric_set.all():
             out[m.key] = m.value
-        for m in MetaChar.objects.filter(individual=self):
+        for m in self.metachar_set.all():
             out[m.key] = m.value
-        for m in MetaTx.objects.filter(individual=self):
+        for m in self.metatx_set.all():
             out[m.key] = m.value.dict
         return out
 

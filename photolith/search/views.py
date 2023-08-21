@@ -3,7 +3,6 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import F, Subquery, Min, Max
-from django.db.models.base import ModelState
 
 from ..errors import json_errors
 from ..models import Individual, MetaNumeric, MetaChar, MetaTx, Taxonomy
@@ -52,7 +51,14 @@ class DataView(PermissionRequiredMixin, View):
 
     def query(self):
         qs = Individual.objects
-        qs = qs.select_related("image").annotate(image__href=F("image__href"))
+        qs = (
+            qs.select_related("image")
+            .prefetch_related("metanumeric_set")
+            .prefetch_related("metachar_set")
+            .prefetch_related("metatx_set")
+            .prefetch_related("metatx_set__value")
+            .annotate(image__href=F("image__href"))
+        )
 
         for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):
@@ -95,13 +101,8 @@ class DataView(PermissionRequiredMixin, View):
                     )
                 )
 
-        def subitem(v):
-            if isinstance(v, ModelState):
-                return None  # Not JSON serialisable, not interesting anyway
-            return v
-
         for ind in qs:
-            out = {k: subitem(v) for k, v in vars(ind).items()}
+            out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
             out["data"] = ind.data
             yield out
 
