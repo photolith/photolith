@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('photolith', '0005_alter_annotation_age_alter_annotation_comment_and_more'),
+        ("photolith", "0005_alter_annotation_age_alter_annotation_comment_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='annotation',
-            old_name='bisect_poly',
-            new_name='axis_poly',
+            model_name="annotation",
+            old_name="bisect_poly",
+            new_name="axis_poly",
         ),
     ]
