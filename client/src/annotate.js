@@ -4,13 +4,13 @@ import { changeEvent } from './events';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
-  if (event.target.name === 'bisect_poly') {
-    const elTableBody = window.document.querySelector('#bisect_poly_table tbody');
+  if (event.target.name === 'axis_poly') {
+    const elTableBody = window.document.querySelector('#axis_poly_table tbody');
     const pointData = JSON.parse(event.target.value || '[]').map((p) => new fabric.Point(p[0], p[1]));
     let totalDist = 0;
 
     // Find currently selected point
-    let selectedIdx = event.target.form.selection.value.match(/^bisect_poly\[(\d+)\]$/);
+    let selectedIdx = event.target.form.selection.value.match(/^axis_poly\[(\d+)\]$/);
     selectedIdx = selectedIdx ? parseInt(selectedIdx[1], 10) : null;
 
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
@@ -27,23 +27,23 @@ function formRefresh (event) {
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh({ target: event.target.form.bisect_poly });
+    formRefresh({ target: event.target.form.axis_poly });
   }
 }
 
 function allAnnotationsClick (elForm, event) {
   if (event.target.tagName === 'BUTTON') {
-    const elScript = this.querySelector('tbody > tr.table-info script.bisect_poly');
-    let bisectPoly = elScript ? JSON.parse(elScript.textContent) : undefined;
-    if (!bisectPoly) return;
+    const elScript = this.querySelector('tbody > tr.table-info script.axis_poly');
+    let axisPoly = elScript ? JSON.parse(elScript.textContent) : undefined;
+    if (!axisPoly) return;
 
     if (event.target.classList.contains('ph-copy-line')) {
       // Strip out everything in the middle
-      bisectPoly = [bisectPoly[0], bisectPoly[bisectPoly.length - 1]];
+      axisPoly = [axisPoly[0], axisPoly[axisPoly.length - 1]];
     }
 
-    elForm.bisect_poly.value = JSON.stringify(bisectPoly);
-    elForm.bisect_poly.dispatchEvent(changeEvent());
+    elForm.axis_poly.value = JSON.stringify(axisPoly);
+    elForm.axis_poly.dispatchEvent(changeEvent());
   } else {
     const elTr = event.target.closest('tbody > tr');
     if (!elTr) return;
@@ -64,13 +64,13 @@ export function init (parent) {
       new fabric.Point(indData.scale_line[1][0], indData.scale_line[1][1])
     );
 
-    // If server-side returned null for bisect_poly, populate an intial value
-    elForm.bisect_poly.value = elForm.bisect_poly.value === 'null'
+    // If server-side returned null for axis_poly, populate an intial value
+    elForm.axis_poly.value = elForm.axis_poly.value === 'null'
       ? JSON.stringify([
         [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
         [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
       ])
-      : elForm.bisect_poly.value;
+      : elForm.axis_poly.value;
 
     elForm.addEventListener('change', formRefresh);
 

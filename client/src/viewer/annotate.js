@@ -8,7 +8,7 @@ const rgbHighlight = window.getComputedStyle(document.documentElement).getProper
 export class PhAnnotate extends PhSyncingViewer {
   annotatePoly () {
     const obj = new EditableLine({
-      id: 'bisect_poly',
+      id: 'axis_poly',
       stroke: `rgba(${rgbHighlight}, 0.6)`
     }, {
       stroke: `rgba(${rgbHighlight}, 1)`

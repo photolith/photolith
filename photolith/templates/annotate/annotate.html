@@ -63,7 +63,7 @@
         </tr></thead>
         <tbody>{% for a in all_annotations %}
           <tr role="button" class="{% if forloop.first %}table-info{% endif %}">
-            <script class="bisect_poly" type="application/json">{{ a.bisect_poly }}</script></td>
+            <script class="axis_poly" type="application/json">{{ a.axis_poly }}</script></td>
             <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|date:'H:m' }}</code></td>
             <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
             <td class="text-nowrap text-end"><code>{{ a.age }}</code></td>
@@ -107,8 +107,8 @@
       </div>
       <div class="col">
 
-        {{ form.bisect_poly|as_crispy_field }}
-        <table id="bisect_poly_table" class="table table-striped point-data" style="">
+        {{ form.axis_poly|as_crispy_field }}
+        <table id="axis_poly_table" class="table table-striped point-data" style="">
           <thead><tr>
             <th>{% translate "Point" %}</th>
             <th>{% translate "Distance (mm)" %}</th>

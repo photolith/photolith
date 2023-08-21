@@ -16,7 +16,7 @@
       </tr></thead>
       <tbody>{% for a in all_annotations %}
         <tr>
-          <script class="bisect_poly" type="application/json">{{ a.bisect_poly }}</script></td>
+          <script class="axis_poly" type="application/json">{{ a.axis_poly }}</script></td>
           <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|date:'H:m' }}</code></td>
           <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
           <td class="text-nowrap text-end"><code>{{ a.age }}</code></td>

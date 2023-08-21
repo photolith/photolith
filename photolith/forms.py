@@ -10,6 +10,6 @@ class AnnotationForm(ModelForm):
             "rating",
             "age",
             "comment",
-            "bisect_poly",
+            "axis_poly",
         ]
-        widgets = {"bisect_poly": HiddenInput()}
+        widgets = {"axis_poly": HiddenInput()}
