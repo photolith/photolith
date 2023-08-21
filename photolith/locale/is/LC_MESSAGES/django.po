@@ -38,12 +38,12 @@ msgid "Unreadable"
 msgstr "Ólæsileg"
 
 #: photolith/models.py
-msgid "Average"
-msgstr "Erfið"
+msgid "Difficult (+/- one year)"
+msgstr ""
 
 #: photolith/models.py
-msgid "Perfect"
-msgstr "Auðveld"
+msgid "Easy to read"
+msgstr ""
 
 #: photolith/models.py
 msgid "Created by"

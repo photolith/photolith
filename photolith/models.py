@@ -163,9 +163,9 @@ class Annotation(models.Model):
     """
 
     class Rating(models.IntegerChoices):
-        POOR = 0, _("Unreadable")
-        ACCEPTABLE = 50, _("Average")
-        GOOD = 100, _("Perfect")
+        UNREADABLE = 0, _("Unreadable")
+        DIFFICULT = 50, _("Difficult (+/- one year)")
+        GOOD = 100, _("Easy to read")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
