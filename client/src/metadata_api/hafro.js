@@ -60,9 +60,9 @@ export default class MetadataApi {
     const intSampleId = parseInt(sampleId, 10);
     if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));
 
-    return this.fetch(`/biota/otolith/sample/${intSampleId}`).then((measures) => {
-      return Promise.all(measures.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
-        individuals: measures.map((m, i) => {
+    return this.fetch(`/biota/otolith/sample/${intSampleId}`).then((data) => {
+      return Promise.all(data.otoliths.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
+        individuals: data.otoliths.map((m, i) => {
           const od = ods[i];
 
           return {
