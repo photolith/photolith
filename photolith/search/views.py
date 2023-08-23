@@ -49,7 +49,7 @@ class IndexView(PermissionRequiredMixin, TemplateView):
 class DataView(PermissionRequiredMixin, View):
     permission_required = ("photolith.view_individual",)
 
-    def query(self):
+    def query(self, pg_start, pg_end, order_cols):
         qs = Individual.objects
         qs = (
             qs.select_related("image")
@@ -109,8 +109,24 @@ class DataView(PermissionRequiredMixin, View):
     @json_errors
     def get(self, *args, **kwargs):
         context = {}
+        rows, total_count = self.query(
+            # https://datatables.net/manual/server-side#Sent-parameters
+            pg_start=self.request.GET.get("start", 0),
+            pg_length=self.request.GET.get("pg_length", 10),
+            order_cols=[
+                dict(
+                    col=self.request.GET[k],
+                    dir=self.request.GET.get(k.replace("[column]", "[dir]"), 'asc'),
+                ),
+                for k in self.request.GET.keys()
+                if k.startswith("order") and k.endswith("[column]")
+            ],
+        )
 
-        context["data"] = list(self.query())
+        # https://datatables.net/manual/server-side#Returned-data
+        context["draw"] = self.request.GET.get("draw")
+        context["recordsTotal"] = context["recordsFiltered"] = total_count
+        context["data"] = list(rows)
 
         # TODO: Data from summary cols, i.e. age / rating
         return JsonResponse(context)
