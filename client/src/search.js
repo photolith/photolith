@@ -3,7 +3,7 @@ import DataTable from 'datatables.net-bs5';
 import TomSelect from 'tom-select';
 
 import { init as initCroppedViewer } from './cropped_viewer';
-import { htmlFetch } from './fetch';
+import { htmlFetch, jsonFetchCached } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
 export function populateFilter (elForm) {
@@ -55,7 +55,10 @@ export function init (parent) {
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
       language: { url: lang !== 'en' ? `/static/datatables.net-plugins/i18n/${lang}.json` : undefined },
-      ajaxSource: '/search/data/' + window.document.location.search,
+      ajax: function (data, callback) {
+        // https://datatables.net/reference/option/ajax#Types
+        return jsonFetchCached('/search/data/', window.document.location.search, {}).then(callback);
+      },
       columns: Object.keys(metaLabels).map((k) => {
         // https://datatables.net/reference/option/columns
         return {

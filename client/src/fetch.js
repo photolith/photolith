@@ -1,3 +1,29 @@
+/** jsonFetch, but stash results in sessionStorage for use between pages */
+export function jsonFetchCached (baseResource, params, options) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/Storage
+  const cachedParams = window.sessionStorage.getItem(baseResource + '?query') || '';
+  if (cachedParams === params) {
+    return Promise.resolve(JSON.parse(window.sessionStorage.getItem(baseResource + '?data')));
+  }
+
+  return jsonFetch(baseResource + params, options).then((data) => {
+    try {
+      window.sessionStorage.setItem(baseResource + '?data', JSON.stringify(data));
+      window.sessionStorage.setItem(baseResource + '?query', params);
+    } catch (e) {
+      // Result probably too big for cache, clear.
+      console.warn('Failed to cache search result ' + params + '\n', e);
+      try {
+        window.sessionStorage.removeItem(baseResource + '?query');
+        window.sessionStorage.removeItem(baseResource + '?data');
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    return data;
+  });
+}
+
 export function jsonFetch (resource, options) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/json';
