@@ -24,6 +24,7 @@ urlpatterns = [
     path("", include("photolith.home.urls", namespace="home")),
     path("annotate/", include("photolith.annotate.urls", namespace="annotate")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
+    path("project/", include("photolith.project.urls", namespace="project")),
     path("media/", include("photolith.media.urls", namespace="media")),
     path("search/", include("photolith.search.urls", namespace="search")),
 ]

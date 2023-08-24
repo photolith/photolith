@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block title %}{% translate "Project" %}{% endblock title %}
+{% block contentclass %}container-fluid{% endblock contentclass %}
+{% block content %}
+
+  {% crispy form %}
+
+  <div class="offcanvas-header">
+      <button type="submit" form="project-form" class="btn btn-info">{% translate "Save" %}</button>
+
+      {% if object.id and perms.photolith.delete_project %}
+        <form method="POST" action="{% url 'project:delete' object.id %}">
+          {% csrf_token %}
+          <input type="submit" class="btn btn-danger" value="{% translate 'Delete' %}">
+        </form>
+      {% endif %}
+
+  </div>
+
+{% endblock content %}

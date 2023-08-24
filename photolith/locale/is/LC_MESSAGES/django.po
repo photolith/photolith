@@ -91,6 +91,10 @@ msgid ""
 "will be used as a starting point for annotations"
 msgstr ""
 
+#: photolith/project/forms.py
+msgid "No base axis"
+msgstr ""
+
 #: photolith/templates/annotate/annotate.html
 msgid "Annotate Individual"
 msgstr "Aldursmerkja einstakling"
@@ -139,6 +143,7 @@ msgstr "Afrita línu"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
+#: photolith/templates/project/update.html
 msgid "Save"
 msgstr "Vista"
 
@@ -178,6 +183,10 @@ msgstr "Inntaka"
 msgid "Search"
 msgstr "Leit"
 
+#: photolith/templates/base.html photolith/templates/project/list.html
+msgid "Projects"
+msgstr ""
+
 #: photolith/templates/base.html
 msgid "Issues"
 msgstr "Vandamál"
@@ -209,6 +218,34 @@ msgstr "Lengd kvarða (mm)"
 #: photolith/templates/ingest/index.html
 msgid "Sample ID"
 msgstr "ID númer sýnis"
+
+#: photolith/templates/project/list.html
+msgid "All projects"
+msgstr ""
+
+#: photolith/templates/project/list.html
+#, fuzzy
+#| msgid "Annotate"
+msgid "Annotate project"
+msgstr "Aldursmerkja"
+
+#: photolith/templates/project/list.html
+#, fuzzy
+#| msgid "Filter results"
+msgid "View results"
+msgstr "Sortera niðurstöður"
+
+#: photolith/templates/project/list.html
+msgid "Edit"
+msgstr ""
+
+#: photolith/templates/project/update.html
+msgid "Project"
+msgstr ""
+
+#: photolith/templates/project/update.html
+msgid "Delete"
+msgstr ""
 
 #: photolith/templates/search/index.html
 msgid "Individual Search"
