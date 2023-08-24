@@ -3,7 +3,7 @@ import json
 from django.utils.html import escape, mark_safe
 from django.contrib import admin
 
-from .models import Image, Individual, Annotation
+from .models import Image, Individual, Annotation, Project
 
 
 def image_preview_html(href, bounding_box):
@@ -99,3 +99,18 @@ class AnnotationAdmin(admin.ModelAdmin):
         )
 
     image_preview.short_description = "Preview"
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ["name", "date_end", "created_by", "created_at"]
+    fields = [
+        "name",
+        "date_end",
+        "search_qs",
+        "base_user",
+        "created_by",
+        "created_at",
+        "modified_at",
+    ]
+    readonly_fields = ["created_at", "modified_at"]

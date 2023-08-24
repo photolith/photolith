@@ -45,15 +45,15 @@ msgstr ""
 msgid "Easy to read"
 msgstr ""
 
-#: photolith/models.py
+#: photolith/models.py photolith/models.py
 msgid "Created by"
 msgstr "Búið til af"
 
-#: photolith/models.py
+#: photolith/models.py photolith/models.py
 msgid "Created at"
 msgstr "Búið til kl."
 
-#: photolith/models.py
+#: photolith/models.py photolith/models.py
 msgid "Last modified"
 msgstr "Síðast breytt"
 
@@ -68,6 +68,28 @@ msgstr "Aldurslestur"
 #: photolith/models.py
 msgid "Comments"
 msgstr "Athugasemdir"
+
+#: photolith/models.py
+msgid "Project name"
+msgstr ""
+
+#: photolith/models.py
+msgid "Search querystring"
+msgstr ""
+
+#: photolith/models.py
+msgid "Project end date"
+msgstr ""
+
+#: photolith/models.py
+msgid "Base axis on user"
+msgstr ""
+
+#: photolith/models.py
+msgid ""
+"If a user is selected, then their most recent annotation for each individual "
+"will be used as a starting point for annotations"
+msgstr ""
 
 #: photolith/templates/annotate/annotate.html
 msgid "Annotate Individual"

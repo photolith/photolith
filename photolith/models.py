@@ -1,3 +1,4 @@
+import datetime
 import numbers
 
 from django.conf import settings
@@ -192,3 +193,50 @@ class Annotation(models.Model):
         if not self.created_by:
             self.created_by = user
         return user.is_superuser or created_by == user
+
+
+class Project(models.Model):
+    name = models.CharField(
+        verbose_name=_("Project name"),
+        max_length=4096,
+        blank=False,
+        null=False,
+    )
+    search_qs = models.CharField(
+        verbose_name=_("Search querystring"),
+        max_length=4096,
+        blank=False,
+        null=False,
+    )
+    date_end = models.DateField(
+        verbose_name=_("Project end date"),
+        # Default 4 weeks from now
+        default=datetime.date.today() + datetime.timedelta(weeks=4),
+        null=False,
+    )
+    base_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Base axis on user"),
+        help_text=_(
+            "If a user is selected, then their most recent annotation for each individual will be used as a starting point for annotations"
+        ),
+        related_name="projects_based_on_set",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Created by"),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    created_at = models.DateTimeField(
+        _("Created at"), auto_now_add=True, editable=False
+    )
+    modified_at = models.DateTimeField(
+        _("Last modified"), auto_now=True, editable=False
+    )
+
+    @property
+    def is_open(self):
+        return self.date_end >= datetime.date.today()
