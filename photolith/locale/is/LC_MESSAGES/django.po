@@ -257,6 +257,10 @@ msgid "Filter results"
 msgstr "Sortera niðurstöður"
 
 #: photolith/templates/search/index.html
+msgid "Save as project"
+msgstr ""
+
+#: photolith/templates/search/index.html
 msgid "Apply"
 msgstr "Samþykkja"
 

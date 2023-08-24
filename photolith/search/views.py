@@ -43,6 +43,7 @@ class IndexView(PermissionRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["meta_fields"] = self.get_meta_fields()
+        context["qs"] = self.request.META["QUERY_STRING"]
         return context
 
 
