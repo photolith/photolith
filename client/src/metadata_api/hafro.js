@@ -61,6 +61,9 @@ export default class MetadataApi {
     if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));
 
     return this.fetch(`/biota/otolith/sample/${intSampleId}`).then((data) => {
+      if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
+      if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
+
       return Promise.all(data.otoliths.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
         individuals: data.otoliths.map((m, i) => {
           const od = ods[i];
