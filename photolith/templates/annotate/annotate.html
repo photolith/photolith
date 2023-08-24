@@ -22,11 +22,13 @@
   </div>
 </div>
 
-{{ ind_dict|json_script:"individual_json" }}
 {% endblock pre_content %}
 
 {% block content %}
 
+{% if individual_id %}
+
+{{ ind_dict|json_script:"individual_json" }}
 <div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_dict.href }}" data-bounding-box="{{ ind_dict.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
 
 <ul class="nav nav-tabs" role="tablist">
@@ -122,4 +124,8 @@
 
   </div>
 </div>
+
+{% else %}
+<div class="p-5 text-center container rounded" style="background: #eee">{% translate "Press Next to start" %}</div>
+{% endif %}
 {% endblock content %}

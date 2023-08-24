@@ -132,6 +132,10 @@ msgstr "Fjarlægð (mm)"
 msgid "Cumulative (mm)"
 msgstr "Samtals lengd (mm)"
 
+#: photolith/templates/annotate/annotate.html
+msgid "Press Next to start"
+msgstr ""
+
 #: photolith/templates/annotate/snippet.html
 msgid "New annotation"
 msgstr "Ný aldursmerking"

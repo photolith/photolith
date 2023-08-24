@@ -15,16 +15,20 @@ function selectPopulate (elSelect) {
 }
 
 function selectRefresh (elSelect) {
-  // Remove everything after /annotate/3/
-  const pathBase = document.location.pathname.replace(/(\d+\/).*/, '$1');
+  if (document.location.pathname === '/annotate/') {
+    // Select 0'th return item
+    elSelect.options[0].selected = true;
+  } else {
+    // Remove everything after /annotate/3/
+    const pathBase = document.location.pathname.replace(/(\d+\/).*/, '$1');
+    // selected iff URL matches pathBase
+    Array.from(elSelect.options).forEach((opt) => {
+      opt.selected = opt.value.startsWith(pathBase);
+    });
+  }
 
   // Remove disabled now a real item is selected
   elSelect.options[0].disabled = false;
-
-  // selected iff URL matches pathBase
-  Array.from(elSelect.options).forEach((opt) => {
-    opt.selected = opt.value.startsWith(pathBase);
-  });
 }
 
 function selectNudge (elSelect, action) {
