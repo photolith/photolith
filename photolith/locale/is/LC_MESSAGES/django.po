@@ -137,7 +137,7 @@ msgid "New annotation"
 msgstr "Ný aldursmerking"
 
 #: photolith/templates/base.html
-msgid "PhOtolith"
+msgid "Photolith"
 msgstr "Kvarnó"
 
 #: photolith/templates/base.html
