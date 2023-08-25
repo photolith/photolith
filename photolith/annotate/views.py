@@ -1,12 +1,12 @@
 from django.core.exceptions import BadRequest
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import FormView
 
 
 from ..errors import json_errors
 from ..forms import AnnotationForm
-from ..models import Individual, Annotation
+from ..models import Individual, Annotation, Project
 
 
 class AnnotateView(PermissionRequiredMixin, FormView):
@@ -39,6 +39,17 @@ class AnnotateView(PermissionRequiredMixin, FormView):
             if not obj.edit_allowed(self.request.user):
                 raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
             kw["instance"] = obj
+        else:
+            kw["instance"] = Annotation.objects.create(
+                individual_id=self.kwargs["individual_id"]
+            )
+            # TODO: Break up both halves of get_all_annotations()
+            (_, init_axis_poly) = self.get_all_annotations(
+                self.kwargs["individual_id"],
+                self.request.GET.get("project", None),
+            )
+            if init_axis_poly:
+                kw["instance"].axis_poly = init_axis_poly
 
         return kw
 
@@ -52,10 +63,22 @@ class AnnotateView(PermissionRequiredMixin, FormView):
             scale_mm=ind.image.scale_mm,
         )
 
-    def get_all_annotations(self, individual_id):
-        return Annotation.objects.filter(
-            individual_id=individual_id,
-        ).order_by("-created_at")
+    def get_all_annotations(self, individual_id, project_id=None):
+        if project_id is not None:
+            p = get_object_or_404(Project, pk=self.request.GET.get("project"))
+            if p.is_open:
+                # Find annotation project should be based on
+                a = p.init_annotation(individual_id)
+                if a:
+                    return [a], a.axis_poly
+                return [], None
+
+        return (
+            Annotation.objects.filter(
+                individual_id=individual_id,
+            ).order_by("-created_at"),
+            None,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -65,8 +88,9 @@ class AnnotateView(PermissionRequiredMixin, FormView):
         if "individual_id" in self.kwargs:
             context["individual_id"] = int(self.kwargs["individual_id"])
             context["ind_dict"] = self.get_individual(context["individual_id"])
-            context["all_annotations"] = self.get_all_annotations(
-                context["individual_id"]
+            (context["all_annotations"], _) = self.get_all_annotations(
+                context["individual_id"],
+                self.request.GET.get("project", None),
             )
         return context
 

@@ -240,3 +240,26 @@ class Project(models.Model):
     @property
     def is_open(self):
         return self.date_end >= datetime.date.today()
+
+    def init_annotation(self, individual_id):
+        """Return the initial annotation for (individual_id) when working within this project"""
+        if not self.base_user:
+            return None
+
+        # Find most recent annotation by base_user
+        a = (
+            Annotation.objects.filter(
+                individual_id=individual_id,
+                created_by=self.base_user,
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        if a is None:
+            return None
+
+        # Create copy without age assignment, intermediate nodes
+        a.pk = None
+        a.age = 0
+        a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]
+        return a
