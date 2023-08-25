@@ -104,6 +104,12 @@ msgid "Prev"
 msgstr "Fyrri"
 
 #: photolith/templates/annotate/annotate.html
+#, fuzzy
+#| msgid "Return to search"
+msgid "Return to project list"
+msgstr "Aftur í leit"
+
+#: photolith/templates/annotate/annotate.html
 msgid "Return to search"
 msgstr "Aftur í leit"
 

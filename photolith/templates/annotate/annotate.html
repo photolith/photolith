@@ -14,7 +14,11 @@
   <div class="flex-grow-1 mx-5">
     <select class="form-select" data-sync-form="form.ingest-form">
       {% comment %}NB: disabled so we don't flash this item before JS has populated{% endcomment %}
-      <option value="/search/?{{ request.GET.urlencode }}" disabled>{% translate "Return to search" %}</option>
+      {% if 'project' in request.GET %}
+        <option value="/project/" disabled>{% translate "Return to project list" %}</option>
+      {% else %}
+        <option value="/search/?{{ request.GET.urlencode }}" disabled>{% translate "Return to search" %}</option>
+      {% endif %}
     </select>
   </div>
   <div class="">
