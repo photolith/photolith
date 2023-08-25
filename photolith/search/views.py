@@ -1,11 +1,14 @@
+import urllib.parse
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views import View
 from django.db.models import F, Subquery, Min, Max
 
 from ..errors import json_errors
-from ..models import Individual, MetaNumeric, MetaChar, MetaTx, Taxonomy
+from ..models import Individual, MetaNumeric, MetaChar, MetaTx, Project, Taxonomy
 from ..nullagg import NullAgg
 
 
@@ -61,7 +64,14 @@ class DataView(PermissionRequiredMixin, View):
             .annotate(image__href=F("image__href"))
         )
 
-        for k, vs in self.request.GET.lists():
+        # If searching for a project, search based on it's search_qs
+        if "project" in self.request.GET:
+            p = get_object_or_404(Project, pk=self.request.GET.get("project"))
+            qs_items = urllib.parse.parse_qs(p.search_qs).items()
+        else:
+            qs_items = self.request.GET.lists()
+
+        for k, vs in qs_items:
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
                 pass
