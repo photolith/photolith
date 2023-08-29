@@ -5,8 +5,9 @@ from django.views.generic.edit import FormView
 
 
 from ..errors import json_errors
-from ..forms import AnnotationForm
 from ..models import Individual, Annotation, Project
+
+from .forms import AnnotationForm
 
 
 class AnnotateView(PermissionRequiredMixin, FormView):

@@ -1,6 +1,6 @@
 from django.forms import ModelForm, HiddenInput
 
-from .models import Annotation
+from ..models import Annotation
 
 
 class AnnotationForm(ModelForm):
