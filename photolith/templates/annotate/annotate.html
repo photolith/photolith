@@ -63,11 +63,11 @@
     <div class="ph-all-annotations">
       <table class="table table-striped" style="">
         <thead><tr>
-          <th class="text-nowrap">{{ Annotation|verbose_name:"created_at" }}</th>
-          <th class="text-nowrap">{{ Annotation|verbose_name:"created_by" }}</th>
-          <th class="text-nowrap">{{ Annotation|verbose_name:"age" }}</th>
-          <th class="text-nowrap">{{ Annotation|verbose_name:"rating" }}</th>
-          <th class="text-nowrap">{{ Annotation|verbose_name:"comment" }}</th>
+          <th class="text-nowrap">{{ object_model|verbose_name:"created_at" }}</th>
+          <th class="text-nowrap">{{ object_model|verbose_name:"created_by" }}</th>
+          <th class="text-nowrap">{{ object_model|verbose_name:"age" }}</th>
+          <th class="text-nowrap">{{ object_model|verbose_name:"rating" }}</th>
+          <th class="text-nowrap">{{ object_model|verbose_name:"comment" }}</th>
         </tr></thead>
         <tbody>{% for a in all_annotations %}
           <tr role="button" class="{% if forloop.first %}table-info{% endif %}">
@@ -80,7 +80,7 @@
           </tr>
         {% endfor %}</tbody>
       </table>
-      {% if annotation_id is None %}
+      {% if object.id is None %}
         <button class="btn btn-info btn-block ph-copy-full">{% translate 'Copy full annotation' %}</button>
         <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy line only' %}</button>
       {% endif %}
@@ -99,6 +99,7 @@
             {{form.errors}}
           </div>
         {% endif %}
+        {{ form.individual|as_crispy_field }}
         <div class="mb-3">
           {{ form.age|as_crispy_field }}
         </div>

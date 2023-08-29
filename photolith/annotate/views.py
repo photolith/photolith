@@ -1,7 +1,9 @@
 from django.core.exceptions import BadRequest
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.edit import FormView
+from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
+from django.urls import reverse_lazy
+from django.views.generic.edit import UpdateView
 
 
 from ..errors import json_errors
@@ -10,89 +12,86 @@ from ..models import Individual, Annotation, Project
 from .forms import AnnotationForm
 
 
-class AnnotateView(PermissionRequiredMixin, FormView):
+class AnnotateView(PermissionRequiredMixin, UpdateView):
     permission_required = ("photolith.view_annotation",)
     template_name = "annotate/annotate.html"
+    model = Annotation
     form_class = AnnotationForm
+    slug_field = "pk"
+    slug_url_kwarg = "annotation_id"
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "annotate:annotate_existing",
+            kwargs=dict(
+                individual_id=self.object.individual_id,
+                annotation_id=self.object.id,
+            ),
+        )
 
     def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.individual_id = self.kwargs["individual_id"]
-        if not obj.edit_allowed(self.request.user):
-            raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
-        obj.save()
-        return redirect(
-            "annotate:annotate_existing",
-            individual_id=self.kwargs["individual_id"],
-            annotation_id=obj.id,
-        )
+        if not self.request.user.has_perms(("photolith.edit_annotation",)):
+            raise PermissionDenied("Not allowed to edit %s" % (str(self.object)))
+        return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kw = super().get_form_kwargs()
+    def get_object(self, queryset=None):
+        if "annotation_id" not in self.kwargs:
+            return None
+        obj = super().get_object(queryset=queryset)
 
-        if "annotation_id" in self.kwargs:
-            obj = Annotation.objects.get(id=self.kwargs["annotation_id"])
-            if obj.individual_id != self.kwargs["individual_id"]:
-                raise BadRequest(
-                    "Annotation %s is for individual %d, not %d"
-                    % (str(obj), obj.individual_id, self.kwargs["individual_id"])
-                )
-            if not obj.edit_allowed(self.request.user):
-                raise PermissionDenied("Not allowed to edit %s" % (str(obj)))
-            kw["instance"] = obj
-        else:
-            kw["instance"] = Annotation.objects.create(
-                individual_id=self.kwargs["individual_id"]
+        if obj.individual_id != self.individual_id:
+            raise BadRequest(
+                "Annotation %s is for individual %d, not %d"
+                % (str(obj), obj.individual_id, self.individual_id)
             )
-            # TODO: Break up both halves of get_all_annotations()
-            (_, init_axis_poly) = self.get_all_annotations(
-                self.kwargs["individual_id"],
-                self.request.GET.get("project", None),
-            )
-            if init_axis_poly:
-                kw["instance"].axis_poly = init_axis_poly
+        return obj
 
-        return kw
-
-    def get_individual(self, individual_id):
-        ind = Individual.objects.get(id=individual_id)
+    def get_initial(self):
         return dict(
-            bounding_box=ind.bounding_box,
-            data=ind.data,
-            href=ind.image.href,
-            scale_line=ind.image.scale_line,
-            scale_mm=ind.image.scale_mm,
+            individual=self.individual_id,
         )
 
-    def get_all_annotations(self, individual_id, project_id=None):
-        if project_id is not None:
-            p = get_object_or_404(Project, pk=self.request.GET.get("project"))
-            if p.is_open:
-                # Find annotation project should be based on
-                a = p.init_annotation(individual_id)
-                if a:
-                    return [a], a.axis_poly
-                return [], None
+    @cached_property
+    def current_project(self):
+        """Return the current project object based on the querystring"""
+        p_id = self.request.GET.get("project")
+        if not p_id:
+            return None
+        return get_object_or_404(Project, pk=p_id)
 
-        return (
-            Annotation.objects.filter(
-                individual_id=individual_id,
-            ).order_by("-created_at"),
-            None,
-        )
+    @cached_property
+    def individual_id(self):
+        if "individual_id" in self.kwargs:
+            return int(self.kwargs["individual_id"])
+        return None
+
+    def get_all_annotations(self):
+        """Return list of alternative annotations, varied if in project mode"""
+        p = self.current_project
+        if p and p.is_open:
+            # Annotating within a project should only show the initial annotation
+            init_a = p.init_annotation(self.individual_id)
+            return [init_a] if init_a else []
+
+        return Annotation.objects.filter(
+            individual_id=self.individual_id,
+        ).order_by("-created_at")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["Annotation"] = Annotation
-        context["annotation_id"] = self.kwargs.get("annotation_id", None)
-        # If individual_id specified, fetch corresponding data
-        if "individual_id" in self.kwargs:
-            context["individual_id"] = int(self.kwargs["individual_id"])
-            context["ind_dict"] = self.get_individual(context["individual_id"])
-            (context["all_annotations"], _) = self.get_all_annotations(
-                context["individual_id"],
-                self.request.GET.get("project", None),
+        context["object_model"] = self.model
+
+        if self.individual_id:
+            ind = get_object_or_404(Individual, pk=self.individual_id)
+            context["individual_id"] = self.individual_id
+            context["ind_dict"] = dict(
+                bounding_box=ind.bounding_box,
+                data=ind.data,
+                href=ind.image.href,
+                scale_line=ind.image.scale_line,
+                scale_mm=ind.image.scale_mm,
             )
+            context["all_annotations"] = self.get_all_annotations()
         return context
 
 

@@ -8,11 +8,11 @@
   <div class="col-7">
     <table class="table table-striped" style="">
       <thead><tr>
-        <th class="text-nowrap">{{ Annotation|verbose_name:"created_at" }}</th>
-        <th class="text-nowrap">{{ Annotation|verbose_name:"created_by" }}</th>
-        <th class="text-nowrap">{{ Annotation|verbose_name:"age" }}</th>
-        <th class="text-nowrap">{{ Annotation|verbose_name:"rating" }}</th>
-        <th class="text-nowrap">{{ Annotation|verbose_name:"comment" }}</th>
+        <th class="text-nowrap">{{ object_model|verbose_name:"created_at" }}</th>
+        <th class="text-nowrap">{{ object_model|verbose_name:"created_by" }}</th>
+        <th class="text-nowrap">{{ object_model|verbose_name:"age" }}</th>
+        <th class="text-nowrap">{{ object_model|verbose_name:"rating" }}</th>
+        <th class="text-nowrap">{{ object_model|verbose_name:"comment" }}</th>
       </tr></thead>
       <tbody>{% for a in all_annotations %}
         <tr>
