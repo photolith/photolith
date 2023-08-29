@@ -79,6 +79,13 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             init_a = p.init_annotation(self.individual_id)
             return [init_a] if init_a else []
 
+        if p:
+            # Closed project: list all annotations within project
+            return Annotation.objects.filter(
+                individual_id=self.individual_id,
+                project=p,
+            ).order_by("-created_at")
+
         return Annotation.objects.filter(
             individual_id=self.individual_id,
         ).order_by("-created_at")

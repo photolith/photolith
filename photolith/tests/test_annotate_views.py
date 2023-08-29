@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import RequestFactory, TestCase
 
 from ..annotate.views import AnnotateView
@@ -7,16 +9,20 @@ from .requires_utils import RequiresUtils
 
 
 class AnnotateViewTest(RequiresUtils, TestCase):
+    def create_project(self, **kwargs):
+        p = Project.objects.create(
+            name="UT Project",
+            search_qs="ut=yes",
+            **kwargs,
+        )
+        return p
+
     def test_get_all_annotations(self):
         def get_all_annotations(individual, project=None):
-            if project is not None:
-                p = Project.objects.create(
-                    name="UT Project",
-                    search_qs="ut=yes",
-                    **project,
-                )
+            if isinstance(project, dict):
+                p = self.create_project(**project)
             else:
-                p = None
+                p = project
             request = RequestFactory().get(
                 "/",
                 dict(
@@ -75,4 +81,35 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             get_all_annotations(ind, project=dict(created_by=user3, base_user=user1)),
             ["0-user1-2"],
+        )
+
+        # Assign a project with a base_user, only see init_annotation (which isn't part of project)
+        p = self.create_project(
+            created_by=user3,
+            base_user=user1,
+        )
+        self.create_annotation(ind, user1, created_delta=dict(days=-5), project=p)
+        self.create_annotation(ind, user1, created_delta=dict(days=-4), project=p)
+        self.create_annotation(ind, user2, created_delta=dict(days=-3), project=p)
+        self.create_annotation(ind, user2, created_delta=dict(days=-2), project=p)
+        self.assertEqual(p.is_open, True)
+        self.assertEqual(
+            get_all_annotations(ind, project=p),
+            [
+                "0-user1-2",
+            ],
+        )
+
+        # Close & see everything part of project
+        p.date_end = (self.now + datetime.timedelta(days=-1)).date()
+        p.save()
+        self.assertEqual(p.is_open, False)
+        self.assertEqual(
+            get_all_annotations(ind, project=p),
+            [
+                "10-user2-2",
+                "10-user2-3",
+                "10-user1-4",
+                "10-user1-5",
+            ],
         )
