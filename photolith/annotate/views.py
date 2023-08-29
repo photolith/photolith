@@ -32,6 +32,11 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         if not self.request.user.has_perms(("photolith.edit_annotation",)):
             raise PermissionDenied("Not allowed to edit %s" % (str(self.object)))
+        if self.object.project and not self.object.project.is_open:
+            raise PermissionDenied(
+                "Project %s closed, cannot edit annotations"
+                % (str(self.object.project))
+            )
         return super().form_valid(form)
 
     def get_object(self, queryset=None):
