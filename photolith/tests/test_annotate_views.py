@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.exceptions import BadRequest
 from django.test import RequestFactory, TestCase
 
 from ..annotate.views import AnnotateView
@@ -16,6 +17,35 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             **kwargs,
         )
         return p
+
+    def test_get_object(self):
+        def get_object(**kwargs):
+            request = RequestFactory().get("/", kwargs)
+            v = AnnotateView()
+            v.setup(request, **(request.GET.dict()))
+            out = v.get_object()
+            return out
+
+        ind = Individual.objects.create(
+            image=Image.objects.create(
+                href="//moo.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
+            ),
+            bounding_box=[[0, 0], [100, 100]],
+        )
+        ind.save()
+        user1 = self.create_user("user1")
+        ann = self.create_annotation(ind, user1, created_delta=dict(days=-5))
+        ann.save()
+        # Returns None, not an error (as the default would)
+        self.assertEqual(get_object(), None)
+        self.assertEqual(get_object(individual_id=ind.id), None)
+
+        # Returns annotation object
+        self.assertEqual(get_object(individual_id=ind.id, annotation_id=ann.id), ann)
+
+        # individual mismatch reported
+        with self.assertRaisesRegexp(BadRequest, r"individual"):
+            get_object(individual_id=ind.id + 1, annotation_id=ann.id)
 
     def test_get_all_annotations(self):
         def get_all_annotations(individual, project=None):
