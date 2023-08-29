@@ -12,8 +12,10 @@ class AnnotationForm(ModelForm):
             "age",
             "comment",
             "axis_poly",
+            "project",
         ]
         widgets = {
             "axis_poly": HiddenInput(),
             "individual": HiddenInput(),
+            "project": HiddenInput(),
         }

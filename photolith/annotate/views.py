@@ -49,6 +49,7 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_initial(self):
         return dict(
             individual=self.individual_id,
+            project=self.current_project,
         )
 
     @cached_property

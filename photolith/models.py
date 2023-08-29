@@ -175,6 +175,13 @@ class Annotation(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+    project = models.ForeignKey(
+        "Project",
+        verbose_name=_("Part of project"),
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     created_at = models.DateTimeField(
         _("Created at"), auto_now_add=True, editable=False
     )
@@ -187,6 +194,14 @@ class Annotation(models.Model):
     age = models.IntegerField(_("Age reading"), null=True)
     comment = models.TextField(_("Comments"), null=False, default="")
     axis_poly = models.JSONField(null=True)
+
+    def __init__(self, *args, **kwargs):
+        """Make sure the axis_poly is set-up on object creation"""
+        super().__init__(*args, **kwargs)
+        if self.project and not self.axis_poly:
+            init_a = self.project.init_annotation(self.individual_id)
+            if init_a:
+                self.axis_poly = init_a.axis_poly
 
     def edit_allowed(self, user):
         """True iff (user) is allowed to edit this annotation. Assign user if one not already assigned"""

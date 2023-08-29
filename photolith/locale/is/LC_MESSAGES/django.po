@@ -49,6 +49,12 @@ msgstr ""
 msgid "Created by"
 msgstr "Búið til af"
 
+#: photolith/models.py
+#, fuzzy
+#| msgid "Annotate"
+msgid "Part of project"
+msgstr "Aldursmerkja"
+
 #: photolith/models.py photolith/models.py
 msgid "Created at"
 msgstr "Búið til kl."
