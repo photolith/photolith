@@ -4,6 +4,10 @@ from ..models import Annotation
 
 
 class AnnotationForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["comment"].widget.attrs["rows"] = 2
+
     class Meta:
         model = Annotation
         fields = [
