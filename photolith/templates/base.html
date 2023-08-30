@@ -2,7 +2,7 @@
 {% load get_format %}
 {% get_current_language as LANGUAGE_CODE %}
 <!doctype html>
-<html lang="{{ LANGUAGE_CODE }}" data-thousand-separator="{% get_format "THOUSAND_SEPARATOR" %}" data-decimal-separator="{% get_format "DECIMAL_SEPARATOR" %}">
+<html lang="{{ LANGUAGE_CODE }}" data-thousand-separator="{% get_format "THOUSAND_SEPARATOR" %}" data-decimal-separator="{% get_format "DECIMAL_SEPARATOR" %}" class="h-100">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -19,7 +19,7 @@
 
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
   </head>
-  <body>
+  <body class="h-100 d-flex flex-column">
 
   <header class="p-3 bg-dark text-white">
     <div class="container">
@@ -73,7 +73,7 @@
     <div id="alert-container" class="position-absolute end-0 mx-2 my-2" style="z-index: 1;"></div>
     {% block pre_content %}
     {% endblock pre_content %}
-    <main class="mt-4 {% block contentclass %}container{% endblock contentclass %}">
+    <main class="flex-grow-1 my-1 {% block contentclass %}container{% endblock contentclass %}">
     {% block content %}
     {% endblock content %}
     </main>

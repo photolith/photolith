@@ -15,7 +15,8 @@
   width: 100%;
   max-width: 150vh;
   margin: auto;
-  height: 50vh;
+  height: 100%;
+  min-height: 5rem;
   overflow: hidden;
   position: relative; /* Contain dropdown */
 }

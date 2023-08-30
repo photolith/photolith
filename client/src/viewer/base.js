@@ -7,6 +7,9 @@ export class PhViewer {
     this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'));
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
+    // NB: Any previous height will grow the elViewer container when page is shrinking,
+    //    set to absolute so it's ignored
+    this.fabCanvas.upperCanvasEl.parentNode.style.position = 'absolute';
 
     this.fabCanvas.phFitBoundingBox = function (boundingBox) {
       const zoom = Math.min(
