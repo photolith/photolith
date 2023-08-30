@@ -5,18 +5,19 @@ from ..migration_utils import group_migration
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("photolith", "0002_individual_taxonomy_metatx_metanumeric_metachar"),
+        ("photolith", "0011_add_annotate_group"),
         # See https://gist.github.com/solace/6a8ac71539220b1f13a95bd559f2c4bd
         ("contenttypes", "__latest__"),
     ]
 
     operations = [
         group_migration(
-            "Ingest",
+            "Project Admin",
             [
-                "add_individual",
-                "view_image",
-                "add_image",
+                "view_project",
+                "add_project",
+                "change_project",
+                "delete_project",
             ],
             [],
         )
