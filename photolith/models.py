@@ -210,6 +210,10 @@ class Annotation(models.Model):
         return user.is_superuser or created_by == user
 
 
+def in_4_weeks():
+    return datetime.date.today() + datetime.timedelta(weeks=4)
+
+
 class Project(models.Model):
     name = models.CharField(
         verbose_name=_("Project name"),
@@ -226,7 +230,7 @@ class Project(models.Model):
     date_end = models.DateField(
         verbose_name=_("Project end date"),
         # Default 4 weeks from now
-        default=datetime.date.today() + datetime.timedelta(weeks=4),
+        default=in_4_weeks,
         null=False,
     )
     base_user = models.ForeignKey(
