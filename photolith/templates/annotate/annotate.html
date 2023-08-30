@@ -115,17 +115,19 @@
         </div>
 
       </div>
-      <div class="col">
+      <div class="col ph-scroll-container">
 
-        {{ form.axis_poly|as_crispy_field }}
-        <table id="axis_poly_table" class="table table-striped point-data" style="">
-          <thead><tr>
-            <th>{% translate "Point" %}</th>
-            <th>{% translate "Distance (mm)" %}</th>
-            <th>{% translate "Cumulative (mm)" %}</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+        <div>
+          {{ form.axis_poly|as_crispy_field }}
+          <table id="axis_poly_table" class="table table-striped point-data" style="">
+            <thead><tr>
+              <th>{% translate "Point" %}</th>
+              <th>{% translate "Distance (mm)" %}</th>
+              <th>{% translate "Cumulative (mm)" %}</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
 
       </div>
     </form>

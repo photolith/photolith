@@ -1,2 +1,13 @@
 @import url('viewer.css');
 @import url('search.css');
+
+.ph-scroll-container {
+  position: relative;
+}
+
+.ph-scroll-container > * {
+  overflow-y: auto;
+  position: absolute;
+  inset: 0 0.75rem;
+  width: auto;
+}
