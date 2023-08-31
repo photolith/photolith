@@ -1,4 +1,4 @@
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
@@ -34,13 +34,20 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         )
 
     def form_valid(self, form):
-        if not self.request.user.has_perms(("photolith.edit_annotation",)):
-            raise PermissionDenied("Not allowed to edit %s" % (str(self.object)))
-        if self.object.project and not self.object.project.is_open:
-            raise PermissionDenied(
-                "Project %s closed, cannot edit annotations"
-                % (str(self.object.project))
-            )
+        if not self.request.user.has_perms(
+            ("photolith.add_annotation", "photolith.change_annotation")
+        ):
+            raise PermissionDenied("Not allowed to edit annotations")
+
+        # Set / check project
+        if self.current_project:
+            p = self.current_project
+            if not p.is_open:
+                raise PermissionDenied(
+                    "Project %s closed, cannot edit annotations" % (str(p))
+                )
+            form.instance.project = p
+
         return super().form_valid(form)
 
     def get_object(self, queryset=None):
