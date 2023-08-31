@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
             [
                 "view_individual",
                 "view_annotation",
+                "add_annotation",
                 "change_annotation",
                 "delete_annotation",
                 "view_project",
