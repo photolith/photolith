@@ -39,6 +39,16 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         ):
             raise PermissionDenied("Not allowed to edit annotations")
 
+        # Set / check created_by
+        if self.object:
+            if not (
+                self.request.user.is_superuser
+                or self.object.created_by == self.request.user
+            ):
+                raise PermissionDenied("You do not own annotation %s" % self.object)
+        else:
+            form.instance.created_by = self.request.user
+
         # Set / check project
         if self.current_project:
             p = self.current_project

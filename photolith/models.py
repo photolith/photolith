@@ -195,12 +195,6 @@ class Annotation(models.Model):
     comment = models.TextField(_("Comments"), null=False, default="")
     axis_poly = models.JSONField(null=True)
 
-    def edit_allowed(self, user):
-        """True iff (user) is allowed to edit this annotation. Assign user if one not already assigned"""
-        if not self.created_by:
-            self.created_by = user
-        return user.is_superuser or created_by == user
-
 
 def in_4_weeks():
     return datetime.date.today() + datetime.timedelta(weeks=4)
