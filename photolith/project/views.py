@@ -34,6 +34,10 @@ class ProjectCreateView(PermissionRequiredMixin, CreateView):
     form_class = ProjectForm
     success_url = reverse_lazy("project:index")
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
     def tidy_qs(self):
         out = []
         for k, vs in self.request.GET.lists():
