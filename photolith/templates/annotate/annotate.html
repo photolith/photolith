@@ -88,7 +88,7 @@
   </div>
   <div class="tab-pane show active" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
 
-    <form action="{{ request.path }}" method="POST" class="annotate-form mt-2 row">
+    <form action="{{ request.get_full_path }}" method="POST" class="annotate-form mt-2 row">
       {% csrf_token %}
       <input type="hidden" name="selection" value="" />
       <div class="col">
