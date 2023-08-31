@@ -33,7 +33,6 @@
 {% if individual_id %}
 
 {{ ind_dict|json_script:"individual_json" }}
-{{ init_axis_poly|json_script:"init_axis_poly" }}
 
 <div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_dict.href }}" data-bounding-box="{{ ind_dict.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
 
