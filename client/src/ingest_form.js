@@ -15,6 +15,7 @@ function formRefresh (event) {
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
     elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
+    elForm.classList.add('rendering');
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
       elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind) => {
@@ -36,6 +37,7 @@ function formRefresh (event) {
       elForm.selection.value = '';
       throw err;
     }).finally(() => {
+      elForm.classList.remove('rendering');
       elForm.selection.dispatchEvent(changeEvent());
     });
   }
