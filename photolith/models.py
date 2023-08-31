@@ -195,14 +195,6 @@ class Annotation(models.Model):
     comment = models.TextField(_("Comments"), null=False, default="")
     axis_poly = models.JSONField(null=True)
 
-    def __init__(self, *args, **kwargs):
-        """Make sure the axis_poly is set-up on object creation"""
-        super().__init__(*args, **kwargs)
-        if self.project and not self.axis_poly:
-            init_a = self.project.init_annotation(self.individual_id)
-            if init_a:
-                self.axis_poly = init_a.axis_poly
-
     def edit_allowed(self, user):
         """True iff (user) is allowed to edit this annotation. Assign user if one not already assigned"""
         if not self.created_by:

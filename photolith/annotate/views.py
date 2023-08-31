@@ -56,10 +56,16 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         return obj
 
     def get_initial(self):
-        return dict(
-            individual=self.individual_id,
-            project=self.current_project,
-        )
+        if self.object:
+            # Don't set initial for update forms, otherwise axis_poly gets reset?
+            return dict()
+        axis_poly = None
+        p = self.current_project
+        if p:
+            init_a = p.init_annotation(self.individual_id)
+            if init_a:
+                axis_poly = init_a.axis_poly
+        return dict(individual=self.individual_id, project=p, axis_poly=axis_poly)
 
     @cached_property
     def current_project(self):
