@@ -12,7 +12,11 @@ export function populateFilter (elForm) {
   const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
   const searchParams = new URLSearchParams(window.location.search);
 
-  elBody.innerHTML = Object.keys(metaLabels).map((k) => {
+  elBody.innerHTML = ['project'].map((k) => {
+    // If not set, don't pollute querystring with hidden field
+    if (!searchParams.get(k)) return '';
+    return `<input type="hidden" name="${k}" value="${searchParams.get(k)}">`;
+  }).join('\n\n') + Object.keys(metaLabels).map((k) => {
     const controlId = 'filter-' + k + '-control';
     const mf = metaFields[k];
     let controlHtml;

@@ -1,3 +1,4 @@
+import itertools
 import urllib.parse
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -64,12 +65,14 @@ class DataView(PermissionRequiredMixin, View):
             .annotate(image__href=F("image__href"))
         )
 
-        # If searching for a project, search based on it's search_qs
+        qs_items = self.request.GET.lists()
+
+        # If searching for a project, append project search terms to list
         if "project" in self.request.GET:
             p = get_object_or_404(Project, pk=self.request.GET.get("project"))
-            qs_items = urllib.parse.parse_qs(p.search_qs).items()
-        else:
-            qs_items = self.request.GET.lists()
+            qs_items = itertools.chain(
+                qs_items, urllib.parse.parse_qs(p.search_qs).items()
+            )
 
         for k, vs in qs_items:
             if all(v == "" for v in vs):
