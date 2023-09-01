@@ -13,6 +13,7 @@
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
       <th></th>
+      {% if perms.photolith.change_project %}<th></th>{% endif %}
     </thead>
     <tbody>
       {% for object in object_list %}
@@ -25,10 +26,12 @@
             {% else %}
               <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
             {% endif %}
-            {% if perms.photolith.change_project %}
-              <a href="{% url 'project:update' object.id %}" class="btn btn-info">{% translate "Edit" %}</a>
-            {% endif %}
           </td>
+          {% if perms.photolith.change_project %}
+            <td>
+              <a href="{% url 'project:update' object.id %}" class="btn btn-info">{% translate "Edit" %}</a>
+            </td>
+          {% endif %}
         </tr>
       {% endfor %}
     </tbody>
