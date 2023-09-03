@@ -1,5 +1,16 @@
 import { fabric } from 'fabric';
 
+function getEventPoint (event) {
+  if (event.clientX !== undefined) {
+    return { x: event.clientX, y: event.clientY };
+  }
+  if (event.targetTouches && event.targetTouches[0].clientX !== undefined) {
+    return { x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY };
+  }
+  console.warn('Unknown move event', event);
+  return null;
+}
+
 export class PhViewer {
   constructor (elViewer) {
     this.elViewer = elViewer;
@@ -82,26 +93,26 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:down', function (opt) {
-      const evt = opt.e;
-
       if (!opt.target) {
         // Mouse down not on an object, drag canvas
         this.isDragging = true;
         this.selection = false;
-        this.lastPosX = evt.clientX;
-        this.lastPosY = evt.clientY;
+        this.lastPoint = getEventPoint(opt.e);
       }
     });
     this.fabCanvas.on('mouse:move', function (opt) {
       if (this.isDragging) {
-        const e = opt.e;
         const vpt = this.viewportTransform;
-        vpt[4] += e.clientX - this.lastPosX;
-        vpt[5] += e.clientY - this.lastPosY;
-        this.phLimitViewport();
-        this.requestRenderAll();
-        this.lastPosX = e.clientX;
-        this.lastPosY = e.clientY;
+        const newPoint = getEventPoint(opt.e);
+
+        if (newPoint && this.lastPoint) {
+          vpt[4] += newPoint.x - this.lastPoint.x;
+          vpt[5] += newPoint.y - this.lastPoint.y;
+          this.phLimitViewport();
+          this.requestRenderAll();
+        }
+
+        this.lastPoint = newPoint;
       }
     });
     this.fabCanvas.on('mouse:up', function (opt) {
