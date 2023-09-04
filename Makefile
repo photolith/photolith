@@ -1,7 +1,7 @@
 PROJECT=photolith
 LOCALE_FILES=$(wildcard $(PROJECT)/locale/*/LC_MESSAGES/django.po)
 
-all: test
+all: compile
 
 bin/pip:
 	python3 -m venv .
