@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 
@@ -147,3 +148,14 @@ INGEST_ROOT = BASE_DIR.parent / "ingest_root"
 
 # Image storage
 MEDIA_ROOT = BASE_DIR.parent / "media"
+
+
+# Allow overrides via. environment (for docker)
+if 'APP_DEBUG' in os.environ:
+    DEBUG = os.environ['APP_DEBUG']
+if 'APP_CLIENTSIDE_CONFIG' in os.environ:
+    CLIENTSIDE_CONFIG = os.environ['APP_CLIENTSIDE_CONFIG']
+if 'APP_ALLOWED_HOSTS' in os.environ:
+    ALLOWED_HOSTS = os.environ['APP_ALLOWED_HOSTS'].split(" ")
+if 'APP_SECRET_KEY' in os.environ:
+    SECRET_KEY = os.environ['APP_SECRET_KEY']
