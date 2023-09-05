@@ -13,8 +13,24 @@ services:
       - 8000
     env_file:
       - ./.env
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - static:/srv/app/staticfiles
+      - media:/srv/app/media
+      - certs:/var/lib/dehydrated/certs
+    ports:
+      - 8443:443
+      - 8080:80
+    env_file:
+      - ./.env
+    depends_on:
+      - wsgi
 
 volumes:
+  certs:
   static:
   media:
   ingest:
