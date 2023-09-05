@@ -21,3 +21,6 @@
 
 # Media
 /media/
+
+# Docker
+/docker/.env
