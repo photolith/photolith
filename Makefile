@@ -34,11 +34,11 @@ lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 	npm run lint
 
 node_modules/.package.json: package.json
-	npm ci --production
+	npm --verbose ci --production
 	touch $@
 
 node_modules/.package-dev.json: package.json
-	npm ci --include=dev
+	npm --verbose ci --include=dev
 	touch node_modules/.package.json
 	touch $@
 
