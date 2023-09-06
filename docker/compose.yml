@@ -29,6 +29,21 @@ services:
       - ./.env
     depends_on:
       - wsgi
+  ftpd:
+    build:
+      context: ./ftpd
+      dockerfile: Dockerfile
+    volumes:
+      - ingest:/srv/app/ingest_root
+      - certs:/var/lib/dehydrated/certs
+    ports:
+      - 8021:021
+      - 21100-21110:21100-21110
+    env_file:
+      - ./.env
+    depends_on:
+      - wsgi
+      - nginx
 
 volumes:
   certs:
