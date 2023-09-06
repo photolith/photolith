@@ -21,6 +21,7 @@ USER root
 COPY --chown=build . /srv/app
 # Allow app to write to media directory
 RUN chown -R app /srv/app/media
+RUN chown -R app /srv/app/db
 
 USER build
 RUN make

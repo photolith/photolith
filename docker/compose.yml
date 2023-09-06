@@ -21,6 +21,7 @@ services:
       - static:/srv/app/staticfiles
       - media:/srv/app/media
       - certs:/var/lib/dehydrated/certs
+      - db:/srv/app/db
     ports:
       - 8443:443
       - 8080:80
@@ -31,6 +32,7 @@ services:
 
 volumes:
   certs:
+  db:
   static:
   media:
   ingest:
