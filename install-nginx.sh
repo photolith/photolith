@@ -81,6 +81,10 @@ server {
         return 200 'User-agent: *\nAllow: /';
     }
 
+    location /static/ {
+        alias ${PROJECT_PATH}/staticfiles/;
+    }
+
     location / {
         # Originating IP address
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
