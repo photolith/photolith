@@ -3,6 +3,8 @@
 You can use docker-compose to perform a full local installation with:
 
 ```
+cp docker/env-example docker/.env
+# NB: Edit docker/.env to suit your local environment
 docker-compose -f docker/compose.yml build && docker-compose -f docker/compose.yml up
 ```
 

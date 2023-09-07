@@ -1,0 +1,5 @@
+# Set a unique secure key for this host
+APP_SECRET_KEY=django-insecure-REPLACEME
+
+# Space separated list of potential hostnames, the first will be considered the canonical version
+APP_ALLOWED_HOSTS=photolith.website.org www.photolith.website.org
