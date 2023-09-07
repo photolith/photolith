@@ -62,7 +62,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "photolith.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -159,3 +159,6 @@ if 'APP_ALLOWED_HOSTS' in os.environ:
     ALLOWED_HOSTS = os.environ['APP_ALLOWED_HOSTS'].split(" ")
 if 'APP_SECRET_KEY' in os.environ:
     SECRET_KEY = os.environ['APP_SECRET_KEY']
+for k in os.environ.keys():
+    if k.startswith("APP_DB_"):
+        DATABASES["default"][k.replace("APP_DB_", "")] = os.environ[k]
