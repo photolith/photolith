@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from ..errors import json_errors
-from ..models import Image, Individual, MetaNumeric, MetaChar, MetaTx, Taxonomy
+from ..models import Image, Individual
 
 
 class UploadView(PermissionRequiredMixin, View):
