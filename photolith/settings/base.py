@@ -151,14 +151,10 @@ MEDIA_ROOT = BASE_DIR.parent / "media"
 
 
 # Allow overrides via. environment (for docker)
-if 'APP_DEBUG' in os.environ:
-    DEBUG = os.environ['APP_DEBUG']
-if 'APP_CLIENTSIDE_CONFIG' in os.environ:
-    CLIENTSIDE_CONFIG = os.environ['APP_CLIENTSIDE_CONFIG']
-if 'APP_ALLOWED_HOSTS' in os.environ:
-    ALLOWED_HOSTS = os.environ['APP_ALLOWED_HOSTS'].split(" ")
-if 'APP_SECRET_KEY' in os.environ:
-    SECRET_KEY = os.environ['APP_SECRET_KEY']
 for k in os.environ.keys():
     if k.startswith("APP_DB_"):
         DATABASES["default"][k.replace("APP_DB_", "")] = os.environ[k]
+    elif k == "APP_ALLOWED_HOSTS":
+        ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")
+    elif k.startswith("APP_"):
+        globals()[k.replace("APP_", "")] = os.environ[k]
