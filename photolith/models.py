@@ -108,6 +108,11 @@ class MetaNumeric(models.Model):
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["key"]),
+        ]
+
 
 class MetaChar(models.Model):
     """
@@ -118,6 +123,11 @@ class MetaChar(models.Model):
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["key"]),
+        ]
+
 
 class MetaTx(models.Model):
     """
@@ -127,6 +137,11 @@ class MetaTx(models.Model):
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["key", "value"]),
+        ]
 
 
 class Taxonomy(models.Model):
@@ -140,6 +155,11 @@ class Taxonomy(models.Model):
     identifier = models.IntegerField(null=True)
     str_en = models.CharField(max_length=255, blank=False, null=False)
     str_is = models.CharField(max_length=255, blank=False, null=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["key", "identifier"]),
+        ]
 
     @property
     def dict(self):
@@ -194,6 +214,12 @@ class Annotation(models.Model):
     age = models.IntegerField(_("Age reading"), null=True)
     comment = models.TextField(_("Comments"), null=False, default="")
     axis_poly = models.JSONField(null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["individual"]),
+            models.Index(fields=["created_by", "individual"]),
+        ]
 
 
 def in_4_weeks():

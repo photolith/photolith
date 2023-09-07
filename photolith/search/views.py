@@ -117,6 +117,7 @@ class DataView(PermissionRequiredMixin, View):
                             key=k.replace("tx_", ""),
                             value__in=Subquery(
                                 Taxonomy.objects.filter(
+                                    key=k.replace("tx_", ""),
                                     identifier__in=vs,
                                 ).values("id")
                             ),
