@@ -7,6 +7,7 @@ services:
       dockerfile: docker/wsgi/Dockerfile
     volumes:
       - static:/srv/app/staticfiles
+      - db:/srv/app/db
       - media:/srv/app/media
       - ingest:/srv/app/ingest_root
     expose:
@@ -19,9 +20,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static:/srv/app/staticfiles
-      - media:/srv/app/media
       - certs:/var/lib/dehydrated/certs
-      - db:/srv/app/db
     ports:
       - 8443:443
       - 8080:80

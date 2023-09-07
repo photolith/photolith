@@ -19,9 +19,9 @@ RUN npm --verbose ci --production && touch node_modules/.package.json && npm cac
 
 USER root
 COPY --chown=build . /srv/app
-# Allow app to write to media directory
-RUN chown -R app /srv/app/media
-RUN chown -R app /srv/app/db
+
+# Recreate .dockerignore'd directories
+RUN mkdir -p /srv/app/{db,media,ingest_root} && chown -R app /srv/app/{db,media,ingest_root}
 
 USER build
 RUN make

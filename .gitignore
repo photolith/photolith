@@ -1,3 +1,5 @@
+# NB: .dockerignore & .gitignore are symlinked: Any entries here will ignore both
+
 # venv
 /pyvenv.cfg
 /bin
@@ -16,11 +18,10 @@
 /node_modules
 /client/dist/
 
-# FTP
-/ingest_root/
-
-# Media
+# User content
+/db/
 /media/
+/ingest_root/
 
 # Docker
 /docker/.env
