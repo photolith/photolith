@@ -23,9 +23,9 @@ class Command(BaseCommand):
         for k in options["setting_key"]:
             v = getattr(settings, k)
             if isinstance(v, list):
-                if options['head']:
+                if options["head"]:
                     v = v[0:1]
-                if options['tail']:
+                if options["tail"]:
                     v = v[1:]
                 v = " ".join(v)
             print(v)
