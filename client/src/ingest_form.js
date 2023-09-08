@@ -1,6 +1,6 @@
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
-import { jsonFetch } from './fetch';
+import { jsonFetch, clearFetchCache } from './fetch';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
@@ -83,6 +83,7 @@ function formSubmit (elForm) {
     });
   }).then((createdInds) => {
     displayAlert('success', `Uploaded ${createdInds.created_individuals.length} individuals`);
+    clearFetchCache(); // Remove cached search results, so new ingests show up.
     elForm.reset();
   }).finally(() => {
     elForm.classList.remove('rendering');

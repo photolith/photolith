@@ -1,3 +1,8 @@
+/** Remove any previously cached items  */
+export function clearFetchCache () {
+  window.sessionStorage.clear();
+}
+
 /** jsonFetch, but stash results in sessionStorage for use between pages */
 export function jsonFetchCached (baseResource, params, options) {
   // https://developer.mozilla.org/en-US/docs/Web/API/Storage
