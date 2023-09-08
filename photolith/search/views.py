@@ -2,6 +2,7 @@ import itertools
 import urllib.parse
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 from django.http import JsonResponse
@@ -47,7 +48,11 @@ class IndexView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["meta_fields"] = self.get_meta_fields()
+        context["meta_fields"] = cache.get_or_set(
+            "photolith_meta_fields",
+            lambda: self.get_meta_fields(),
+            timeout=600,  # Seconds
+        )
         context["qs"] = self.request.META["QUERY_STRING"]
         return context
 
