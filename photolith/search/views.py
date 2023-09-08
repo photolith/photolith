@@ -21,7 +21,9 @@ class IndexView(PermissionRequiredMixin, TemplateView):
     template_name = "search/index.html"
 
     def get_meta_fields(self):
-        out = {}
+        out = dict(
+            created_at=dict(filter_name="dt_created_at"),
+        )
         for m in MetaNumeric.objects.values("key").annotate(
             min=Min("value"), max=Max("value")
         ):
@@ -94,6 +96,15 @@ class DataView(PermissionRequiredMixin, View):
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
                 pass
+            elif k == "dt_created_at":
+                if len(vs) > 0 and vs[0]:
+                    qs = qs.filter(created_at__gte=datetime.date.fromisoformat(vs[0]))
+                if len(vs) > 1 and vs[1]:
+                    # Date ls less than midinight the day after (i.e. filter is inclusive)
+                    qs = qs.filter(
+                        created_at__lt=datetime.date.fromisoformat(vs[1])
+                        + datetime.timedelta(days=1)
+                    )
             elif k.startswith("nm_"):
                 if len(vs) != 2:
                     raise ValueError(
