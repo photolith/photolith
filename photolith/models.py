@@ -32,10 +32,15 @@ class Individual(models.Model):
     image = models.ForeignKey("Image", on_delete=models.CASCADE, null=False)
     bounding_box = models.JSONField(null=False)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Created by"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_at = models.DateTimeField(
+        _("Created at"), auto_now_add=True, editable=False
+    )
+    modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
 
     @property
     def data(self):

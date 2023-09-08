@@ -33,6 +33,18 @@ msgstr "Hlaðið upp af %(photo_dir)s"
 msgid "Upload files from computer"
 msgstr "Sækja skrár úr tölvu"
 
+#: photolith/models.py photolith/models.py photolith/models.py
+msgid "Created by"
+msgstr "Búið til af"
+
+#: photolith/models.py photolith/models.py photolith/models.py
+msgid "Created at"
+msgstr "Búið til kl."
+
+#: photolith/models.py
+msgid "Modified at"
+msgstr ""
+
 #: photolith/models.py
 msgid "Unreadable"
 msgstr "Ólæsileg"
@@ -45,19 +57,11 @@ msgstr ""
 msgid "Easy to read"
 msgstr ""
 
-#: photolith/models.py photolith/models.py
-msgid "Created by"
-msgstr "Búið til af"
-
 #: photolith/models.py
 #, fuzzy
 #| msgid "Annotate"
 msgid "Part of project"
 msgstr "Aldursmerkja"
-
-#: photolith/models.py photolith/models.py
-msgid "Created at"
-msgstr "Búið til kl."
 
 #: photolith/models.py photolith/models.py
 msgid "Last modified"
