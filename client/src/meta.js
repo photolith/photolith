@@ -57,7 +57,10 @@ export function populateIndividualData (indData, elTableBody) {
 
   if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
 
-  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => `<tr>
+  // NB: Don't list values when undefined (i.e. in ingest when created_at is nonsensical)
+  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => indData[k] === undefined
+    ? ''
+    : `<tr>
     <td>${renderMetaLabel(metaLabels[k])}</td>
     <td>${renderMetaCell(indData[k], 'display', indData, undefined)}</td>
   </tr>`).join('\n');

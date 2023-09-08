@@ -28,7 +28,8 @@ const metaLabels = {
     station: 'Station',
     stationDate: 'Station Date',
     gear: 'Gear',
-    meshSize: 'Mesh Size'
+    meshSize: 'Mesh Size',
+    created_at: 'Created'
   },
   is: {
     slideLabel: 'Upplýsingar á gleri',
@@ -41,7 +42,8 @@ const metaLabels = {
     station: 'Stöð',
     stationDate: 'Stöðvardagur',
     gear: 'Gír',
-    meshSize: 'Möskvastærð'
+    meshSize: 'Möskvastærð',
+    created_at: 'Búið'
   }
 };
 
