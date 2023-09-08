@@ -1,8 +1,8 @@
 const metaLabels = {
   en: {
-    id: 'ID',
-    title: 'Title',
+    measureId: 'measureId',
     slideLabel: 'Slide Label',
+    serialNo: 'serialNo',
     length: 'Length',
     sex: 'Sex',
     maturity: 'Maturity',
@@ -14,9 +14,9 @@ const metaLabels = {
     meshSize: 'Mesh Size'
   },
   is: {
-    id: 'ID',
-    title: 'Titill',
+    measureId: 'measureId',
     slideLabel: 'Upplýsingar á gleri',
+    serialNo: 'serialNo',
     length: 'Lengd',
     sex: 'Kyn',
     maturity: 'Kynþroski',
@@ -49,11 +49,11 @@ export default class MetadataApi {
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
-    return ind.title;
+    return ind.serialNo;
   }
 
   individualTitle (ind, lang) {
-    return ind.slideLabel + ' -- ' + ind.title;
+    return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 
   sampleDetail (sampleId) {
@@ -69,8 +69,8 @@ export default class MetadataApi {
           const od = ods[i];
 
           return {
-            id: m.measureId.toString(),
-            title: m.serialNo.toString(),
+            measureId: m.measureId.toString(),
+            serialNo: m.serialNo.toString(),
             slideLabel: [
               od.sampleResponse.sampleId,
                 `${od.sampleResponse.station.cruise.name}/${od.sampleResponse.station.number}`,

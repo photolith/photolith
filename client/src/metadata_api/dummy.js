@@ -18,9 +18,8 @@ const maturity = [
 
 const metaLabels = {
   en: {
-    id: 'ID',
-    title: 'Title',
     slideLabel: 'Slide Label',
+    serialNo: 'serialNo',
     length: 'Length',
     sex: 'Sex',
     maturity: 'Maturity',
@@ -32,9 +31,8 @@ const metaLabels = {
     meshSize: 'Mesh Size'
   },
   is: {
-    id: 'ID',
-    title: 'Titill',
-    slideLabel: 'Skyggnumerki',
+    slideLabel: 'Upplýsingar á gleri',
+    serialNo: 'serialNo',
     length: 'Lengd',
     sex: 'Kynlíf',
     maturity: 'Þroska',
@@ -58,11 +56,11 @@ export default class MetadataApi {
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
-    return ind.title;
+    return ind.serialNo;
   }
 
   individualTitle (ind, lang) {
-    return ind.slideLabel + ' -- ' + ind.title;
+    return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 
   sampleDetail (sampleId) {
@@ -72,8 +70,8 @@ export default class MetadataApi {
     return Promise.resolve(Array.from(Array(20))).then((measures) => {
       return {
         individuals: measures.map((_, i) => ({
-          id: (sampleId * 100 + i).toString(),
-          title: i.toString(),
+          measureId: (sampleId * 100 + i).toString(),
+          serialNo: i.toString(),
           slideLabel: [
             sampleId,
             'TB2-2021/95',
