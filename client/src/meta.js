@@ -17,6 +17,11 @@ export function renderMetaCell (data, type, row, meta) {
     out = out[document.documentElement.lang] || out.en;
   }
 
+  if (type && type !== 'display') {
+    // DataTables.net requesting non-display format, stop here.
+    return out;
+  }
+
   if (typeof out === 'number') {
     // https://datatables.net/manual/data/renderers#Number-helper
     renderNumber = renderNumber || DataTable.render.number(
