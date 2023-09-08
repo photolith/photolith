@@ -125,6 +125,7 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             qs.select_related("image")
             .prefetch_related("metanumeric_set")
             .prefetch_related("metachar_set")
+            .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
             .annotate(image__href=F("image__href"))

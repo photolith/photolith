@@ -1,3 +1,4 @@
+import datetime
 import itertools
 import urllib.parse
 
@@ -66,6 +67,7 @@ class DataView(PermissionRequiredMixin, View):
             qs.select_related("image")
             .prefetch_related("metanumeric_set")
             .prefetch_related("metachar_set")
+            .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
             .annotate(image__href=F("image__href"))
@@ -115,6 +117,17 @@ class DataView(PermissionRequiredMixin, View):
                         ).values("individual_id")
                     )
                 )
+            elif k.startswith("dt_"):
+                sq = MetaDT.objects.filter(key=k.replace("nm_", ""))
+                if len(vs) > 0 and vs[0]:
+                    sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
+                if len(vs) > 1 and vs[1]:
+                    # Date ls less than midinight the day after (i.e. filter is inclusive)
+                    sq = sq.filter(
+                        value__lt=datetime.date.fromisoformat(vs[1])
+                        + datetime.timedelta(days=1)
+                    )
+                qs = qs.filter(id__in=Subquery(sq))
             elif k.startswith("tx_"):
                 qs = qs.filter(
                     id__in=Subquery(

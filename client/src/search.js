@@ -36,6 +36,12 @@ export function populateFilter (elForm) {
       controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
           ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(mf.filter_name).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang]}</option>`)}
         </select>`;
+    } else if (mf.filter_name.startsWith('dt')) {
+      controlHtml = `<div class="input-group">
+          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" class="form-control" id="${controlId}">
+          <span class="input-group-text">..</span>
+          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" class="form-control" id="${controlId}-2">
+        </div>`;
     }
 
     return `<div class="mb-3">

@@ -6,6 +6,14 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+def isisoformat(v):
+    try:
+        datetime.datetime.fromisoformat(v)
+        return True
+    except ValueError:
+        return False
+
+
 class Image(models.Model):
     """
     An image containing one or more otoliths
@@ -49,6 +57,8 @@ class Individual(models.Model):
             out[m.key] = m.value
         for m in self.metachar_set.all():
             out[m.key] = m.value
+        for m in self.metadt_set.all():
+            out[m.key] = m.value
         for m in self.metatx_set.all():
             out[m.key] = m.value.dict
         return out
@@ -62,6 +72,16 @@ class Individual(models.Model):
                         individual=self,
                         key=k,
                         value=float(v),
+                    ),
+                    bulk=False,
+                )
+
+            elif isinstance(v, str) and isisoformat(v):
+                self.metadt_set.add(
+                    MetaDT(
+                        individual=self,
+                        key=k,
+                        value=str(v),
                     ),
                     bulk=False,
                 )
@@ -98,6 +118,8 @@ class Individual(models.Model):
             tx.save()
         for tx in self.metachar_set.all():
             tx.save()
+        for tx in self.metadt_set.all():
+            tx.save()
         for tx in self.metatx_set.all():
             tx.save()
             tx.value.save()
@@ -127,6 +149,21 @@ class MetaChar(models.Model):
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["key"]),
+        ]
+
+
+class MetaDT(models.Model):
+    """
+    DateTime Metadata about an individual, e.g. station date
+    """
+
+    individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
+    key = models.CharField(max_length=255, blank=False, null=False)
+    value = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         indexes = [
