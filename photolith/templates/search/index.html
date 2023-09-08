@@ -11,7 +11,7 @@
   </svg>
 </button>
 
-{% if perms.photolith.create_project %}<a href="{% url 'project:create' %}?{{qs}}" class="btn btn-outline-dark float-end m-3 me-0" title="{% translate 'Save as project' %}">
+{% if perms.photolith.create_project and qs %}<a href="{% url 'project:create' %}?{{qs}}" class="btn btn-outline-dark float-end m-3 me-0" title="{% translate 'Save as project' %}">
   <!-- https://icons.getbootstrap.com/icons/journal-plus/ -->
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-plus" viewBox="0 0 16 16">
     <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
@@ -20,8 +20,15 @@
   </svg>
 </a>{% endif %}
 
+{% if qs %}
   <table class="table ph-search-table">
   </table>
+{% else %}
+  <div class="p-5 text-center container rounded" style="background: #eee; margin-top: 5rem">
+    {% translate "Select terms to filter by or" %}
+    <a href="{{recent_qs}}">{% translate "view most recent individuals" %}</a>
+  </div>
+{% endif %}
 
 <form action="" method="get" class="filter-form offcanvas offcanvas-end" tabindex="-1" id="filter-offcanvas" aria-labelledby="filter-label">
   {{ meta_fields|json_script:"meta_fields" }}

@@ -277,6 +277,14 @@ msgid "Save as project"
 msgstr ""
 
 #: photolith/templates/search/index.html
+msgid "Select terms to filter by or"
+msgstr ""
+
+#: photolith/templates/search/index.html
+msgid "view most recent individuals"
+msgstr ""
+
+#: photolith/templates/search/index.html
 msgid "Apply"
 msgstr "Samþykkja"
 
