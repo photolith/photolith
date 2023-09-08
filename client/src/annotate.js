@@ -57,11 +57,11 @@ function allAnnotationsClick (elForm, event) {
 
 export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
-    const indData = JSON.parse(document.getElementById('individual_json').textContent);
+    const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
     // Ratio to convert annotation point distance into mm
-    indData.px_to_mm = indData.scale_mm / new fabric.Point(indData.scale_line[0][0], indData.scale_line[0][1]).distanceFrom(
-      new fabric.Point(indData.scale_line[1][0], indData.scale_line[1][1])
+    indData.px_to_mm = indData.image__scale_mm / new fabric.Point(indData.image__scale_line[0][0], indData.image__scale_line[0][1]).distanceFrom(
+      new fabric.Point(indData.image__scale_line[1][0], indData.image__scale_line[1][1])
     );
 
     // If server-side returned null for axis_poly, populate an intial value
@@ -76,6 +76,6 @@ export function init (parent) {
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
-    populateIndividualData(indData.data);
+    populateIndividualData(indData);
   });
 }

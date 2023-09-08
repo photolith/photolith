@@ -1,5 +1,6 @@
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.urls import reverse_lazy
@@ -117,20 +118,32 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             individual_id=self.individual_id,
         ).order_by("-created_at")
 
+    def get_individual(self):
+        # Shortened form of search.views:DataView
+        qs = Individual.objects.filter(pk=self.individual_id)
+        qs = (
+            qs.select_related("image")
+            .prefetch_related("metanumeric_set")
+            .prefetch_related("metachar_set")
+            .prefetch_related("metatx_set")
+            .prefetch_related("metatx_set__value")
+            .annotate(image__href=F("image__href"))
+            .annotate(image__scale_line=F("image__scale_line"))
+            .annotate(image__scale_mm=F("image__scale_mm"))
+        )
+        ind = get_object_or_404(qs)
+
+        out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
+        out.update(ind.data)
+        return out
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["object_model"] = self.model
 
         if self.individual_id:
             ind = get_object_or_404(Individual, pk=self.individual_id)
-            context["individual_id"] = self.individual_id
-            context["ind_dict"] = dict(
-                bounding_box=ind.bounding_box,
-                data=ind.data,
-                href=ind.image.href,
-                scale_line=ind.image.scale_line,
-                scale_mm=ind.image.scale_mm,
-            )
+            context["ind_data"] = self.get_individual()
             context["all_annotations"] = self.get_all_annotations()
         return context
 

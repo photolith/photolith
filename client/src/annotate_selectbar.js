@@ -4,7 +4,7 @@ import { jsonFetchCached } from './fetch';
 function selectPopulate (elSelect) {
   return jsonFetchCached('/search/data/', window.document.location.search, {}).then((data) => {
     data.data.forEach((row) => {
-      const opt = new window.Option(window.mApi.individualTitle(row.data));
+      const opt = new window.Option(window.mApi.individualTitle(row));
 
       opt.value = `/annotate/${row.id}/${window.document.location.search}`;
       elSelect.append(opt);

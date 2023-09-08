@@ -132,7 +132,7 @@ class DataView(PermissionRequiredMixin, View):
 
         for ind in qs:
             out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
-            out["data"] = ind.data
+            out.update(ind.data)
             yield out
 
     @json_errors

@@ -30,11 +30,11 @@
 
 {% block content %}
 
-{% if individual_id %}
+{% if ind_data.id %}
 
-{{ ind_dict|json_script:"individual_json" }}
+{{ ind_data|json_script:"ind_data" }}
 
-<div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_dict.href }}" data-bounding-box="{{ ind_dict.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
+<div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_data.image__href }}" data-bounding-box="{{ ind_data.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
 
 <ul class="nav nav-tabs" role="tablist">
   <li class="nav-item" role="presentation"><button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadata-tab-pane" type="button" role="tab" aria-controls="metadata-tab-pane" aria-selected="true">

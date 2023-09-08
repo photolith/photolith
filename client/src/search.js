@@ -66,7 +66,7 @@ export function init (parent) {
       columns: Object.keys(metaLabels).map((k) => {
         // https://datatables.net/reference/option/columns
         return {
-          data: 'data.' + k,
+          data: k,
           defaultContent: '',
           title: renderMetaLabel(metaLabels[k]),
           // https://datatables.net/reference/option/columns.createdCell
