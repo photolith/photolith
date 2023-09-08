@@ -1,6 +1,10 @@
 // https://datatables.net/download/npm
 import DataTable from 'datatables.net-bs5';
 
+const { DateTime } = require('luxon');
+
+const ISO_DT_REGEX = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/;
+
 // Cache renderers, changing locale requires a page reload
 let renderNumber;
 
@@ -29,6 +33,16 @@ export function renderMetaCell (data, type, row, meta) {
       document.documentElement.getAttribute('data-decimal-separator') || '.'
     ).display;
     out = renderNumber(out);
+  }
+
+  if (ISO_DT_REGEX.test(out)) {
+    // Convert ISO string to human-readable before continuing
+    const dt = DateTime.fromISO(out);
+    // NB: Ideally tell Intl to use en/is locale, but:
+    // * We should be telling it en-GB, not just en.
+    // * The browser may not have 'is' anyway
+    // The operating system locale is a more useful default
+    out = dt.toLocaleString(DateTime.DATETIME_SHORT);
   }
 
   return `<code>${htmlEscape(out)}</code>`;
