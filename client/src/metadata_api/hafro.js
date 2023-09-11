@@ -1,6 +1,5 @@
 const metaLabels = {
   en: {
-    measureId: 'measureId',
     slideLabel: 'Slide Label',
     serialNo: 'serialNo',
     length: 'Length',
@@ -11,10 +10,10 @@ const metaLabels = {
     station: 'Station',
     stationDate: 'Station Date',
     gear: 'Gear',
-    meshSize: 'Mesh Size'
+    meshSize: 'Mesh Size',
+    created_at: 'Created'
   },
   is: {
-    measureId: 'measureId',
     slideLabel: 'Upplýsingar á gleri',
     serialNo: 'serialNo',
     length: 'Lengd',
@@ -25,7 +24,8 @@ const metaLabels = {
     station: 'Stöð',
     stationDate: 'Dags',
     gear: 'Veiðarfæri',
-    meshSize: 'Möskvastærð'
+    meshSize: 'Möskvastærð',
+    created_at: 'Búið'
   }
 };
 
