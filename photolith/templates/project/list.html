@@ -37,4 +37,8 @@
     </tbody>
   </table>
 
+{% if perms.photolith.create_project  %}
+  <p><a href="{% url 'search:index' %}">{% translate "Create a project by searching" %}</a>{% translate ", when ready click the book icon in the top right." %}</p>
+{% endif %}
+
 {% endblock content %}
