@@ -64,6 +64,9 @@ export default class MetadataApi {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
       if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
 
+      // Sort incoming data by serialNo (i.e. individual number)
+      data.otoliths.sort((a, b) => a.serialNo - b.serialNo);
+
       return Promise.all(data.otoliths.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
         individuals: data.otoliths.map((m, i) => {
           const od = ods[i];
