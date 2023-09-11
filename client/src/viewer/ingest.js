@@ -11,9 +11,9 @@ export class PhCropper extends PhSyncingViewer {
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
   }
 
-  boundingBox (objId, title) {
+  boundingBox (objId, label) {
     // http://fabricjs.com/docs/fabric.Textbox.html
-    const obj = new fabric.Textbox(title.toString(), {
+    const obj = new fabric.Textbox(label, {
       id: objId,
       fontFamily: 'Arial',
       fontSize: 90,
@@ -107,7 +107,7 @@ export class PhCropper extends PhSyncingViewer {
       const m = el.name.match(/^bounding_box:(.*)$/);
 
       if (!m) return;
-      const obj = this.boundingBox(el.name, m[1]);
+      const obj = this.boundingBox(el.name, el.getAttribute('data-label'));
       if (!setActive) {
         this.fabCanvas.setActiveObject(obj);
         setActive = true;

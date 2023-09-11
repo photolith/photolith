@@ -18,17 +18,15 @@ function formRefresh (event) {
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
-      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind) => {
-        const label = window.mApi.individualLabel(ind);
+      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, indIdx) => {
         return `
-          <input type="hidden" name="data:${label}" value="">
-          <input type="hidden" name="bounding_box:${label}" value="">
+          <input type="hidden" name="data:${indIdx}" value="">
+          <input type="hidden" name="bounding_box:${indIdx}" value="">
         `;
       }).join('\n');
-      sd.individuals.forEach((ind) => {
-        const label = window.mApi.individualLabel(ind);
-
-        elForm[`data:${label}`].value = JSON.stringify(ind);
+      sd.individuals.forEach((ind, indIdx) => {
+        elForm[`data:${indIdx}`].value = JSON.stringify(ind);
+        elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';
       elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
