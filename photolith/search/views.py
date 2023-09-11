@@ -61,6 +61,10 @@ class IndexView(PermissionRequiredMixin, TemplateView):
             "?dt_created_at="
             + (datetime.date.today() - datetime.timedelta(weeks=1)).isoformat()
         )
+        if self.request.GET.get("project"):
+            context["project"] = get_object_or_404(
+                Project, pk=self.request.GET.get("project")
+            )
         return context
 
 

@@ -285,6 +285,12 @@ msgid "Save as project"
 msgstr ""
 
 #: photolith/templates/search/index.html
+#, fuzzy
+#| msgid "Annotate"
+msgid "Results for project"
+msgstr "Aldursmerkja"
+
+#: photolith/templates/search/index.html
 msgid "Select terms to filter by or"
 msgstr ""
 
