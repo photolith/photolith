@@ -70,30 +70,42 @@ export default class MetadataApi {
       return Promise.all(data.otoliths.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
         individuals: data.otoliths.map((m, i) => {
           const od = ods[i];
+          const out = {};
 
-          return {
-            measureId: m.measureId.toString(),
-            serialNo: m.serialNo.toString(),
-            slideLabel: [
+          if (od.sampleResponse && od.speciesDTO) {
+            out.slideLabel = [
               od.sampleResponse.sampleId,
                 `${od.sampleResponse.station.cruise.name}/${od.sampleResponse.station.number}`,
                 od.speciesDTO.id,
                 (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1
-            ].join(' '),
-            length: od.measureDTO.length,
-            sex: od.measureDTO.sexNo,
-            maturity: od.measureDTO.sexualMaturity.sexualMaturityId,
-            species: {
+            ].join(' ');
+          }
+          if (od.measureDTO) {
+            out.length = od.measureDTO.length;
+            out.sex = od.measureDTO.sexNo;
+            out.maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
+          }
+          if (od.speciesDTO) {
+            out.species = {
               id: od.speciesDTO.id,
               en: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`,
-              is: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`
-            },
-            cruise: od.sampleResponse.station.cruise.name,
-            station: od.sampleResponse.station.number.toString(),
-            stationDate: od.sampleResponse.station.stationDate,
-            gear: od.sampleResponse.gear.isscfgNo,
-            meshSize: od.sampleResponse.meshSize
-          };
+              is: `${od.speciesDTO.name} [${od.speciesDTO.code3a}]`
+            };
+          }
+          if (od.sampleResponse && od.sampleResponse.station) {
+            out.cruise = od.sampleResponse.station.cruise.name;
+            out.station = od.sampleResponse.station.number.toString();
+            out.stationDate = od.sampleResponse.station.stationDate;
+          }
+          if (od.sampleResponse) {
+            out.gear = od.sampleResponse.gear.isscfgNo;
+            out.meshSize = od.sampleResponse.meshSize;
+          }
+
+          out.sampleId = sampleId.toString();
+          out.measureId = m.measureId.toString();
+          out.serialNo = m.serialNo.toString();
+          return out;
         })
       }));
     });
