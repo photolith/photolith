@@ -143,7 +143,6 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         context["object_model"] = self.model
 
         if self.individual_id:
-            ind = get_object_or_404(Individual, pk=self.individual_id)
             context["ind_data"] = self.get_individual()
             context["all_annotations"] = self.get_all_annotations()
         return context
