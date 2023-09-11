@@ -127,11 +127,12 @@ STATICFILES_DIRS = (
 )
 
 
-# Settings export (i.e. Javascript configuration)
-CLIENTSIDE_CONFIG = """
-window.mApi = new DummyMetadataApi();
-"""
-SETTINGS_EXPORT = ["CLIENTSIDE_CONFIG"]
+# Default clientside settings (exported )
+CS_METADATA_API = "DummyMetadataApi"
+CS_METADATA_ARGS = ""
+# Export anything CS_ via. django_settings_export
+SETTINGS_EXPORT = [x for x in globals().keys() if x.startswith("CS_")]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

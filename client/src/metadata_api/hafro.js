@@ -31,7 +31,7 @@ const metaLabels = {
 
 export default class MetadataApi {
   constructor (baseHref) {
-    this.baseHref = baseHref;
+    this.baseHref = baseHref || '';
   }
 
   fetch (endpoint) {

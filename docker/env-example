@@ -11,3 +11,6 @@ APP_ALLOWED_HOSTS=photolith.website.org www.photolith.website.org
 #APP_DB_PASSWORD=photolith_pw
 #APP_DB_HOST=db
 #APP_DB_PORT=5432
+
+# Configure API adapter to use
+#APP_CS_METADATA_API="HafroMetadataApi"

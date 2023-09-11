@@ -13,9 +13,7 @@
     <script defer src="/static/@popperjs/core/dist/umd/popper.min.js"></script>
     <script defer src="/static/bootstrap/dist/js/bootstrap.min.js"></script>
     <script defer src="/static/app.js"></script>
-    <script>
-      window.addEventListener('DOMContentLoaded', function() { {% autoescape off %}{{ settings.CLIENTSIDE_CONFIG }}{% endautoescape %} });
-    </script>
+    {% include "snippet/cs_config.html" %}
 
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
   </head>
