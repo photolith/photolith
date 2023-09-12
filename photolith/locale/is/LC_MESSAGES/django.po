@@ -144,6 +144,10 @@ msgid "Next"
 msgstr "Næsti"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Help"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
 msgid "Individual Metadata"
 msgstr "Gögn með einstakling"
 
@@ -154,6 +158,47 @@ msgstr "Núverandi aldursmerkingar"
 #: photolith/templates/annotate/annotate.html
 msgid "Annotate"
 msgstr "Aldursmerkja"
+
+#: photolith/templates/annotate/annotate.html
+msgid "Annotate by marking the otolith/rings in the image."
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Then fill in the <kbd>Annotate</kbd> form and press <kbd>Save</kbd>."
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "You can:"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Zoom in/out by pinching or scrolling the mouse"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid ""
+"Adjust image contrast or download using the magic wand menu, increasing ring "
+"detail by decreasing gamma, e.g."
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Drag the start and end points to mark the centre & edge of the otolith"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid ""
+"Double-click on the line to add a ring marker, drag a ring marker to move it"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Double-click a ring marker to remove"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid ""
+"<kbd>Ctrl</kbd>-drag to move a ring marker freeform, not following the axis "
+"line"
+msgstr ""
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html

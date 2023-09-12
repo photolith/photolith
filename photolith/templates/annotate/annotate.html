@@ -37,6 +37,9 @@
 <div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_data.image__href }}" data-bounding-box="{{ ind_data.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
 
 <ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item" role="presentation"><button class="nav-link" id="help-tab" data-bs-toggle="tab" data-bs-target="#help-tab-pane" type="button" role="tab" aria-controls="help-tab-pane" aria-selected="true">
+    {% translate 'Help' %}
+  </button></li>
   <li class="nav-item" role="presentation"><button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadata-tab-pane" type="button" role="tab" aria-controls="metadata-tab-pane" aria-selected="true">
     {% translate 'Individual Metadata' %}
   </button></li>
@@ -49,6 +52,22 @@
 </ul>
 
 <div class="tab-content">
+  <div class="tab-pane" id="help-tab-pane" role="tabpanel" aria-labelledby="help-tab" tabindex="0">
+    <p>
+      {% translate "Annotate by marking the otolith/rings in the image." %}
+      {% translate "Then fill in the <kbd>Annotate</kbd> form and press <kbd>Save</kbd>." %}
+      {% translate "You can:" %}
+    </p>
+    <ul>
+      <li>{% translate "Zoom in/out by pinching or scrolling the mouse" %}</li>
+      <li>{% translate "Adjust image contrast or download using the magic wand menu, increasing ring detail by decreasing gamma, e.g." %}</li>
+      <li>{% translate "Drag the start and end points to mark the centre & edge of the otolith" %}</li>
+      <li>{% translate "Double-click on the line to add a ring marker, drag a ring marker to move it" %}</li>
+      <li>{% translate "Double-click a ring marker to remove" %}</li>
+      <li>{% translate "<kbd>Ctrl</kbd>-drag to move a ring marker freeform, not following the axis line" %}</li>
+    </ul>
+  </div>
+
   <div class="tab-pane" id="metadata-tab-pane" role="tabpanel" aria-labelledby="metadata-tab" tabindex="0">
 
     <table class="table table-striped individual-data" style="">
