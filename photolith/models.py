@@ -65,8 +65,35 @@ class Individual(models.Model):
 
     @data.setter
     def data(self, new_value):
-        for k, v in new_value.items():
+        # Build lookup of current meta keys
+        schema = {}
+        for k in MetaNumeric.objects.values("key").distinct():
+            schema[k["key"]] = "nm"
+        for k in MetaChar.objects.values("key").distinct():
+            schema[k["key"]] = "ch"
+        for k in MetaDT.objects.values("key").distinct():
+            schema[k["key"]] = "dt"
+        for k in MetaTx.objects.values("key").distinct():
+            schema[k["key"]] = "tx"
+
+        # Return meta-type for given k/v
+        def meta_schema_for(k, v):
+            if k in schema:
+                return schema[k]
             if isinstance(v, numbers.Number):
+                return "nm"
+            if isinstance(v, str) and isisoformat(v):
+                return "dt"
+            if isinstance(v, str):
+                return "ch"
+            if isinstance(v, dict):
+                return "tx"
+            raise ValueError("Unknown type of %s: %s" % (k, str(v)))
+
+        # TODO: Not removing old values
+        for k, v in new_value.items():
+            t = meta_schema_for(k, v)
+            if t == "nm":
                 self.metanumeric_set.add(
                     MetaNumeric(
                         individual=self,
@@ -76,7 +103,7 @@ class Individual(models.Model):
                     bulk=False,
                 )
 
-            elif isinstance(v, str) and isisoformat(v):
+            elif t == "dt":
                 self.metadt_set.add(
                     MetaDT(
                         individual=self,
@@ -86,7 +113,7 @@ class Individual(models.Model):
                     bulk=False,
                 )
 
-            elif isinstance(v, str):
+            elif t == "ch":
                 self.metachar_set.add(
                     MetaChar(
                         individual=self,
@@ -96,7 +123,7 @@ class Individual(models.Model):
                     bulk=False,
                 )
 
-            elif isinstance(v, dict):
+            elif t == "tx":
                 tx, created = Taxonomy.objects.get_or_create(key=k, identifier=v["id"])
                 v["key"] = k
                 tx.dict = v
