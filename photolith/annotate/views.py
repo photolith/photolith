@@ -121,16 +121,13 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             init_a = p.init_annotation(self.individual_id)
             return [init_a] if init_a else []
 
+        qs = Annotation.objects.filter(
+            individual_id=self.individual_id,
+        )
         if p:
             # Closed project: list all annotations within project
-            return Annotation.objects.filter(
-                individual_id=self.individual_id,
-                project=p,
-            ).order_by("-created_at")
-
-        return Annotation.objects.filter(
-            individual_id=self.individual_id,
-        ).order_by("-created_at")
+            qs = qs.filter(project=p)
+        return qs.order_by("-authority", "-created_at")
 
     def get_individual(self):
         # Shortened form of search.views:DataView
