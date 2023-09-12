@@ -58,6 +58,18 @@ msgid "Easy to read"
 msgstr ""
 
 #: photolith/models.py
+msgid "Unknown"
+msgstr ""
+
+#: photolith/models.py
+msgid "Human, non expert"
+msgstr ""
+
+#: photolith/models.py
+msgid "Human, expert"
+msgstr ""
+
+#: photolith/models.py
 #, fuzzy
 #| msgid "Annotate"
 msgid "Part of project"
@@ -70,6 +82,10 @@ msgstr "Síðast breytt"
 #: photolith/models.py
 msgid "Image rating"
 msgstr "Einkunn myndar"
+
+#: photolith/models.py
+msgid "Reader authority"
+msgstr ""
 
 #: photolith/models.py photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"

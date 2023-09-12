@@ -1,12 +1,22 @@
 import datetime
 
+from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
-from ..models import Annotation
+from ..models import Annotation, UserProfile, Taxonomy
 
 
 class RequiresUtils:
+    @classmethod
+    def setUpClass(cls):
+        super(RequiresUtils, cls).setUpClass()
+        # Force SECRET_KEY to be set in all unit-tests, don't worry about teardown
+        # NB: override_settings() would be neater, but it's own teardown complains
+        # about lack of SECRET_KEY
+        settings.SECRET_KEY = "insecure-ut"
+
     def setUp(self):
         super(RequiresUtils, self).setUp()
         self.now = timezone.now()
@@ -22,12 +32,26 @@ class RequiresUtils:
         self._ru_objects.append(o)
         return o
 
-    def create_user(self, username):
+    def create_user(self, username=None, groups=[], species_expert=None):
+        if not username:
+            username = "ut_user%d" % (get_user_model().objects.count() + 1)
         out = get_user_model().objects.create(
             username=username,
             password="%s123" % username,
             email="%s@example.com" % username,
         )
+        out.groups.set(Group.objects.filter(name__in=groups))
+        self.assertEqual(out.groups.count(), len(groups))
+
+        userprofile = dict()
+        if species_expert:
+            userprofile["species_expert"] = Taxonomy.objects.filter(
+                str_en=species_expert
+            ).first()
+        if len(userprofile):
+            userprofile["user"] = out
+            UserProfile.objects.create(**userprofile)
+
         return self._ru_append(out)
 
     def create_annotation(

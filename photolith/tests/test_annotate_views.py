@@ -1,7 +1,8 @@
 import datetime
+import re
 
 from django.core.exceptions import BadRequest
-from django.test import RequestFactory, TestCase
+from django.test import Client, RequestFactory, TestCase
 
 from ..annotate.views import AnnotateView
 from ..models import Annotation, Individual, Image, Project
@@ -17,6 +18,75 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             **kwargs,
         )
         return p
+
+    def form_post(self, user, ind, **kwargs):
+        ann_dict = dict(
+            individual=ind.id,
+            project=kwargs["project"].id if "project" in kwargs else "",
+            age=kwargs.get("age", 10),
+            axis_poly=kwargs.get("axis_poly", [[0, 0], [1, 1], [2, 2]]),
+            comment=kwargs.get("comment", "UT comment"),
+            rating=kwargs.get("rating", Annotation.Rating.GOOD),
+        )
+
+        client = Client()
+        client.force_login(user)
+        resp = client.post("/annotate/%d/" % (ind.id,), ann_dict)
+        self.assertEqual(resp.status_code, 302)
+        m = re.fullmatch(r"/annotate/(\d+)/(\d+)\?(.*)", resp.url)
+        self.assertTrue(m is not None)
+        self.assertEqual(int(m.group(1)), ind.id)
+        out = Annotation.objects.get(pk=int(m.group(2)))
+        return out
+
+    def test_form_valid_authority(self):
+        """Make sure authority is set appropriately on save"""
+        ind_nospecies = Individual.objects.create(
+            image=Image.objects.create(
+                href="//moo0.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
+            ),
+            bounding_box=[[0, 0], [100, 100]],
+        )
+        ind_fish = Individual.objects.create(
+            image=Image.objects.create(
+                href="//moo1.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
+            ),
+            bounding_box=[[0, 0], [100, 100]],
+        )
+        ind_fish.data = dict(species={"id": 100, "en": "Fish", "is": "Fiskur"})
+        ind_rock = Individual.objects.create(
+            image=Image.objects.create(
+                href="//moo2.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
+            ),
+            bounding_box=[[0, 0], [100, 100]],
+        )
+        ind_rock.data = dict(species={"id": 200, "en": "Rock", "is": "Rockur"})
+
+        # User without profile isn't an authority
+        user1 = self.create_user(groups=["Annotate"])
+        ann = self.form_post(user1, ind_nospecies)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user1, ind_fish)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user1, ind_rock)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+
+        # Add profile, only authority for relevant species
+        user2 = self.create_user(groups=["Annotate"], species_expert="Fish")
+        ann = self.form_post(user2, ind_nospecies)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user2, ind_fish)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
+        ann = self.form_post(user2, ind_rock)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+
+        user3 = self.create_user(groups=["Annotate"], species_expert="Rock")
+        ann = self.form_post(user3, ind_nospecies)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user3, ind_fish)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user3, ind_rock)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
 
     def test_get_object(self):
         def get_object(**kwargs):

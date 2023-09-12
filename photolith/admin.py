@@ -2,8 +2,10 @@ import json
 
 from django.utils.html import escape, mark_safe
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 
-from .models import Image, Individual, Annotation, Project
+from .models import UserProfile, Image, Individual, Annotation, Project
 
 
 def image_preview_html(href, bounding_box):
@@ -26,6 +28,20 @@ def image_preview_html(href, bounding_box):
 
 class IndividualInline(admin.StackedInline):
     model = Individual
+
+
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+
+
+# Redefine UserAdmin to include UserProfileInline
+class UserAdmin(BaseUserAdmin):
+    inlines = [UserProfileInline]
+
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 @admin.register(Image)

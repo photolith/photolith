@@ -59,6 +59,20 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
                 )
             form.instance.project = p
 
+        # Set authority based on user's profile
+        form.instance.authority = Annotation.AuthorityLevel.NON_EXPERT
+        if hasattr(self.request.user, "userprofile"):
+            ind_data = self.get_individual()
+            if (
+                "id" in ind_data.get("species", dict())
+                and self.request.user.userprofile.species_expert
+            ):
+                if (
+                    self.request.user.userprofile.species_expert.identifier
+                    == ind_data["species"]["id"]
+                ):
+                    form.instance.authority = Annotation.AuthorityLevel.EXPERT
+
         return super().form_valid(form)
 
     def get_object(self, queryset=None):

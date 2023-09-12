@@ -3,7 +3,7 @@ import numbers
 
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 
 def isisoformat(v):
@@ -12,6 +12,17 @@ def isisoformat(v):
         return True
     except ValueError:
         return False
+
+
+class UserProfile(models.Model):
+    # https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#extending-the-existing-user-model
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    species_expert = models.ForeignKey(
+        "Taxonomy",
+        null=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to=dict(key="species"),
+    )
 
 
 class Image(models.Model):
@@ -246,6 +257,12 @@ class Taxonomy(models.Model):
             elif hasattr(self, "str_%s" % k):
                 setattr(self, "str_%s" % k, v)
 
+    def __str__(self):
+        return "%s: %s" % (
+            self.key,
+            getattr(self, "str_%s" % get_language(), "str_en"),
+        )
+
 
 class Annotation(models.Model):
     """
@@ -256,6 +273,11 @@ class Annotation(models.Model):
         UNREADABLE = 0, _("Unreadable")
         DIFFICULT = 50, _("Difficult (+/- one year)")
         GOOD = 100, _("Easy to read")
+
+    class AuthorityLevel(models.IntegerChoices):
+        UNKNOWN = 0, _("Unknown")
+        NON_EXPERT = 50, _("Human, non expert")
+        EXPERT = 100, _("Human, expert")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
@@ -279,6 +301,12 @@ class Annotation(models.Model):
     )
     rating = models.PositiveSmallIntegerField(
         _("Image rating"), null=True, choices=Rating.choices
+    )
+    authority = models.PositiveSmallIntegerField(
+        _("Reader authority"),
+        null=False,
+        default=AuthorityLevel.UNKNOWN,
+        choices=AuthorityLevel.choices,
     )
     age = models.IntegerField(_("Age reading"), null=True)
     comment = models.TextField(_("Comments"), null=False, default="")
