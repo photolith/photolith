@@ -148,7 +148,7 @@ class Individual(models.Model):
                     bulk=False,
                 )
 
-            else:
+            else:  # pragma: no cover
                 raise ValueError("Unknown type of %s: %s" % (k, str(v)))
 
     def data_save(self):

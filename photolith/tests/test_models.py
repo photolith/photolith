@@ -125,6 +125,10 @@ class IndividualTest(RequiresUtils, TestCase):
             ],
         )
 
+        # Unknown types are an error
+        with self.assertRaisesRegex(ValueError, "parents"):
+            ind2.data = dict(parents=["Bob", "Carla"])
+
 
 class ProjectTest(TestCase):
     maxDiff = None
