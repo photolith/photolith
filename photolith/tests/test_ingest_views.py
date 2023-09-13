@@ -66,6 +66,14 @@ class UploadViewTest(RequiresUtils, TestCase):
                             ),
                             [[0, 0], [200, 200]],
                         ),
+                        (
+                            # NB: Will be ignored since there's no bounding box
+                            dict(
+                                species={"id": 200, "en": "Cat", "is": "Köttur"},
+                                length=300,
+                            ),
+                            None,
+                        ),
                     ],
                 )
             ),
@@ -75,6 +83,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         # We can find them in the database
         Individual.objects.all().order_by("pk")
         inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(len(inds), 2)
         self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
         self.assertEqual(
             inds[0].data,
