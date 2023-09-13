@@ -95,10 +95,9 @@ class UploadView(PermissionRequiredMixin, View):
                 bounding_box=ind_bounding_box,
             )
             ind.save()
-            created_inds.append(ind)
-
             ind.data = ind_data
-            ind.data_save()
+            ind.save()
+            created_inds.append(ind)
         return JsonResponse(
             dict(
                 created_individuals=[model_to_dict(ind) for ind in created_inds],

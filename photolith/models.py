@@ -151,16 +151,19 @@ class Individual(models.Model):
             else:  # pragma: no cover
                 raise ValueError("Unknown type of %s: %s" % (k, str(v)))
 
-    def data_save(self):
+    def save(self, *args, **kwargs):
+        """Save any associated meta objects as well as ourselves"""
+        super().save(*args, **kwargs)
         for tx in self.metanumeric_set.all():
-            tx.save()
+            tx.save(*args, **kwargs)
         for tx in self.metachar_set.all():
-            tx.save()
+            tx.save(*args, **kwargs)
         for tx in self.metadt_set.all():
-            tx.save()
+            tx.save(*args, **kwargs)
         for tx in self.metatx_set.all():
-            tx.save()
-            tx.value.save()
+            tx.save(*args, **kwargs)
+            tx.value.save(*args, **kwargs)
+        return
 
 
 class MetaNumeric(models.Model):
