@@ -29,7 +29,7 @@ test: compile
 	./manage.py test
 
 coverage: compile lib/.requirements-dev.txt
-	./bin/coverage run --source='.' ./manage.py test $(PROJECT)
+	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test $(PROJECT)
 	./bin/coverage report
 	./bin/coverage html -d staticfiles/htmlcov/
 	echo "Visit https://.../static/htmlcov/"
