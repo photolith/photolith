@@ -1,7 +1,6 @@
 from django.urls import path
 
 from . import views
-from . import view_upload
 
 
 app_name = "photolith"
@@ -14,7 +13,7 @@ urlpatterns = [
     ),
     path(
         "upload/",
-        view_upload.UploadView.as_view(http_method_names=["post"]),
+        views.UploadView.as_view(http_method_names=["post"]),
         name="upload",
     ),
 ]
