@@ -25,3 +25,6 @@
 
 # Docker
 /docker/.env
+
+# Coverage
+/.coverage

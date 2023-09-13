@@ -28,6 +28,12 @@ compile: lib/.requirements.txt ./manage.py $(LOCALE_FILES:.po=.mo) node_modules/
 test: compile
 	./manage.py test
 
+coverage: compile lib/.requirements-dev.txt
+	./bin/coverage run --source='.' ./manage.py test $(PROJECT)
+	./bin/coverage report
+	./bin/coverage html -d staticfiles/htmlcov/
+	echo "Visit https://.../static/htmlcov/"
+
 lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/autoflake -r  --imports django,requests photolith/ | patch -p1
 	./bin/black $(PROJECT)
