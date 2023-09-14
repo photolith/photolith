@@ -146,8 +146,19 @@ export class PhViewer {
     }).finally(() => {
       const elDl = this.elViewer.querySelector(':scope .download-link');
 
-      elDl.href = blob && this.fabCanvas.backgroundImage ? URL.createObjectURL(blob) : '#';
-      elDl.download = blob && this.fabCanvas.backgroundImage ? blob.name : undefined;
+      if (this.fabCanvas.backgroundImage && blob instanceof window.Blob) {
+        // Offer link directly to blob
+        elDl.href = URL.createObjectURL(blob);
+        elDl.download = blob.name;
+      } else if (this.fabCanvas.backgroundImage) {
+        // Download from canvas
+        elDl.href = this.fabCanvas.backgroundImage.toDataURL({ format: 'jpeg' });
+        elDl.download = blob.name + '.jpg';
+      } else {
+        // No image, disable download link
+        elDl.href = '#';
+        elDl.download = undefined;
+      }
     });
   }
 

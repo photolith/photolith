@@ -33,6 +33,10 @@ msgstr "Hlaðið upp af %(photo_dir)s"
 msgid "Upload files from computer"
 msgstr "Sækja skrár úr tölvu"
 
+#: photolith/ingest/views.py
+msgid "Take photo (default camera)"
+msgstr ""
+
 #: photolith/models.py photolith/models.py photolith/models.py
 msgid "Created by"
 msgstr "Búið til af"
