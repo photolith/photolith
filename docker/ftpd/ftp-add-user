@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eux
-INGEST_ROOT="/srv/app/ingest_root"
+INGEST_ROOT="${INGEST_ROOT-/srv/app/ingest_root}"
 INGEST_USERDB="${INGEST_ROOT}/vsftpd.db"
 
 USER="${1}"
