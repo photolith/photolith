@@ -2,8 +2,8 @@
 set -eu
 PROJECT_PATH="${PROJECT_PATH-$(dirname "$(readlink -f "$0")")}"  # The full project path
 PROJECT_NAME="${PROJECT_NAME-$(basename ${PROJECT_PATH})}"  # The project directory name
-DEFAULT_HOST="${PROJECT_PATH}/manage.py config_param --head ALLOWED_HOSTS"
-EXTRA_HOSTS="${PROJECT_PATH}/manage.py config_param --tail ALLOWED_HOSTS"
+DEFAULT_HOST="$(${PROJECT_PATH}/manage.py config_param --head ALLOWED_HOSTS)"
+EXTRA_HOSTS="$(${PROJECT_PATH}/manage.py config_param --tail ALLOWED_HOSTS)"
 CERT_DIR="/var/lib/dehydrated/certs"
 DOMAINS_DIR="/etc/dehydrated/domains.txt.d"
 DHPARAM="/etc/ssl/dhparam.pem"
