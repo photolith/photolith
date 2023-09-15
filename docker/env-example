@@ -2,7 +2,7 @@
 APP_SECRET_KEY=django-insecure-REPLACEME
 
 # Space separated list of potential hostnames, the first will be considered the canonical version
-APP_ALLOWED_HOSTS=photolith.website.org www.photolith.website.org
+APP_ALLOWED_HOSTS="photolith.website.org www.photolith.website.org"
 
 # By default a .sqlite database will be used, to use postgresql configure the following options
 #APP_DB_ENGINE=django.db.backends.postgresql
