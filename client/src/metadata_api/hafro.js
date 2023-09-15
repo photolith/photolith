@@ -29,6 +29,13 @@ const metaLabels = {
   }
 };
 
+/** Return zero-padded month string from (d) */
+function formattedMonth (d) {
+  const m = d.getMonth() + 1;
+
+  return (m < 10 ? '0' : '') + m;
+}
+
 export default class MetadataApi {
   constructor (baseHref) {
     this.baseHref = baseHref || '';
@@ -77,7 +84,7 @@ export default class MetadataApi {
               od.sampleResponse.sampleId,
                 `${od.sampleResponse.station.cruise.name}/${od.sampleResponse.station.number}`,
                 od.speciesDTO.id,
-                (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1
+                formattedMonth(new Date(od.sampleResponse.station.stationDate))
             ].join(' ');
           }
           if (od.measureDTO) {
