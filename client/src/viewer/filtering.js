@@ -75,7 +75,14 @@ export class PhFilteringViewer extends PhViewer {
 
     this.startRendering();
     window.setTimeout(() => {
-      img.applyFilters();
+      try {
+        img.applyFilters();
+      } catch (err) {
+        console.error(err);
+        this.elForm.reset();
+        setTimeout(this.refreshFilters.bind(this), 600);
+        throw new Error('Could not apply image filter, GPU out of memory(?)');
+      }
       this.fabCanvas.renderAll();
     }, 10);
   }
