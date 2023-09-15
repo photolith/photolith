@@ -1,4 +1,6 @@
-# Docker based installation
+# Production notes
+
+## Docker-based installation
 
 You can use docker-compose to perform a full local installation with:
 
