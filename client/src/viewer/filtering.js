@@ -5,8 +5,8 @@ import { PhViewer } from './base';
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {
     if (fabric.isWebglSupported()) {
-      // TODO; fabric.maxTextureSize is 1 << 14, but setting it results in 2d fallback(?)
-      fabric.textureSize = Math.max(8192, fabric.maxTextureSize);
+      // Increase textureSize to limit, so our images hopefully fit
+      fabric.textureSize = fabric.maxTextureSize;
     }
 
     super(elViewer);
