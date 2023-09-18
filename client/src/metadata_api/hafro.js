@@ -67,16 +67,15 @@ export default class MetadataApi {
     const intSampleId = parseInt(sampleId, 10);
     if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));
 
-    return this.fetch(`/biota/otolith/sample/${intSampleId}`).then((data) => {
+    return this.fetch(`/biota/otolith/sample/${intSampleId}/combined`).then((data) => {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
       if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
 
       // Sort incoming data by serialNo (i.e. individual number)
       data.otoliths.sort((a, b) => a.serialNo - b.serialNo);
 
-      return Promise.all(data.otoliths.map((m) => this.fetch(`/biota/otolith/${m.measureId}/detail`))).then((ods) => ({
-        individuals: data.otoliths.map((m, i) => {
-          const od = ods[i];
+      return {
+        individuals: data.otoliths.map((od, i) => {
           const out = {};
 
           if (od.sampleResponse && od.speciesDTO) {
@@ -109,12 +108,12 @@ export default class MetadataApi {
             out.meshSize = od.sampleResponse.meshSize;
           }
 
-          out.sampleId = sampleId.toString();
-          out.measureId = m.measureId.toString();
-          out.serialNo = m.serialNo.toString();
+          out.sampleId = od.sampleId.toString();
+          out.measureId = od.measureId.toString();
+          out.serialNo = od.serialNo.toString();
           return out;
         })
-      }));
+      };
     });
   }
 }
