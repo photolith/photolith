@@ -17,9 +17,11 @@ export class PhAnnotate extends PhSyncingViewer {
 
     this.fabCanvas.add(obj);
     this.fabCanvas.on('mouse:dblclick', (opt) => {
-      if (opt.target) {
+      if (opt.target && opt.target.phNodeIdx > 0 && opt.target.phNodeIdx < obj.phNodes.length - 1) {
+        // Double-clicked on a mid-node, remove it
         obj.phRemoveNode(opt.target);
       } else {
+        // Double-clicked elsewhere (NB: including on an end-node), add a new node
         obj.phAddNode(fabric.util.transformPoint(
           new fabric.Point(opt.e.offsetX, opt.e.offsetY),
           fabric.util.invertTransform(this.fabCanvas.viewportTransform)
