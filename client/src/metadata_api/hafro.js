@@ -81,7 +81,7 @@ export default class MetadataApi {
   sampleDetail (slideLabel) {
     const lbl = parseSlideLabel(slideLabel);
 
-    return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined`).then((data) => {
+    return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
       if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
 
