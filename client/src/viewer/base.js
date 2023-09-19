@@ -74,10 +74,23 @@ export class PhViewer {
       }
     };
 
-    window.addEventListener('resize', function (event) {
-      this.fabCanvas.setWidth(this.elViewer.clientWidth);
-      this.fabCanvas.setHeight(this.elViewer.clientHeight);
-    }.bind(this));
+    if (window.ResizeObserver) {
+      // Monitor size of parent, resizing fabric canvas
+      const resizeObserver = new window.ResizeObserver((entries) => {
+        if (entries.length < 1) return;
+        const entry = entries[0];
+
+        this.fabCanvas.setWidth(entry.contentRect.width);
+        this.fabCanvas.setHeight(entry.contentRect.height);
+      });
+      resizeObserver.observe(this.elViewer);
+    } else {
+      // Fall back to monitoring the entire window
+      window.addEventListener('resize', function (event) {
+        this.fabCanvas.setWidth(this.elViewer.clientWidth);
+        this.fabCanvas.setHeight(this.elViewer.clientHeight);
+      }.bind(this));
+    }
 
     this.fabCanvas.on('after:render', function (opt) {
       // NB: Don't clear rendering if we're mid-file-load
