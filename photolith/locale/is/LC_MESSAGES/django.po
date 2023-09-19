@@ -119,7 +119,9 @@ msgstr "Staðsetja ás út frá notanda"
 msgid ""
 "If a user is selected, then their most recent annotation for each individual "
 "will be used as a starting point for annotations"
-msgstr "Ef notandi er valinn þá mun nýlegasta aldursmerking hvers einstaklings vera notuð sem upphafsstaður fyrir merkingar"
+msgstr ""
+"Ef notandi er valinn þá mun nýlegasta aldursmerking hvers einstaklings vera "
+"notuð sem upphafsstaður fyrir merkingar"
 
 #: photolith/project/forms.py
 msgid "No base axis"
@@ -170,7 +172,8 @@ msgstr "Settu inn ár með því að tvísmella á árhring á myndinni."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Then fill in the <kbd>Annotate</kbd> form and press <kbd>Save</kbd>."
-msgstr "Fylltu svo út <kbd>aldursmerkingarformið</kbd> og ýttu á <kbd>Vista</kbd>"
+msgstr ""
+"Fylltu svo út <kbd>aldursmerkingarformið</kbd> og ýttu á <kbd>Vista</kbd>"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -186,17 +189,21 @@ msgstr "Þysjaðu inn/út með því að skrolla með músinni"
 msgid ""
 "Adjust image contrast or download using the magic wand menu, increasing ring "
 "detail by decreasing gamma, e.g."
-msgstr "Breyttu contrast, gamma o.þ.h. með því að ýta á galdrasprotann á myndinni."
+msgstr ""
+"Breyttu contrast, gamma o.þ.h. með því að ýta á galdrasprotann á myndinni."
 "Breyting á Gamma og/eða Contrast getur aukið smáatriði á myndinni."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Drag the start and end points to mark the centre & edge of the otolith"
-msgstr "Dragðu upphafs- og endapunkta á ásnum til að merkja miðju og jaðar kvarnar"
+msgstr ""
+"Dragðu upphafs- og endapunkta á ásnum til að merkja miðju og jaðar kvarnar"
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
 "Double-click on the line to add a ring marker, drag a ring marker to move it"
-msgstr "Tvíklikkaðu á ásinn til að bæta við aldurslestri eða dragðu merkinguna til að færa hana til"
+msgstr ""
+"Tvíklikkaðu á ásinn til að bæta við aldurslestri eða dragðu merkinguna til "
+"að færa hana til"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Double-click a ring marker to remove"
@@ -206,7 +213,9 @@ msgstr "Tvíklikkaðu á merkingu til að fjarlægja hana"
 msgid ""
 "<kbd>Ctrl</kbd>-drag to move a ring marker freeform, not following the axis "
 "line"
-msgstr "Smelltu með vinstri takka á músinni og haltu inni Ctlr til að færa merkingu án þess að fylgja ásinum."
+msgstr ""
+"Smelltu með vinstri takka á músinni og haltu inni Ctlr til að færa merkingu "
+"án þess að fylgja ásinum."
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -306,13 +315,17 @@ msgstr "Sláðu inn id-númer og ýttu á enter."
 
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
-msgstr "Eftir að þetta hefur verið gert þá birtast box fyrir hvern einstakling inni á myndinni."
+msgstr ""
+"Eftir að þetta hefur verið gert þá birtast box fyrir hvern einstakling inni "
+"á myndinni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Position each over the relevant individual, the scale line over the scale "
 "and press <kbd>Save</kbd>."
-msgstr "Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem er efst á hverri mynd."
+msgstr ""
+"Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem er "
+"efst á hverri mynd."
 
 #: photolith/templates/ingest/index.html
 msgid ""
