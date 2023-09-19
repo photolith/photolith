@@ -157,5 +157,10 @@ for k in os.environ.keys():
         DATABASES["default"][k.replace("APP_DB_", "")] = os.environ[k]
     elif k == "APP_ALLOWED_HOSTS":
         ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")
+    elif k == "APP_AUTH_PASSWORD_VALIDATORS":
+        AUTH_PASSWORD_VALIDATORS = (
+            os.environ[k].split(" ") if len(os.environ[k]) > 0 else []
+        )
+        AUTH_PASSWORD_VALIDATORS = [dict(name=x) for x in AUTH_PASSWORD_VALIDATORS]
     elif k.startswith("APP_"):
         globals()[k.replace("APP_", "")] = os.environ[k]
