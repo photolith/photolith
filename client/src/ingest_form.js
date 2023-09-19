@@ -11,7 +11,7 @@ function formRefresh (event) {
     return el.name.startsWith('bounding_box:') && el.value;
   });
 
-  if (event.target.name === 'sample') {
+  if (event.target.name === 'slide-label') {
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
     elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
@@ -92,8 +92,8 @@ export function init (parent) {
   parent.querySelectorAll('form.ingest-form').forEach((elForm) => {
     elForm.addEventListener('change', formRefresh);
     elForm.addEventListener('reset', (event) => {
-      // Give the form a chance to reset, then refresh the sample field (triggering everything else to refresh)
-      window.setTimeout(() => formRefresh({ target: elForm.sample }), 10);
+      // Give the form a chance to reset, then refresh the slide-label field (triggering everything else to refresh)
+      window.setTimeout(() => formRefresh({ target: elForm['slide-label'] }), 10);
     });
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();

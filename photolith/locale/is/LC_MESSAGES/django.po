@@ -322,35 +322,41 @@ msgstr "Stilltu contrast, birtu, gamma o.fl. með töfrasprotanum"
 
 #: photolith/templates/ingest/index.html
 msgid "View individual details by clicking on the relevant box"
-msgstr "Hægt er að skoða upplýsingar hvers einstaklings með því að ýta á viðeigandi box"
+msgstr ""
+"Hægt er að skoða upplýsingar hvers einstaklings með því að ýta á viðeigandi "
+"box"
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Drag individual boxes or resize them by clicking on one and dragging it's "
 "corners"
-msgstr "Dragðu hvert box yfir viðeigandi kvörn með því að vinstrismella á það og færa það með músinni. "
-"Einnig er hægt að minnka og stækka boxin eftir þörfum."
+msgstr ""
+"Dragðu hvert box yfir viðeigandi kvörn með því að vinstrismella á það og "
+"færa það með músinni. Einnig er hægt að minnka og stækka boxin eftir þörfum."
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Select many boxes with <kbd>Ctrl</kbd>-drag, they then can be resized as a "
 "group"
-msgstr "Veldu mörg box með því að halda inni Ctrl og draga yfir þau box sem þú vilt velja saman. "
-"Boxin geta þá verið færð eða stærðin á þeim breytt á sama tíma."
+msgstr ""
+"Veldu mörg box með því að halda inni Ctrl og draga yfir þau box sem þú vilt "
+"velja saman. Boxin geta þá verið færð eða stærðin á þeim breytt á sama tíma."
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Discard an individual by dragging it outside the image, which will stop it "
 "being uploaded"
-msgstr "Þau box sem eru dregin út fyrir myndina hverfa og eru ekki færð inn í gagnagrunn"
+msgstr ""
+"Þau box sem eru dregin út fyrir myndina hverfa og eru ekki færð inn í "
+"gagnagrunn"
 
 #: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
 msgstr "Lengd kvarða (mm)"
 
 #: photolith/templates/ingest/index.html
-msgid "Sample ID"
-msgstr "ID númer sýnis"
+msgid "Slide Label"
+msgstr ""
 
 #: photolith/templates/project/list.html
 msgid "All projects"

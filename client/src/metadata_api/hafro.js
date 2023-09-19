@@ -36,6 +36,21 @@ function formattedMonth (d) {
   return (m < 10 ? '0' : '') + m;
 }
 
+/** e.g. 537572 TG1-2023/110 1 03 */
+function parseSlideLabel (s) {
+  const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9\-=]+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
+  if (!m) throw new Error(`"${s}" isn't recognisable as a slide label`);
+
+  return {
+    full: m[0],
+    sampleId: parseInt(m.groups.sampleId, 10),
+    cruise: m.groups.cruise,
+    station: parseInt(m.groups.station, 10),
+    species: parseInt(m.groups.species, 10),
+    month: parseInt(m.groups.month, 10)
+  };
+}
+
 export default class MetadataApi {
   constructor (baseHref) {
     this.baseHref = baseHref || '';
@@ -63,11 +78,10 @@ export default class MetadataApi {
     return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 
-  sampleDetail (sampleId) {
-    const intSampleId = parseInt(sampleId, 10);
-    if (!isFinite(intSampleId)) return Promise.reject(new Error(`Invalid sample ID: ${sampleId}`));
+  sampleDetail (slideLabel) {
+    const lbl = parseSlideLabel(slideLabel);
 
-    return this.fetch(`/biota/otolith/sample/${intSampleId}/combined`).then((data) => {
+    return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined`).then((data) => {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
       if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
 
@@ -85,6 +99,8 @@ export default class MetadataApi {
                 od.speciesDTO.id,
                 formattedMonth(new Date(od.sampleResponse.station.stationDate))
             ].join(' ');
+          } else {
+            out.slideLabel = lbl.full;
           }
           if (od.measureDTO) {
             out.length = od.measureDTO.length;
@@ -102,6 +118,9 @@ export default class MetadataApi {
             out.cruise = od.sampleResponse.station.cruise.name;
             out.station = od.sampleResponse.station.number.toString();
             out.stationDate = od.sampleResponse.station.stationDate;
+          } else {
+            out.cruise = lbl.cruise;
+            out.station = lbl.station.toString();
           }
           if (od.sampleResponse) {
             out.gear = od.sampleResponse.gear.isscfgNo;
