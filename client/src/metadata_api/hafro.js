@@ -1,3 +1,5 @@
+import { displayAlert } from '../alert';
+
 const metaLabels = {
   en: {
     slideLabel: 'Slide Label',
@@ -72,7 +74,9 @@ export default class MetadataApi {
   }
 
   sampleDetail (slideLabel) {
+    slideLabel = slideLabel.trim();
     const lbl = parseSlideLabel(slideLabel);
+    let suppressWarnings = false;
 
     return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
@@ -126,6 +130,11 @@ export default class MetadataApi {
             od.speciesDTO.id,
             (out.stationMonth < 10 ? '0' : '') + out.stationMonth
           ].join(' ');
+
+          if (!suppressWarnings && out.slideLabel !== slideLabel) {
+            displayAlert('warning', `The API returned a slide label of "${out.slideLabel}", you entered "${slideLabel}"`);
+            suppressWarnings = true;
+          }
 
           return out;
         })
