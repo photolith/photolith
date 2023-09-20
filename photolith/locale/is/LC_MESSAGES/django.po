@@ -85,7 +85,7 @@ msgstr "Síðast breytt"
 
 #: photolith/models.py
 msgid "Image rating"
-msgstr "Mat á mynd"
+msgstr "Einkunn myndar"
 
 #: photolith/models.py
 msgid "Reader authority"
@@ -292,7 +292,7 @@ msgstr "Vefstjórn"
 
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"
-msgstr "Myndtaka"
+msgstr "Færa inn myndir"
 
 #: photolith/templates/ingest/index.html
 msgid "Choose an image source:"
@@ -308,17 +308,17 @@ msgstr "Næsta mynd"
 
 #: photolith/templates/ingest/index.html
 msgid "First, select an image by choosing an import method from the drop-down menu at the top."
-msgstr "Veldu fyrst mynd með því að velja viðeigandi innflutningsmöguleika í dálknum efst á síðunni."
+msgstr "Veldu viðeigandi innflutningsmöguleika í dálknum efst á síðunni til að færa inn mynd."
 
 #: photolith/templates/ingest/index.html
 msgid "Then enter the slide label (f.ex. 542871 OJUN-2023/7 1 06) and press enter."
-msgstr "Sláðu inn kvarnaupplýsingar (t.d. 542871 OJUN-2023/7 1 06) og ýttu á enter."
+msgstr "Sláðu inn merkingu á gleri (t.d. 542871 OJUN-2023/7 1 06) og ýttu á enter."
 
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
 msgstr ""
-"Eftir að kvarnaupplýsingarnar hafa verið slegnar inn þá birtast box fyrir hvern einstakling inni "
-"á myndinni."
+"Eftir að kvarnaupplýsingarnar hafa verið slegnar inn þá birtast box fyrir hvern einstakling "
+"inni á myndinni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -332,7 +332,9 @@ msgstr ""
 msgid ""
 "Adjust image contrast or download using the magic wand menu, increasing "
 "brightness to view slide notes, e.g."
-msgstr "Stilltu contrast, birtu, gamma o.fl. með töfrasprotanum"
+msgstr ""
+"Stilltu contrast, birtu, gamma o.fl. með töfrasprotanum. Einnig er "
+"hægt að hala niður myndinni til að breyta henni."
 
 #: photolith/templates/ingest/index.html
 msgid "View individual details by clicking on the relevant box"
@@ -417,7 +419,7 @@ msgstr "Einstaklingsleit"
 #: photolith/templates/search/index.html
 #: photolith/templates/search/index.html
 msgid "Filter results"
-msgstr "Leitarmöguleikar"
+msgstr "Veldu eiginleika til að sía"
 
 #: photolith/templates/search/index.html
 msgid "Save as project"
@@ -431,11 +433,11 @@ msgstr "Niðurstöður verkefnis"
 
 #: photolith/templates/search/index.html
 msgid "Select terms to filter by or"
-msgstr "Velja eiginleika til að sortera með eða"
+msgstr "Veldu eiginleika til að sía með takkanum hér til hliðar eða"
 
 #: photolith/templates/search/index.html
 msgid "view most recent individuals"
-msgstr "sjá nýjustu kvarnirnar"
+msgstr "skoðaðu nýjustu kvarnirnar."
 
 #: photolith/templates/search/index.html
 msgid "Apply"
@@ -451,7 +453,7 @@ msgstr "Birtustig"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Contrast"
-msgstr "Kontrast"
+msgstr "Contrast"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Gamma"
@@ -459,11 +461,11 @@ msgstr "Gamma"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Saturation"
-msgstr "Litamettun (Saturation)"
+msgstr "Saturation"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Vibrance"
-msgstr "Skýrleiki (Vibrance)"
+msgstr "Vibrance"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Edge detection"
@@ -471,4 +473,4 @@ msgstr "Greining jaðars"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Reset"
-msgstr "Núllstilla"
+msgstr "Endurstilla"
