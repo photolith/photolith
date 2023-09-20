@@ -29,24 +29,17 @@ const metaLabels = {
   }
 };
 
-/** Return zero-padded month string from (d) */
-function formattedMonth (d) {
-  const m = d.getMonth() + 1;
-
-  return (m < 10 ? '0' : '') + m;
-}
-
 /** e.g. 537572 TG1-2023/110 1 03 */
 function parseSlideLabel (s) {
-  const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9\-=]+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
+  const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
   if (!m) throw new Error(`"${s}" isn't recognisable as a slide label`);
 
   return {
-    full: m[0],
     sampleId: parseInt(m.groups.sampleId, 10),
-    cruise: m.groups.cruise,
+    cruise: [m.groups.cruise, m.groups.year].join('-'),
     station: parseInt(m.groups.station, 10),
     species: parseInt(m.groups.species, 10),
+    year: parseInt(m.groups.year, 10),
     month: parseInt(m.groups.month, 10)
   };
 }
@@ -90,18 +83,9 @@ export default class MetadataApi {
 
       return {
         individuals: data.otoliths.map((od, i) => {
-          const out = {};
+          // NB: Add slideLabel now so it sits at the top
+          const out = { slideLabel: null };
 
-          if (od.sampleResponse && od.speciesDTO) {
-            out.slideLabel = [
-              od.sampleResponse.sampleId,
-                `${od.sampleResponse.station.cruise.name}/${od.sampleResponse.station.number}`,
-                od.speciesDTO.id,
-                formattedMonth(new Date(od.sampleResponse.station.stationDate))
-            ].join(' ');
-          } else {
-            out.slideLabel = lbl.full;
-          }
           if (od.measureDTO) {
             out.length = od.measureDTO.length;
             out.sex = od.measureDTO.sexNo;
@@ -118,9 +102,13 @@ export default class MetadataApi {
             out.cruise = od.sampleResponse.station.cruise.name;
             out.station = od.sampleResponse.station.number.toString();
             out.stationDate = od.sampleResponse.station.stationDate;
+            out.stationYear = (new Date(od.sampleResponse.station.stationDate)).getYear();
+            out.stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
           } else {
             out.cruise = lbl.cruise;
             out.station = lbl.station.toString();
+            out.stationYear = lbl.year;
+            out.stationMonth = lbl.month;
           }
           if (od.sampleResponse) {
             out.gear = od.sampleResponse.gear.isscfgNo;
@@ -130,6 +118,15 @@ export default class MetadataApi {
           out.sampleId = od.sampleId.toString();
           out.measureId = od.measureId.toString();
           out.serialNo = od.serialNo.toString();
+
+          // re-build slideLabel based on what we now know
+          out.slideLabel = [
+            out.sampleId,
+            [out.cruise, out.station].join('/'),
+            od.speciesDTO.id,
+            (out.stationMonth < 10 ? '0' : '') + out.stationMonth
+          ].join(' ');
+
           return out;
         })
       };
