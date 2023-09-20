@@ -14,18 +14,18 @@ const metaLabels = {
     created_at: 'Uploaded'
   },
   is: {
-    slideLabel: 'Upplýsingar á gleri',
-    serialNo: 'TODO',
+    slideLabel: 'Merking á gleri',
+    serialNo: 'Einstaklingur nr.',
     length: 'Lengd',
     sex: 'Kyn',
     maturity: 'Kynþroski',
     species: 'Tegund',
     cruise: 'Leiðangur',
     station: 'Stöð',
-    stationDate: 'Dags',
+    stationDate: 'Dagsetning leiðangurs',
     gear: 'Veiðarfæri',
     meshSize: 'Möskvastærð',
-    created_at: 'TODO'
+    created_at: 'Fært inn'
   }
 };
 
