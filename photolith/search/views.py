@@ -4,7 +4,6 @@ import urllib.parse
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.cache import cache
-from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -88,14 +87,6 @@ class DataView(PermissionRequiredMixin, View):
         # If searching for a project, append project search terms to list
         if "project" in self.request.GET:
             p = get_object_or_404(Project, pk=self.request.GET.get("project"))
-            if p.is_open:
-                if (
-                    not self.request.user.is_superuser
-                    and not self.request.user.has_perm("photolith.change_project")
-                ):
-                    raise PermissionDenied(
-                        "Project still open, not allowed to view results"
-                    )
             qs_items = itertools.chain(
                 qs_items, urllib.parse.parse_qs(p.search_qs).items()
             )
