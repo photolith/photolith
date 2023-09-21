@@ -12,7 +12,7 @@
 </button>
 
 {% if perms.photolith.create_project and qs and not project %}<a href="{% url 'project:create' %}?{{qs}}" class="btn btn-outline-dark float-end m-3 me-0" title="{% translate 'Save as project' %}">
-  Save as project
+  {% translate 'Save as project' %}
 </a>{% endif %}
 
 {% if project %}<h2>

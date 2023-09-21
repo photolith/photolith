@@ -443,6 +443,7 @@ msgid "Filter results"
 msgstr "Veldu eiginleika til að sía"
 
 #: photolith/templates/search/index.html
+#: photolith/templates/search/index.html
 msgid "Save as project"
 msgstr "Vista sem verkefni"
 
