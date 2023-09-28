@@ -69,13 +69,17 @@
     <button type="submit" disabled style="display: none" aria-hidden="true"></button>
     <div class="row">
       <fieldset class="col" disabled>
-        <div class="mb-3">
-          <label for="scale-input" class="form-label">{% translate "Scale length (mm)" %}</label>
-          <input type="number" name="scale" class="form-control" id="scale-input" value="10" />
+        <div class="mb-3 row">
+          <label for="scale-input" class="col-form-label col-sm-3">{% translate "Scale length (mm)" %}</label>
+          <div class="col">
+            <input type="number" name="scale" class="form-control" id="scale-input" value="10" />
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="slide-label-input" class="form-label">{% translate "Slide Label" %}</label>
-          <input type="text" name="slide-label" class="form-control" id="slide-label-input" />
+        <div class="mb-3 row">
+          <label for="slide-label-input" class="col-form-label col-sm-3">{% translate "Slide Label" %}</label>
+          <div class="col">
+            <input type="text" name="slide-label" class="form-control" id="slide-label-input" />
+          </div>
         </div>
         <div class="col" style="text-align: right;">
           <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success" disabled="disabled">
