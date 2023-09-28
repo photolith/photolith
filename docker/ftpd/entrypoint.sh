@@ -54,6 +54,8 @@ pam_service_name=vsftpd
 rsa_cert_file=${CERT_DIR}/${DEFAULT_HOST}/fullchain.pem
 rsa_private_key_file=${CERT_DIR}/${DEFAULT_HOST}/privkey.pem
 ssl_enable=YES
+force_local_logins_ssl=NO
+force_local_data_ssl=NO
 
 background=NO
 listen=YES
