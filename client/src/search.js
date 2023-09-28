@@ -6,7 +6,7 @@ import { init as initCroppedViewer } from './cropped_viewer';
 import { htmlFetch, jsonFetchCached } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
-export function populateFilter (elForm) {
+function populateFilter (elForm) {
   const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
   const elBody = elForm.querySelector('.offcanvas-body');
   const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
