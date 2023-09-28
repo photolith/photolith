@@ -131,6 +131,42 @@ msgstr ""
 msgid "No base axis"
 msgstr "Ekki fastur ás"
 
+#: photolith/templates/403.html photolith/templates/403.html
+#: photolith/templates/429.html photolith/templates/429.html
+msgid "Access denied"
+msgstr ""
+
+#: photolith/templates/403.html photolith/templates/429.html
+msgid "You are not allowed to visit this page"
+msgstr ""
+
+#: photolith/templates/403.html photolith/templates/404.html
+#: photolith/templates/429.html photolith/templates/500.html
+#: photolith/templates/base.html
+msgid "Home"
+msgstr "Heim"
+
+#: photolith/templates/404.html photolith/templates/404.html
+#: photolith/templates/404.html
+msgid "Page Not found"
+msgstr ""
+
+#: photolith/templates/500.html photolith/templates/500.html
+msgid "Server Error"
+msgstr ""
+
+#: photolith/templates/500.html
+msgid "There was an issue with the server"
+msgstr ""
+
+#: photolith/templates/500.html
+msgid "Reload page"
+msgstr ""
+
+#: photolith/templates/500.html
+msgid "Report Issue"
+msgstr ""
+
 #: photolith/templates/annotate/annotate.html
 msgid "Annotate Individual"
 msgstr "Aldursmerkja einstakling"
@@ -270,10 +306,6 @@ msgstr "Ný aldursmerking"
 #: photolith/templates/base.html
 msgid "Photolith"
 msgstr "Kvarnó"
-
-#: photolith/templates/base.html
-msgid "Home"
-msgstr "Heim"
 
 #: photolith/templates/base.html photolith/templates/ingest/index.html
 msgid "Ingest"

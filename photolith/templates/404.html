@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Page Not found" %}{% endblock %}
+
+{% block content %}
+<h1>{% translate "Page Not found" %}</h1>
+
+<p>{% translate "Page Not found" %}</p>
+
+<a href="/" class="btn btn-info btn-block">{% translate "Home" %}</a>
+{% endblock content %}
