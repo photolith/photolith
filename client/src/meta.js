@@ -13,7 +13,7 @@ function htmlEscape (s) {
 }
 
 // https://datatables.net/reference/option/columns.render#function
-export function renderMetaCell (data, type, row, meta) {
+export function renderMetaCell (k, data, type, row, meta) {
   let out = data;
 
   if (typeof out === 'object' && out.id && out.en) {
@@ -26,7 +26,9 @@ export function renderMetaCell (data, type, row, meta) {
     return out;
   }
 
-  if (typeof out === 'number') {
+  if (typeof out === 'number' && k.endsWith('Year')) {
+    // Pass years through verbatim, without thousand separators
+  } else if (typeof out === 'number') {
     // https://datatables.net/manual/data/renderers#Number-helper
     renderNumber = renderNumber || DataTable.render.number(
       document.documentElement.getAttribute('data-thousand-separator') || ',',
@@ -62,6 +64,6 @@ export function populateIndividualData (indData, elTableBody) {
     ? ''
     : `<tr>
     <td>${renderMetaLabel(metaLabels[k])}</td>
-    <td>${renderMetaCell(indData[k], 'display', indData, undefined)}</td>
+    <td>${renderMetaCell(k, indData[k], 'display', indData, undefined)}</td>
   </tr>`).join('\n');
 }

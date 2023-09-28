@@ -94,7 +94,7 @@ export function init (parent) {
             if (typeof cellData === 'number') td.classList.add('text-end');
             td.classList.add('text-nowrap');
           },
-          render: renderMetaCell
+          render: renderMetaCell.bind(null, k)
         };
       }),
       createdRow: function (row, data, dataIndex) {
