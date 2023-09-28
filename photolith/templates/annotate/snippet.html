@@ -28,7 +28,9 @@
       {% endfor %}</tbody>
     </table>
     <div class="text-end">
-      <a href="/annotate/{{ ind_data.id }}/" class="btn btn-info">{% translate "New annotation" %}</a>
+      <a href="/annotate/{{ ind_data.id }}/" class="btn btn-info">
+        {% if read_only %}{% translate 'View annotations' %}{% else %}{% translate 'View/add annotation' %}{% endif %}
+      </a>
     </div>
   </div>  
 </div>

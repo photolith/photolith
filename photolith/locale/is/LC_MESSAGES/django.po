@@ -307,8 +307,12 @@ msgid "Press Next to start"
 msgstr "Ýttu á Næsti til að byrja"
 
 #: photolith/templates/annotate/snippet.html
-msgid "New annotation"
-msgstr "Ný aldursmerking"
+msgid "View annotations"
+msgstr ""
+
+#: photolith/templates/annotate/snippet.html
+msgid "View/add annotation"
+msgstr "Skoða/bæta aldursmerking"
 
 #: photolith/templates/base.html
 msgid "Photolith"
