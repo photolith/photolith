@@ -2,6 +2,7 @@ import { displayAlert } from '../alert';
 
 const metaLabels = {
   en: {
+    sampleId: 'Sample Id',
     slideLabel: 'Slide Label',
     serialNo: 'Individual No.',
     length: 'Length',
@@ -18,6 +19,7 @@ const metaLabels = {
     created_at: 'Uploaded'
   },
   is: {
+    sampleId: 'TODO:',
     slideLabel: 'Merking á gleri',
     serialNo: 'Einstaklingur nr.',
     length: 'Lengd',
@@ -33,6 +35,33 @@ const metaLabels = {
     meshSize: 'Möskvastærð',
     created_at: 'Fært inn'
   }
+};
+
+const fieldsFor = {
+  search_columns: [
+    'sampleId',
+    'cruise',
+    'station',
+    'stationYear',
+    'stationMonth',
+    'species',
+    'length',
+    'weight',
+    'sex',
+    'maturity',
+    'created_at'
+  ],
+  search_filter: [
+    'cruise',
+    'station',
+    'species',
+    'length',
+    'weight',
+    'sex',
+    'stationYear',
+    'stationMonth',
+    'maturity'
+  ]
 };
 
 /** e.g. 537572 TG1-2023/110 1 03 */
@@ -65,8 +94,11 @@ export default class MetadataApi {
     });
   }
 
-  metaLabels () {
-    return metaLabels[this.lang] || metaLabels.en;
+  metaLabels (view) {
+    const out = metaLabels[this.lang] || metaLabels.en;
+    // If a view given, filter by fieldsFor
+    if (view) return Object.fromEntries(fieldsFor[view].map((k) => [k, out[k]]));
+    return out;
   }
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
