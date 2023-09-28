@@ -23,7 +23,8 @@
           <td>
             {% if object.is_open %}
               <a href="{% url 'annotate:start' %}?project={{ object.id }}" class="btn btn-info">{% translate "Annotate project" %}</a>
-            {% else %}
+            {% endif %}
+            {% if not object.is_open or perms.photolith.change_project %}
               <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
             {% endif %}
           </td>
