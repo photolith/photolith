@@ -52,8 +52,13 @@ function randomChoice (ar) {
 }
 
 export default class MetadataApi {
-  metaLabels (lang) {
-    return metaLabels[lang] || metaLabels.en;
+  constructor (lang, baseHref) {
+    this.lang = lang;
+    this.baseHref = baseHref || '';
+  }
+
+  metaLabels () {
+    return metaLabels[this.lang] || metaLabels.en;
   }
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
@@ -61,7 +66,7 @@ export default class MetadataApi {
     return ind.serialNo;
   }
 
-  individualTitle (ind, lang) {
+  individualTitle (ind) {
     return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 

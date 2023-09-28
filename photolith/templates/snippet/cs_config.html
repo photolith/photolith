@@ -1,5 +1,7 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <script>
   window.addEventListener('DOMContentLoaded', function() {
-    {% if settings.CS_METADATA_API %}window.mApi = new {{ settings.CS_METADATA_API }}("{{ settings.CS_METADATA_BASE }}");{% endif %}
+    {% if settings.CS_METADATA_API %}window.mApi = new {{ settings.CS_METADATA_API }}("{{ LANGUAGE_CODE }}", "{{ settings.CS_METADATA_BASE }}");{% endif %}
   });
 </script>

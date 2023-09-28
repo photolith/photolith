@@ -7,7 +7,7 @@ import { htmlFetch, jsonFetchCached } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
 
 function populateFilter (elForm) {
-  const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
+  const metaLabels = window.mApi.metaLabels();
   const elBody = elForm.querySelector('.offcanvas-body');
   const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
   const searchParams = new URLSearchParams(window.location.search);
@@ -72,7 +72,7 @@ export function init (parent) {
   });
   parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
-    const metaLabels = window.mApi.metaLabels(lang);
+    const metaLabels = window.mApi.metaLabels();
 
     // https://datatables.net/reference/option/%24.fn.dataTable.ext.errMode
     DataTable.ext.errMode = 'throw';

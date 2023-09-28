@@ -53,7 +53,7 @@ export function renderMetaLabel (metaLabel) {
 }
 
 export function populateIndividualData (indData, elTableBody) {
-  const metaLabels = window.mApi.metaLabels(document.documentElement.lang);
+  const metaLabels = window.mApi.metaLabels();
 
   if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
 
