@@ -12,7 +12,6 @@ const metaLabels = {
     station: 'Station',
     stationDate: 'Station Date',
     gear: 'Gear',
-    meshSize: 'Mesh Size',
     created_at: 'Uploaded'
   },
   is: {
@@ -26,7 +25,6 @@ const metaLabels = {
     station: 'Stöð',
     stationDate: 'Dagsetning leiðangurs',
     gear: 'Veiðarfæri',
-    meshSize: 'Möskvastærð',
     created_at: 'Fært inn'
   }
 };
@@ -116,7 +114,6 @@ export default class MetadataApi {
           }
           if (od.sampleResponse) {
             out.gear = od.sampleResponse.gear.isscfgNo;
-            out.meshSize = od.sampleResponse.meshSize;
           }
 
           out.sampleId = od.sampleId.toString();
