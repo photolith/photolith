@@ -79,6 +79,8 @@ export function init (parent) {
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
       language: { url: lang !== 'en' ? `/static/datatables.net-plugins/i18n/${lang}.json` : undefined },
+      // Allow table to resize with browser
+      autoWidth: false,
       ajax: function (data, callback) {
         // https://datatables.net/reference/option/ajax#Types
         return jsonFetchCached('/search/data/', window.document.location.search, {}).then(callback);
