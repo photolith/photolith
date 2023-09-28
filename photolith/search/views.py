@@ -105,6 +105,7 @@ class DataView(PermissionRequiredMixin, View):
                         + datetime.timedelta(days=1)
                     )
             elif k.startswith("nm_"):
+                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
                 if len(vs) != 2:
                     raise ValueError(
                         "Numeric searches should have 2 values: %s=%s"
@@ -129,9 +130,10 @@ class DataView(PermissionRequiredMixin, View):
                 )
             elif k.startswith("dt_"):
                 sq = MetaDT.objects.filter(key=k.replace("nm_", ""))
-                if len(vs) > 0 and vs[0]:
+                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
+                if len(vs) > 0:
                     sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
-                if len(vs) > 1 and vs[1]:
+                if len(vs) > 1:
                     # Date ls less than midinight the day after (i.e. filter is inclusive)
                     sq = sq.filter(
                         value__lt=datetime.date.fromisoformat(vs[1])
