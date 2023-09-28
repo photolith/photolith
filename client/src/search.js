@@ -28,9 +28,9 @@ function populateFilter (elForm) {
       controlHtml = `<input type="text" name="${mf.filter_name}" value="${searchParams.get(mf.filter_name) || ''}" class="form-control" id="${controlId}">`;
     } else if (mf.filter_name.startsWith('nm')) {
       controlHtml = `<div class="input-group">
-          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control" id="${controlId}">
+          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
-          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control" id="${controlId}-2">
+          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
         </div>`;
     } else if (mf.filter_name.startsWith('tx')) {
       controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
@@ -38,9 +38,9 @@ function populateFilter (elForm) {
         </select>`;
     } else if (mf.filter_name.startsWith('dt')) {
       controlHtml = `<div class="input-group">
-          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" class="form-control" id="${controlId}">
+          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
-          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" class="form-control" id="${controlId}-2">
+          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" class="form-control range-end" id="${controlId}-2">
         </div>`;
     }
 
@@ -54,8 +54,22 @@ function populateFilter (elForm) {
   }));
 }
 
+function filterChange (elForm, elTarget) {
+  if (!elTarget.name) {
+    // Do nothing for unnamed elements
+  } else if (elTarget.classList.contains('range-start')) {
+    const elRangeEnd = elTarget.nextElementSibling.nextElementSibling;
+    if (!elRangeEnd.value) elRangeEnd.value = elTarget.value;
+  }
+}
+
 export function init (parent) {
-  parent.querySelectorAll('form.filter-form').forEach(populateFilter);
+  parent.querySelectorAll('form.filter-form').forEach((elForm) => {
+    populateFilter(elForm);
+    elForm.addEventListener('change', (event) => {
+      filterChange(elForm, event.target);
+    });
+  });
   parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels(lang);
