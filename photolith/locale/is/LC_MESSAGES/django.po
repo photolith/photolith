@@ -207,6 +207,7 @@ msgid "Annotate"
 msgstr "Aldursmerkja"
 
 #: photolith/templates/annotate/annotate.html
+#: photolith/templates/ingest/index.html
 #, fuzzy
 #| msgid "New annotation"
 msgid "Maximise annotation view"
