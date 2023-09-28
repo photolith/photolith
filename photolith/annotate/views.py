@@ -152,6 +152,7 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["object_model"] = self.model
+        context["read_only"] = self.current_project and not self.current_project.is_open
 
         if self.individual_id:
             context["ind_data"] = self.get_individual()

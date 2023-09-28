@@ -36,6 +36,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
 
   setSyncForm (el) {
     this.elSyncForm = el;
+    if (!el) return;
 
     this.elSyncForm.addEventListener('load_individuals', (event) => {
       this.loadIndividuals();
