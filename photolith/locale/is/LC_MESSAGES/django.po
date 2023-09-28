@@ -532,5 +532,9 @@ msgid "Edge detection"
 msgstr "Greining jaðars"
 
 #: photolith/templates/snippet/viewer.html
+msgid "Download original image"
+msgstr ""
+
+#: photolith/templates/snippet/viewer.html
 msgid "Reset"
 msgstr "Endurstilla"
