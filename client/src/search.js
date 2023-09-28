@@ -116,7 +116,7 @@ export function init (parent) {
       // Create child row if not already present
       if (!row.child() || row.child().length === 0) {
         row.child('<div><div class="rendering" style="width: 10rem; height: 10rem; margin: auto;"></div></div>');
-        htmlFetch('/annotate/' + row.data().id + '/snippet/').then((html) => {
+        htmlFetch('/annotate/' + row.data().id + '/snippet/' + window.document.location.search).then((html) => {
           row.child(html);
           row.child()[0].querySelectorAll('a[href^="/annotate/"]').forEach((el) => {
             // Add current search querystring to any annotate links
