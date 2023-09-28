@@ -12,6 +12,7 @@
 /db.sqlite3
 /manage.py
 /*/settings/local.py
+/*/settings/version.py
 /staticfiles
 
 # Node

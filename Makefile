@@ -19,10 +19,13 @@ manage.py: lib/.requirements.txt
 	sed -i 's|#!/usr/bin/env python|#!$(shell pwd)/bin/python|' manage.py
 	rm -r /tmp/manage-py
 
+./photolith/settings/version.py:
+	echo GIT_REVISION='"'"$(shell git describe --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)"'"' > $@
+
 $(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/django.po
 	./manage.py compilemessages --ignore=site-packages --ignore=registration
 
-compile: lib/.requirements.txt ./manage.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
+compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
 	npm run build
 
 test: compile
@@ -58,4 +61,4 @@ makemessages: manage.py
 
 precommit: lint makemessages
 
-.PHONY: all compile test lint start makemessages
+.PHONY: all compile test lint start makemessages ./photolith/settings/version.py

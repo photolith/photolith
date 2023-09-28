@@ -45,6 +45,7 @@
               <span class="ms-1">{{ user.username }}</span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="header-menu">
+              <li><span class="dropdown-item disabled" style="font-size: 75%">v. {{ settings.CS_GIT_REVISION }}</span></li>
               <li><a class="dropdown-item" href="https://github.com/photolith/photolith/issues">{% translate 'Issues' %}</a></li>
               {% if user.is_superuser %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">{% translate 'Site administration' %}</a></li>{% endif %}
 

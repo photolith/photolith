@@ -14,6 +14,12 @@ import os
 from pathlib import Path
 
 
+try:
+    from .version import GIT_REVISION
+except ImportError:
+    GIT_REVISION = "unknown"
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -130,6 +136,7 @@ STATICFILES_DIRS = (
 # Default clientside settings (exported )
 CS_METADATA_API = "DummyMetadataApi"
 CS_METADATA_BASE = ""
+CS_GIT_REVISION = GIT_REVISION
 # Export anything CS_ via. django_settings_export
 SETTINGS_EXPORT = [x for x in globals().keys() if x.startswith("CS_")]
 
