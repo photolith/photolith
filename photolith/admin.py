@@ -1,6 +1,7 @@
 import json
 
 from django.utils.html import escape, mark_safe
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -38,6 +39,21 @@ class UserProfileInline(admin.StackedInline):
 # Redefine UserAdmin to include UserProfileInline
 class UserAdmin(BaseUserAdmin):
     inlines = [UserProfileInline]
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+        (
+            _("Groups"),
+            {
+                "fields": ("groups",),
+            },
+        ),
+    )
 
 
 admin.site.unregister(User)

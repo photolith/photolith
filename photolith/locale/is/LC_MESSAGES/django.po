@@ -17,6 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
+#: photolith/admin.py
+msgid "Groups"
+msgstr "Hópar"
+
 #: photolith/ingest/views.py
 #, python-format
 msgid "(%(count)d photo)"
