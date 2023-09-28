@@ -207,6 +207,12 @@ msgid "Annotate"
 msgstr "Aldursmerkja"
 
 #: photolith/templates/annotate/annotate.html
+#, fuzzy
+#| msgid "New annotation"
+msgid "Maximise annotation view"
+msgstr "Ný aldursmerking"
+
+#: photolith/templates/annotate/annotate.html
 msgid "Annotate by marking the otolith/rings in the image."
 msgstr "Settu inn ár með því að tvísmella á árhring á myndinni."
 
