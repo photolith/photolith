@@ -56,10 +56,6 @@ class IndexView(PermissionRequiredMixin, TemplateView):
             timeout=600,  # Seconds
         )
         context["qs"] = self.request.META["QUERY_STRING"]
-        context["recent_qs"] = (
-            "?dt_created_at="
-            + (datetime.date.today() - datetime.timedelta(weeks=1)).isoformat()
-        )
         if self.request.GET.get("project"):
             context["project"] = get_object_or_404(
                 Project, pk=self.request.GET.get("project")

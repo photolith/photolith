@@ -490,12 +490,8 @@ msgid "Results for project"
 msgstr "Niðurstöður verkefnis"
 
 #: photolith/templates/search/index.html
-msgid "Select terms to filter by or"
-msgstr "Veldu eiginleika til að sía með takkanum hér til hliðar eða"
-
-#: photolith/templates/search/index.html
-msgid "view most recent individuals"
-msgstr "skoðaðu nýjustu kvarnirnar."
+msgid "Select terms to filter by using filter menu"
+msgstr "Veldu eiginleika til að sía með takkanum hér til hliðar"
 
 #: photolith/templates/search/index.html
 msgid "Apply"
