@@ -30,7 +30,7 @@
   </div>
 {% endif %}
 
-<form action="" method="get" class="filter-form offcanvas offcanvas-end" tabindex="-1" id="filter-offcanvas" aria-labelledby="filter-label">
+<form action="" method="get" class="filter-form offcanvas {% if not qs %}show{% endif %} offcanvas-end" tabindex="-1" id="filter-offcanvas" aria-labelledby="filter-label">
   {{ meta_fields|json_script:"meta_fields" }}
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="filter-label">{% translate "Filter results" %}</h5>
