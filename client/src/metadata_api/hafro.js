@@ -111,19 +111,32 @@ export default class MetadataApi {
     return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 
-  /** e.g. 537572 TG1-2023/110 1 03 */
   parseSlideLabel (s) {
-    const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
-    if (!m) throw this.intlError('"{0}" isn\'t recognisable as a slide label', s);
+    let m;
 
-    return {
-      sampleId: parseInt(m.groups.sampleId, 10),
-      cruise: [m.groups.cruise, m.groups.year].join('-'),
-      station: parseInt(m.groups.station, 10),
-      species: parseInt(m.groups.species, 10),
-      year: parseInt(m.groups.year, 10),
-      month: parseInt(m.groups.month, 10)
-    };
+    /** Full: 537572 TG1-2023/110 1 03 */
+    m = s.match(/^\s*(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)\s*$/);
+    if (m) {
+      return {
+        sampleId: parseInt(m.groups.sampleId, 10),
+        cruise: [m.groups.cruise, m.groups.year].join('-'),
+        station: parseInt(m.groups.station, 10),
+        species: parseInt(m.groups.species, 10),
+        year: parseInt(m.groups.year, 10),
+        month: parseInt(m.groups.month, 10)
+      };
+    }
+
+    /** Partial: 537572 1 */
+    m = s.match(/^\s*(?<sampleId>\d+)\s+(?<species>\d+)\s*$/);
+    if (m) {
+      return {
+        sampleId: parseInt(m.groups.sampleId, 10),
+        species: parseInt(m.groups.species, 10)
+      };
+    }
+
+    throw this.intlError('"{0}" isn\'t recognisable as a slide label', s);
   }
 
   sampleDetail (slideLabel) {
@@ -169,10 +182,10 @@ export default class MetadataApi {
             out.stationYear = (new Date(od.sampleResponse.station.stationDate)).getYear();
             out.stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
           } else {
-            out.cruise = lbl.cruise;
-            out.station = lbl.station.toString();
-            out.stationYear = lbl.year;
-            out.stationMonth = lbl.month;
+            if (lbl.cruise) out.cruise = lbl.cruise;
+            if (lbl.station) out.station = lbl.station.toString();
+            if (lbl.year) out.stationYear = lbl.year;
+            if (lbl.month) out.stationMonth = lbl.month;
           }
           if (od.sampleResponse) {
             out.gear = od.sampleResponse.gear.isscfgNo;
@@ -184,10 +197,16 @@ export default class MetadataApi {
           out.serialNo = od.serialNo.toString();
 
           // re-build slideLabel based on what we now know
+          if (!out.sampleId || !out.cruise || !out.station || !out.species || !out.stationMonth) {
+            console.warn('label', lbl);
+            console.warn('API', od);
+            console.warn('Combined', out);
+            throw this.intlError('Not enough information from API to reconstruct slide label: Contact IT or enter entire slide label');
+          }
           out.slideLabel = [
             out.sampleId,
             [out.cruise, out.station].join('/'),
-            od.speciesDTO.id,
+            out.species.id,
             (out.stationMonth < 10 ? '0' : '') + out.stationMonth
           ].join(' ');
 
