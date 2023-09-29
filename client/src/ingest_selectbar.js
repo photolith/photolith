@@ -1,4 +1,4 @@
-import { changeEvent } from './events';
+import { changeEvent, toggleUnloadWarning } from './events';
 import { Cancelled } from './errors';
 import { LocalFileSet } from './fileset/local';
 import { NullFileSet } from './fileset/null';
@@ -34,6 +34,7 @@ function nextSelection (elSelect) {
     elSyncForm.image_file.value = elSelect.fs.name;
     elSyncForm.image_file.phBlob = f;
     elSyncForm.image_file.dispatchEvent(changeEvent());
+    toggleUnloadWarning(remaining > 0);
   }).catch((err) => {
     if (err instanceof Cancelled) {
       // File select cancelled, don't change anything.
@@ -53,6 +54,7 @@ export function init (parent) {
       if (elSelect.fs) elSelect.fs.close();
       elSelect.fs = newFileSet(elSelect.value);
       elSelect.selectedIndex = 0;
+      toggleUnloadWarning(false);
       nextSelection(elSelect);
     });
 
