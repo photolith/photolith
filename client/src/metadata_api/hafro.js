@@ -111,9 +111,16 @@ export default class MetadataApi {
   }
 
   sampleDetail (slideLabel) {
-    slideLabel = slideLabel.trim();
-    const lbl = parseSlideLabel(slideLabel);
     let suppressWarnings = false;
+    let lbl;
+
+    slideLabel = slideLabel.trim();
+    try {
+      lbl = parseSlideLabel(slideLabel);
+    } catch (error) {
+      // Convert parse errors into rejects, so we handle the UI properly
+      return Promise.reject(error);
+    }
 
     return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
       if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
