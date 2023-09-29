@@ -2,10 +2,10 @@ import { displayAlert } from '../alert';
 
 const errorTemplates = {
   is: {
-    '"{0}" isn\'t recognisable as a slide label': '"{0}" er ekki auðþekkjanlegt sem skyggnumerki',
-    'No otoliths for sample ID': 'Engir otólítar fyrir auðkenni sýnis',
-    'Fetching {0} failed ({1})': 'Mistókst að sækja {0} ({1})',
-    'Too many ({0}) otoliths for sample ID': 'Of margir ({0}) otólítar fyrir auðkenni sýnis'
+    '"{0}" isn\'t recognisable as a slide label': 'Kannast ekki við "{0}" sem merkingu á gleri',
+    'No otoliths for sample ID': 'Engar kvarnir eru skráðar á þetta raðnúmer',
+    'Fetching {0} failed ({1})': 'Tókst ekki að sækja {0} ({1})',
+    'Too many ({0}) otoliths for sample ID': 'Of margar ({0}) kvarnir á þessu raðnúmeri'
   }
 };
 
@@ -28,7 +28,7 @@ const metaLabels = {
     created_at: 'Uploaded'
   },
   is: {
-    sampleId: 'TODO:',
+    sampleId: 'Raðnúmer sýnis (id)',
     slideLabel: 'Merking á gleri',
     serialNo: 'Einstaklingur nr.',
     length: 'Lengd',
