@@ -1,5 +1,14 @@
 import { displayAlert } from '../alert';
 
+const errorTemplates = {
+  is: {
+    '"{0}" isn\'t recognisable as a slide label': '"{0}" er ekki auðþekkjanlegt sem skyggnumerki',
+    'No otoliths for sample ID': 'Engir otólítar fyrir auðkenni sýnis',
+    'Fetching {0} failed ({1})': 'Mistókst að sækja {0} ({1})',
+    'Too many ({0}) otoliths for sample ID': 'Of margir ({0}) otólítar fyrir auðkenni sýnis'
+  }
+};
+
 const metaLabels = {
   en: {
     sampleId: 'Sample Id',
@@ -64,21 +73,6 @@ const fieldsFor = {
   ]
 };
 
-/** e.g. 537572 TG1-2023/110 1 03 */
-function parseSlideLabel (s) {
-  const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
-  if (!m) throw new Error(`"${s}" isn't recognisable as a slide label`);
-
-  return {
-    sampleId: parseInt(m.groups.sampleId, 10),
-    cruise: [m.groups.cruise, m.groups.year].join('-'),
-    station: parseInt(m.groups.station, 10),
-    species: parseInt(m.groups.species, 10),
-    year: parseInt(m.groups.year, 10),
-    month: parseInt(m.groups.month, 10)
-  };
-}
-
 export default class MetadataApi {
   constructor (lang, baseHref) {
     this.lang = lang;
@@ -88,10 +82,17 @@ export default class MetadataApi {
   fetch (endpoint) {
     return window.fetch(this.baseHref + endpoint).then((resp) => {
       if (!resp.ok) {
-        throw new Error(`Fetching ${endpoint} failed (${resp.status})`);
+        throw this.intlError('Fetching {0} failed ({1})', endpoint, resp.status);
       }
       return resp.json();
     });
+  }
+
+  intlError (errTmpl, ...values) {
+    if (errorTemplates[this.lang]) {
+      errTmpl = errorTemplates[this.lang][errTmpl];
+    }
+    return new Error(errTmpl.replace(/{(\d)}/g, (_, i) => values[Number(i)]));
   }
 
   metaLabels (view) {
@@ -110,21 +111,36 @@ export default class MetadataApi {
     return ind.slideLabel + ' -- ' + ind.serialNo;
   }
 
+  /** e.g. 537572 TG1-2023/110 1 03 */
+  parseSlideLabel (s) {
+    const m = s.match(/(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)/);
+    if (!m) throw this.intlError('"{0}" isn\'t recognisable as a slide label', s);
+
+    return {
+      sampleId: parseInt(m.groups.sampleId, 10),
+      cruise: [m.groups.cruise, m.groups.year].join('-'),
+      station: parseInt(m.groups.station, 10),
+      species: parseInt(m.groups.species, 10),
+      year: parseInt(m.groups.year, 10),
+      month: parseInt(m.groups.month, 10)
+    };
+  }
+
   sampleDetail (slideLabel) {
     let suppressWarnings = false;
     let lbl;
 
     slideLabel = slideLabel.trim();
     try {
-      lbl = parseSlideLabel(slideLabel);
+      lbl = this.parseSlideLabel(slideLabel);
     } catch (error) {
       // Convert parse errors into rejects, so we handle the UI properly
       return Promise.reject(error);
     }
 
     return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
-      if (data.otoliths.length === 0) throw new Error('No otoliths for sample ID');
-      if (data.otoliths.length > 50) throw new Error(`Too many (${data.otoliths.length}) otoliths for sample ID`);
+      if (data.otoliths.length === 0) throw this.intlError('No otoliths for sample ID');
+      if (data.otoliths.length > 50) throw this.intlError('Too many ({0}) otoliths for sample ID', data.otoliths.length);
 
       // Sort incoming data by serialNo (i.e. individual number)
       data.otoliths.sort((a, b) => a.serialNo - b.serialNo);
