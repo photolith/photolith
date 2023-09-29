@@ -156,6 +156,7 @@ INGEST_ROOT = BASE_DIR.parent / "ingest_root"
 
 # Image storage
 MEDIA_ROOT = BASE_DIR.parent / "media"
+MEDIA_URL = "/media/"
 
 
 # Allow overrides via. environment (for docker)

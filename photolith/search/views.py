@@ -75,7 +75,7 @@ class DataView(PermissionRequiredMixin, View):
             .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
-            .annotate(image__href=F("image__href"))
+            .annotate(image__content=F("image__content"))
         )
 
         qs_items = self.request.GET.lists()

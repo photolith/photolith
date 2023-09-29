@@ -10,13 +10,9 @@ from .requires_utils import RequiresUtils
 
 class UploadViewTest(RequiresUtils, TestCase):
     def form_post(self, user, ind_data=[]):
-        image = Image.objects.create(
-            href="//ind%d.jpg" % Image.objects.count(),
-            orig_filename="moo.jpg",
-            mimetype="image/jpeg",
-        )
+        image = self.create_image()
         post_dict = dict(
-            image_href=image.href,
+            image_content=image.content.name,
         )
         for i, (data, bounding_box) in enumerate(ind_data):
             post_dict["data:%d" % i] = json.dumps(data)

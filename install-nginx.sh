@@ -85,6 +85,10 @@ server {
         alias ${PROJECT_PATH}/staticfiles/;
     }
 
+    location /media/ {
+        alias ${PROJECT_PATH}/media/;
+    }
+
     location / {
         # Originating IP address
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;

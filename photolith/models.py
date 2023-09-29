@@ -2,8 +2,13 @@ import datetime
 import numbers
 
 from django.conf import settings
+from django.core.files.storage import storages
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
+
+
+def default_storage():
+    return storages["default"]
 
 
 def isisoformat(v):
@@ -30,8 +35,10 @@ class Image(models.Model):
     An image containing one or more otoliths
     """
 
-    # href: Web-accessible location of image
-    href = models.CharField(max_length=255, blank=False, null=False, unique=True)
+    # https://docs.djangoproject.com/en/4.2/topics/files/
+    content = models.ImageField(
+        storage=default_storage, upload_to="image_content", null=True
+    )
     orig_filename = models.CharField(max_length=255, blank=False, null=False)
     mimetype = models.CharField(max_length=255, blank=False, null=False)
     scale_line = models.JSONField(null=True)

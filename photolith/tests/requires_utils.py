@@ -1,11 +1,13 @@
+import base64
 import datetime
 
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from ..models import Annotation, UserProfile, Taxonomy
+from ..models import Annotation, Image, UserProfile, Taxonomy
 
 
 class RequiresUtils:
@@ -76,5 +78,29 @@ class RequiresUtils:
         )
         out.created_at = out.modified_at = self.now + datetime.timedelta(
             **created_delta
+        )
+        return self._ru_append(out)
+
+    def create_image(
+        self,
+        orig_filename=None,
+        mimetype="image/jpeg",
+        scale_line=None,
+        scale_mm=None,
+    ):
+        if not orig_filename:
+            orig_filename = "ut_image%d.jpg" % (Image.objects.count() + 1)
+        out = Image.objects.create(
+            orig_filename=orig_filename,
+            mimetype=mimetype,
+            scale_line=scale_line,
+            scale_mm=scale_mm,
+        )
+        out.content = SimpleUploadedFile(
+            name=orig_filename,
+            content=base64.b64decode(
+                b"/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=,"
+            ),
+            content_type=mimetype,
         )
         return self._ru_append(out)

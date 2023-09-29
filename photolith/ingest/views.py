@@ -75,7 +75,7 @@ class UploadView(PermissionRequiredMixin, View):
 
     @json_errors
     def post(self, *args, **kwargs):
-        image = Image.objects.get(href=self.request.POST["image_href"])
+        image = Image.objects.get(content=self.request.POST["image_content"])
 
         created_inds = []
         for post_key in self.request.POST.keys():
@@ -104,3 +104,31 @@ class UploadView(PermissionRequiredMixin, View):
                 created_individuals=[model_to_dict(ind) for ind in created_inds],
             )
         )
+
+
+class UploadImageView(PermissionRequiredMixin, View):
+    permission_required = ("photolith.add_image",)
+
+    @json_errors
+    def post(self, *args, **kwargs):
+        mimetype = self.request.content_type
+        if mimetype != "image/jpeg":
+            raise ValueError("Unknown content type %s" % mimetype)
+
+        image = Image(
+            created_by=self.request.user,
+            orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
+            mimetype=mimetype,
+            scale_line=json.loads(
+                self.request.META.get("HTTP_X_PHOTOLITH_SCALE_LINE", "None")
+            ),
+            scale_mm=self.request.META.get("HTTP_X_PHOTOLITH_SCALE_MM", None),
+        )
+        # NB: to_python performs image validation
+        image.content.save(
+            image.orig_filename, image.content.field.to_python(self.request)
+        )
+        image.save()
+        out = model_to_dict(image)
+        out["content"] = out["content"].name
+        return JsonResponse(out)

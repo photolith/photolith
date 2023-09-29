@@ -90,6 +90,10 @@ server {
         alias /srv/app/staticfiles/;
     }
 
+    location /media/ {
+        alias /srv/app/media/;
+    }
+
     location / {
         # Originating IP address
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;

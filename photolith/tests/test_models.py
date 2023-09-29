@@ -14,11 +14,7 @@ class IndividualTest(RequiresUtils, TestCase):
         else:
             self._ci_count = self._ci_count + 1
         ind = Individual.objects.create(
-            image=Image.objects.create(
-                href="//ind%d.jpg" % self._ci_count,
-                orig_filename="moo.jpg",
-                mimetype="image/jpeg",
-            ),
+            image=self.create_image(),
             bounding_box=[[0, 0], [100, 100]],
             **kwargs,
         )

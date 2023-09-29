@@ -16,4 +16,9 @@ urlpatterns = [
         views.UploadView.as_view(http_method_names=["post"]),
         name="upload",
     ),
+    path(
+        "upload-image/",
+        views.UploadImageView.as_view(http_method_names=["post"]),
+        name="upload-image",
+    ),
 ]

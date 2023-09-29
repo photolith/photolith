@@ -41,8 +41,8 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'image_file') {
-    // Image file changed, so image_href is no longer valid
-    elForm.image_href.value = '';
+    // Image file changed, so image_content is no longer valid
+    elForm.image_content.value = '';
 
     // If there's an image, we'll be able to fill in form
     elForm.querySelector('fieldset').disabled = !event.target.value;
@@ -56,11 +56,11 @@ function formRefresh (event) {
 
 function formSubmit (elForm) {
   return Promise.resolve().then(() => {
-    if (elForm.image_href.value) return;
+    if (elForm.image_content.value) return;
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
 
     // Image not already uploaded, so upload it
-    return jsonFetch('/media/upload/', {
+    return jsonFetch('/ingest/upload-image/', {
       method: 'POST',
       body: elForm.image_file.phBlob,
       headers: {
@@ -71,7 +71,7 @@ function formSubmit (elForm) {
         'X-Photolith-scale-mm': elForm.scale.value
       }
     }).then((data) => {
-      elForm.image_href.value = data.href;
+      elForm.image_content.value = data.content;
     });
   }).then(() => {
     elForm.classList.add('rendering');

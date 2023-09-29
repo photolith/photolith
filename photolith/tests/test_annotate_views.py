@@ -42,22 +42,16 @@ class AnnotateViewTest(RequiresUtils, TestCase):
     def test_form_valid_authority(self):
         """Make sure authority is set appropriately on save"""
         ind_nospecies = Individual.objects.create(
-            image=Image.objects.create(
-                href="//moo0.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
-            ),
+            image=self.create_image("moo0.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
         ind_fish = Individual.objects.create(
-            image=Image.objects.create(
-                href="//moo1.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
-            ),
+            image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
         ind_fish.data = dict(species={"id": 100, "en": "Fish", "is": "Fiskur"})
         ind_rock = Individual.objects.create(
-            image=Image.objects.create(
-                href="//moo2.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
-            ),
+            image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
         ind_rock.data = dict(species={"id": 200, "en": "Rock", "is": "Rockur"})
@@ -97,9 +91,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             return out
 
         ind = Individual.objects.create(
-            image=Image.objects.create(
-                href="//moo.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
-            ),
+            image=self.create_image(),
             bounding_box=[[0, 0], [100, 100]],
         )
         ind.save()
@@ -146,9 +138,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
         # No annotations for individual yet
         ind = Individual.objects.create(
-            image=Image.objects.create(
-                href="//moo.jpg", orig_filename="moo.jpg", mimetype="image/jpeg"
-            ),
+            image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
         self.assertEqual(get_all_annotations(ind), [])
