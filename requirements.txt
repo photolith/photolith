@@ -7,6 +7,9 @@ django-settings-export==1.2.1
 django-crispy-forms==2.0
 crispy-bootstrap5==0.7
 
+django-storages==1.14.1
+django-storages[s3]==1.14.1
+
 pillow==10.0.0
 
 gunicorn==21.2.0

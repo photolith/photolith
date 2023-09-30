@@ -155,6 +155,15 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 INGEST_ROOT = BASE_DIR.parent / "ingest_root"
 
 # Image storage
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {},
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 MEDIA_ROOT = BASE_DIR.parent / "media"
 MEDIA_URL = "/media/"
 
@@ -163,6 +172,10 @@ MEDIA_URL = "/media/"
 for k in os.environ.keys():
     if k.startswith("APP_DB_"):
         DATABASES["default"][k.replace("APP_DB_", "")] = os.environ[k]
+    elif k == "APP_STORAGE_BACKEND":
+        STORAGES["default"]["BACKEND"] = os.environ[k]
+    elif k.startswith("APP_STORAGE_"):
+        STORAGES["default"]["OPTIONS"][k.replace("APP_STORAGE_", "")] = os.environ[k]
     elif k == "APP_ALLOWED_HOSTS":
         ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")
     elif k == "APP_AUTH_PASSWORD_VALIDATORS":

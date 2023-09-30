@@ -1,3 +1,4 @@
+import io
 import json
 
 from django.conf import settings
@@ -124,10 +125,10 @@ class UploadImageView(PermissionRequiredMixin, View):
             ),
             scale_mm=self.request.META.get("HTTP_X_PHOTOLITH_SCALE_MM", None),
         )
+        # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
+        file = io.BytesIO(self.request.read())
         # NB: to_python performs image validation
-        image.content.save(
-            image.orig_filename, image.content.field.to_python(self.request)
-        )
+        image.content.save(image.orig_filename, image.content.field.to_python(file))
         image.save()
         out = model_to_dict(image)
         out["content"] = out["content"].name
