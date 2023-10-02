@@ -64,7 +64,7 @@ admin.site.register(User, UserAdmin)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ["content", "orig_filename", "created_by", "created_at"]
     fields = ["preview", "content", "orig_filename", "created_by", "created_at"]
-    readonly_fields = ["preview", "created_at"]
+    readonly_fields = ["preview", "created_by", "created_at"]
     inlines = [IndividualInline]
 
     def preview(self, obj):
@@ -75,12 +75,30 @@ class ImageAdmin(admin.ModelAdmin):
 
     preview.short_description = "Preview"
 
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change,
+    ):
+        """Force created_by to current user"""
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Individual)
 class IndividualAdmin(admin.ModelAdmin):
     list_display = ["image_content", "slideLabel", "title", "created_by", "created_at"]
     fields = ["image_preview", "image", "created_by", "created_at", "data"]
-    readonly_fields = ["image_content", "image", "image_preview", "created_at", "data"]
+    readonly_fields = [
+        "image_content",
+        "image",
+        "image_preview",
+        "created_by",
+        "created_at",
+        "data",
+    ]
 
     def image_content(self, obj):
         return obj.image.orig_filename
@@ -109,6 +127,17 @@ class IndividualAdmin(admin.ModelAdmin):
             )
         )
 
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change,
+    ):
+        """Force created_by to current user"""
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Annotation)
 class AnnotationAdmin(admin.ModelAdmin):
@@ -122,7 +151,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "created_by",
         "created_at",
     ]
-    readonly_fields = ["individual", "image_preview", "created_at"]
+    readonly_fields = ["individual", "image_preview", "created_by", "created_at"]
 
     def image_preview(self, obj):
         return image_preview_html(
@@ -131,6 +160,17 @@ class AnnotationAdmin(admin.ModelAdmin):
         )
 
     image_preview.short_description = "Preview"
+
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change,
+    ):
+        """Force created_by to current user"""
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Project)
@@ -145,4 +185,15 @@ class ProjectAdmin(admin.ModelAdmin):
         "created_at",
         "modified_at",
     ]
-    readonly_fields = ["created_at", "modified_at"]
+    readonly_fields = ["created_at", "created_by", "modified_at"]
+
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change,
+    ):
+        """Force created_by to current user"""
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
