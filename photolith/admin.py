@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from .models import UserProfile, Image, Individual, Annotation, Project
+from .models import UserProfile, Image, Individual, Annotation, Project, Team
 
 
 def image_preview_html(href, bounding_box):
@@ -31,6 +31,12 @@ class IndividualInline(admin.StackedInline):
     model = Individual
 
 
+class TeamInline(admin.TabularInline):
+    model = Team.users.through
+    verbose_name = _("team")
+    extra = 0
+
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
@@ -38,7 +44,7 @@ class UserProfileInline(admin.StackedInline):
 
 # Redefine UserAdmin to include UserProfileInline
 class UserAdmin(BaseUserAdmin):
-    inlines = [UserProfileInline]
+    inlines = [UserProfileInline, TeamInline]
     add_fieldsets = (
         (
             None,
@@ -178,6 +184,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ["name", "date_end", "created_by", "created_at"]
     fields = [
         "name",
+        "team",
         "date_end",
         "search_qs",
         "base_user",
@@ -186,6 +193,31 @@ class ProjectAdmin(admin.ModelAdmin):
         "modified_at",
     ]
     readonly_fields = ["created_at", "created_by", "modified_at"]
+
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change,
+    ):
+        """Force created_by to current user"""
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+    fields = [
+        "name",
+        "users",
+        "created_by",
+        "created_at",
+        "modified_at",
+    ]
+    readonly_fields = ["created_at", "created_by", "modified_at"]
+    filter_horizontal = ("users",)
 
     def save_model(
         self,

@@ -18,6 +18,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: photolith/admin.py
+msgid "team"
+msgstr ""
+
+#: photolith/admin.py
 msgid "Groups"
 msgstr "Hópar"
 
@@ -108,6 +112,11 @@ msgid "Project name"
 msgstr "Nafn verkefnis"
 
 #: photolith/models.py
+msgid ""
+"The set of users that should perform the annotation as part of the project"
+msgstr ""
+
+#: photolith/models.py
 msgid "Search querystring"
 msgstr "Leita"
 
@@ -126,6 +135,14 @@ msgid ""
 msgstr ""
 "Ef notandi er valinn þá mun nýlegasta aldursmerking hvers einstaklings vera "
 "notuð sem upphafsstaður fyrir merkingar"
+
+#: photolith/models.py
+msgid "Team name"
+msgstr ""
+
+#: photolith/models.py
+msgid "Team members"
+msgstr ""
 
 #: photolith/project/forms.py
 msgid "No base axis"

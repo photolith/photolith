@@ -22,6 +22,7 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = [
             "name",
+            "team",
             "search_qs",
             "date_end",
             "base_user",

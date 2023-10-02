@@ -340,6 +340,14 @@ class Project(models.Model):
         blank=False,
         null=False,
     )
+    team = models.ForeignKey(
+        "Team",
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text=_(
+            "The set of users that should perform the annotation as part of the project"
+        ),
+    )
     search_qs = models.CharField(
         verbose_name=_("Search querystring"),
         max_length=4096,
@@ -401,3 +409,27 @@ class Project(models.Model):
         a.age = 0
         a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]
         return a
+
+
+class Team(models.Model):
+    name = models.CharField(
+        verbose_name=_("Team name"),
+        max_length=4096,
+        blank=False,
+        null=False,
+    )
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Team members"),
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="team_created_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    def __str__(self):
+        return self.name
