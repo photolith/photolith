@@ -12,6 +12,7 @@
     <thead>
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
+      <th class="text-nowrap">{% translate "Annotations" %}</th>
       <th></th>
       {% if perms.photolith.change_project %}<th></th>{% endif %}
     </thead>
@@ -20,6 +21,7 @@
         <tr>
           <td>{{object.name}}</td>
           <td>{{object.date_end}}</td>
+          <td>{{object.num_annotations}}</td>
           <td>
             {% if object.is_open %}
               <a href="{% url 'annotate:start' %}?project={{ object.id }}" class="btn btn-info">{% translate "Annotate project" %}</a>

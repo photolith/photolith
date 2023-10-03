@@ -1,6 +1,7 @@
 import urllib.parse
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Count, Q
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -17,7 +18,13 @@ class ProjectListView(PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if not self.request.user.has_perm("photolith.change_project"):
+            qs = qs.filter(team__users=self.request.user)
         qs = qs.order_by("-date_end")
+        # Count annotations made by self
+        qs = qs.annotate(
+            num_annotations=Count("annotation", filter=Q(created_by=self.request.user))
+        )
         return qs
 
     def get_context_data(self, **kwargs):

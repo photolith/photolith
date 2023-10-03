@@ -464,6 +464,10 @@ msgid "All projects"
 msgstr "Öll verkefni"
 
 #: photolith/templates/project/list.html
+msgid "Annotations"
+msgstr ""
+
+#: photolith/templates/project/list.html
 #, fuzzy
 #| msgid "Annotate"
 msgid "Annotate project"
