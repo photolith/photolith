@@ -110,17 +110,13 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_all_annotations(self):
         """Return list of alternative annotations, varied if in project mode"""
         p = self.current_project
-        if p and p.is_open:
-            # Annotating within a project should only show the initial annotation
-            init_a = p.init_annotation(self.individual_id)
-            return [init_a] if init_a else []
+        if p:
+            # Only show annotations relevant for this project
+            return p.annotations_for(self.individual_id, self.request.user)
 
         qs = Annotation.objects.filter(
             individual_id=self.individual_id,
         )
-        if p:
-            # Closed project: list all annotations within project
-            qs = qs.filter(project=p)
         return qs.order_by("-authority", "-created_at")
 
     def get_individual(self):

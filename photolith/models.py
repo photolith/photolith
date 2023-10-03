@@ -387,28 +387,44 @@ class Project(models.Model):
     def is_open(self):
         return self.date_end >= datetime.date.today()
 
-    def init_annotation(self, individual_id):
-        """Return the initial annotation for (individual_id) when working within this project"""
-        if not self.base_user:
-            return None
+    def annotations_for(self, individual_id, annotater):
+        """Return annotations that should be visible as part of this project"""
+        if not self.is_open:
+            # Project closed, show all results
+            return Annotation.objects.filter(
+                individual_id=individual_id,
+                project=self,
+            ).order_by("-authority", "-created_at")
 
-        # Find most recent annotation by base_user
-        a = (
+        # Find previous annotations
+        out = list(
             Annotation.objects.filter(
                 individual_id=individual_id,
-                created_by=self.base_user,
+                project=self,
+                created_by=annotater,
             )
             .order_by("-created_at")
-            .first()
+            .all()
         )
-        if a is None:
-            return None
 
-        # Create copy without age assignment, intermediate nodes
-        a.pk = None
-        a.age = 0
-        a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]
-        return a
+        if self.base_user:
+            # Find most recent annotation by base_user
+            a = (
+                Annotation.objects.filter(
+                    individual_id=individual_id,
+                    created_by=self.base_user,
+                )
+                .order_by("-created_at")
+                .first()
+            )
+            if a:
+                # Create copy without age assignment, intermediate nodes
+                a.pk = None
+                a.age = 0
+                a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]
+                out.append(a)
+
+        return out
 
 
 class Team(models.Model):

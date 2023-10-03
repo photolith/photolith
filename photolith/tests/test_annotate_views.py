@@ -110,7 +110,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             get_object(individual_id=ind.id + 1, annotation_id=ann.id)
 
     def test_get_all_annotations(self):
-        def get_all_annotations(individual, project=None):
+        def get_all_annotations(individual, project=None, user=None):
             if isinstance(project, dict):
                 p = self.create_project(**project)
             else:
@@ -122,6 +122,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                     project=p.id if p else "",
                 ),
             )
+            request.user = user
             v = AnnotateView()
             v.setup(request, **(request.GET.dict()))
             out = v.get_all_annotations()
@@ -174,6 +175,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
 
         # Assign a project with a base_user, only see init_annotation (which isn't part of project)
+        # and your own annotations
         p = self.create_project(
             created_by=user3,
             base_user=user1,
@@ -186,6 +188,22 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             get_all_annotations(ind, project=p),
             [
+                "0-user1-2",
+            ],
+        )
+        self.assertEqual(
+            get_all_annotations(ind, project=p, user=user1),
+            [
+                "10-user1-4",
+                "10-user1-5",
+                "0-user1-2",
+            ],
+        )
+        self.assertEqual(
+            get_all_annotations(ind, project=p, user=user2),
+            [
+                "10-user2-2",
+                "10-user2-3",
                 "0-user1-2",
             ],
         )
