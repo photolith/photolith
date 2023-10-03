@@ -64,14 +64,6 @@ export function init (parent) {
       new fabric.Point(indData.image__scale_line[1][0], indData.image__scale_line[1][1])
     );
 
-    // If server-side returned null for axis_poly, populate an intial value
-    elForm.axis_poly.value = elForm.axis_poly.value === 'null'
-      ? JSON.stringify([
-        [(indData.bounding_box[0][0] + indData.bounding_box[1][0]) / 2, (indData.bounding_box[0][1] + indData.bounding_box[1][1]) / 2],
-        [indData.bounding_box[0][0] + 5, indData.bounding_box[0][1] + 5]
-      ])
-      : elForm.axis_poly.value;
-
     elForm.addEventListener('change', formRefresh);
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));

@@ -91,13 +91,7 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         if self.object:
             # Don't set initial for update forms, otherwise axis_poly gets reset?
             return dict()
-        axis_poly = None
-        p = self.current_project
-        if p:
-            init_a = p.init_annotation(self.individual_id)
-            if init_a:
-                axis_poly = init_a.axis_poly
-        return dict(individual=self.individual_id, project=p, axis_poly=axis_poly)
+        return dict(individual=self.individual_id, project=self.current_project)
 
     @cached_property
     def current_project(self):
@@ -157,6 +151,16 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         if self.individual_id:
             context["ind_data"] = self.get_individual()
             context["all_annotations"] = self.get_all_annotations()
+            if len(context["all_annotations"]) > 0:
+                context["form"].initial["axis_poly"] = context["all_annotations"][
+                    0
+                ].axis_poly
+            else:
+                bb = context["ind_data"]["bounding_box"]
+                context["form"].initial["axis_poly"] = [
+                    [(bb[0][0] + bb[1][0]) / 2, (bb[0][1] + bb[1][1]) / 2],
+                    [bb[0][0] + 5, bb[0][1] + 5],
+                ]
         return context
 
 
