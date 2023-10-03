@@ -4,6 +4,7 @@ import { init as initIngestForm } from './ingest_form';
 import { init as initSearch } from './search';
 import { init as initAnnotate } from './annotate';
 import { init as initAnnotateSelectBar } from './annotate_selectbar';
+import { init as initProjectForm } from './project_form';
 import { init as initViewer } from './viewer';
 import { init as initCroppedViewer } from './cropped_viewer';
 
@@ -21,6 +22,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   initSearch(window.document);
   initAnnotate(window.document);
   initAnnotateSelectBar(window.document);
+  initProjectForm(window.document);
   initViewer(window.document);
 });
 

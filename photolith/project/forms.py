@@ -15,6 +15,14 @@ class ProjectForm(forms.ModelForm):
         # https://django-crispy-forms.readthedocs.io/en/latest/api_layout.html
         self.fields["date_end"].widget.input_type = "date"
 
+        # Only show already-selected options, let javascript populate initial values
+        if self.instance.id:
+            self.fields["individuals"].choices = [
+                (i.id, str(i)) for i in self.instance.individuals.all()
+            ]
+        else:
+            self.fields["individuals"].choices = []
+
         self.helper = FormHelper()
         self.helper.form_id = "project-form"
 
@@ -23,7 +31,7 @@ class ProjectForm(forms.ModelForm):
         fields = [
             "name",
             "team",
-            "search_qs",
+            "individuals",
             "date_end",
             "base_user",
         ]

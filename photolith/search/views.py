@@ -1,6 +1,5 @@
 import datetime
 import itertools
-import urllib.parse
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.cache import cache
@@ -78,16 +77,12 @@ class DataView(PermissionRequiredMixin, View):
             .annotate(image__content=F("image__content"))
         )
 
-        qs_items = self.request.GET.lists()
-
-        # If searching for a project, append project search terms to list
+        # If searching for a project, only search within individuals part of project
         if "project" in self.request.GET:
             p = get_object_or_404(Project, pk=self.request.GET.get("project"))
-            qs_items = itertools.chain(
-                qs_items, urllib.parse.parse_qs(p.search_qs).items()
-            )
+            qs = qs.filter(project=p)
 
-        for k, vs in qs_items:
+        for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
                 pass

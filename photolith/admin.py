@@ -186,13 +186,13 @@ class ProjectAdmin(admin.ModelAdmin):
         "name",
         "team",
         "date_end",
-        "search_qs",
+        "individuals",
         "base_user",
         "created_by",
         "created_at",
         "modified_at",
     ]
-    readonly_fields = ["created_at", "created_by", "modified_at"]
+    readonly_fields = ["individuals", "created_at", "created_by", "modified_at"]
 
     def save_model(
         self,

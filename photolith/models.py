@@ -348,11 +348,8 @@ class Project(models.Model):
             "The set of users that should perform the annotation as part of the project"
         ),
     )
-    search_qs = models.CharField(
-        verbose_name=_("Search querystring"),
-        max_length=4096,
-        blank=False,
-        null=False,
+    individuals = models.ManyToManyField(
+        Individual,
     )
     date_end = models.DateField(
         verbose_name=_("Project end date"),

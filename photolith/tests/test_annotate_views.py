@@ -14,7 +14,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
     def create_project(self, **kwargs):
         p = Project.objects.create(
             name="UT Project",
-            search_qs="ut=yes",
             **kwargs,
         )
         return p

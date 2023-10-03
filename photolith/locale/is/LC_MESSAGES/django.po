@@ -117,10 +117,6 @@ msgid ""
 msgstr ""
 
 #: photolith/models.py
-msgid "Search querystring"
-msgstr "Leita"
-
-#: photolith/models.py
 msgid "Project end date"
 msgstr "Lokadagsetning verkefnis"
 

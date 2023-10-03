@@ -1,5 +1,3 @@
-import urllib.parse
-
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count, Q
 from django.urls import reverse_lazy
@@ -44,19 +42,6 @@ class ProjectCreateView(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
-
-    def tidy_qs(self):
-        out = []
-        for k, vs in self.request.GET.lists():
-            # Ignore all-blank entries, didn't fill in the form
-            if any(v != "" for v in vs):
-                out.extend((k, v) for v in vs)
-        return urllib.parse.urlencode(out)
-
-    def get_initial(self):
-        return dict(
-            search_qs=self.tidy_qs(),
-        )
 
 
 # https://docs.djangoproject.com/en/4.2/ref/class-based-views/generic-editing/#updateview
