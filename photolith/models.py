@@ -426,6 +426,9 @@ class Project(models.Model):
 
         return out
 
+    def __str__(self):
+        return self.name
+
 
 class Team(models.Model):
     name = models.CharField(
