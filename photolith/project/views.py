@@ -21,7 +21,12 @@ class ProjectListView(PermissionRequiredMixin, ListView):
         qs = qs.order_by("-date_end")
         # Count annotations made by self
         qs = qs.annotate(
-            num_annotations=Count("annotation", filter=Q(created_by=self.request.user))
+            num_annotations=Count(
+                "annotation",
+                distinct=True,
+                filter=Q(annotation__created_by=self.request.user),
+            ),
+            num_individuals=Count("individuals", distinct=True),
         )
         return qs
 
