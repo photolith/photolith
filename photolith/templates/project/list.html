@@ -3,30 +3,33 @@
 {% load i18n %}
 {% load verbose_name %}
 {% block title %}{% translate "All projects" %}{% endblock title %}
-{% block contentclass %}container-fluid{% endblock contentclass %}
+{% block contentclass %}container{% endblock contentclass %}
 {% block content %}
 
-  <h2>{% translate 'Projects' %}</h2>
+{% regroup object_list by is_open as open_closed_groups %}
+{% for is_open, object_group in open_closed_groups %}
+{% if is_open %}
+  <h2>{% translate 'Open projects' %}</h2>
 
   <table class="table ph-project-table">
     <thead>
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
       <th class="text-nowrap">{% translate "Annotations" %}</th>
-      <th></th>
+      <th width="100%"></th>
       {% if perms.photolith.change_project %}<th></th>{% endif %}
     </thead>
     <tbody>
-      {% for object in object_list %}
+      {% for object in object_group %}
         <tr>
           <td>{{object.name}}</td>
           <td>{{object.date_end}}</td>
           <td>{{object.num_annotations}} / {{object.num_individuals}}</td>
           <td>
-            {% if object.is_open and object.num_annotations < object.num_individuals %}
+            {% if object.num_annotations < object.num_individuals %}
               <a href="{% url 'annotate:start' %}?project={{ object.id }}" class="btn btn-info">{% translate "Annotate project" %}</a>
             {% endif %}
-            {% if not object.is_open or perms.photolith.change_project %}
+            {% if perms.photolith.change_project %}
               <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
             {% endif %}
           </td>
@@ -39,6 +42,38 @@
       {% endfor %}
     </tbody>
   </table>
+{% else %}
+  <h2 class="mt-5">{% translate 'Closed projects' %}</h2>
+
+  <table class="table ph-project-table">
+    <thead>
+      <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
+      <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
+      <th class="text-nowrap">{% translate "Annotations" %}</th>
+      <th width="100%"></th>
+      {% if perms.photolith.change_project %}<th></th>{% endif %}
+    </thead>
+    <tbody>
+      {% for object in object_group %}
+        <tr>
+          <td>{{object.name}}</td>
+          <td>{{object.date_end}}</td>
+          <td>{{object.num_annotations}} / {{object.num_individuals}}</td>
+          <td>
+            <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
+          </td>
+          {% if perms.photolith.change_project %}
+            <td>
+              <a href="{% url 'project:update' object.id %}" class="btn btn-info">{% translate "Edit" %}</a>
+            </td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endfor %}
+
 
 {% if perms.photolith.create_project  %}
   <p><a href="{% url 'search:index' %}">{% translate "Create a project by searching" %}</a>{% translate ", when ready click the book icon in the top right." %}</p>
