@@ -147,9 +147,17 @@ class IndividualAdmin(admin.ModelAdmin):
 
 @admin.register(Annotation)
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ["individual", "age", "rating", "created_by", "created_at"]
+    list_display = [
+        "individual",
+        "project",
+        "age",
+        "rating",
+        "created_by",
+        "created_at",
+    ]
     fields = [
         "individual",
+        "project",
         "image_preview",
         "age",
         "rating",
