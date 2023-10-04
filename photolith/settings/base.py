@@ -167,6 +167,17 @@ STORAGES = {
 MEDIA_ROOT = BASE_DIR.parent / "media"
 MEDIA_URL = "/media/"
 
+# Logging
+LOGGING = {
+    "version": 1,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {},
+}
 
 # Allow overrides via. environment (for docker)
 for k in os.environ.keys():
@@ -183,5 +194,10 @@ for k in os.environ.keys():
             os.environ[k].split(" ") if len(os.environ[k]) > 0 else []
         )
         AUTH_PASSWORD_VALIDATORS = [dict(name=x) for x in AUTH_PASSWORD_VALIDATORS]
+    elif k == "APP_LOG_DB":
+        LOGGING["loggers"]["django.db.backends"] = {
+            "level": "DEBUG",
+            "handlers": ["console"],
+        }
     elif k.startswith("APP_"):
         globals()[k.replace("APP_", "")] = os.environ[k]
