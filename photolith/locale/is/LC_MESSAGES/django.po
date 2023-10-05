@@ -339,7 +339,7 @@ msgstr "Færa inn myndir"
 msgid "Search"
 msgstr "Leit"
 
-#: photolith/templates/base.html photolith/templates/project/list.html
+#: photolith/templates/base.html
 msgid "Projects"
 msgstr "Verkefni"
 
@@ -460,6 +460,11 @@ msgid "All projects"
 msgstr "Öll verkefni"
 
 #: photolith/templates/project/list.html
+msgid "Open projects"
+msgstr ""
+
+#: photolith/templates/project/list.html
+#: photolith/templates/project/list.html
 msgid "Annotations"
 msgstr ""
 
@@ -470,14 +475,20 @@ msgid "Annotate project"
 msgstr "Aldursmerkja í verkefni"
 
 #: photolith/templates/project/list.html
+#: photolith/templates/project/list.html
 #, fuzzy
 #| msgid "Filter results"
 msgid "View results"
 msgstr "Sjá niðurstöður"
 
 #: photolith/templates/project/list.html
+#: photolith/templates/project/list.html
 msgid "Edit"
 msgstr "Breyta"
+
+#: photolith/templates/project/list.html
+msgid "Closed projects"
+msgstr ""
 
 #: photolith/templates/project/list.html
 msgid "Create a project by searching"
