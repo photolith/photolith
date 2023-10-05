@@ -34,7 +34,7 @@ class RequiresUtils:
         self._ru_objects.append(o)
         return o
 
-    def create_user(self, username=None, groups=[], species_expert=None):
+    def create_user(self, username=None, groups=[], species_expert=[]):
         if not username:
             username = "ut_user%d" % (get_user_model().objects.count() + 1)
         out = get_user_model().objects.create(
@@ -45,14 +45,11 @@ class RequiresUtils:
         out.groups.set(Group.objects.filter(name__in=groups))
         self.assertEqual(out.groups.count(), len(groups))
 
-        userprofile = dict()
-        if species_expert:
-            userprofile["species_expert"] = Taxonomy.objects.filter(
-                str_en=species_expert
-            ).first()
-        if len(userprofile):
-            userprofile["user"] = out
-            UserProfile.objects.create(**userprofile)
+        up = UserProfile.objects.create(user=out)
+        if len(species_expert) > 0:
+            up.species_expert.set(
+                Taxonomy.objects.filter(str_en__in=species_expert).all()
+            )
 
         return self._ru_append(out)
 

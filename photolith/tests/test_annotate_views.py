@@ -65,7 +65,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
 
         # Add profile, only authority for relevant species
-        user2 = self.create_user(groups=["Annotate"], species_expert="Fish")
+        user2 = self.create_user(groups=["Annotate"], species_expert=["Fish"])
         ann = self.form_post(user2, ind_nospecies)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
         ann = self.form_post(user2, ind_fish)
@@ -73,12 +73,20 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         ann = self.form_post(user2, ind_rock)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
 
-        user3 = self.create_user(groups=["Annotate"], species_expert="Rock")
+        user3 = self.create_user(groups=["Annotate"], species_expert=["Rock"])
         ann = self.form_post(user3, ind_nospecies)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
         ann = self.form_post(user3, ind_fish)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
         ann = self.form_post(user3, ind_rock)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
+
+        user4 = self.create_user(groups=["Annotate"], species_expert=["Fish", "Rock"])
+        ann = self.form_post(user4, ind_nospecies)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
+        ann = self.form_post(user4, ind_fish)
+        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
+        ann = self.form_post(user4, ind_rock)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
 
     def test_get_object(self):

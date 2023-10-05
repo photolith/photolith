@@ -39,6 +39,7 @@ class TeamInline(admin.TabularInline):
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
+    filter_horizontal = ("species_expert",)
     can_delete = False
 
 

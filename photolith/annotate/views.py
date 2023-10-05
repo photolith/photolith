@@ -68,8 +68,10 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
                 and self.request.user.userprofile.species_expert
             ):
                 if (
-                    self.request.user.userprofile.species_expert.identifier
-                    == ind_data["species"]["id"]
+                    self.request.user.userprofile.species_expert.filter(
+                        identifier=ind_data["species"]["id"]
+                    ).count()
+                    > 0
                 ):
                     form.instance.authority = Annotation.AuthorityLevel.EXPERT
 

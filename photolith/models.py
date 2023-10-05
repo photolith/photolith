@@ -22,10 +22,8 @@ def isisoformat(v):
 class UserProfile(models.Model):
     # https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#extending-the-existing-user-model
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    species_expert = models.ForeignKey(
+    species_expert = models.ManyToManyField(
         "Taxonomy",
-        null=True,
-        on_delete=models.SET_NULL,
         limit_choices_to=dict(key="species"),
     )
 
