@@ -7,6 +7,8 @@ from django.test import TestCase
 
 from photolith.ingest.photo_dir import list_photo_dirs, get_next_photo
 
+from .binaries import JPEG_VALID, JPEG_TRUNCATED
+
 
 class PhotoDirTestCase(TestCase):
     def setUp(self):
@@ -18,9 +20,9 @@ class PhotoDirTestCase(TestCase):
         shutil.rmtree(self.base_path)
         super(PhotoDirTestCase, self).tearDown()
 
-    def create_file(self, file_path):
+    def create_file(self, file_path, content=JPEG_VALID):
         with open(file_path, "wb") as f:
-            f.write(b"#")
+            f.write(content)
 
     def test_list_photo_dirs(self):
         def lpd():
@@ -92,3 +94,17 @@ class PhotoDirTestCase(TestCase):
         )
         self.assertEqual(gnp("pd", prev="003.jpg"), None)
         self.assertEqual(gnp("pd2"), None)
+
+        # Create truncated file, complain
+        self.create_file(self.base_path / "pd" / "004.jpg", JPEG_TRUNCATED)
+        out = gnp("pd", prev="003.jpg")
+        self.assertEqual(
+            out,
+            dict(
+                error=out["error"],
+                path=self.base_path / "pd" / "004.jpg",
+                name="004.jpg",
+                remaining=0,
+            ),
+        )
+        self.assertIn("image file is truncated", out["error"])

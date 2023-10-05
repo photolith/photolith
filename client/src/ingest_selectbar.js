@@ -32,8 +32,10 @@ function nextSelection (elSelect) {
     }
 
     elSyncForm.image_file.value = elSelect.fs.name;
-    elSyncForm.image_file.phBlob = f;
-    elSyncForm.image_file.dispatchEvent(changeEvent());
+    if (f instanceof window.Blob || f instanceof window.HTMLVideoElement) {
+      elSyncForm.image_file.phBlob = f;
+      elSyncForm.image_file.dispatchEvent(changeEvent());
+    }
     toggleUnloadWarning(remaining > 0);
   }).catch((err) => {
     if (err instanceof Cancelled) {

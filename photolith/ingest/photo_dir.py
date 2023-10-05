@@ -4,6 +4,8 @@ import os.path
 import pathlib
 import re
 
+from PIL import Image
+
 
 def list_photo_dirs(base):
     for p in sorted(pathlib.Path(base).iterdir()):
@@ -35,6 +37,20 @@ def get_next_photo(base, photo_dir, prev=None):
 
     if file_path is None:
         return None
+
+    # Try reading the image, if we can't assume it's not fully uploaded yet
+    # Based on lib/python3.11/site-packages/django/forms/fields.py:to_python
+    with Image.open(file_path) as im:
+        try:
+            im.load()
+        except OSError as exc:
+            # Pillow returns OSError('image file is truncated (1 bytes not processed)')
+            return dict(
+                path=file_path,
+                name=os.path.basename(file_path),
+                remaining=remaining,
+                error=str(exc),
+            )
 
     # Open file, removing it now it's been handed clientside
     return dict(

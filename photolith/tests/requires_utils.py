@@ -1,4 +1,3 @@
-import base64
 import datetime
 
 from django.conf import settings
@@ -8,6 +7,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 from ..models import Annotation, Image, UserProfile, Taxonomy
+
+from .binaries import JPEG_VALID
 
 
 class RequiresUtils:
@@ -95,9 +96,7 @@ class RequiresUtils:
         )
         out.content = SimpleUploadedFile(
             name=orig_filename,
-            content=base64.b64decode(
-                b"/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=,"
-            ),
+            content=JPEG_VALID,
             content_type=mimetype,
         )
         return self._ru_append(out)

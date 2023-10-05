@@ -59,6 +59,20 @@ class NextPhotoView(PermissionRequiredMixin, View):
                     "Expires": 0,
                 },
             )
+        if f.get("error"):
+            return HttpResponse(
+                "%s: %s"
+                % (
+                    f["name"],
+                    f["error"],
+                ),
+                status=400,
+                headers={
+                    "Content-Type": "text/plain",
+                    "X-Photolith-Name": f["name"],
+                    "X-Photolith-Remaining": f["remaining"],
+                },
+            )
         return FileResponse(
             open(f["path"], "rb"),
             headers={
