@@ -108,7 +108,7 @@ export default class MetadataApi {
   }
 
   individualTitle (ind) {
-    return ind.slideLabel + ' -- ' + ind.serialNo;
+    return ind.slideLabel + ' : ' + ind.serialNo;
   }
 
   parseSlideLabel (s) {

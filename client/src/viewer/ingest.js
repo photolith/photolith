@@ -99,6 +99,8 @@ export class PhCropper extends PhSyncingViewer {
 
   loadIndividuals () {
     let setActive = false;
+    const elIndividual = this.elSyncForm.elements.individual;
+    const selIndividual = elIndividual.options[elIndividual.selectedIndex].value;
 
     this.fabCanvas.getObjects().forEach((o) => {
       if ((o.id || '').match(/^bounding_box:(.*)$/)) this.fabCanvas.remove(o);
@@ -107,6 +109,7 @@ export class PhCropper extends PhSyncingViewer {
       const m = el.name.match(/^bounding_box:(.*)$/);
 
       if (!m) return;
+      if (selIndividual && selIndividual !== m[1]) return;
       const obj = this.boundingBox(el.name, el.getAttribute('data-label'));
       if (!setActive) {
         this.fabCanvas.setActiveObject(obj);

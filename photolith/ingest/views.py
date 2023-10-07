@@ -93,8 +93,11 @@ class UploadView(PermissionRequiredMixin, View):
         image = Image.objects.get(content=self.request.POST["image_content"])
 
         created_inds = []
+        sel_individual = self.request.POST.get("individual", "")
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
+                continue
+            if sel_individual and post_key != "data:%s" % sel_individual:
                 continue
             ind_data = json.loads(self.request.POST[post_key])
             ind_bounding_box = json.loads(

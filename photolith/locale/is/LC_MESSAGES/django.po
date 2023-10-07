@@ -430,8 +430,8 @@ msgid "Scale length (mm)"
 msgstr "Lengd kvarða (mm)"
 
 #: photolith/templates/ingest/index.html
-msgid "Slide Label"
-msgstr "Merking á gleri"
+msgid "Label:Individual"
+msgstr ""
 
 #: photolith/templates/project/list.html
 msgid "All projects"

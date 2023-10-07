@@ -9,10 +9,11 @@ from .requires_utils import RequiresUtils
 
 
 class UploadViewTest(RequiresUtils, TestCase):
-    def form_post(self, user, ind_data=[]):
+    def form_post(self, user, ind_data=[], individual=""):
         image = self.create_image()
         post_dict = dict(
             image_content=image.content.name,
+            individual=str(individual),
         )
         for i, (data, bounding_box) in enumerate(ind_data):
             post_dict["data:%d" % i] = json.dumps(data)
@@ -28,7 +29,10 @@ class UploadViewTest(RequiresUtils, TestCase):
             for i, new in enumerate(out["created_individuals"]):
                 self.assertEqual(new["created_by"], user.id)
                 self.assertEqual(new["image"], image.id)
-                self.assertEqual(new["bounding_box"], ind_data[i][1])
+                self.assertEqual(
+                    new["bounding_box"],
+                    ind_data[int(individual) if individual else i][1],
+                )
             return out["created_individuals"]
         raise ValueError(str(out))
 
@@ -90,3 +94,46 @@ class UploadViewTest(RequiresUtils, TestCase):
             inds[1].data,
             {"length": 100.0, "species": {"id": 200, "en": "Cat", "is": "Köttur"}},
         )
+
+        # Create 1 individual, by filtering with the "individual" field
+        user = self.create_user(groups=["Ingest"])
+        self.assertEqual(
+            len(
+                self.form_post(
+                    user,
+                    [
+                        (
+                            dict(
+                                species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                                length=100,
+                            ),
+                            [[0, 0], [911, 100]],
+                        ),
+                        (
+                            dict(
+                                species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                                length=100,
+                            ),
+                            [[0, 0], [920, 100]],
+                        ),
+                        (
+                            dict(
+                                species={"id": 200, "en": "Cat", "is": "Köttur"},
+                                length=100,
+                            ),
+                            [[0, 0], [930, 200]],
+                        ),
+                    ],
+                    individual=1,  # NB: 0-indexed
+                )
+            ),
+            1,
+        )
+
+        # We can find them in the database
+        Individual.objects.all().order_by("pk")
+        inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(len(inds), 3)
+        self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
+        self.assertEqual(inds[1].bounding_box, [[0, 0], [200, 200]])
+        self.assertEqual(inds[2].bounding_box, [[0, 0], [920, 100]])

@@ -14,6 +14,7 @@ function formRefresh (event) {
   if (event.target.name === 'slide-label') {
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
+    elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
     elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
@@ -25,6 +26,7 @@ function formRefresh (event) {
         `;
       }).join('\n');
       sd.individuals.forEach((ind, indIdx) => {
+        elForm.elements.individual.append(new window.Option(window.mApi.individualLabel(ind), indIdx));
         elForm[`data:${indIdx}`].value = JSON.stringify(ind);
         elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
@@ -38,6 +40,9 @@ function formRefresh (event) {
       elForm.classList.remove('rendering');
       elForm.selection.dispatchEvent(changeEvent());
     });
+  }
+  if (event.target.name === 'individual') {
+    elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
   }
 
   if (event.target.name === 'image_file') {
@@ -82,7 +87,6 @@ function formSubmit (elForm) {
   }).then((createdInds) => {
     displayAlert('success', `Uploaded ${createdInds.created_individuals.length} individuals`);
     clearFetchCache(); // Remove cached search results, so new ingests show up.
-    elForm.reset();
   }).finally(() => {
     elForm.classList.remove('rendering');
   });

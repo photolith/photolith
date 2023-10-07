@@ -108,7 +108,16 @@ export class PhSyncingViewer extends PhFilteringViewer {
     } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
       obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])));
     } else {
-      throw new Error(`Cannot apply value to ${obj.id}`);
+      obj.left = val[0][0];
+      obj.top = val[0][1];
+      obj.width = val[1][0] - val[0][0];
+      obj.height = val[1][0] - val[1][0];
+      obj.setCoords(); // http://fabricjs.com/fabric-gotchas
+
+      if (this.canvas) {
+        this.canvas.fire('object:modified', { target: this });
+        this.canvas.requestRenderAll();
+      }
     }
   }
 }
