@@ -144,7 +144,17 @@ export class PhViewer {
   load (blob, boundingBox) {
     this.fabCanvas.setBackgroundImage(undefined);
     this.fabCanvas.requestRenderAll();
-    if (!blob) return Promise.resolve();
+
+    if (blob === 'start_load') {
+      // Not a blob, indication we should start spinner
+      this.startRendering();
+      return Promise.resolve();
+    }
+    if (!blob) {
+      // Clearing any existing image, stop rendering
+      this.fabCanvas.upperCanvasEl.parentNode.classList.remove('rendering');
+      return Promise.resolve();
+    }
 
     return window.createImageBitmap(blob).then((origBitmap) => {
       const img = new fabric.Image(origBitmap, {

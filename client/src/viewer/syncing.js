@@ -45,12 +45,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
     this.elSyncForm.addEventListener('change', (event) => {
       if (event.detail === 999) return; // Break loops
       if (event.target.name === 'image_file') {
-        if (!event.target.phBlob) {
-          // No blob, so start of load
-          this.startRendering();
-        } else {
-          this.load(event.target.phBlob);
-        }
+        this.load(event.target.phBlob);
         return;
       }
 
@@ -69,8 +64,10 @@ export class PhSyncingViewer extends PhFilteringViewer {
     function roundPoint (p) {
       const out = [Math.round(p.x), Math.round(p.y)];
       // If outside bounds, return undefined instead of the point
-      if (out[0] < 0 || out[0] > obj.canvas.backgroundImage.width) return undefined;
-      if (out[1] < 0 || out[1] > obj.canvas.backgroundImage.height) return undefined;
+      if (obj.canvas.backgroundImage) {
+        if (out[0] < 0 || out[0] > obj.canvas.backgroundImage.width) return undefined;
+        if (out[1] < 0 || out[1] > obj.canvas.backgroundImage.height) return undefined;
+      }
       return out;
     }
 

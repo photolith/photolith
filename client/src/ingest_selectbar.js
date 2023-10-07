@@ -19,7 +19,7 @@ function nextSelection (elSelect) {
   const elSyncForm = window.document.querySelector(elSelect.getAttribute('data-sync-form'));
 
   elSyncForm.image_file.value = '';
-  elSyncForm.image_file.phBlob = null;
+  elSyncForm.image_file.phBlob = 'start_load';
   elSyncForm.image_file.dispatchEvent(changeEvent());
 
   return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
@@ -32,12 +32,15 @@ function nextSelection (elSelect) {
     }
 
     elSyncForm.image_file.value = elSelect.fs.name;
-    if (f instanceof window.Blob || f instanceof window.HTMLVideoElement) {
-      elSyncForm.image_file.phBlob = f;
-      elSyncForm.image_file.dispatchEvent(changeEvent());
-    }
+    elSyncForm.image_file.phBlob = f;
+    elSyncForm.image_file.dispatchEvent(changeEvent());
     toggleUnloadWarning(remaining > 0);
   }).catch((err) => {
+    // Clear the loading spinner, if still going
+    elSyncForm.image_file.value = '';
+    elSyncForm.image_file.phBlob = null;
+    elSyncForm.image_file.dispatchEvent(changeEvent());
+
     if (err instanceof Cancelled) {
       // File select cancelled, don't change anything.
       return;
