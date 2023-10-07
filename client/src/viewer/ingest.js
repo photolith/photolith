@@ -11,7 +11,7 @@ export class PhCropper extends PhSyncingViewer {
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
   }
 
-  boundingBox (objId, label) {
+  boundingBox (objId, label, boundingBoxPos) {
     // http://fabricjs.com/docs/fabric.Textbox.html
     const obj = new fabric.Textbox(label, {
       id: objId,
@@ -31,8 +31,7 @@ export class PhCropper extends PhSyncingViewer {
 
     obj.setControlsVisibility({ mtr: false });
     if (!obj.canvas) {
-      // Set initial position based on boundingBoxCount
-      this.boundingBoxCount++;
+      // Set initial position based on boundingBoxPos
       const countWidth = 5; const countHeight = 5;
       const marginWidth = this.fabCanvas.backgroundImage.width / 7;
       const marginHeight = this.fabCanvas.backgroundImage.height / 7;
@@ -40,8 +39,8 @@ export class PhCropper extends PhSyncingViewer {
       const boxHeight = (this.fabCanvas.backgroundImage.height - marginHeight * 2) / countHeight;
 
       obj.set({
-        left: marginWidth + (this.boundingBoxCount % countWidth) * boxWidth,
-        top: marginHeight + Math.min(Math.floor(this.boundingBoxCount / countWidth), countHeight) * boxHeight,
+        left: marginWidth + (boundingBoxPos % countWidth) * boxWidth,
+        top: marginHeight + Math.min(Math.floor(boundingBoxPos / countWidth), countHeight) * boxHeight,
         width: boxWidth * 0.9,
         height: boxHeight * 0.8,
         fontSize: boxHeight * 0.8,
@@ -84,7 +83,6 @@ export class PhCropper extends PhSyncingViewer {
     return super.load(blob, boundingBox).then(() => {
     }).finally(() => { // NB: Set-up bounding box even if loading failed
       this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
-      this.boundingBoxCount = -1;
 
       if (this.fabCanvas.backgroundImage) {
         const scaleLine = this.scaleLine();
@@ -101,6 +99,7 @@ export class PhCropper extends PhSyncingViewer {
     let setActive = false;
     const elIndividual = this.elSyncForm.elements.individual;
     const selIndividual = elIndividual.options[elIndividual.selectedIndex].value;
+    let boundingBoxPos = 0;
 
     this.fabCanvas.getObjects().forEach((o) => {
       if ((o.id || '').match(/^bounding_box:(.*)$/)) this.fabCanvas.remove(o);
@@ -110,7 +109,8 @@ export class PhCropper extends PhSyncingViewer {
 
       if (!m) return;
       if (selIndividual && selIndividual !== m[1]) return;
-      const obj = this.boundingBox(el.name, el.getAttribute('data-label'));
+      const obj = this.boundingBox(el.name, el.getAttribute('data-label'), boundingBoxPos);
+      boundingBoxPos++;
       if (!setActive) {
         this.fabCanvas.setActiveObject(obj);
         setActive = true;
