@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
-from ..models import Project
+from ..models import Annotation, Project
 from .forms import ProjectForm
 
 
@@ -22,9 +22,15 @@ class ProjectListView(PermissionRequiredMixin, ListView):
         # Count annotations made by self
         qs = qs.annotate(
             num_annotations=Count(
-                "annotation",
+                "individuals",
                 distinct=True,
-                filter=Q(annotation__created_by=self.request.user),
+                filter=Exists(
+                    Annotation.objects.filter(
+                        project=OuterRef("pk"),
+                        individual=OuterRef("individuals"),
+                        created_by=self.request.user,
+                    )
+                ),
             ),
             num_individuals=Count("individuals", distinct=True),
         )
