@@ -11,13 +11,6 @@ from .requires_utils import RequiresUtils
 
 
 class AnnotateViewTest(RequiresUtils, TestCase):
-    def create_project(self, **kwargs):
-        p = Project.objects.create(
-            name="UT Project",
-            **kwargs,
-        )
-        return p
-
     def form_post(self, user, ind, **kwargs):
         ann_dict = dict(
             individual=ind.id,

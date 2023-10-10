@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from ..models import Annotation, Image, UserProfile, Taxonomy
+from ..models import Annotation, Image, Project, UserProfile, Taxonomy, Team
 
 from .binaries import JPEG_VALID
 
@@ -99,4 +99,30 @@ class RequiresUtils:
             content=JPEG_VALID,
             content_type=mimetype,
         )
+        return self._ru_append(out)
+
+    def create_project(
+        self,
+        team=[],
+        individuals=[],
+        date_end_delta=dict(days=1),
+        base_user=None,
+        created_by=None,
+        created_delta=dict(),
+    ):
+        out = Project.objects.create(
+            name="UT Project %d" % (Project.objects.count() + 1),
+            date_end=(self.now + datetime.timedelta(**date_end_delta)).date(),
+            base_user=base_user,
+            created_by=created_by,
+        )
+        out.save()
+
+        if isinstance(team, list):
+            t = Team.objects.create(name=out.name + " Team")
+            t.users.set(team)
+            team = t
+        out.team = team
+        out.individuals.set(individuals)
+        out.save()
         return self._ru_append(out)
