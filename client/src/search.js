@@ -25,7 +25,16 @@ function populateFilter (elForm) {
     if (!mf) return '';
 
     if (mf.filter_name.startsWith('ch')) {
-      controlHtml = `<input type="text" name="${mf.filter_name}" value="${searchParams.get(mf.filter_name) || ''}" class="form-control" id="${controlId}">`;
+      controlHtml = searchParams.getAll(mf.filter_name).map((v) => {
+        if (!v) return '';
+        return `<input type="text" name="${mf.filter_name}" value="${v}" class="form-control">`;
+      }).join('\n');
+      // Should be at least one box, so we have something to copy
+      if (!controlHtml) controlHtml = `<input type="text" name="${mf.filter_name}" value="" class="form-control">`;
+      controlHtml = `<div class="input-group">
+          ${controlHtml}
+          <button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>
+      </div>`;
     } else if (mf.filter_name.startsWith('nm')) {
       controlHtml = `<div class="input-group">
           <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
