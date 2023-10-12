@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from ..models import Annotation, Image, Project, UserProfile, Taxonomy, Team
+from ..models import Annotation, Image, Individual, Project, UserProfile, Taxonomy, Team
 
 from .binaries import JPEG_VALID
 
@@ -52,6 +52,22 @@ class RequiresUtils:
                 Taxonomy.objects.filter(str_en__in=species_expert).all()
             )
 
+        return self._ru_append(out)
+
+    def create_individual(
+        self,
+        image=None,
+        bounding_box=[[0, 0], [100, 100]],
+        created_by=None,
+        created_delta=dict(),
+        data=dict(),
+    ):
+        out = Individual.objects.create(
+            image=image or self.create_image(),
+            bounding_box=bounding_box,
+            created_by=created_by,
+        )
+        out.data = data
         return self._ru_append(out)
 
     def create_annotation(

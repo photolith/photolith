@@ -8,18 +8,6 @@ from .requires_utils import RequiresUtils
 
 
 class IndividualTest(RequiresUtils, TestCase):
-    def create_individual(self, **kwargs):
-        if not hasattr(self, "_ci_count"):
-            self._ci_count = 0
-        else:
-            self._ci_count = self._ci_count + 1
-        ind = Individual.objects.create(
-            image=self.create_image(),
-            bounding_box=[[0, 0], [100, 100]],
-            **kwargs,
-        )
-        return ind
-
     def test_data(self):
         """Make sure we can get and set data JSON, updating schema transparently"""
         ind1 = self.create_individual()
