@@ -6,7 +6,7 @@ function individualPopulate (elSelect) {
   elSelect.form.classList.add('rendering');
   return jsonFetchCached('/search/data/', window.document.location.search, {}).then((data) => {
     data.data.forEach((row) => {
-      const opt = new window.Option(window.mApi.individualTitle(row));
+      const opt = new window.Option(row.__str__);
 
       opt.value = `${row.id}`;
       elSelect.append(opt);

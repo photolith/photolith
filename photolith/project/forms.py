@@ -18,7 +18,8 @@ class ProjectForm(forms.ModelForm):
         # Only show already-selected options, let javascript populate initial values
         if self.instance.id:
             self.fields["individuals"].choices = [
-                (i.id, str(i)) for i in self.instance.individuals.all()
+                (i.id, str(i))
+                for i in self.instance.individuals.prefetch_related("metachar_set")
             ]
         else:
             self.fields["individuals"].choices = []

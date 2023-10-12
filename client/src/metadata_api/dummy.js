@@ -19,7 +19,7 @@ const maturity = [
 const metaLabels = {
   en: {
     slideLabel: 'Slide Label',
-    serialNo: 'serialNo',
+    individualLabel: 'Individual No.',
     length: 'Length',
     sex: 'Sex',
     maturity: 'Maturity',
@@ -32,8 +32,8 @@ const metaLabels = {
     created_at: 'Created'
   },
   is: {
-    slideLabel: 'Upplýsingar á gleri',
-    serialNo: 'serialNo',
+    slideLabel: 'Merking á gleri',
+    individualLabel: 'Einstaklingur nr.',
     length: 'Lengd',
     sex: 'Kynlíf',
     maturity: 'Þroska',
@@ -63,11 +63,7 @@ export default class MetadataApi {
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
-    return ind.serialNo;
-  }
-
-  individualTitle (ind) {
-    return ind.slideLabel + ' -- ' + ind.serialNo;
+    return ind.individualLabel;
   }
 
   sampleDetail (sampleId) {
@@ -78,7 +74,7 @@ export default class MetadataApi {
       return {
         individuals: measures.map((_, i) => ({
           measureId: (sampleId * 100 + i).toString(),
-          serialNo: i.toString(),
+          individualLabel: i.toString(),
           slideLabel: [
             sampleId,
             'TB2-2021/95',

@@ -113,6 +113,31 @@ class IndividualTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(ValueError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])
 
+    def test_str(self):
+        self.assertEqual(str(self.create_individual()), "Individual 1")
+        self.assertEqual(str(self.create_individual()), "Individual 2")
+        self.assertEqual(
+            str(
+                self.create_individual(
+                    data=dict(
+                        slideLabel="UT slide 01",
+                    )
+                )
+            ),
+            "UT slide 01",
+        )
+        self.assertEqual(
+            str(
+                self.create_individual(
+                    data=dict(
+                        slideLabel="UT slide 02",
+                        individualLabel="009",
+                    )
+                )
+            ),
+            "UT slide 02 : 009",
+        )
+
 
 class ProjectTest(TestCase):
     maxDiff = None

@@ -13,7 +13,7 @@ const metaLabels = {
   en: {
     sampleId: 'Sample Id',
     slideLabel: 'Slide Label',
-    serialNo: 'Individual No.',
+    individualLabel: 'Individual No.',
     length: 'Length',
     sex: 'Sex',
     maturity: 'Maturity',
@@ -30,7 +30,7 @@ const metaLabels = {
   is: {
     sampleId: 'Raðnúmer sýnis (id)',
     slideLabel: 'Merking á gleri',
-    serialNo: 'Einstaklingur nr.',
+    individualLabel: 'Einstaklingur nr.',
     length: 'Lengd',
     sex: 'Kyn',
     maturity: 'Kynþroski',
@@ -104,11 +104,7 @@ export default class MetadataApi {
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
-    return ind.serialNo;
-  }
-
-  individualTitle (ind) {
-    return ind.slideLabel + ' : ' + ind.serialNo;
+    return ind.individualLabel;
   }
 
   parseSlideLabel (s) {
@@ -194,7 +190,7 @@ export default class MetadataApi {
 
           out.sampleId = od.sampleId.toString();
           out.measureId = od.measureId.toString();
-          out.serialNo = od.serialNo.toString();
+          out.individualLabel = od.serialNo.toString();
 
           // re-build slideLabel based on what we now know
           if (!out.sampleId || !out.cruise || !out.station || !out.species || !out.stationMonth) {

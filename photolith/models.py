@@ -170,6 +170,21 @@ class Individual(models.Model):
             tx.value.save(*args, **kwargs)
         return
 
+    def __str__(self):
+        # Fetch all metachars
+        # NB: Ideally .prefetch_related("metachar_set") should be used as part of any query
+        #     We don't filter here to make sure any prefetch is used
+        data = {x.key: x.value for x in self.metachar_set.all()}
+
+        if data.get("individualLabel") and data.get("slideLabel"):
+            return "%s : %s" % (
+                data["slideLabel"],
+                data["individualLabel"],
+            )
+        if data.get("slideLabel"):
+            return data["slideLabel"]
+        return "Individual %d" % self.pk
+
 
 class MetaNumeric(models.Model):
     """
