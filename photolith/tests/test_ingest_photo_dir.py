@@ -95,8 +95,9 @@ class PhotoDirTestCase(TestCase):
         self.assertEqual(gnp("pd", prev="003.jpg"), None)
         self.assertEqual(gnp("pd2"), None)
 
-        # Create truncated file, complain
+        # Create truncated & nonsense file, complain
         self.create_file(self.base_path / "pd" / "004.jpg", JPEG_TRUNCATED)
+        self.create_file(self.base_path / "pd" / "005.jpg", b"moomooomoo")
         out = gnp("pd", prev="003.jpg")
         self.assertEqual(
             out,
@@ -104,7 +105,18 @@ class PhotoDirTestCase(TestCase):
                 error=out["error"],
                 path=self.base_path / "pd" / "004.jpg",
                 name="004.jpg",
-                remaining=0,
+                remaining=1,
             ),
         )
         self.assertIn("image file is truncated", out["error"])
+        out = gnp("pd", prev="004.jpg")
+        self.assertEqual(
+            out,
+            dict(
+                error=out["error"],
+                path=self.base_path / "pd" / "005.jpg",
+                name="005.jpg",
+                remaining=0,
+            ),
+        )
+        self.assertIn("cannot identify image file", out["error"])

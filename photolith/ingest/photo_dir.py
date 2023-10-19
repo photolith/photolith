@@ -4,7 +4,7 @@ import os.path
 import pathlib
 import re
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 
 def list_photo_dirs(base):
@@ -40,17 +40,26 @@ def get_next_photo(base, photo_dir, prev=None):
 
     # Try reading the image, if we can't assume it's not fully uploaded yet
     # Based on lib/python3.11/site-packages/django/forms/fields.py:to_python
-    with Image.open(file_path) as im:
-        try:
+    try:
+        with Image.open(file_path) as im:
             im.load()
-        except OSError as exc:
-            # Pillow returns OSError('image file is truncated (1 bytes not processed)')
-            return dict(
-                path=file_path,
-                name=os.path.basename(file_path),
-                remaining=remaining,
-                error=str(exc),
-            )
+    except UnidentifiedImageError as exc:
+        # Garbage JPEG: aa.jpg: cannot identify image file '/srv/photolith/ingest_root/ftpuser/aa.jpg'
+        # Or aa.jpg: Truncated File Read
+        return dict(
+            path=file_path,
+            name=os.path.basename(file_path),
+            remaining=remaining,
+            error=str(exc),
+        )
+    except OSError as exc:
+        # Pillow returns OSError('image file is truncated (1 bytes not processed)')
+        return dict(
+            path=file_path,
+            name=os.path.basename(file_path),
+            remaining=remaining,
+            error=str(exc),
+        )
 
     # Open file, removing it now it's been handed clientside
     return dict(
