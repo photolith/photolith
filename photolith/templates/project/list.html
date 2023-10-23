@@ -15,7 +15,7 @@
     <thead>
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
-      <th class="text-nowrap">{% translate "Annotations" %}</th>
+      <th class="text-nowrap">{% translate "Individuals annotated" %}</th>
       <th width="100%"></th>
       {% if perms.photolith.change_project %}<th></th>{% endif %}
     </thead>

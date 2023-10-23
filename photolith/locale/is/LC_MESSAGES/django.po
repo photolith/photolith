@@ -442,8 +442,7 @@ msgid "Open projects"
 msgstr ""
 
 #: photolith/templates/project/list.html
-#: photolith/templates/project/list.html
-msgid "Annotations"
+msgid "Individuals annotated"
 msgstr ""
 
 #: photolith/templates/project/list.html
@@ -462,6 +461,10 @@ msgstr "Breyta"
 
 #: photolith/templates/project/list.html
 msgid "Closed projects"
+msgstr ""
+
+#: photolith/templates/project/list.html
+msgid "Annotations"
 msgstr ""
 
 #: photolith/templates/project/list.html
