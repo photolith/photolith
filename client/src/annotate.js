@@ -4,6 +4,11 @@ import { changeEvent } from './events';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
+  function pxToMM (px) {
+    const mm = px * event.target.form.phPxMmRatio;
+    return Math.round(mm * 100) / 100;
+  }
+
   if (event.target.name === 'axis_poly') {
     const elTableBody = window.document.querySelector('#axis_poly_table tbody');
     const pointData = JSON.parse(event.target.value || '[]').map((p) => new fabric.Point(p[0], p[1]));
@@ -17,8 +22,8 @@ function formRefresh (event) {
       ? ''
       : `<tr class="${i === selectedIdx ? 'table-info' : ''}">
       <td>${i === pointData.length - 1 ? 'E' : i}</td>
-      <td>${Math.round(p.distanceFrom(pointData[i - 1]))}</td>
-      <td>${Math.round(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
+      <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
+      <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
     </tr>`).join('\n');
 
     // Count ring markers and use that as age value
@@ -60,7 +65,7 @@ export function init (parent) {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
     // Ratio to convert annotation point distance into mm
-    indData.px_to_mm = indData.image__scale_mm / new fabric.Point(indData.image__scale_line[0][0], indData.image__scale_line[0][1]).distanceFrom(
+    elForm.phPxMmRatio = indData.image__scale_mm / new fabric.Point(indData.image__scale_line[0][0], indData.image__scale_line[0][1]).distanceFrom(
       new fabric.Point(indData.image__scale_line[1][0], indData.image__scale_line[1][1])
     );
 
