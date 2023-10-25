@@ -38,8 +38,8 @@ export class PhSyncingViewer extends PhFilteringViewer {
     this.elSyncForm = el;
     if (!el) return;
 
-    this.elSyncForm.addEventListener('load_individuals', (event) => {
-      this.loadIndividuals();
+    this.elSyncForm.addEventListener('element_addremove', (event) => {
+      this.elementAddRemove();
     });
 
     this.elSyncForm.addEventListener('change', (event) => {

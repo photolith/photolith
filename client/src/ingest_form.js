@@ -15,7 +15,7 @@ function formRefresh (event) {
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
     elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
-    elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
+    elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
@@ -31,7 +31,7 @@ function formRefresh (event) {
         elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';
-      elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
+      elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
       elForm.selection.value = '';
@@ -42,7 +42,7 @@ function formRefresh (event) {
     });
   }
   if (event.target.name === 'individual') {
-    elForm.dispatchEvent(new window.CustomEvent('load_individuals'));
+    elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
   }
 
   if (event.target.name === 'image_file') {

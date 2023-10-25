@@ -95,7 +95,7 @@ export class PhCropper extends PhSyncingViewer {
     });
   }
 
-  loadIndividuals () {
+  elementAddRemove () {
     let setActive = false;
     const elIndividual = this.elSyncForm.elements.individual;
     const selIndividual = elIndividual.options[elIndividual.selectedIndex].value;
