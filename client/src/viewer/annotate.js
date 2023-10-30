@@ -6,18 +6,15 @@ import EditableLine from './editable_line';
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 
 export class PhAnnotate extends PhSyncingViewer {
-  annotatePoly () {
-    const obj = new EditableLine({
-      id: 'axis_poly',
-      stroke: `rgba(${rgbHighlight}, 0.6)`
-    }, {
-      stroke: `rgba(${rgbHighlight}, 1)`
-    });
-    if (obj.canvas) return obj;
+  constructor (elViewer) {
+    super(elViewer);
 
-    this.fabCanvas.add(obj);
     this.fabCanvas.on('mouse:dblclick', (opt) => {
-      if (opt.target && opt.target.phNodeIdx > 0 && opt.target.phNodeIdx < obj.phNodes.length - 1) {
+      const obj = this.fabCanvas.getObjects().find((obj) => obj.id === 'axis_poly');
+
+      if (!obj) {
+        // No axis_poly, nothing to do
+      } else if (opt.target && opt.target.phNodeIdx > 0 && opt.target.phNodeIdx < obj.phNodes.length - 1) {
         // Double-clicked on a mid-node, remove it
         obj.phRemoveNode(opt.target);
       } else {
@@ -28,6 +25,18 @@ export class PhAnnotate extends PhSyncingViewer {
         ), opt);
       }
     });
+  }
+
+  annotatePoly () {
+    const obj = new EditableLine({
+      id: 'axis_poly',
+      stroke: `rgba(${rgbHighlight}, 0.6)`
+    }, {
+      stroke: `rgba(${rgbHighlight}, 1)`
+    });
+    if (obj.canvas) return obj;
+
+    this.fabCanvas.add(obj);
     return obj;
   }
 
