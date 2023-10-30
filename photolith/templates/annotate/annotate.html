@@ -97,7 +97,7 @@
           <th class="text-nowrap">{{ object_model|verbose_name:"comment" }}</th>
         </tr></thead>
         <tbody>{% for a in all_annotations %}
-          <tr role="button" class="{% if forloop.first %}table-info{% endif %}">
+          <tr role="button">
             <script class="axis_poly" type="application/json">{{ a.axis_poly }}</script></td>
             <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|time:'H:i' }}</code></td>
             <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
@@ -122,6 +122,7 @@
     <form action="{{ request.get_full_path }}" method="POST" class="annotate-form mt-2 row">
       {% csrf_token %}
       <input type="hidden" name="selection" value="" />
+      <div class="existing-annotation-polys"></div>
       <div class="col">
 
         {% if form.errors %}

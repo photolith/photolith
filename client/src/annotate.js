@@ -58,11 +58,38 @@ function allAnnotationsClick (elForm, event) {
     const elTr = event.target.closest('tbody > tr');
     if (!elTr) return;
 
+    // Select item (or deselect if already selected)
     Array.from(elTr.parentElement.children).forEach((el) => {
-      el.classList.remove('table-info');
+      if (el === elTr) {
+        el.classList.toggle('table-info');
+      } else {
+        el.classList.remove('table-info');
+      }
     });
-    elTr.classList.add('table-info');
+
+    existingAnnotationsPopulate(
+      elForm,
+      document.querySelector('.ph-all-annotations>table>tbody'));
   }
+}
+
+function existingAnnotationsPopulate (elForm, tableEl) {
+  let polys = [];
+
+  if (tableEl) {
+    const selectedEl = tableEl.querySelector('tr.table-info');
+
+    if (selectedEl) {
+      polys = selectedEl.querySelectorAll('script.axis_poly');
+    } else {
+      polys = tableEl.querySelectorAll('script.axis_poly');
+    }
+  }
+
+  elForm.querySelector('.existing-annotation-polys').innerHTML = Array.from(polys).map((el, i) => {
+    return `<input type="hidden" name="view_poly:${i}" value="${el.textContent}" />`;
+  }).join('\n');
+  elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
 }
 
 export function init (parent) {
@@ -79,5 +106,27 @@ export function init (parent) {
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
     populateIndividualData(indData);
+
+    parent.querySelectorAll('button#existing-tab').forEach((elExistingBtn) => {
+      if (elExistingBtn.classList.contains('active')) {
+        // Selected by default, populate now
+        elForm.elements.axis_poly.disabled = true;
+        existingAnnotationsPopulate(
+          elForm,
+          document.querySelector('.ph-all-annotations>table>tbody'));
+      }
+      elExistingBtn.addEventListener('shown.bs.tab', function (event) {
+        elForm.elements.axis_poly.disabled = true;
+        existingAnnotationsPopulate(
+          elForm,
+          document.querySelector('.ph-all-annotations>table>tbody'));
+      });
+      elExistingBtn.addEventListener('hide.bs.tab', function (event) {
+        elForm.elements.axis_poly.disabled = false;
+        existingAnnotationsPopulate(
+          elForm,
+          null);
+      });
+    });
   });
 }

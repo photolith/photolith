@@ -157,6 +157,8 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
                 context["form"].initial["axis_poly"] = context["all_annotations"][
                     0
                 ].axis_poly
+                # Always default to existing tab, when there's previous items to show
+                context["default_tab"] = "existing"
             else:
                 bb = context["ind_data"]["bounding_box"]
                 context["form"].initial["axis_poly"] = [

@@ -248,6 +248,14 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         out = ctx_data(ind)
         self.assertEqual(out["default_tab"], "editor")
 
+        # Annotate, show list of existing annotations, default to last annotation
+        ann1 = self.create_annotation(ind, axis_poly=[[3, 0], [4, 9], [2, 2]])
+        ann2 = self.create_annotation(ind, axis_poly=[[6, 1], [4, 5], [2, 3]])
+        out = ctx_data(ind)
+        self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out["form"].instance.id, None)
+        self.assertEqual(out["form"].initial["axis_poly"], ann2.axis_poly)
+
         # Can explicitly edit either
         out = ctx_data(ind, annotation=ann1)
         self.assertEqual(out["default_tab"], "editor")
