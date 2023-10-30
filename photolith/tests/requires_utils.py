@@ -81,7 +81,9 @@ class RequiresUtils:
         project=None,
     ):
         if not created_by:
-            created_by = self.create_user("annotator")
+            if not hasattr(self, "_ru_annotator"):
+                self._ru_annotator = self.create_user("annotator")
+            created_by = self._ru_annotator
         out = Annotation.objects.create(
             individual=individual,
             created_by=created_by,

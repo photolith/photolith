@@ -221,3 +221,39 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                 "10-user1-5",
             ],
         )
+
+    def test_get_context_data(self):
+        def ctx_data(individual, annotation=None, project=None, user=None):
+            if isinstance(project, dict):
+                p = self.create_project(**project)
+            else:
+                p = project
+            request = RequestFactory().get(
+                "/",
+                dict(
+                    individual_id=individual.id,
+                    annotation_id=annotation.id if annotation else "",
+                    project=p.id if p else "",
+                ),
+            )
+            request.user = user
+            v = AnnotateView()
+            v.object = annotation  # NB: Bodge what should be happening in post()
+            v.setup(request, **(request.GET.dict()))
+            out = v.get_context_data()
+            return out
+
+        # No annotations, displaying editor
+        ind = self.create_individual()
+        out = ctx_data(ind)
+        self.assertEqual(out["default_tab"], "editor")
+
+        # Can explicitly edit either
+        out = ctx_data(ind, annotation=ann1)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["form"].instance.id, ann1.id)
+        self.assertEqual(out["form"].initial["axis_poly"], ann1.axis_poly)
+        out = ctx_data(ind, annotation=ann2)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["form"].instance.id, ann2.id)
+        self.assertEqual(out["form"].initial["axis_poly"], ann2.axis_poly)

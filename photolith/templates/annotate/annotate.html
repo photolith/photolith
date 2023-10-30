@@ -43,11 +43,11 @@
   <li class="nav-item" role="presentation"><button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadata-tab-pane" type="button" role="tab" aria-controls="metadata-tab-pane" aria-selected="true">
     {% translate 'Individual Metadata' %}
   </button></li>
-  <li class="nav-item" role="presentation"><button class="nav-link {% if read_only %}active{% endif %}" id="existing-tab" data-bs-toggle="tab" data-bs-target="#existing-tab-pane" type="button" role="tab" aria-controls="existing-tab-pane" aria-selected="true">
+  <li class="nav-item" role="presentation"><button class="nav-link {% if default_tab == 'existing' %}active{% endif %}" id="existing-tab" data-bs-toggle="tab" data-bs-target="#existing-tab-pane" type="button" role="tab" aria-controls="existing-tab-pane" aria-selected="true">
     {% translate 'Existing Annotations' %}
   </button></li>
   {% if not read_only %}
-  <li class="nav-item" role="presentation"><button class="nav-link active" id="editor-tab" data-bs-toggle="tab" data-bs-target="#editor-tab-pane" type="button" role="tab" aria-controls="editor-tab-pane" aria-selected="true">
+  <li class="nav-item" role="presentation"><button class="nav-link {% if default_tab == 'editor' %}active{% endif %}" id="editor-tab" data-bs-toggle="tab" data-bs-target="#editor-tab-pane" type="button" role="tab" aria-controls="editor-tab-pane" aria-selected="true">
     {% translate 'Annotate' %}
   </button></li>
   {% endif %}
@@ -84,7 +84,7 @@
     </table>
 
   </div>
-  <div class="tab-pane {% if read_only %}show active{% endif %}" id="existing-tab-pane" role="tabpanel" aria-labelledby="existing-tab" tabindex="0">
+  <div class="tab-pane {% if default_tab == 'existing' %}show active{% endif %}" id="existing-tab-pane" role="tabpanel" aria-labelledby="existing-tab" tabindex="0">
 
     <div class="ph-all-annotations">
       <table class="table table-striped" style="">
@@ -117,7 +117,7 @@
   </div>
 
   {% if not read_only %}
-  <div class="tab-pane show active" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
+  <div class="tab-pane {% if default_tab == 'editor' %}show active{% endif %}" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
 
     <form action="{{ request.get_full_path }}" method="POST" class="annotate-form mt-2 row">
       {% csrf_token %}

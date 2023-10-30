@@ -145,11 +145,15 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["object_model"] = self.model
         context["read_only"] = self.current_project and not self.current_project.is_open
+        context["default_tab"] = "existing" if context["read_only"] else "editor"
 
         if self.individual_id:
             context["ind_data"] = self.get_individual()
             context["all_annotations"] = self.get_all_annotations()
-            if len(context["all_annotations"]) > 0:
+            if self.object and self.object.id:
+                # Editing an existing annotation
+                context["default_tab"] = "editor"
+            elif len(context["all_annotations"]) > 0:
                 context["form"].initial["axis_poly"] = context["all_annotations"][
                     0
                 ].axis_poly
