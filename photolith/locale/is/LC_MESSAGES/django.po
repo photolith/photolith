@@ -128,8 +128,8 @@ msgid ""
 "If a user is selected, then their most recent annotation for each individual "
 "will be used as a starting point for annotations"
 msgstr ""
-"Ef valinn er notandi þá mun nýlegasta aldursmerking þess notanda á hverjum einstakling "
-"vera notuð sem upphafsstaður fyrir merkingar"
+"Ef valinn er notandi þá mun nýlegasta aldursmerking þess notanda á hverjum "
+"einstakling vera notuð sem upphafsstaður fyrir merkingar"
 
 #: photolith/models.py
 msgid "Team name"
@@ -249,7 +249,8 @@ msgid ""
 "detail by decreasing gamma, e.g."
 msgstr ""
 "Breytt contrast, gamma o.þ.h. með því að ýta á galdrasprotann á myndinni. "
-"Breyting á Gamma og/eða Contrast getur aukið smáatriði á myndinni og gert árhringi skýrari."
+"Breyting á Gamma og/eða Contrast getur aukið smáatriði á myndinni og gert "
+"árhringi skýrari."
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
@@ -263,7 +264,8 @@ msgstr ""
 msgid ""
 "Double-click on the line to add a ring marker, drag a ring marker to move it"
 msgstr ""
-"Tvíklikkaðu á ásinn til að bæta við aldurslestri. Hægt er að draga merkingar til með músinni." 
+"Tvíklikkaðu á ásinn til að bæta við aldurslestri. Hægt er að draga merkingar "
+"til með músinni."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Double-click a ring marker to remove"
@@ -381,8 +383,8 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
 msgstr ""
-"Eftir að raðnúmer hefur verið slegið inn þá birtast box fyrir "
-"hvern einstakling inni á myndinni."
+"Eftir að raðnúmer hefur verið slegið inn þá birtast box fyrir hvern "
+"einstakling inni á myndinni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -390,9 +392,10 @@ msgid ""
 "and press <kbd>Save</kbd>. It is important that the scale line is correctly set "
 "so that measurements on the otoliths are correct."
 msgstr ""
-"Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem birtist "
-"efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
-"Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu réttar."
+"Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
+"birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
+"Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu "
+"réttar."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -413,8 +416,8 @@ msgid ""
 "Drag individual boxes or resize them by clicking on one and dragging it's "
 "corners"
 msgstr ""
-"Dragðu hvert box yfir viðeigandi kvörn með því að smella á það og "
-"færa það með músinni. Einnig er hægt að minnka og stækka boxin eftir þörfum."
+"Dragðu hvert box yfir viðeigandi kvörn með því að smella á það og færa það "
+"með músinni. Einnig er hægt að minnka og stækka boxin eftir þörfum."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -430,8 +433,8 @@ msgid ""
 "Discard an individual by dragging it outside the image, which will stop it "
 "being uploaded"
 msgstr ""
-"Ef það vantar t.d. kvörn á glerið þá er hægt að draga viðeigandi box út af myndinni, "
-"sem kemur í veg fyrir að sá einstaklingur er færður inn."
+"Ef það vantar t.d. kvörn á glerið þá er hægt að draga viðeigandi box út af "
+"myndinni, sem kemur í veg fyrir að sá einstaklingur er færður inn."
 
 #: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
