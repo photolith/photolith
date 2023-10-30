@@ -110,10 +110,8 @@ msgid "Project name"
 msgstr "Nafn verkefnis"
 
 #: photolith/models.py
-msgid ""
-"The set of users that should be included in the project"
-msgstr ""
-"Hópur notenda sem eiga að taka þátt í verkefninu"
+msgid "The set of users that should be included in the project"
+msgstr "Hópur notenda sem eiga að taka þátt í verkefninu"
 
 #: photolith/models.py
 msgid "Project end date"
@@ -227,11 +225,11 @@ msgstr "Settu inn ár með því að tvísmella á myndina."
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"Then choose an image rating, write comments if needed and press <kbd>Save</kbd> "
-"to commit the age reading to the database."
+"Then choose an image rating, write comments if needed and press <kbd>Save</"
+"kbd> to commit the age reading to the database."
 msgstr ""
-"Veldu svo einkunn, settu inn athugasemdir ef einhverjar og ýttu á <kbd>Vista</kbd> "
-"til að færa aldursmerkinguna inn í gagnagrunninn."
+"Veldu svo einkunn, settu inn athugasemdir ef einhverjar og ýttu á "
+"<kbd>Vista</kbd> til að færa aldursmerkinguna inn í gagnagrunninn."
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -254,11 +252,12 @@ msgstr ""
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"There is an axis line that shows up on the image. "
-"Drag the start and end points to mark the centre & edge of the otolith."
+"There is an axis line that shows up on the image. Drag the start and end "
+"points to mark the centre & edge of the otolith."
 msgstr ""
-"Það birtist lína á myndinni sem er lestrarásinn. Það þarf að draga punktana á endunum "
-"þannig að hann byrjar í miðju og fer út í jaðar eftir þeirri línu sem hentar best. "
+"Það birtist lína á myndinni sem er lestrarásinn. Það þarf að draga punktana "
+"á endunum þannig að hann byrjar í miðju og fer út í jaðar eftir þeirri línu "
+"sem hentar best. "
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
@@ -273,8 +272,9 @@ msgstr "Tvíklikkaðu á merkingu til að fjarlægja hana."
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"Generally the annotations follow the axis line. If you want to move an annotation away from the line, "
-"<kbd>Ctrl</kbd>-drag to move a ring marker freeform."
+"Generally the annotations follow the axis line. If you want to move an "
+"annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker "
+"freeform."
 msgstr ""
 "Merkingar fylgja ásnum sem er settur. Ef þú vilt færa merkinguna út af "
 "ásnum, smelltu þá á hana, haltu inni <kbd>Ctrl</kbd> og dragðu hana til."
@@ -374,11 +374,12 @@ msgstr ""
 "inn mynd."
 
 #: photolith/templates/ingest/index.html
-msgid "Then enter the sample ID and species number (f.ex. <kbd>542871 1</kbd> for species no. 1). "
-"Press <kbd>enter</kbd>."
+msgid ""
+"Then enter the sample ID and species number (f.ex. <kbd>542871 1</kbd> for "
+"species no. 1). Press <kbd>enter</kbd>."
 msgstr ""
-"Sláðu inn raðnúmer (id sýnis) og tegundanúmer (t.d. <kbd>542871 1</kbd> fyrir tegund nr. 1). "
-"Ýttu á <kbd>enter</kbd>."
+"Sláðu inn raðnúmer (id sýnis) og tegundanúmer (t.d. <kbd>542871 1</kbd> "
+"fyrir tegund nr. 1). Ýttu á <kbd>enter</kbd>."
 
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
@@ -389,8 +390,8 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 msgid ""
 "Position each over the relevant individual, the scale line over the scale "
-"and press <kbd>Save</kbd>. It is important that the scale line is correctly set "
-"so that measurements on the otoliths are correct."
+"and press <kbd>Save</kbd>. It is important that the scale line is correctly "
+"set so that measurements on the otoliths are correct."
 msgstr ""
 "Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
 "birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
@@ -480,12 +481,13 @@ msgstr "Aldursmerkingar"
 
 #: photolith/templates/project/list.html
 msgid "Create a project by <kbd>searching</kbd>."
-msgstr "Búðu til verkefni með því að nota <kbd>leitina</kbd>." 
+msgstr "Búðu til verkefni með því að nota <kbd>leitina</kbd>."
 
 #: photolith/templates/project/list.html
 msgid "Then click <kbd>Save as project</kbd> in the top right corner."
 msgstr ""
-"Leitaðu að þeim eiginleikum sem þarf fyrir verkefnið og ýttu svo á <kbd>Vista sem verkefni</kbd>."
+"Leitaðu að þeim eiginleikum sem þarf fyrir verkefnið og ýttu svo á "
+"<kbd>Vista sem verkefni</kbd>."
 
 #: photolith/templates/project/update.html
 msgid "Project"

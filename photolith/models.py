@@ -357,9 +357,7 @@ class Project(models.Model):
         "Team",
         on_delete=models.SET_NULL,
         null=True,
-        help_text=_(
-            "The set of users that should perform the annotation as part of the project"
-        ),
+        help_text=_("The set of users that should be included in the project"),
     )
     individuals = models.ManyToManyField(
         Individual,

@@ -76,7 +76,7 @@
 
 
 {% if perms.photolith.create_project  %}
-  <p><a href="{% url 'search:index' %}">{% translate "Create a project by searching" %}</a>{% translate ", when ready click the book icon in the top right." %}</p>
+  <p><a href="{% url 'search:index' %}">{% translate "Create a project by <kbd>searching</kbd>." %}</a>{% translate "Then click <kbd>Save as project</kbd> in the top right corner." %}</p>
 {% endif %}
 
 {% endblock content %}

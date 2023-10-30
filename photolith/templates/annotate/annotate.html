@@ -62,17 +62,17 @@
 <div class="tab-content">
   <div class="tab-pane" id="help-tab-pane" role="tabpanel" aria-labelledby="help-tab" tabindex="0">
     <p>
-      {% translate "Annotate by marking the otolith/rings in the image." %}
-      {% translate "Then fill in the <kbd>Annotate</kbd> form and press <kbd>Save</kbd>." %}
+      {% translate "Annotate by marking the annuli in the image." %}
+      {% translate "Then choose an image rating, write comments if needed and press <kbd>Save</kbd> to commit the age reading to the database." %}
       {% translate "You can:" %}
     </p>
     <ul>
       <li>{% translate "Zoom in/out by pinching or scrolling the mouse" %}</li>
       <li>{% translate "Adjust image contrast or download using the magic wand menu, increasing ring detail by decreasing gamma, e.g." %}</li>
-      <li>{% translate "Drag the start and end points to mark the centre & edge of the otolith" %}</li>
+      <li>{% translate "There is an axis line that shows up on the image. Drag the start and end points to mark the centre & edge of the otolith." %}</li>
       <li>{% translate "Double-click on the line to add a ring marker, drag a ring marker to move it" %}</li>
       <li>{% translate "Double-click a ring marker to remove" %}</li>
-      <li>{% translate "<kbd>Ctrl</kbd>-drag to move a ring marker freeform, not following the axis line" %}</li>
+      <li>{% translate "Generally the annotations follow the axis line. If you want to move an annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker freeform." %}</li>
     </ul>
   </div>
 
@@ -152,8 +152,8 @@
           {{ form.axis_poly|as_crispy_field }}
           <table id="axis_poly_table" class="table table-striped point-data" style="">
             <thead><tr>
-              <th>{% translate "Point" %}</th>
-              <th>{% translate "Distance (mm)" %}</th>
+              <th>{% translate "Annuli" %}</th>
+              <th>{% translate "Distance between (mm)" %}</th>
               <th>{% translate "Cumulative (mm)" %}</th>
             </tr></thead>
             <tbody></tbody>
@@ -168,6 +168,6 @@
 </div>
 
 {% else %}
-<div class="p-5 text-center container rounded" style="background: #eee">{% translate "Press Next to start" %}</div>
+<div class="p-5 text-center container rounded" style="background: #eee">{% translate "Press <kbd>Next</kbd> to start" %}</div>
 {% endif %}
 {% endblock content %}
