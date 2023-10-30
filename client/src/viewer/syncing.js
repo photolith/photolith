@@ -9,7 +9,6 @@ export class PhSyncingViewer extends PhFilteringViewer {
 
     this.fabCanvas.on('object:added', this.reverseSyncForm.bind(this));
     this.fabCanvas.on('object:modified', this.syncForm.bind(this));
-    this.fabCanvas.on('object:removed', this.syncForm.bind(this));
     this.fabCanvas.on({
       'selection:cleared': this.selection.bind(this),
       'selection:created': this.selection.bind(this),
