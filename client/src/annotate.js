@@ -49,6 +49,11 @@ function allAnnotationsClick (elForm, event) {
 
     elForm.axis_poly.value = JSON.stringify(axisPoly);
     elForm.axis_poly.dispatchEvent(changeEvent());
+    document.querySelector('button#editor-tab').dispatchEvent(new window.MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    }));
   } else {
     const elTr = event.target.closest('tbody > tr');
     if (!elTr) return;
