@@ -1,9 +1,12 @@
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
 from django.urls import reverse_lazy
+from django.views.generic import View
 from django.views.generic.edit import UpdateView
 
 
@@ -196,3 +199,20 @@ class AnnotateSnippetView(AnnotateView):
 class AnnotateStartView(AnnotateView):
     # As above, but won't have an individual_id
     pass
+
+
+class DeleteView(PermissionRequiredMixin, View):
+    permission_required = ("photolith.delete_annotation",)
+
+    @json_errors
+    def post(self, *args, **kwargs):
+        obj = get_object_or_404(Annotation, pk=int(self.kwargs["annotation_id"]))
+        if not (self.request.user.is_superuser or obj.created_by == self.request.user):
+            raise PermissionDenied("You do not own annotation %s" % obj)
+
+        old_annotation_id = obj.id
+        obj.delete()
+
+        context = dict(old_annotation_id=old_annotation_id)
+        context["message"] = _("Successfully deleted annotation")
+        return JsonResponse(context)

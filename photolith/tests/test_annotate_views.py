@@ -1,11 +1,12 @@
 import datetime
+import json
 import random
 import re
 
 from django.core.exceptions import BadRequest
 from django.test import Client, RequestFactory, TestCase
 
-from ..annotate.views import AnnotateView
+from ..annotate.views import AnnotateView, DeleteView
 from ..models import Annotation, Individual, Image, Project
 
 from .requires_utils import RequiresUtils
@@ -371,3 +372,53 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                 ann.axis_poly,
             ],
         )
+
+
+class AnnotateDeleteViewTest(RequiresUtils, TestCase):
+    def ann_del(self, ann, user):
+        client = Client()
+        client.force_login(user)
+        resp = client.post("/annotate/delete/%d/" % (ann.id,), {})
+        return (
+            resp.status_code,
+            json.loads(resp.content)
+            if resp.headers["Content-Type"] == "application/json"
+            else resp.content,
+        )
+
+    def test_call(self):
+        user1 = self.create_user(groups=["Annotate"])
+        ind = self.create_individual()
+        ann = self.create_annotation(ind, created_by=user1)
+
+        # Can't delete if not part of the annotate group
+        user3 = self.create_user(groups=[])
+        out = self.ann_del(ann, user3)
+        self.assertEqual(out[0], 403)
+
+        # Can't delete something you don't own
+        user2 = self.create_user(groups=["Annotate"])
+        out = self.ann_del(ann, user2)
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="You do not own annotation %s" % str(ann),
+                ),
+            ),
+        )
+
+        out = self.ann_del(ann, user1)
+        self.assertEqual(
+            out,
+            (
+                200,
+                dict(
+                    message="Successfully deleted annotation",
+                    old_annotation_id=ann.id,
+                ),
+            ),
+        )
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).first(), None)

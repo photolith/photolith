@@ -25,6 +25,10 @@ msgstr "Teymi"
 msgid "Groups"
 msgstr "Hópar"
 
+#: photolith/annotate/views.py
+msgid "Successfully deleted annotation"
+msgstr ""
+
 #: photolith/ingest/views.py
 #, python-format
 msgid "(%(count)d photo)"
