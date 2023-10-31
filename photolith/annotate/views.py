@@ -144,8 +144,19 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["object_model"] = self.model
-        context["read_only"] = self.current_project and not self.current_project.is_open
-        context["default_tab"] = "existing" if context["read_only"] else "editor"
+        context["read_only"] = False
+
+        # Find base_poly if within project with base_user
+        def get_base_poly():
+            p = self.current_project
+            if p and p.base_user:
+                try:
+                    return next(
+                        a.axis_poly for a in context["all_annotations"] if a.age == 0
+                    )
+                except StopIteration:
+                    return None
+            return None
 
         if self.individual_id:
             context["ind_data"] = self.get_individual()
@@ -153,18 +164,27 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             if self.object and self.object.id:
                 # Editing an existing annotation
                 context["default_tab"] = "editor"
-            elif len(context["all_annotations"]) > 0:
-                context["form"].initial["axis_poly"] = context["all_annotations"][
-                    0
-                ].axis_poly
-                # Always default to existing tab, when there's previous items to show
+            elif self.current_project and not self.current_project.is_open:
+                # Closed project, read-only
+                context["read_only"] = True
                 context["default_tab"] = "existing"
+            elif base_poly := get_base_poly():
+                # Open project with base_poly
+                context["form"].initial["axis_poly"] = base_poly
+                context["default_tab"] = (
+                    "existing" if len(context["all_annotations"]) > 1 else "editor"
+                )
             else:
+                # Generate default axis_poly
                 bb = context["ind_data"]["bounding_box"]
                 context["form"].initial["axis_poly"] = [
                     [(bb[0][0] + bb[1][0]) / 2, (bb[0][1] + bb[1][1]) / 2],
                     [bb[0][0] + 5, bb[0][1] + 5],
                 ]
+                # Show editor iff there's no existing annotations
+                context["default_tab"] = (
+                    "existing" if len(context["all_annotations"]) > 0 else "editor"
+                )
         return context
 
 

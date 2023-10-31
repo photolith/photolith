@@ -243,18 +243,27 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             out = v.get_context_data()
             return out
 
+        user1 = self.create_user()
+        user2 = self.create_user()
+        user3 = self.create_user()
+
         # No annotations, displaying editor
         ind = self.create_individual()
         out = ctx_data(ind)
         self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
 
-        # Annotate, show list of existing annotations, default to last annotation
-        ann1 = self.create_annotation(ind, axis_poly=[[3, 0], [4, 9], [2, 2]])
-        ann2 = self.create_annotation(ind, axis_poly=[[6, 1], [4, 5], [2, 3]])
+        # Annotate, show list of existing annotations, default still initial annotation
+        ann1 = self.create_annotation(
+            ind, axis_poly=[[3, 0], [4, 9], [2, 2]], created_by=user1
+        )
+        ann2 = self.create_annotation(
+            ind, axis_poly=[[6, 1], [4, 5], [2, 3]], created_by=user1
+        )
         out = ctx_data(ind)
         self.assertEqual(out["default_tab"], "existing")
         self.assertEqual(out["form"].instance.id, None)
-        self.assertEqual(out["form"].initial["axis_poly"], ann2.axis_poly)
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
 
         # Can explicitly edit either
         out = ctx_data(ind, annotation=ann1)
@@ -265,3 +274,99 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(out["default_tab"], "editor")
         self.assertEqual(out["form"].instance.id, ann2.id)
         self.assertEqual(out["form"].initial["axis_poly"], ann2.axis_poly)
+
+        # Create a project without base_user, users isolated from other edits
+        p = self.create_project(team=[user1, user2, user3], individuals=[ind])
+        out = ctx_data(ind, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
+        ann = self.create_annotation(
+            ind, axis_poly=[[25, 34], [44, 93], [22, 52]], created_by=user2, project=p
+        )
+        out = ctx_data(ind, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
+        self.assertEqual(
+            [a.axis_poly for a in out["all_annotations"]],
+            [
+                ann.axis_poly,
+            ],
+        )
+        out = ctx_data(ind, project=p, user=user3)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
+        self.assertEqual([a.axis_poly for a in out["all_annotations"]], [])
+
+        # Close project, we see everything
+        self.close_project(p)
+        out = ctx_data(ind, project=p, user=user3)
+        self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out["read_only"], True)
+        self.assertEqual(
+            [a.axis_poly for a in out["all_annotations"]],
+            [
+                ann.axis_poly,
+            ],
+        )
+
+        # Project with base_user, base ignored for default_tab
+        ind2 = self.create_individual()
+        p = self.create_project(
+            team=[user1, user2, user3], individuals=[ind, ind2], base_user=user1
+        )
+        out = ctx_data(ind, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(
+            out["form"].initial["axis_poly"], [ann1.axis_poly[0], ann1.axis_poly[-1]]
+        )
+        self.assertEqual(
+            [a.axis_poly for a in out["all_annotations"]],
+            [
+                [ann1.axis_poly[0], ann1.axis_poly[-1]],
+            ],
+        )
+        ann = self.create_annotation(
+            ind,
+            axis_poly=[[252, 344], [424, 93], [322, 542]],
+            created_by=user2,
+            project=p,
+        )
+        out = ctx_data(ind, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(
+            out["form"].initial["axis_poly"], [ann1.axis_poly[0], ann1.axis_poly[-1]]
+        )
+        self.assertEqual(
+            [a.axis_poly for a in out["all_annotations"]],
+            [
+                ann.axis_poly,
+                [ann1.axis_poly[0], ann1.axis_poly[-1]],
+            ],
+        )
+
+        # Without a base_user annotation (which ind2 doesn't have), we continue as before
+        out = ctx_data(ind2, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "editor")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
+        self.assertEqual([a.axis_poly for a in out["all_annotations"]], [])
+        ann = self.create_annotation(
+            ind2,
+            axis_poly=[[252, 344], [424, 93], [322, 542]],
+            created_by=user2,
+            project=p,
+        )
+        out = ctx_data(ind2, project=p, user=user2)
+        self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out["read_only"], False)
+        self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
+        self.assertEqual(
+            [a.axis_poly for a in out["all_annotations"]],
+            [
+                ann.axis_poly,
+            ],
+        )

@@ -89,7 +89,7 @@ class RequiresUtils:
             created_by=created_by,
             rating=Annotation.Rating.GOOD,
             age=10,
-            axis_poly=[[0, 0], [1, 1], [2, 2]],
+            axis_poly=axis_poly,
             project=project,
         )
         out.created_at = out.modified_at = self.now + datetime.timedelta(
@@ -144,3 +144,8 @@ class RequiresUtils:
         out.individuals.set(individuals)
         out.save()
         return self._ru_append(out)
+
+    def close_project(self, project):
+        project.date_end = (self.now - datetime.timedelta(days=1)).date()
+        project.save()
+        return project
