@@ -1,4 +1,4 @@
-export function displayAlert (level, messageHTML) {
+export function displayAlert (level, messageHTML, timeout) {
   const elAlert = document.createElement('DIV');
 
   elAlert.className = `alert alert-${level} alert-dismissible fade show`;
@@ -11,5 +11,5 @@ export function displayAlert (level, messageHTML) {
 
   window.setTimeout(() => {
     if (elAlert.isConnected) new window.bootstrap.Alert(elAlert).close();
-  }, 5000);
+  }, timeout || 5000);
 }

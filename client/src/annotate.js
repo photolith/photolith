@@ -1,5 +1,6 @@
 import { fabric } from 'fabric';
 
+import { displayAlert } from './alert';
 import { changeEvent } from './events';
 import { populateIndividualData } from './meta';
 
@@ -40,7 +41,12 @@ function allAnnotationsClick (elForm, event) {
   if (event.target.tagName === 'BUTTON') {
     const elScript = this.querySelector('tbody > tr.table-info script.axis_poly');
     let axisPoly = elScript ? JSON.parse(elScript.textContent) : undefined;
-    if (!axisPoly) return;
+
+    if (!axisPoly) {
+      displayAlert('warning', this.getAttribute('data-locale-select-annotation-first'), 2000);
+      return;
+    }
+
 
     if (event.target.classList.contains('ph-copy-line')) {
       // Strip out everything in the middle

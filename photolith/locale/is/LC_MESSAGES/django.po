@@ -290,6 +290,10 @@ msgid "Value"
 msgstr "Gildi úr gagnagrunn"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Select an annotation first"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
 msgid "Copy full annotation"
 msgstr "Afrita fyrri aldursmerkingu"
 

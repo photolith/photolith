@@ -86,8 +86,8 @@
   </div>
   <div class="tab-pane {% if default_tab == 'existing' %}show active{% endif %}" id="existing-tab-pane" role="tabpanel" aria-labelledby="existing-tab" tabindex="0">
 
-    <div class="ph-all-annotations">
-      <table class="table table-striped" style="">
+    <div class="ph-all-annotations" data-locale-select-annotation-first="{% translate 'Select an annotation first' %}">
+      <table class="table table-striped">
         <thead><tr>
           <th class="text-nowrap">{{ object_model|verbose_name:"created_at" }}</th>
           <th class="text-nowrap">{{ object_model|verbose_name:"created_by" }}</th>
