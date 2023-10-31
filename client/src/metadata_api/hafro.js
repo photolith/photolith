@@ -73,6 +73,17 @@ const fieldsFor = {
   ]
 };
 
+const labelHelp = {
+  en: [
+    'Full label, e.g. <kbd>537572 TG1-2023/110 1 03</kbd>',
+    '"(sample-id) (species no)", e.g. <kbd>537572 1</kbd>'
+  ],
+  is: [
+    'TODO: Full label, e.g. <kbd>537572 TG1-2023/110 1 03</kbd>',
+    'TODO: "(sample-id) (species no)", e.g. <kbd>537572 1</kbd>'
+  ]
+};
+
 export default class MetadataApi {
   constructor (lang, baseHref) {
     this.lang = lang;
@@ -93,6 +104,10 @@ export default class MetadataApi {
       errTmpl = errorTemplates[this.lang][errTmpl];
     }
     return new Error(errTmpl.replace(/{(\d)}/g, (_, i) => values[Number(i)]));
+  }
+
+  labelHelp () {
+    return labelHelp[this.lang];
   }
 
   metaLabels (view) {

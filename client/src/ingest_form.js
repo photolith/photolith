@@ -12,6 +12,10 @@ function formRefresh (event) {
   });
 
   if (event.target.name === 'slide-label') {
+    // Display help if no value, or table
+    elForm.querySelector(':scope .label_help').classList.toggle('d-none', event.target.value);
+    elForm.querySelector(':scope .individual-data').classList.toggle('d-none', !event.target.value);
+
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
     elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
@@ -103,5 +107,6 @@ export function init (parent) {
       event.preventDefault();
       formSubmit(elForm);
     });
+    elForm.querySelector(':scope .label_help>ul').innerHTML = window.mApi.labelHelp().map((x) => '<li>' + x + '</li>').join('\n');
   });
 }
