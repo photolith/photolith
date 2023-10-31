@@ -506,6 +506,10 @@ msgid "Project"
 msgstr "Verkefni"
 
 #: photolith/templates/project/update.html
+msgid "Cancel"
+msgstr ""
+
+#: photolith/templates/project/update.html
 msgid "Delete"
 msgstr "Eyða"
 

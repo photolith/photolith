@@ -8,6 +8,7 @@
   {% crispy form %}
 
   <div class="offcanvas-header">
+      <a href="{% url 'project:index' %}" class="btn btn-outline-dark btn-block">{% translate 'Cancel' %}</a>
       <button type="submit" form="project-form" class="btn btn-info">{% translate "Save" %}</button>
 
       {% if object.id and perms.photolith.delete_project %}
