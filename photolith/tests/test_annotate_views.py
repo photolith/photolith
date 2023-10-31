@@ -1,4 +1,5 @@
 import datetime
+import random
 import re
 
 from django.core.exceptions import BadRequest
@@ -17,7 +18,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             project=kwargs["project"].id if "project" in kwargs else "",
             age=kwargs.get("age", 10),
             axis_poly=kwargs.get("axis_poly", [[0, 0], [1, 1], [2, 2]]),
-            comment=kwargs.get("comment", "UT comment"),
+            comment=kwargs.get("comment", "UT comment %f" % random.uniform(100, 1000)),
             rating=kwargs.get("rating", Annotation.Rating.GOOD),
         )
 
@@ -25,10 +26,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         client.force_login(user)
         resp = client.post("/annotate/%d/" % (ind.id,), ann_dict)
         self.assertEqual(resp.status_code, 302)
-        m = re.fullmatch(r"/annotate/(\d+)/(\d+)\?(.*)", resp.url)
+        m = re.fullmatch(r"/annotate/(\d+)/\?(.*)", resp.url)
         self.assertTrue(m is not None)
         self.assertEqual(int(m.group(1)), ind.id)
-        out = Annotation.objects.get(pk=int(m.group(2)))
+        out = Annotation.objects.get(comment=ann_dict["comment"])
         return out
 
     def test_form_valid_authority(self):

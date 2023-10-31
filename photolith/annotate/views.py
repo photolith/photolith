@@ -24,10 +24,9 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         return (
             reverse_lazy(
-                "annotate:annotate_existing",
+                "annotate:annotate",
                 kwargs=dict(
                     individual_id=self.object.individual_id,
-                    annotation_id=self.object.id,
                 ),
             )
             + "?"
