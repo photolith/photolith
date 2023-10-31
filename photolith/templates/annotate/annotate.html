@@ -97,7 +97,7 @@
           <th class="text-nowrap">{{ object_model|verbose_name:"comment" }}</th>
         </tr></thead>
         <tbody>{% for a in all_annotations %}
-          <tr role="button">
+          <tr role="button" class="{% if a.created_by == request.user %}my-annotation{% endif %}" data-annotation-id="{{ a.id }}">
             <script class="axis_poly" type="application/json">{{ a.axis_poly }}</script></td>
             <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|time:'H:i' }}</code></td>
             <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
@@ -111,6 +111,7 @@
       {% if not read_only and object.id is None %}
         <button class="btn btn-info btn-block ph-copy-full">{% translate 'Copy full annotation' %}</button>
         <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy line only' %}</button>
+        <button class="btn btn-danger btn-block float-end ph-delete d-none">{% translate 'Delete annotation' %}</button>
       {% endif %}
     </div>
 

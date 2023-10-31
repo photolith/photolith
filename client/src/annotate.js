@@ -2,6 +2,7 @@ import { fabric } from 'fabric';
 
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
+import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
 function formRefresh (event) {
@@ -47,7 +48,19 @@ function allAnnotationsClick (elForm, event) {
       return;
     }
 
+    if (event.target.classList.contains('ph-delete')) {
+      return jsonFetch(`/annotate/delete/${elScript.parentNode.getAttribute('data-annotation-id')}/`, {
+        method: 'POST'
+      }).then((data) => {
+        elScript.parentNode.remove();
+        existingAnnotationsPopulate(
+          elForm,
+          this.querySelector('tbody'));
+        displayAlert('success', data.message);
+      });
+    }
 
+    // ph-copy-line or ph-copy-full
     if (event.target.classList.contains('ph-copy-line')) {
       // Strip out everything in the middle
       axisPoly = [axisPoly[0], axisPoly[axisPoly.length - 1]];
@@ -90,6 +103,9 @@ function existingAnnotationsPopulate (elForm, tableEl) {
     } else {
       polys = tableEl.querySelectorAll('script.axis_poly');
     }
+    document.querySelector('.ph-all-annotations > button.ph-delete').classList.toggle('d-none', !(
+      selectedEl && selectedEl.classList.contains('my-annotation')
+    ));
   }
 
   elForm.querySelector('.existing-annotation-polys').innerHTML = Array.from(polys).map((el, i) => {
