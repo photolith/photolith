@@ -3,7 +3,7 @@ import json
 import random
 import re
 
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.test import Client, RequestFactory, TestCase
 
 from ..annotate.views import AnnotateView, DeleteView
@@ -148,6 +148,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         user1 = self.create_user("user1")
         user2 = self.create_user("user2")
         user3 = self.create_user("user3")
+        user4 = self.create_user("user4")
+        userA = self.create_user("userA", groups=["Project Admin"])
 
         # Create 4 annotations, see all 4, newest first
         self.create_annotation(ind, user1, created_delta=dict(days=-3))
@@ -166,13 +168,25 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
         # Projects have no annotations
         self.assertEqual(
-            get_all_annotations(ind, project=dict(created_by=user3, base_user=None)),
+            get_all_annotations(
+                ind,
+                project=dict(
+                    created_by=user3, base_user=None, team=[user1, user2, user3]
+                ),
+                user=user3,
+            ),
             [],
         )
 
         # ...unless we assign a base user, get the most recent one, details blanked
         self.assertEqual(
-            get_all_annotations(ind, project=dict(created_by=user3, base_user=user1)),
+            get_all_annotations(
+                ind,
+                project=dict(
+                    created_by=user3, base_user=user1, team=[user1, user2, user3]
+                ),
+                user=user3,
+            ),
             ["0-user1-2"],
         )
 
@@ -181,6 +195,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         p = self.create_project(
             created_by=user3,
             base_user=user1,
+            team=[user1, user2, user3],
         )
         self.create_annotation(ind, user1, created_delta=dict(days=-5), project=p)
         self.create_annotation(ind, user1, created_delta=dict(days=-4), project=p)
@@ -188,7 +203,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.create_annotation(ind, user2, created_delta=dict(days=-2), project=p)
         self.assertEqual(p.is_open, True)
         self.assertEqual(
-            get_all_annotations(ind, project=p),
+            get_all_annotations(ind, project=p, user=user3),
             [
                 "0-user1-2",
             ],
@@ -210,12 +225,24 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
+        # user4 not part of the project
+        with self.assertRaisesRegex(PermissionDenied, "administrator"):
+            get_all_annotations(ind, project=p, user=user4),
+
+        # userA isn't either, but can get in anyway
+        self.assertEqual(
+            get_all_annotations(ind, project=p, user=userA),
+            [
+                "0-user1-2",
+            ],
+        )
+
         # Close & see everything part of project
         p.date_end = (self.now + datetime.timedelta(days=-1)).date()
         p.save()
         self.assertEqual(p.is_open, False)
         self.assertEqual(
-            get_all_annotations(ind, project=p),
+            get_all_annotations(ind, project=p, user=user3),
             [
                 "10-user2-2",
                 "10-user2-3",
@@ -223,6 +250,14 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                 "10-user1-5",
             ],
         )
+        self.assertEqual(
+            get_all_annotations(ind, project=p, user=user3),
+            get_all_annotations(ind, project=p, user=userA),
+        )
+
+        # user4 still not part of the project
+        with self.assertRaisesRegex(PermissionDenied, "administrator"):
+            get_all_annotations(ind, project=p, user=user4),
 
     def test_get_context_data(self):
         def ctx_data(individual, annotation=None, project=None, user=None):

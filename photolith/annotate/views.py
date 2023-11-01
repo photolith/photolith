@@ -103,7 +103,13 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         p_id = self.request.GET.get("project")
         if not p_id:
             return None
-        return get_object_or_404(Project, pk=p_id)
+        p = get_object_or_404(Project, pk=p_id)
+        if not self.request.user.has_perm("photolith.change_project"):
+            if not p.team.users.contains(self.request.user):
+                raise PermissionDenied(
+                    "Contact an administrator to be added to this project"
+                )
+        return p
 
     @cached_property
     def individual_id(self):
