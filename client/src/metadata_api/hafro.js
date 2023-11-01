@@ -79,8 +79,8 @@ const labelHelp = {
     '"(sample-id) (species no)", e.g. <kbd>537572 1</kbd>'
   ],
   is: [
-    'TODO: Full label, e.g. <kbd>537572 TG1-2023/110 1 03</kbd>',
-    'TODO: "(sample-id) (species no)", e.g. <kbd>537572 1</kbd>'
+    'Full merking á gleri, t.d. <kbd>537572 TG1-2023/110 1 03</kbd>',
+    '"(raðnúmer) (tegund nr.)", t.d. <kbd>537572 1</kbd>'
   ]
 };
 
