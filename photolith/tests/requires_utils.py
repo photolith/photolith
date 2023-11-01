@@ -128,6 +128,11 @@ class RequiresUtils:
         created_by=None,
         created_delta=dict(),
     ):
+        if isinstance(individuals, int):
+            individuals = [
+                self.create_individual(created_by=created_by, data=dict(idx=i))
+                for i in range(individuals)
+            ]
         out = Project.objects.create(
             name="UT Project %d" % (Project.objects.count() + 1),
             date_end=(self.now + datetime.timedelta(**date_end_delta)).date(),

@@ -1,6 +1,6 @@
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F
+from django.db.models import Count, F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
@@ -203,8 +203,28 @@ class AnnotateSnippetView(AnnotateView):
 
 
 class AnnotateStartView(AnnotateView):
-    # As above, but won't have an individual_id
-    pass
+    def project_progress(self):
+        """Retrun all individuals in project, together with number of annotations"""
+        p = self.current_project
+        if not p:
+            return None
+
+        return p.individuals.annotate(
+            num_annotations=Count(
+                "annotation",
+                filter=Q(
+                    annotation__project=p,
+                    annotation__created_by=self.request.user,
+                ),
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["project_progress"] = self.project_progress()
+
+        return context
 
 
 class DeleteView(PermissionRequiredMixin, View):

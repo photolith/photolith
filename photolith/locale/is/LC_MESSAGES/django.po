@@ -331,6 +331,15 @@ msgstr "Samtals lengd (mm)"
 msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 
+#: photolith/templates/annotate/annotate.html
+msgid "Individual"
+msgstr "Einstakingsnúmer"
+
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/project/list.html
+msgid "Annotations"
+msgstr "Aldursmerkingar"
+
 #: photolith/templates/annotate/snippet.html
 msgid "View annotations"
 msgstr "Skoða aldursmerkingar"
@@ -486,10 +495,6 @@ msgstr "Breyta"
 #: photolith/templates/project/list.html
 msgid "Closed projects"
 msgstr "Kláruð verkefni"
-
-#: photolith/templates/project/list.html
-msgid "Annotations"
-msgstr "Aldursmerkingar"
 
 #: photolith/templates/project/list.html
 msgid "Create a project by <kbd>searching</kbd>."

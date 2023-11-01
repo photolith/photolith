@@ -169,6 +169,21 @@
 </div>
 
 {% else %}
-<div class="p-5 text-center container rounded" style="background: #eee">{% translate "Press <kbd>Next</kbd> to start" %}</div>
+<div class="text-center container rounded" style="background: #eee">
+  <p class="my-4">{% translate "Press <kbd>Next</kbd> to start" %}</p>
+
+  <table class="table w-auto mx-auto">
+    <thead><tr>
+      <th>{% translate "Individual" %}</th>
+      <th>{% translate "Annotations" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for ind in project_progress %}<tr class="{% if ind.num_annotations > 0 %}table-success{% endif %}">
+        <td><a href="{% url 'annotate:annotate' ind.id %}?{{ request.GET.urlencode }}">{{ ind }}</a></td>
+        <td>{{ ind.num_annotations }}</td>
+      </tr>{% endfor %}
+    </tbody>
+
+</div>
 {% endif %}
 {% endblock content %}

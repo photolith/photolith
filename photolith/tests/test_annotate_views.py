@@ -6,7 +6,7 @@ import re
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.test import Client, RequestFactory, TestCase
 
-from ..annotate.views import AnnotateView, DeleteView
+from ..annotate.views import AnnotateView, AnnotateStartView, DeleteView
 from ..models import Annotation, Individual, Image, Project
 
 from .requires_utils import RequiresUtils
@@ -407,6 +407,56 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                 ann.axis_poly,
             ],
         )
+
+
+class AnnotateStartViewTest(RequiresUtils, TestCase):
+    def test_project_progress(self):
+        def pp(user, project):
+            request = RequestFactory().get(
+                "/",
+                dict(
+                    project=project.id,
+                ),
+            )
+            request.user = user
+            v = AnnotateStartView()
+            v.setup(request, **(request.GET.dict()))
+            out = v.project_progress()
+            return [(int(o.data["idx"]), o.num_annotations) for o in out]
+
+        user1 = self.create_user()
+        user2 = self.create_user()
+        user3 = self.create_user()
+        userA = self.create_user("userA", groups=["Project Admin"])
+
+        # 2 projects with same individuals
+        p1 = self.create_project(individuals=4, created_by=userA, team=[user1, user2])
+        p2 = self.create_project(
+            individuals=p1.individuals.all()[1:3], team=[user1, user2], created_by=userA
+        )
+
+        # Nothing annotated yet
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 0), (2, 0), (3, 0)])
+
+        # Do some annotation, counts go up
+        ann = self.create_annotation(p1.individuals.all()[1], user1, project=p1)
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 1), (2, 0), (3, 0)])
+        ann = self.create_annotation(p1.individuals.all()[1], user1, project=p1)
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 2), (2, 0), (3, 0)])
+        ann = self.create_annotation(p1.individuals.all()[2], user1, project=p1)
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 2), (2, 1), (3, 0)])
+
+        # user2 doesn't see them & vice versa
+        self.assertEqual(pp(user2, p1), [(0, 0), (1, 0), (2, 0), (3, 0)])
+        ann = self.create_annotation(p1.individuals.all()[1], user2, project=p1)
+        self.assertEqual(pp(user2, p1), [(0, 0), (1, 1), (2, 0), (3, 0)])
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 2), (2, 1), (3, 0)])
+
+        # Projects are also isolated from each other
+        self.assertEqual(pp(user1, p2), [(1, 0), (2, 0)])
+        ann = self.create_annotation(p2.individuals.all()[0], user1, project=p2)
+        self.assertEqual(pp(user1, p2), [(1, 1), (2, 0)])
+        self.assertEqual(pp(user1, p1), [(0, 0), (1, 2), (2, 1), (3, 0)])
 
 
 class AnnotateDeleteViewTest(RequiresUtils, TestCase):
