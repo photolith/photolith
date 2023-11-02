@@ -1,5 +1,6 @@
 import datetime
 import numbers
+import re
 
 from django.conf import settings
 from django.core.files.storage import storages
@@ -291,7 +292,7 @@ class Taxonomy(models.Model):
     def __str__(self):
         return "%s: %s" % (
             self.key,
-            getattr(self, "str_%s" % get_language(), "str_en"),
+            getattr(self, "str_%s" % re.sub(r"\W.*", "", get_language()), self.str_en),
         )
 
 
