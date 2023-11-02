@@ -1,6 +1,6 @@
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Count, F, Q
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
