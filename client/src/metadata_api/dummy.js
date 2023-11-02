@@ -53,7 +53,8 @@ function randomChoice (ar) {
 
 export default class MetadataApi {
   constructor (lang, baseHref) {
-    this.lang = lang;
+    // Strip -gb from en-gb
+    this.lang = lang.replace(/\W.*/, '');
     this.baseHref = baseHref || '';
   }
 

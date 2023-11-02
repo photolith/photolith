@@ -40,7 +40,7 @@ function populateFilter (elForm) {
         </div>`;
     } else if (mf.filter_name.startsWith('tx')) {
       controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
-          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(mf.filter_name).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang]}</option>`)}
+          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(mf.filter_name).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
         </select>`;
     } else if (mf.filter_name.startsWith('dt')) {
       controlHtml = `<div class="input-group">
@@ -84,7 +84,7 @@ export function init (parent) {
     DataTable.ext.errMode = 'throw';
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
-      language: { url: lang !== 'en' ? `/static/datatables.net-plugins/i18n/${lang}.json` : undefined },
+      language: { url: lang === 'en-us' ? undefined : `/static/datatables.net-plugins/i18n/${lang}.json` },
       // Allow table to resize with browser
       autoWidth: false,
       ajax: function (data, callback) {

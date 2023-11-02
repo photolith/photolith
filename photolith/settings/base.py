@@ -117,7 +117,7 @@ LANGUAGES = [
     (lang, get_language_info(lang)["name_translated"])
     for lang in (
         "is",
-        "en",
+        "en-gb",
     )
 ]
 LOCALE_PATHS = [BASE_DIR / "locale/"]

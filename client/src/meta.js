@@ -17,8 +17,8 @@ export function renderMetaCell (k, data, type, row, meta) {
   let out = data;
 
   if (typeof out === 'object' && out.id && out.en) {
-    // Resolve language
-    out = out[document.documentElement.lang] || out.en;
+    // Resolve language, stripping off any -GB
+    out = out[document.documentElement.lang.replace(/\W.*/, '')] || out.en;
   }
 
   if (type && type !== 'display') {
@@ -40,11 +40,15 @@ export function renderMetaCell (k, data, type, row, meta) {
   if (ISO_DT_REGEX.test(out)) {
     // Convert ISO string to human-readable before continuing
     const dt = DateTime.fromISO(out);
-    // NB: Ideally tell Intl to use en/is locale, but:
-    // * We should be telling it en-GB, not just en.
-    // * The browser may not have 'is' anyway
-    // The operating system locale is a more useful default
-    out = dt.toLocaleString(DateTime.DATETIME_SHORT);
+    try {
+      // Try first using the django locale
+      // NB: Hafro browsers are set to en-US, even though they really want en-GB dates.
+      //     Django only recognises en-gb, so this should do the "right" thing in this case.
+      out = dt.setLocale(document.documentElement.lang).toLocaleString(DateTime.DATETIME_SHORT);
+    } catch (e) {
+      console.warn('Date formatting failed, trying without locale', e);
+      out = dt.toLocaleString(DateTime.DATETIME_SHORT);
+    }
   }
 
   return `<code>${htmlEscape(out)}</code>`;
