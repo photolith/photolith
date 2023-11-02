@@ -1,16 +1,25 @@
+import csv
 import datetime
 import itertools
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.cache import cache
 from django.views.generic import TemplateView
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.db.models import F, Subquery, Min, Max
+from django.db.models import Prefetch, Subquery, Min, Max
 
 from ..errors import json_errors
-from ..models import Individual, MetaNumeric, MetaChar, MetaTx, Project, Taxonomy
+from ..models import (
+    Annotation,
+    Individual,
+    MetaNumeric,
+    MetaChar,
+    MetaTx,
+    Project,
+    Taxonomy,
+)
 from ..nullagg import NullAgg
 
 
@@ -65,7 +74,7 @@ class IndexView(PermissionRequiredMixin, TemplateView):
 class DataView(PermissionRequiredMixin, View):
     permission_required = ("photolith.view_individual",)
 
-    def query(self):
+    def query(self, with_annotations="", with_image_url=False):
         qs = Individual.objects
         qs = (
             qs.select_related("image")
@@ -74,7 +83,6 @@ class DataView(PermissionRequiredMixin, View):
             .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
-            .annotate(image__content=F("image__content"))
         )
 
         # If searching for a project, only search within individuals part of project
@@ -146,11 +154,61 @@ class DataView(PermissionRequiredMixin, View):
                     )
                 )
 
+        if with_annotations:
+            if with_annotations == "all" or with_annotations == "best":
+                ann_qs = Annotation.objects.order_by("-authority", "-created_at")
+            else:
+                raise ValueError("Unknown annotations type '%s'" % with_annotations)
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "annotation_set",
+                    queryset=ann_qs,
+                    to_attr="_annotations",
+                )
+            )
+
         for ind in qs:
             out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
             out.update(ind.data)
             out["__str__"] = str(ind)
-            yield out
+
+            if with_image_url:
+                out["image__content__url"] = self.request.build_absolute_uri(
+                    ind.image.content.url
+                )
+
+            if with_annotations and len(ind._annotations) > 0:
+                px_to_mm = ind.image.px_to_mm()
+                for a in ind._annotations:
+                    a_out = dict(
+                        age=a.age,
+                        rating=a.rating,
+                        authority=a.authority,
+                        annotated_by=a.created_by,
+                        annotated_at=a.created_at,
+                        comment=a.comment,
+                    )
+                    for i, x in enumerate(a.axis_poly_dists()):
+                        a_out["growth_%d" % (i + 1)] = px_to_mm * x
+
+                    yield {**out, **a_out}
+                    if with_annotations == "best":
+                        # Only want one annotation, stop now
+                        break
+            elif with_annotations:
+                # Output row with dummy data
+                a_out = dict(
+                    age=None,
+                    rating=None,
+                    authority=None,
+                    annotated_by=None,
+                    annotated_at=None,
+                    comment=None,
+                )
+
+                yield {**out, **a_out}
+            else:
+                yield out
 
     @json_errors
     def get(self, *args, **kwargs):
@@ -158,5 +216,54 @@ class DataView(PermissionRequiredMixin, View):
 
         context["data"] = list(self.query())
 
-        # TODO: Data from summary cols, i.e. age / rating
         return JsonResponse(context)
+
+
+class ExportView(DataView):
+    def get(self, *args, **kwargs):
+        # https://docs.djangoproject.com/en/4.2/howto/outputting-csv/#streaming-large-csv-files
+        def csv_rowgen(rows):
+            class Echo:
+                def write(self, value):
+                    return value
+
+            # Extract fieldnames by reading first row early
+            try:
+                first_row = next(rows)
+                # NB: Cheat and assume fish are at most 20 years old, we don't know at this point
+                fieldnames = [
+                    k
+                    for k in first_row.keys()
+                    if k not in ("id", "image_id", "created_by_id", "__str__")
+                ] + ["growth_%d" % i for i in range(1, 21)]
+                # Put first row back again
+                rows = itertools.chain([first_row], rows)
+            except StopIteration:
+                # Nothing in search, return empty CSV
+                return
+
+            writer = csv.writer(Echo())
+            yield writer.writerow(fieldnames)
+            for row in rows:
+                row_out = []
+                for n in fieldnames:
+                    if isinstance(row.get(n), dict):  # Taxonomy
+                        row_out.append(row[n]["id"])
+                    elif isinstance(row.get(n), datetime.date):
+                        row_out.append(row[n].isoformat())
+                    else:
+                        row_out.append(row.get(n))
+                yield writer.writerow(row_out)
+
+        return StreamingHttpResponse(
+            csv_rowgen(
+                self.query(
+                    with_annotations=self.kwargs["with_annotations"],
+                    with_image_url=True,
+                )
+            ),
+            content_type="text/csv",
+            headers={
+                "Content-Disposition": 'attachment; filename="photolith-export.csv"'
+            },
+        )

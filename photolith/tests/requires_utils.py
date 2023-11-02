@@ -78,6 +78,8 @@ class RequiresUtils:
         rating=Annotation.Rating.GOOD,
         age=10,
         axis_poly=[[0, 0], [1, 1], [2, 2]],
+        authority=0,
+        comment="",
         project=None,
     ):
         if not created_by:
@@ -90,6 +92,8 @@ class RequiresUtils:
             rating=Annotation.Rating.GOOD,
             age=10,
             axis_poly=axis_poly,
+            authority=authority,
+            comment=comment,
             project=project,
         )
         out.created_at = out.modified_at = self.now + datetime.timedelta(
