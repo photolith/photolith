@@ -151,6 +151,28 @@ class IndividualTest(RequiresUtils, TestCase):
         )
 
 
+class AnnotationTest(RequiresUtils, TestCase):
+    def assertAlmostEqualList(self, a, b):
+        self.assertEqual(len(a), len(b))
+        for i in range(len(a)):
+            self.assertAlmostEqual(a[i], b[i])
+
+    def test_axis_poly_dists(self):
+        def axis_poly_dists(axis_poly):
+            ind = self.create_individual()
+            ann = self.create_annotation(ind, axis_poly=axis_poly)
+            return ann.axis_poly_dists()
+
+        self.assertAlmostEqualList(
+            axis_poly_dists([(0, 0), (10, 15), (20, 20), (30, 30)]),
+            [18.027756377319946, 11.180339887498949, 14.142135623730951],
+        )
+        self.assertAlmostEqualList(
+            axis_poly_dists([(20, 20), (30, 30), (40, 40)]),
+            [14.142135623730951, 14.142135623730951],
+        )
+
+
 class ProjectTest(TestCase):
     maxDiff = None
 

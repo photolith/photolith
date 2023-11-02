@@ -350,6 +350,11 @@ class Annotation(models.Model):
             models.Index(fields=["created_by", "individual"]),
         ]
 
+    def axis_poly_dists(self):
+        return [
+            euclidean_dist(a, b) for a, b in zip(self.axis_poly, self.axis_poly[1:])
+        ]
+
 
 def in_4_weeks():
     return datetime.date.today() + datetime.timedelta(weeks=4)
