@@ -139,14 +139,13 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
-            .annotate(image__scale_line=F("image__scale_line"))
-            .annotate(image__scale_mm=F("image__scale_mm"))
         )
         ind = get_object_or_404(qs)
 
         out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
         out.update(ind.data)
         out["image__content__url"] = ind.image.content.url
+        out["image__px_to_mm"] = ind.image.px_to_mm()
         return out
 
     def get_context_data(self, **kwargs):

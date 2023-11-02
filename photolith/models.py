@@ -7,6 +7,11 @@ from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
 
 
+def euclidean_dist(a, b):
+    """Distance between 2 (x, y) tuples"""
+    return pow(pow(b[0] - a[0], 2) + pow(b[1] - a[1], 2), 0.5)
+
+
 def default_storage():
     return storages["default"]
 
@@ -46,6 +51,9 @@ class Image(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    def px_to_mm(self):
+        return self.scale_mm / euclidean_dist(self.scale_line[0], self.scale_line[1])
 
 
 class Individual(models.Model):

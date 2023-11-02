@@ -120,7 +120,7 @@
   {% if not read_only %}
   <div class="tab-pane {% if default_tab == 'editor' %}show active{% endif %}" id="editor-tab-pane" role="tabpanel" aria-labelledby="editor-tab" tabindex="0">
 
-    <form action="{{ request.get_full_path }}" method="POST" class="annotate-form mt-2 row">
+    <form action="{{ request.get_full_path }}" method="POST" class="annotate-form mt-2 row" data-px-mm="{{ ind_data.image__px_to_mm }}">
       {% csrf_token %}
       <input type="hidden" name="selection" value="" />
       <div class="existing-annotation-polys"></div>

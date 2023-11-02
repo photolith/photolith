@@ -5,9 +5,9 @@ import { changeEvent } from './events';
 import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
-function formRefresh (event) {
+function formRefresh (pxMmRatio, event) {
   function pxToMM (px) {
-    const mm = px * event.target.form.phPxMmRatio;
+    const mm = px * pxMmRatio;
     return Math.round(mm * 100) / 100;
   }
 
@@ -34,7 +34,7 @@ function formRefresh (event) {
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh({ target: event.target.form.axis_poly });
+    formRefresh(pxMmRatio, { target: event.target.form.axis_poly });
   }
 }
 
@@ -118,12 +118,7 @@ export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
-    // Ratio to convert annotation point distance into mm
-    elForm.phPxMmRatio = indData.image__scale_mm / new fabric.Point(indData.image__scale_line[0][0], indData.image__scale_line[0][1]).distanceFrom(
-      new fabric.Point(indData.image__scale_line[1][0], indData.image__scale_line[1][1])
-    );
-
-    elForm.addEventListener('change', formRefresh);
+    elForm.addEventListener('change', formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm'))));
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 

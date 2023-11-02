@@ -101,8 +101,8 @@ class RequiresUtils:
         self,
         orig_filename=None,
         mimetype="image/jpeg",
-        scale_line=None,
-        scale_mm=None,
+        scale_line=[(10, 10), (20, 20)],
+        scale_mm=10,
     ):
         if not orig_filename:
             orig_filename = "ut_image%d.jpg" % (Image.objects.count() + 1)

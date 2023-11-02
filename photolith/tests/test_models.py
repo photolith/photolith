@@ -7,6 +7,18 @@ from ..models import *
 from .requires_utils import RequiresUtils
 
 
+class ImageTest(RequiresUtils, TestCase):
+    def test_px_to_mm(self):
+        def px_to_mm(scale_line, scale_mm):
+            i = self.create_image(scale_line=scale_line, scale_mm=scale_mm)
+            return i.px_to_mm()
+
+        self.assertAlmostEqual(
+            px_to_mm([(10, 20), (30, 50)], 10),
+            0.2773500981126146,
+        )
+
+
 class IndividualTest(RequiresUtils, TestCase):
     def test_data(self):
         """Make sure we can get and set data JSON, updating schema transparently"""
