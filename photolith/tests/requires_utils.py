@@ -125,6 +125,7 @@ class RequiresUtils:
 
     def create_project(
         self,
+        name=None,
         team=[],
         individuals=[],
         date_end_delta=dict(days=1),
@@ -138,7 +139,7 @@ class RequiresUtils:
                 for i in range(individuals)
             ]
         out = Project.objects.create(
-            name="UT Project %d" % (Project.objects.count() + 1),
+            name=name or "UT Project %d" % (Project.objects.count() + 1),
             date_end=(self.now + datetime.timedelta(**date_end_delta)).date(),
             base_user=base_user,
             created_by=created_by,

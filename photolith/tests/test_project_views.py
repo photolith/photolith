@@ -1,4 +1,4 @@
-from django.test import RequestFactory, TestCase
+from django.test import Client, RequestFactory, TestCase
 
 from ..project.views import ProjectListView
 from ..models import Annotation, Individual, Image, Project
@@ -213,3 +213,97 @@ class ProjectListViewTest(RequiresUtils, TestCase):
                 ),
             ],
         )
+
+
+class ProjectUpdateViewTest(RequiresUtils, TestCase):
+    def do_project_update(self, project, user, **updates):
+        client = Client()
+        client.force_login(user)
+        if "team" not in updates:
+            updates["team"] = project.team.id
+        if "individuals" not in updates:
+            updates["individuals"] = [i.id for i in project.individuals.all()]
+        if "date_end" not in updates:
+            updates["date_end"] = project.date_end
+        resp = client.post("/project/update/%d/" % (project.id,), updates)
+        return (
+            resp.status_code,
+            json.loads(resp.content)
+            if resp.headers["Content-Type"] == "application/json"
+            else resp.content,
+        )
+
+    def test_call(self):
+        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
+        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=["Annotate"])
+        user2 = self.create_user(groups=["Annotate"])
+
+        p1 = self.create_project(
+            name="A1_project",
+            individuals=2,
+            team=[user1],
+            created_by=userA1,
+        )
+
+        # Only owner is allowed to update
+        self.assertEqual(self.do_project_update(p1, user1, name="Gerald")[0], 403)
+        self.assertEqual(Project.objects.filter(pk=p1.id).first().name, "A1_project")
+        self.assertEqual(self.do_project_update(p1, user2, name="Gerald")[0], 403)
+        self.assertEqual(Project.objects.filter(pk=p1.id).first().name, "A1_project")
+        self.assertEqual(self.do_project_update(p1, userA2, name="Gerald")[0], 403)
+        self.assertEqual(Project.objects.filter(pk=p1.id).first().name, "A1_project")
+        self.assertEqual(self.do_project_update(p1, userA1, name="Gerald")[0], 302)
+        self.assertEqual(Project.objects.filter(pk=p1.id).first().name, "Gerald")
+
+
+class ProjectDeleteViewTest(RequiresUtils, TestCase):
+    def do_project_del(self, project, user):
+        client = Client()
+        client.force_login(user)
+        resp = client.post("/project/delete/%d/" % (project.id,), {})
+        return (
+            resp.status_code,
+            json.loads(resp.content)
+            if resp.headers["Content-Type"] == "application/json"
+            else resp.content,
+        )
+
+    def test_call(self):
+        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
+        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=["Annotate"])
+        user2 = self.create_user(groups=["Annotate"])
+
+        p1 = self.create_project(
+            name="A1_project",
+            individuals=2,
+            team=[user1],
+            created_by=userA1,
+        )
+        p2 = self.create_project(
+            name="A2_project",
+            individuals=4,
+            team=[user2],
+            created_by=userA2,
+        )
+
+        # Only owner is allowed to delete
+        self.assertEqual(self.do_project_del(p1, user1)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A1_project").count(), 1)
+        self.assertEqual(self.do_project_del(p1, user2)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A1_project").count(), 1)
+        self.assertEqual(self.do_project_del(p1, userA2)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A1_project").count(), 1)
+        self.assertEqual(self.do_project_del(p1, userA1)[0], 302)
+        self.assertEqual(Project.objects.filter(name="A1_project").count(), 0)
+
+        # Only owner is allowed to delete
+        self.assertEqual(self.do_project_del(p2, user1)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A2_project").count(), 1)
+        self.assertEqual(self.do_project_del(p2, user2)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A2_project").count(), 1)
+        self.assertEqual(self.do_project_del(p2, userA1)[0], 403)
+        self.assertEqual(Project.objects.filter(name="A2_project").count(), 1)
+        self.assertEqual(self.do_project_del(p2, userA2)[0], 302)
+        self.assertEqual(Project.objects.filter(name="A2_project").count(), 0)

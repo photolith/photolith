@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count, Exists, OuterRef
 from django.urls import reverse_lazy
@@ -69,6 +70,14 @@ class ProjectUpdateView(PermissionRequiredMixin, UpdateView):
         context["object_model"] = self.model
         return context
 
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.created_by != self.request.user:
+            raise PermissionDenied(
+                "This project is owned by '%s'" % self.object.created_by
+            )
+        return super().post(*args, **kwargs)
+
 
 # https://docs.djangoproject.com/en/4.2/ref/class-based-views/generic-editing/#django.views.generic.edit.DeleteView
 class ProjectDeleteView(PermissionRequiredMixin, DeleteView):
@@ -76,3 +85,11 @@ class ProjectDeleteView(PermissionRequiredMixin, DeleteView):
     model = Project
     slug_field = "id"
     success_url = reverse_lazy("project:index")
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.created_by != self.request.user:
+            raise PermissionDenied(
+                "This project is owned by '%s'" % self.object.created_by
+            )
+        return super().post(*args, **kwargs)
