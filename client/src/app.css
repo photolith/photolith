@@ -11,3 +11,10 @@
   inset: 0 0.75rem;
   width: auto;
 }
+
+.ph-line-legend {
+  display: inline-block;
+  border: 3px solid transparent;
+  margin-bottom: 2px;
+  width: 2rem;
+}

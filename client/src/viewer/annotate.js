@@ -5,15 +5,6 @@ import EditableLine from './editable_line';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 
-const existingPallete = [
-  '230, 159, 0',
-  '0, 158, 115',
-  '240, 228, 66',
-  '0, 144, 178',
-  '213, 94, 0',
-  '204, 121, 167'
-];
-
 export class PhAnnotate extends PhSyncingViewer {
   constructor (elViewer) {
     super(elViewer);
@@ -77,9 +68,9 @@ export class PhAnnotate extends PhSyncingViewer {
       const i = parseInt(m[1], 10);
       const obj = new EditableLine({
         id: el.name,
-        stroke: `rgba(${existingPallete[i % existingPallete.length]}, 0.6)`
+        stroke: `rgba(${el.getAttribute('data-stroke')}, 0.6)`
       }, {
-        stroke: `rgba(${existingPallete[i % existingPallete.length]}, 1)`,
+        stroke: `rgba(${el.getAttribute('data-stroke')}, 1)`,
         radius: 10 - (i % 5),
         selectable: false
       });

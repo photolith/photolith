@@ -5,6 +5,15 @@ import { changeEvent } from './events';
 import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
+const existingPallete = [
+  '230, 159, 0',
+  '0, 158, 115',
+  '240, 228, 66',
+  '0, 144, 178',
+  '213, 94, 0',
+  '204, 121, 167'
+];
+
 function formRefresh (pxMmRatio, event) {
   function pxToMM (px) {
     const mm = px * pxMmRatio;
@@ -40,8 +49,8 @@ function formRefresh (pxMmRatio, event) {
 
 function allAnnotationsClick (elForm, event) {
   if (event.target.tagName === 'BUTTON') {
-    const elScript = this.querySelector('tbody > tr.table-info script.axis_poly');
-    let axisPoly = elScript ? JSON.parse(elScript.textContent) : undefined;
+    const elSelected = this.querySelector('tbody > tr.table-info');
+    let axisPoly = elSelected ? JSON.parse(elSelected.querySelector(':scope .ph-line-legend').getAttribute('data-axis-poly')) : undefined;
 
     if (!axisPoly) {
       displayAlert('warning', this.getAttribute('data-locale-select-annotation-first'), 2000);
@@ -49,10 +58,10 @@ function allAnnotationsClick (elForm, event) {
     }
 
     if (event.target.classList.contains('ph-delete')) {
-      return jsonFetch(`/annotate/delete/${elScript.parentNode.getAttribute('data-annotation-id')}/`, {
+      return jsonFetch(`/annotate/delete/${elSelected.getAttribute('data-annotation-id')}/`, {
         method: 'POST'
       }).then((data) => {
-        elScript.parentNode.remove();
+        elSelected.remove();
         existingAnnotationsPopulate(
           elForm,
           this.querySelector('tbody'));
@@ -98,18 +107,27 @@ function existingAnnotationsPopulate (elForm, tableEl) {
   if (tableEl) {
     const selectedEl = tableEl.querySelector('tr.table-info');
 
+    // Grey all legends, so unused legends stay greyed out
+    tableEl.querySelectorAll('.ph-line-legend').forEach((el) => {
+      el.style.borderColor = '#ccc';
+    });
+
     if (selectedEl) {
-      polys = selectedEl.querySelectorAll('script.axis_poly');
+      polys = selectedEl.querySelectorAll('.ph-line-legend');
     } else {
-      polys = tableEl.querySelectorAll('script.axis_poly');
+      polys = tableEl.querySelectorAll('.ph-line-legend');
     }
+
     document.querySelector('.ph-all-annotations > button.ph-delete').classList.toggle('d-none', !(
       selectedEl && selectedEl.classList.contains('my-annotation')
     ));
   }
 
   elForm.querySelector('.existing-annotation-polys').innerHTML = Array.from(polys).map((el, i) => {
-    return `<input type="hidden" name="view_poly:${i}" value="${el.textContent}" />`;
+    const col = existingPallete[i % existingPallete.length];
+
+    el.style.borderColor = `rgb(${col})`;
+    return `<input type="hidden" name="view_poly:${i}" data-stroke="${col}" value="${el.getAttribute('data-axis-poly')}" />`;
   }).join('\n');
   elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
 }
