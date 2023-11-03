@@ -190,7 +190,9 @@ class ProjectTest(TestCase):
         # Is still open today
         p.date_end = datetime.date.today()
         self.assertEqual(p.is_open, True)
+        self.assertEqual(p.is_closed, not p.is_open)
 
         # Not open yesterday
         p.date_end = datetime.date.today() - datetime.timedelta(days=1)
         self.assertEqual(p.is_open, False)
+        self.assertEqual(p.is_closed, not p.is_open)

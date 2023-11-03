@@ -409,6 +409,10 @@ class Project(models.Model):
     def is_open(self):
         return self.date_end >= datetime.date.today()
 
+    @property
+    def is_closed(self):
+        return not self.is_open
+
     def annotations_for(self, individual_id, annotater):
         """Return annotations that should be visible as part of this project"""
         if not self.is_open:
