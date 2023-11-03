@@ -7,28 +7,97 @@ from .requires_utils import RequiresUtils
 
 
 class ProjectListViewTest(RequiresUtils, TestCase):
-    def query(self, user, **kwargs):
-        request = RequestFactory().get("/", kwargs)
+    def query(self, user, *outputs):
+        request = RequestFactory().get("/", {})
         request.user = user
         v = ProjectListView()
         v.setup(request, **(request.GET.dict()))
-        out = [
-            dict(
-                name=p.name,
-                is_open=p.is_open,
-                num_annotations=p.num_annotations,
-                num_individuals=p.num_individuals,
-            )
-            for p in v.get_queryset().all()
-        ]
+
+        out = [{k: getattr(row, k) for k in outputs} for row in v.get_queryset()]
         return out
 
-    def test_get_queryset(self):
+    def test_get_queryset__visibility(self):
+        user1 = self.create_user(groups=["Annotate"])
+        user2 = self.create_user(groups=["Annotate"])
+        user3 = self.create_user(groups=["Annotate"])
+        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
+        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
+
+        self.create_project(
+            name="p1.1",
+            team=[user1, user2, userA2],
+            date_end_delta=dict(days=4),
+            created_by=userA1,
+        )
+        self.create_project(
+            name="p1.2",
+            team=[user2, user3, userA1],
+            date_end_delta=dict(days=3),
+            created_by=userA1,
+        )
+        self.create_project(
+            name="p2.1",
+            team=[user1, user2, userA2],
+            date_end_delta=dict(days=2),
+            created_by=userA2,
+        )
+        self.create_project(
+            name="p2.2",
+            team=[user2, user3, userA1],
+            date_end_delta=dict(days=1),
+            created_by=userA2,
+        )
+
+        # Can see projects we either created or part of the team
+        self.assertEqual(
+            self.query(user1, "name", "team_member"),
+            [
+                {"name": "p1.1", "team_member": True},
+                {"name": "p2.1", "team_member": True},
+            ],
+        )
+        self.assertEqual(
+            self.query(user2, "name", "team_member"),
+            [
+                {"name": "p1.1", "team_member": True},
+                {"name": "p1.2", "team_member": True},
+                {"name": "p2.1", "team_member": True},
+                {"name": "p2.2", "team_member": True},
+            ],
+        )
+        self.assertEqual(
+            self.query(user3, "name", "team_member"),
+            [
+                {"name": "p1.2", "team_member": True},
+                {"name": "p2.2", "team_member": True},
+            ],
+        )
+        self.assertEqual(
+            self.query(userA1, "name", "team_member"),
+            [
+                {"name": "p1.1", "team_member": False},
+                {"name": "p1.2", "team_member": True},
+                {"name": "p2.2", "team_member": True},
+            ],
+        )
+        self.assertEqual(
+            self.query(userA2, "name", "team_member"),
+            [
+                {"name": "p1.1", "team_member": True},
+                {"name": "p2.1", "team_member": True},
+                {"name": "p2.2", "team_member": False},
+            ],
+        )
+
+    def test_get_queryset__annotation_counts(self):
         user1 = self.create_user(groups=["Annotate"])
         user2 = self.create_user(groups=["Annotate"])
         user3 = self.create_user(groups=["Annotate"])
         userA = self.create_user(groups=["Annotate", "Project Admin"])
-        self.assertEqual(self.query(user1), [])
+        self.assertEqual(
+            self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
+            [],
+        )
 
         ind_fish = Individual.objects.create(
             image=self.create_image("moo1.jpg"),
@@ -53,7 +122,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             date_end_delta=dict(days=2),
         )
         self.assertEqual(
-            self.query(user1),
+            self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -64,7 +133,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             ],
         )
         self.assertEqual(
-            self.query(user2),
+            self.query(user2, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -81,12 +150,15 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             ],
         )
         # NB: Not part of p1 or p2
-        self.assertEqual(self.query(user3), [])
+        self.assertEqual(
+            self.query(user3, "name", "is_open", "num_annotations", "num_individuals"),
+            [],
+        )
 
         # user1 does some annotating
         self.create_annotation(ind_fish, created_by=user1, project=p1)
         self.assertEqual(
-            self.query(user1),
+            self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -100,7 +172,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
         # Do some more on the same individual, doesn't alter counts
         self.create_annotation(ind_fish, created_by=user1, project=p1)
         self.assertEqual(
-            self.query(user1),
+            self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -114,7 +186,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
         # Do annotation on other individual
         self.create_annotation(ind_rock, created_by=user1, project=p1)
         self.assertEqual(
-            self.query(user1),
+            self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -127,7 +199,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
 
         # User2 sees none of this
         self.assertEqual(
-            self.query(user2),
+            self.query(user2, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -151,7 +223,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             project=None,
         )
         self.assertEqual(
-            self.query(user2),
+            self.query(user2, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -175,7 +247,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             project=p1,
         )
         self.assertEqual(
-            self.query(user2),
+            self.query(user2, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",
@@ -197,7 +269,7 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             project=p2,
         )
         self.assertEqual(
-            self.query(user2),
+            self.query(user2, "name", "is_open", "num_annotations", "num_individuals"),
             [
                 dict(
                     name="UT Project 1",

@@ -1,11 +1,11 @@
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Q
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
-from ..models import Annotation, Project
+from ..models import Annotation, Project, Team
 from .forms import ProjectForm
 
 
@@ -17,8 +17,12 @@ class ProjectListView(PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if not self.request.user.has_perm("photolith.change_project"):
-            qs = qs.filter(team__users=self.request.user)
+
+        # Only show projects you're part of, or you created
+        qs = qs.filter(
+            Q(team__users=self.request.user) | Q(created_by=self.request.user)
+        )
+
         qs = qs.order_by("-date_end")
         # Count annotations made by self
         qs = qs.annotate(
@@ -34,6 +38,13 @@ class ProjectListView(PermissionRequiredMixin, ListView):
                 ),
             ),
             num_individuals=Count("individuals", distinct=True),
+        )
+
+        # Add boolean to show if we're a member
+        qs = qs.annotate(
+            team_member=Exists(
+                Team.objects.filter(project=OuterRef("pk"), users=self.request.user)
+            ),
         )
         return qs
 
