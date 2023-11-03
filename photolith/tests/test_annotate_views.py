@@ -229,13 +229,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=user4),
 
-        # userA isn't either, but can get in anyway
-        self.assertEqual(
+        # userA isn't either, being a project admin isn't enough
+        with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=userA),
-            [
-                "0-user1-2",
-            ],
-        )
 
         # Close & see everything part of project
         p.date_end = (self.now + datetime.timedelta(days=-1)).date()
@@ -250,10 +246,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                 "10-user1-5",
             ],
         )
-        self.assertEqual(
-            get_all_annotations(ind, project=p, user=user3),
+        # UserA still can't get in
+        with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=userA),
-        )
 
         # user4 still not part of the project
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
