@@ -9,37 +9,36 @@
 {% regroup object_list by is_open as open_closed_groups %}
 {% for is_open, object_group in open_closed_groups %}
 {% if is_open %}
-  <h2>{% translate 'Open projects' %}</h2>
+  <h2 class="mt-3">{% translate 'Open projects' %}</h2>
 
   <table class="table ph-project-table">
     <thead>
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
+      <th class="text-nowrap">{{ object_model|verbose_name:"team" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
       <th class="text-nowrap">{% translate "Individuals annotated" %}</th>
-      <th width="100%"></th>
-      {% if perms.photolith.change_project %}<th></th>{% endif %}
+      <th></th>
     </thead>
     <tbody>
-      {% for object in object_group %}
+      {% for object in object_group %}{% if object.team_member or object.created_by == request.user %}
         <tr>
           <td>{{object.name}}</td>
+          <td>{{object.team.name}}</td>
           <td>{{object.date_end}}</td>
           <td>{{object.num_annotations}} / {{object.num_individuals}}</td>
           <td>
-            {% if object.num_annotations < object.num_individuals %}
+            {% if object.team_member %}
               <a href="{% url 'annotate:start' %}?project={{ object.id }}" class="btn btn-info">{% translate "Annotate project" %}</a>
-            {% endif %}
-            {% if perms.photolith.change_project %}
+            {% elif object.created_by == request.user %}
               <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
             {% endif %}
+
+            {% if object.created_by == request.user %}
+              <a href="{% url 'project:update' object.id %}" class="btn btn-info float-end">{% translate "Edit" %}</a>
+            {% endif %}
           </td>
-          {% if perms.photolith.change_project %}
-            <td>
-              <a href="{% url 'project:update' object.id %}" class="btn btn-info">{% translate "Edit" %}</a>
-            </td>
-          {% endif %}
         </tr>
-      {% endfor %}
+      {% endif %}{% endfor %}
     </tbody>
   </table>
 {% else %}
@@ -48,27 +47,25 @@
   <table class="table ph-project-table">
     <thead>
       <th class="text-nowrap">{{ object_model|verbose_name:"name" }}</th>
+      <th class="text-nowrap">{{ object_model|verbose_name:"team" }}</th>
       <th class="text-nowrap">{{ object_model|verbose_name:"date_end" }}</th>
-      <th class="text-nowrap">{% translate "Annotations" %}</th>
-      <th width="100%"></th>
-      {% if perms.photolith.change_project %}<th></th>{% endif %}
+      <th></th>
     </thead>
     <tbody>
-      {% for object in object_group %}
+      {% for object in object_group %}{% if object.team_member or object.created_by == request.user %}
         <tr>
           <td>{{object.name}}</td>
+          <td>{{object.team.name}}</td>
           <td>{{object.date_end}}</td>
-          <td>{{object.num_annotations}} / {{object.num_individuals}}</td>
           <td>
             <a href="{% url 'search:index' %}?project={{ object.id }}" class="btn btn-info">{% translate "View results" %}</a>
+
+            {% if object.created_by == request.user %}
+              <a href="{% url 'project:update' object.id %}" class="btn btn-info float-end">{% translate "Edit" %}</a>
+            {% endif %}
           </td>
-          {% if perms.photolith.change_project %}
-            <td>
-              <a href="{% url 'project:update' object.id %}" class="btn btn-info">{% translate "Edit" %}</a>
-            </td>
-          {% endif %}
         </tr>
-      {% endfor %}
+      {% endif %}{% endfor %}
     </tbody>
   </table>
 {% endif %}

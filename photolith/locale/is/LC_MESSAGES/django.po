@@ -336,7 +336,6 @@ msgid "Individual"
 msgstr "Einstakingsnúmer"
 
 #: photolith/templates/annotate/annotate.html
-#: photolith/templates/project/list.html
 msgid "Annotations"
 msgstr "Aldursmerkingar"
 
