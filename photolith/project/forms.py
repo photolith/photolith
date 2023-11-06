@@ -13,7 +13,7 @@ class ProjectForm(forms.ModelForm):
         self.fields["base_user"].empty_label = _("No base axis")
         self.fields["base_user"].required = False
         # https://django-crispy-forms.readthedocs.io/en/latest/api_layout.html
-        self.fields["date_end"].widget.input_type = "date"
+        self.fields["date_end"].widget = DatePicker()
 
         # Only show already-selected options, let javascript populate initial values
         if self.instance.id:
@@ -36,3 +36,15 @@ class ProjectForm(forms.ModelForm):
             "date_end",
             "base_user",
         ]
+
+
+class DatePicker(forms.DateInput):
+    # https://stackoverflow.com/a/74127243
+    input_type = "date"
+
+    def format_value(self, value):
+        return (
+            value.isoformat()
+            if value is not None and hasattr(value, "isoformat")
+            else ""
+        )
