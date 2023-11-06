@@ -7,12 +7,12 @@
 
   {% crispy form %}
 
-  <div class="offcanvas-header">
-      <a href="{% url 'project:index' %}" class="btn btn-outline-dark btn-block">{% translate 'Cancel' %}</a>
+  <div class="">
       <button type="submit" form="project-form" class="btn btn-info">{% translate "Save" %}</button>
+      <a href="{% url 'project:index' %}" class="btn btn-outline-dark btn-block">{% translate 'Cancel' %}</a>
 
       {% if object.id and perms.photolith.delete_project %}
-        <form method="POST" action="{% url 'project:delete' object.id %}">
+        <form method="POST" action="{% url 'project:delete' object.id %}" class="float-end">
           {% csrf_token %}
           <input type="submit" class="btn btn-danger" value="{% translate 'Delete' %}">
         </form>
