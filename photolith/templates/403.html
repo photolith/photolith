@@ -6,7 +6,11 @@
 {% block content %}
 <h1>{% translate "Access denied" %}</h1>
 
-<p>{% translate "You are not allowed to visit this page" %}</p>
+{% if exception %}
+  <p class="err-detail">{{exception}}</p>
+{% else %}
+  <p class="err-detail">{% translate "You are not allowed to visit this page" %}</p>
+{% endif %}
 
 {% include "registration/snippet_logout.html" %}
 <a href="/" class="btn btn-outline-dark btn-block">{% translate "Home" %}</a>

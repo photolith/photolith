@@ -13,19 +13,29 @@ from .requires_utils import RequiresUtils
 
 
 class AnnotateViewTest(RequiresUtils, TestCase):
-    def form_post(self, user, ind, **kwargs):
+    def form_post(self, user, ind, qs_project=None, **kwargs):
         ann_dict = dict(
             individual=ind.id,
-            project=kwargs["project"].id if "project" in kwargs else "",
+            project=kwargs["project"].id if kwargs.get("project") else "",
             age=kwargs.get("age", 10),
             axis_poly=kwargs.get("axis_poly", [[0, 0], [1, 1], [2, 2]]),
             comment=kwargs.get("comment", "UT comment %f" % random.uniform(100, 1000)),
             rating=kwargs.get("rating", Annotation.Rating.GOOD),
         )
+        qs = ""
+        if qs_project:
+            qs += "&project=%d" % qs_project.id
 
         client = Client()
         client.force_login(user)
-        resp = client.post("/annotate/%d/" % (ind.id,), ann_dict)
+        resp = client.post("/annotate/%d/?%s" % (ind.id, qs), ann_dict)
+        if resp.status_code == 403:
+            # Reconstitute python error if we can
+            m = re.search(
+                r'<p class="err-detail">(.*?)</p>', resp.content.decode("utf-8")
+            )
+            if m:
+                raise PermissionDenied(m.group(1))
         self.assertEqual(resp.status_code, 302)
         m = re.fullmatch(r"/annotate/(\d+)/\?(.*)", resp.url)
         self.assertTrue(m is not None)
@@ -83,6 +93,51 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
         ann = self.form_post(user4, ind_rock)
         self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
+
+    def test_form_valid_project(self):
+        """Can only annotate in open projects"""
+        user1 = self.create_user(groups=["Annotate"])
+        user2 = self.create_user(groups=["Annotate"])
+        ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
+        p1 = [self.create_project(team=[user1]) for _ in range(random.randrange(1, 9))][
+            -1
+        ]
+        self.close_project(p1)
+
+        # The querystring project wasn't used
+        # Can save outside a valid project
+        ann = self.form_post(user1, ind, project=None, qs_project=p1)
+        self.assertEqual(ann.project, None)
+
+        # ...even if it wasn't our project
+        ann = self.form_post(user1, ind, project=None, qs_project=p1)
+        self.assertEqual(ann.project, None)
+
+    def test_get_initial(self):
+        user1 = self.create_user("user1")
+
+        def get_initial(ind, ann=None, **kwargs):
+            kwargs["individual_id"] = ind.id
+            request = RequestFactory().get("/", kwargs)
+            request.user = user1
+            v = AnnotateView()
+            v.setup(request, **(request.GET.dict()))
+            v.object = ann
+            out = v.get_initial()
+            return out
+
+        # Create a few so id isn't just 1
+        ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
+        p = [self.create_project(team=[user1]) for _ in range(random.randrange(1, 9))][
+            -1
+        ]
+
+        # Current individual set
+        self.assertEqual(get_initial(ind)["individual"], ind.id)
+        # No project = None
+        self.assertEqual(get_initial(ind)["project"], None)
+        # Open project passed through
+        self.assertEqual(get_initial(ind, project=p.id)["project"], p)
 
     def test_get_object(self):
         def get_object(**kwargs):
@@ -322,13 +377,14 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         p = self.create_project(team=[user1, user2, user3], individuals=[ind])
         out = ctx_data(ind, project=p, user=user2)
         self.assertEqual(out["default_tab"], "editor")
-        self.assertEqual(out["read_only"], False)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
         ann = self.create_annotation(
             ind, axis_poly=[[25, 34], [44, 93], [22, 52]], created_by=user2, project=p
         )
         out = ctx_data(ind, project=p, user=user2)
         self.assertEqual(out["default_tab"], "existing")
+        self.assertEqual(out.get("project_closed", False), False)
+        self.assertEqual(out["form"].initial["project"], p)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
         self.assertEqual(
             [a.axis_poly for a in out["all_annotations"]],
@@ -338,7 +394,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
         out = ctx_data(ind, project=p, user=user3)
         self.assertEqual(out["default_tab"], "editor")
-        self.assertEqual(out["read_only"], False)
+        self.assertEqual(out.get("project_closed", False), False)
+        self.assertEqual(out["form"].initial["project"], p)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
         self.assertEqual([a.axis_poly for a in out["all_annotations"]], [])
 
@@ -346,7 +403,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.close_project(p)
         out = ctx_data(ind, project=p, user=user3)
         self.assertEqual(out["default_tab"], "existing")
-        self.assertEqual(out["read_only"], True)
+        self.assertEqual(out.get("project_closed", False), True)
+        self.assertEqual(out["form"].initial["project"], None)  # Project cleared
         self.assertEqual(
             [a.axis_poly for a in out["all_annotations"]],
             [
@@ -361,7 +419,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
         out = ctx_data(ind, project=p, user=user2)
         self.assertEqual(out["default_tab"], "editor")
-        self.assertEqual(out["read_only"], False)
         self.assertEqual(
             out["form"].initial["axis_poly"], [ann1.axis_poly[0], ann1.axis_poly[-1]]
         )
@@ -379,7 +436,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
         out = ctx_data(ind, project=p, user=user2)
         self.assertEqual(out["default_tab"], "existing")
-        self.assertEqual(out["read_only"], False)
         self.assertEqual(
             out["form"].initial["axis_poly"], [ann1.axis_poly[0], ann1.axis_poly[-1]]
         )
@@ -394,7 +450,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         # Without a base_user annotation (which ind2 doesn't have), we continue as before
         out = ctx_data(ind2, project=p, user=user2)
         self.assertEqual(out["default_tab"], "editor")
-        self.assertEqual(out["read_only"], False)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
         self.assertEqual([a.axis_poly for a in out["all_annotations"]], [])
         ann = self.create_annotation(
@@ -405,7 +460,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
         out = ctx_data(ind2, project=p, user=user2)
         self.assertEqual(out["default_tab"], "existing")
-        self.assertEqual(out["read_only"], False)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
         self.assertEqual(
             [a.axis_poly for a in out["all_annotations"]],

@@ -143,9 +143,10 @@
           {{ form.comment|as_crispy_field }}
         </div>
         <div class="col" style="text-align: right;">
-          {% if not read_only %}
-            <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success">
-          {% endif %}
+          <input type="submit"
+                 name="save"
+                 value="{% if project_closed %}{% translate 'Save outside project' %}{% else %}{% translate 'Save' %}{% endif %}"
+                 class="btn btn-success" />
         </div>
 
       </div>

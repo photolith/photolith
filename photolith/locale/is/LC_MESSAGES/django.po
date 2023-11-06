@@ -310,6 +310,10 @@ msgid "Delete annotation"
 msgstr ""
 
 #: photolith/templates/annotate/annotate.html
+msgid "Save outside project"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
 #: photolith/templates/project/update.html
 msgid "Save"

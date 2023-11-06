@@ -52,14 +52,21 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         else:
             form.instance.created_by = self.request.user
 
-        # Set / check project
-        if self.current_project:
-            p = self.current_project
+        # Cannot add extra annotations to a closed project
+        # NB: Use form.instance.project instead of querystring in case we are copying an annotation outside a project,
+        #     QS will be closed project, form.instance.project will be unset
+        if p := form.instance.project:
+            if not (
+                p.team.users.contains(self.request.user)
+                or p.created_by == self.request.user
+            ):
+                raise PermissionDenied(
+                    "Contact an administrator to be added to this project"
+                )
             if not p.is_open:
                 raise PermissionDenied(
                     "Project %s closed, cannot edit annotations" % (str(p))
                 )
-            form.instance.project = p
 
         # Set authority based on user's profile
         form.instance.authority = Annotation.AuthorityLevel.NON_EXPERT
@@ -155,7 +162,6 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["object_model"] = self.model
-        context["read_only"] = False
 
         # Find base_poly if within project with base_user
         def get_base_poly():
@@ -177,7 +183,10 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
                 context["default_tab"] = "editor"
             elif self.current_project and not self.current_project.is_open:
                 # Closed project, read-only
-                context["read_only"] = True
+                context["form"].initial["axis_poly"] = []
+                # Save new annotations outside project
+                context["form"].initial["project"] = None
+                context["project_closed"] = True
                 context["default_tab"] = "existing"
             elif base_poly := get_base_poly():
                 # Open project with base_poly
