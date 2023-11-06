@@ -225,6 +225,17 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
+        # Don't see project annotations outside project
+        self.assertEqual(
+            get_all_annotations(ind),
+            [
+                "10-user1-2",
+                "10-user1-3",
+                "10-user2-3",
+                "10-user3-3",
+            ],
+        )
+
         # user4 not part of the project
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=user4),

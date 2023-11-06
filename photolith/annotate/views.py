@@ -126,8 +126,10 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
             # Only show annotations relevant for this project
             return p.annotations_for(self.individual_id, self.request.user)
 
+        # Otherwise, show annotations performed outside project
         qs = Annotation.objects.filter(
             individual_id=self.individual_id,
+            project=None,
         )
         return qs.order_by("-authority", "-created_at")
 
