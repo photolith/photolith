@@ -69,10 +69,19 @@ function allAnnotationsClick (elForm, event) {
       });
     }
 
-    // ph-copy-line or ph-copy-full
     if (event.target.classList.contains('ph-copy-line')) {
       // Strip out everything in the middle
       axisPoly = [axisPoly[0], axisPoly[axisPoly.length - 1]];
+    } else if (event.target.classList.contains('ph-copy-full')) {
+      // Copy other metadata to form, leave axis poly intact
+      // NB: Wait until after the change event has auto-updated the age
+      window.setTimeout((newVal) => {
+        elForm.elements.age.value = newVal;
+      }, 100, elSelected.querySelector('.val-age').textContent);
+      elForm.elements.rating.value = elSelected.querySelector('.val-rating').getAttribute('data-value');
+      elForm.elements.comment.value = elSelected.querySelector('.val-comment').textContent;
+    } else {
+      throw new Error('Unknown button ' + event.target.className);
     }
 
     elForm.axis_poly.value = JSON.stringify(axisPoly);
