@@ -9,7 +9,10 @@ export function displayAlert (level, messageHTML, timeout) {
   ].join('\n');
   document.getElementById('alert-container').append(elAlert);
 
-  window.setTimeout(() => {
-    if (elAlert.isConnected) new window.bootstrap.Alert(elAlert).close();
-  }, timeout || 5000);
+  if (timeout === undefined) timeout = 5000;
+  if (timeout > 0) {
+    window.setTimeout(() => {
+      if (elAlert.isConnected) new window.bootstrap.Alert(elAlert).close();
+    }, timeout);
+  }
 }

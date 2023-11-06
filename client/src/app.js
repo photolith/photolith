@@ -27,9 +27,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  displayAlert('danger', event.reason);
+  displayAlert('danger', event.reason, -1);
 });
 
 window.onerror = (event, source, lineno, colno, error) => {
-  displayAlert('danger', error);
+  displayAlert('danger', `<details><summary>${error}</summary><pre>${error.stack}</pre></details>`, -1);
 };
