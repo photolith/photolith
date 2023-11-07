@@ -26,9 +26,11 @@ class UploadViewTest(RequiresUtils, TestCase):
         )
         post_dict["scale_line"] = json.dumps(scale_line) if scale_line else ""
         post_dict["scale_mm"] = str(scale_mm or "")
-        for i, (data, bounding_box) in enumerate(ind_data):
-            post_dict["data:%d" % i] = json.dumps(data)
-            post_dict["bounding_box:%d" % i] = json.dumps(bounding_box)
+        for i, data in enumerate(ind_data):
+            post_dict["bounding_box:%d" % i] = json.dumps(data["_bb"])
+            post_dict["data:%d" % i] = json.dumps(
+                {k: v for k, v in data.items() if k != "_bb"}
+            )
 
         client = Client()
         client.force_login(user)
@@ -42,7 +44,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 self.assertEqual(new["image"], image.id)
                 self.assertEqual(
                     new["bounding_box"],
-                    ind_data[int(sel_individual) if sel_individual else i][1],
+                    ind_data[int(sel_individual) if sel_individual else int(k)]["_bb"],
                 )
             return out["created_individuals"]
         raise ValueError(str(out))
@@ -54,7 +56,7 @@ class UploadViewTest(RequiresUtils, TestCase):
 
         # Can create nothing successfully
         user = self.create_user(groups=["Ingest"])
-        self.assertEqual(self.form_post(user), [])
+        self.assertEqual(len(self.form_post(user)), 0)
 
         # Create 2 individuals
         user = self.create_user(groups=["Ingest"])
@@ -63,27 +65,21 @@ class UploadViewTest(RequiresUtils, TestCase):
                 self.form_post(
                     user,
                     [
-                        (
-                            dict(
-                                species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                                length=100,
-                            ),
-                            [[0, 0], [100, 100]],
+                        dict(
+                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                            length=100,
+                            _bb=[[0, 0], [100, 100]],
                         ),
-                        (
-                            dict(
-                                species={"id": 200, "en": "Cat", "is": "Köttur"},
-                                length=100,
-                            ),
-                            [[0, 0], [200, 200]],
+                        dict(
+                            species={"id": 200, "en": "Cat", "is": "Köttur"},
+                            length=100,
+                            _bb=[[0, 0], [200, 200]],
                         ),
-                        (
+                        dict(
                             # NB: Will be ignored since there's no bounding box
-                            dict(
-                                species={"id": 200, "en": "Cat", "is": "Köttur"},
-                                length=300,
-                            ),
-                            None,
+                            species={"id": 200, "en": "Cat", "is": "Köttur"},
+                            length=300,
+                            _bb=None,
                         ),
                     ],
                 )
@@ -113,26 +109,20 @@ class UploadViewTest(RequiresUtils, TestCase):
                 self.form_post(
                     user,
                     [
-                        (
-                            dict(
-                                species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                                length=100,
-                            ),
-                            [[0, 0], [911, 100]],
+                        dict(
+                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                            length=100,
+                            _bb=[[0, 0], [911, 100]],
                         ),
-                        (
-                            dict(
-                                species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                                length=100,
-                            ),
-                            [[0, 0], [920, 100]],
+                        dict(
+                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                            length=100,
+                            _bb=[[0, 0], [920, 100]],
                         ),
-                        (
-                            dict(
-                                species={"id": 200, "en": "Cat", "is": "Köttur"},
-                                length=100,
-                            ),
-                            [[0, 0], [930, 200]],
+                        dict(
+                            species={"id": 200, "en": "Cat", "is": "Köttur"},
+                            length=100,
+                            _bb=[[0, 0], [930, 200]],
                         ),
                     ],
                     sel_individual=1,  # NB: 0-indexed
@@ -158,12 +148,10 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.form_post(
             user,
             [
-                (
-                    dict(
-                        species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                        length=100,
-                    ),
-                    [[0, 0], [911, 100]],
+                dict(
+                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    length=100,
+                    _bb=[[0, 0], [911, 100]],
                 ),
             ],
             image=img,
