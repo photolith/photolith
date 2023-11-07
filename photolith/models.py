@@ -55,7 +55,7 @@ class Image(models.Model):
 
     def px_to_mm(self):
         if not self.scale_mm:
-            return float("NaN")
+            return None
         return self.scale_mm / euclidean_dist(self.scale_line[0], self.scale_line[1])
 
 
