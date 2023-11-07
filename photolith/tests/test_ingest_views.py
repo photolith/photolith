@@ -1,5 +1,7 @@
 import itertools
 import json
+import urllib.parse
+import re
 
 from django.test import Client, TestCase
 
@@ -175,6 +177,35 @@ class UploadViewTest(RequiresUtils, TestCase):
                 updated_individuals={"0": inds[2].id, "2": inds[1].id},
             ),
         )
+
+    def test_post__searchquerystring(self):
+        """Can add a search querystring to the output"""
+        user = self.create_user(groups=["Ingest"])
+        img = self.create_image(scale_line=None, scale_mm=None)
+
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    slideLabel="AB-01",
+                    _bb=[[0, 0], [100, 100]],
+                ),
+                dict(
+                    slideLabel="AB-01",
+                    _bb=[[0, 0], [200, 200]],
+                ),
+                dict(
+                    slideLabel="AB-02",
+                    _bb=[[0, 0], [300, 300]],
+                ),
+            ],
+        )
+        m = re.search(
+            r'<a href="/search/\?([^"]+)".*>Show individuals</a>', out["alert"]
+        )
+        qs = urllib.parse.parse_qs(m.group(1))
+        self.assertEqual(list(qs.keys()), ["ch_slideLabel"])
+        self.assertEqual(set(qs["ch_slideLabel"]), set(("AB-02", "AB-01")))
 
     def test_post__image_update(self):
         """Creating individuals updates the scale"""

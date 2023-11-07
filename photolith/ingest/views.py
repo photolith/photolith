@@ -1,5 +1,6 @@
 import io
 import json
+import urllib.parse
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -101,6 +102,7 @@ class UploadView(PermissionRequiredMixin, View):
 
         created_inds = {}
         updated_inds = {}
+        search_query = set()
         sel_individual = self.request.POST.get("individual", "")
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
@@ -132,6 +134,11 @@ class UploadView(PermissionRequiredMixin, View):
                 updated_inds[post_key.replace("data:", "")] = ind.id
             else:
                 created_inds[post_key.replace("data:", "")] = ind.id
+            if ind_data.get("slideLabel"):
+                # NB: search_query is a set, we don't repeat values
+                search_query.add(
+                    urllib.parse.urlencode({"ch_slideLabel": ind_data["slideLabel"]})
+                )
 
         alert = ""
         if len(created_inds) > 0:
@@ -146,6 +153,11 @@ class UploadView(PermissionRequiredMixin, View):
                 "Updated %(count)d individuals. ",
                 len(updated_inds),
             ) % dict(count=len(updated_inds))
+        if len(search_query) > 0:
+            alert += '<br><a href="/search/?%s" target="_blank">%s</a>' % (
+                "&".join(search_query),
+                _("Show individuals"),
+            )
         return JsonResponse(
             dict(
                 alert=alert,

@@ -63,6 +63,10 @@ msgid_plural "Updated %(count)d individuals. "
 msgstr[0] ""
 msgstr[1] ""
 
+#: photolith/ingest/views.py
+msgid "Show individuals"
+msgstr ""
+
 #: photolith/models.py photolith/models.py photolith/models.py
 msgid "Created by"
 msgstr "Búið til af"
