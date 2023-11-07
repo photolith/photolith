@@ -12,36 +12,34 @@ from .requires_utils import RequiresUtils
 class ExportViewTest(RequiresUtils, TestCase):
     maxDiff = None
 
+    def export(self, user, with_annotations, search=dict()):
+        client = Client()
+        client.force_login(user)
+        resp = client.get("/search/export/%s/" % (with_annotations,), search)
+        self.assertEqual(resp.status_code, 200)
+
+        reader = csv.DictReader(l.decode("utf-8") for l in resp.streaming_content)
+        for r in reader:
+            # Make sure all dates are ISO formats
+            if r["age"]:
+                datetime.datetime.fromisoformat(r["annotated_at"])
+                del r["annotated_at"]
+            datetime.datetime.fromisoformat(r["created_at"])
+            del r["created_at"]
+            datetime.datetime.fromisoformat(r["modified_at"])
+            del r["modified_at"]
+
+            # Strip of URL base from image
+            self.assertTrue(r["image__content__url"].startswith("http://testserver/"))
+            r["image__content__url"] = r["image__content__url"].replace(
+                "http://testserver", ""
+            )
+
+            # Remove empty entries to simplify output dicts
+            yield {k: v for k, v in r.items() if v != ""}
+
     def test_call(self):
         userA = self.create_user("userA", groups=["Annotate", "Project Admin"])
-
-        def export(with_annotations, search=dict()):
-            client = Client()
-            client.force_login(userA)
-            resp = client.get("/search/export/%s/" % (with_annotations,), search)
-            self.assertEqual(resp.status_code, 200)
-
-            reader = csv.DictReader(l.decode("utf-8") for l in resp.streaming_content)
-            for r in reader:
-                # Make sure all dates are ISO formats
-                if r["age"]:
-                    datetime.datetime.fromisoformat(r["annotated_at"])
-                    del r["annotated_at"]
-                datetime.datetime.fromisoformat(r["created_at"])
-                del r["created_at"]
-                datetime.datetime.fromisoformat(r["modified_at"])
-                del r["modified_at"]
-
-                # Strip of URL base from image
-                self.assertTrue(
-                    r["image__content__url"].startswith("http://testserver/")
-                )
-                r["image__content__url"] = r["image__content__url"].replace(
-                    "http://testserver", ""
-                )
-
-                # Remove empty entries to simplify output dicts
-                yield {k: v for k, v in r.items() if v != ""}
 
         img = self.create_image(
             # Scale should multiply distances by 2
@@ -76,7 +74,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             bounding_box=[(1, 1), (2, 2)],
         )
         self.assertEqual(
-            list(export("all")),
+            list(self.export(userA, "all")),
             [
                 {
                     "bounding_box": "[[0, 0], [0, 0]]",
@@ -113,7 +111,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             ],
         )
         self.assertEqual(
-            list(export("best")),
+            list(self.export(userA, "best")),
             [
                 {
                     "bounding_box": "[[0, 0], [0, 0]]",
@@ -137,5 +135,55 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "bounding_box": "[[1, 1], [2, 2]]",
                     "image__content__url": img.content.url,
                 },
+            ],
+        )
+
+    def test_call__noscale(self):
+        userA = self.create_user("userA", groups=["Annotate", "Project Admin"])
+
+        img = self.create_image(
+            scale_line=[(0, 0), (1, 0)],
+            scale_mm=None,
+        )
+        ind1 = self.create_individual(
+            image=img,
+            bounding_box=[(0, 0), (1, 1)],
+        )
+        ann11 = self.create_annotation(
+            ind1,
+            age=3,
+            axis_poly=[(0, 0), (1, 0), (3, 0)],
+        )
+        # No growth columns
+        self.assertEqual(
+            list(self.export(userA, "best")),
+            [
+                {
+                    "age": "10",
+                    "annotated_by": "annotator",
+                    "authority": "0",
+                    "bounding_box": "[[0, 0], [1, 1]]",
+                    "image__content__url": img.content.url,
+                    "rating": "100",
+                }
+            ],
+        )
+
+        # Set scale_mm, they come back
+        img.scale_mm = 1
+        img.save()
+        self.assertEqual(
+            list(self.export(userA, "best")),
+            [
+                {
+                    "age": "10",
+                    "annotated_by": "annotator",
+                    "authority": "0",
+                    "bounding_box": "[[0, 0], [1, 1]]",
+                    "growth_1": "1.0",
+                    "growth_2": "2.0",
+                    "image__content__url": img.content.url,
+                    "rating": "100",
+                }
             ],
         )

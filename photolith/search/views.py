@@ -188,8 +188,9 @@ class DataView(PermissionRequiredMixin, View):
                         annotated_at=a.created_at,
                         comment=a.comment,
                     )
-                    for i, x in enumerate(a.axis_poly_dists()):
-                        a_out["growth_%d" % (i + 1)] = px_to_mm * x
+                    if px_to_mm:
+                        for i, x in enumerate(a.axis_poly_dists()):
+                            a_out["growth_%d" % (i + 1)] = px_to_mm * x
 
                     yield {**out, **a_out}
                     if with_annotations == "best":
