@@ -99,7 +99,8 @@ class UploadView(PermissionRequiredMixin, View):
         )
         image.save()
 
-        created_inds = []
+        created_inds = {}
+        updated_inds = {}
         sel_individual = self.request.POST.get("individual", "")
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
@@ -114,19 +115,42 @@ class UploadView(PermissionRequiredMixin, View):
             if not ind_bounding_box:
                 # Ignore individuals that don't have a bounding box
                 continue
-
-            ind = Individual(
-                image=image,
-                created_by=self.request.user,
-                bounding_box=ind_bounding_box,
+            ind_id = self.request.POST.get(
+                post_key.replace("data:", "individual_id:", 1)
             )
+
+            if ind_id:
+                ind = Individual.objects.get(pk=int(ind_id))
+            else:
+                ind = Individual(created_by=self.request.user)
+            ind.image = image
+            ind.bounding_box = ind_bounding_box
             ind.save()
             ind.data = ind_data
             ind.save()
-            created_inds.append(ind)
+            if ind_id:
+                updated_inds[post_key.replace("data:", "")] = ind.id
+            else:
+                created_inds[post_key.replace("data:", "")] = ind.id
+
+        alert = ""
+        if len(created_inds) > 0:
+            alert += ngettext(
+                "Created %(count)d individual. ",
+                "Created %(count)d individuals. ",
+                len(created_inds),
+            ) % dict(count=len(created_inds))
+        if len(updated_inds) > 0:
+            alert += ngettext(
+                "Updated %(count)d individual. ",
+                "Updated %(count)d individuals. ",
+                len(updated_inds),
+            ) % dict(count=len(updated_inds))
         return JsonResponse(
             dict(
-                created_individuals=[model_to_dict(ind) for ind in created_inds],
+                alert=alert,
+                created_individuals=created_inds,
+                updated_individuals=updated_inds,
             )
         )
 

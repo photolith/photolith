@@ -1,3 +1,4 @@
+import itertools
 import json
 
 from django.test import Client, TestCase
@@ -28,8 +29,10 @@ class UploadViewTest(RequiresUtils, TestCase):
         post_dict["scale_mm"] = str(scale_mm or "")
         for i, data in enumerate(ind_data):
             post_dict["bounding_box:%d" % i] = json.dumps(data["_bb"])
+            if "_id" in data:
+                post_dict["individual_id:%d" % i] = json.dumps(data["_id"])
             post_dict["data:%d" % i] = json.dumps(
-                {k: v for k, v in data.items() if k != "_bb"}
+                {k: v for k, v in data.items() if k not in ("_bb", "_id")}
             )
 
         client = Client()
@@ -39,14 +42,16 @@ class UploadViewTest(RequiresUtils, TestCase):
             return resp.status_code
         out = json.loads(resp.content)
         if "created_individuals" in out:
-            for i, new in enumerate(out["created_individuals"]):
-                self.assertEqual(new["created_by"], user.id)
-                self.assertEqual(new["image"], image.id)
-                self.assertEqual(
-                    new["bounding_box"],
-                    ind_data[int(sel_individual) if sel_individual else int(k)]["_bb"],
-                )
-            return out["created_individuals"]
+            for k, id in itertools.chain(
+                out["created_individuals"].items(), out["updated_individuals"].items()
+            ):
+                data = ind_data[int(sel_individual) if sel_individual else int(k)]
+                new = Individual.objects.get(pk=id)
+                if not data.get("_id"):
+                    self.assertEqual(new.created_by, user)
+                self.assertEqual(new.image, image)
+                self.assertEqual(new.bounding_box, data["_bb"])
+            return out
         raise ValueError(str(out))
 
     def test_post(self):
@@ -56,7 +61,7 @@ class UploadViewTest(RequiresUtils, TestCase):
 
         # Can create nothing successfully
         user = self.create_user(groups=["Ingest"])
-        self.assertEqual(len(self.form_post(user)), 0)
+        self.assertEqual(len(self.form_post(user)["created_individuals"]), 0)
 
         # Create 2 individuals
         user = self.create_user(groups=["Ingest"])
@@ -82,7 +87,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                             _bb=None,
                         ),
                     ],
-                )
+                )["created_individuals"]
             ),
             2,
         )
@@ -126,18 +131,50 @@ class UploadViewTest(RequiresUtils, TestCase):
                         ),
                     ],
                     sel_individual=1,  # NB: 0-indexed
-                )
+                )["created_individuals"]
             ),
             1,
         )
 
         # We can find them in the database
-        Individual.objects.all().order_by("pk")
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(len(inds), 3)
         self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
         self.assertEqual(inds[1].bounding_box, [[0, 0], [200, 200]])
         self.assertEqual(inds[2].bounding_box, [[0, 0], [920, 100]])
+
+        # Can simultaneously create & update
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    length=100,
+                    _bb=[[0, 0], [925, 100]],
+                    _id=inds[2].id,
+                ),
+                dict(
+                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    length=100,
+                    _bb=[[0, 0], [930, 100]],
+                ),
+                dict(
+                    species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    length=100,
+                    _bb=[[0, 0], [205, 200]],
+                    _id=inds[1].id,
+                ),
+            ],
+        )
+        inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(
+            out,
+            dict(
+                alert="Created 1 individual. Updated 2 individuals. ",
+                created_individuals={"1": inds[3].id},
+                updated_individuals={"0": inds[2].id, "2": inds[1].id},
+            ),
+        )
 
     def test_post__image_update(self):
         """Creating individuals updates the scale"""

@@ -49,6 +49,20 @@ msgstr "Sækja skrár..."
 msgid "Take photo (default camera)"
 msgstr "Taka mynd með tengdri myndavél"
 
+#: photolith/ingest/views.py
+#, python-format
+msgid "Created %(count)d individual. "
+msgid_plural "Created %(count)d individuals. "
+msgstr[0] ""
+msgstr[1] ""
+
+#: photolith/ingest/views.py
+#, python-format
+msgid "Updated %(count)d individual. "
+msgid_plural "Updated %(count)d individuals. "
+msgstr[0] ""
+msgstr[1] ""
+
 #: photolith/models.py photolith/models.py photolith/models.py
 msgid "Created by"
 msgstr "Búið til af"

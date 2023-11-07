@@ -102,8 +102,13 @@ function formSubmit (elForm) {
       method: 'POST',
       body: new FormData(elForm)
     });
-  }).then((createdInds) => {
-    displayAlert('success', `Uploaded ${createdInds.created_individuals.length} individuals`);
+  }).then((data) => {
+    displayAlert('success', data.alert);
+    elForm.querySelector(':scope .individuals').innerHTML += Object.keys(data.created_individuals).map((k) => {
+      return `<input type="hidden" name="individual_id:${k}" value="${data.created_individuals[k]}">`;
+    }).join('\n') + Object.keys(data.updated_individuals).map((k) => {
+      return `<input type="hidden" name="individual_id:${k}" value="${data.updated_individuals[k]}">`;
+    }).join('\n');
     clearFetchCache(); // Remove cached search results, so new ingests show up.
   }).finally(() => {
     elForm.classList.remove('rendering');
