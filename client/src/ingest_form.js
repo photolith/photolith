@@ -3,6 +3,19 @@ import { changeEvent } from './events';
 import { jsonFetch, clearFetchCache } from './fetch';
 import { populateIndividualData } from './meta';
 
+function checkExisting (labels, warnMsg) {
+  const sp = new URLSearchParams();
+  // Filter by any of the labels we provided
+  labels.forEach((l) => sp.append('ch_slideLabel', l));
+
+  jsonFetch('/search/data/?' + sp).then((data) => {
+    if (!data.data.length) return;
+    displayAlert('warning',
+      warnMsg.replace('%d', `<b><a href="/search/?${sp}" target="_blank">${data.data.length}</a></b>`) +
+      `:<ul>${data.data.map((i) => `<li>${i.__str__}</li>`).join('\n')}</ul>`);
+  });
+}
+
 function formRefresh (event) {
   const elForm = event.target.form;
 
@@ -23,6 +36,9 @@ function formRefresh (event) {
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
+      // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
+      checkExisting(new Set(sd.individuals.map((x) => x.slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
+
       elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, indIdx) => {
         return `
           <input type="hidden" name="data:${indIdx}" value="">

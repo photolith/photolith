@@ -60,7 +60,7 @@
 
   <div class="tab-pane show active" id="ingest-tab-pane" role="tabpanel" aria-labelledby="ingest-tab" tabindex="0">
 
-  <form class="ingest-form mt-2">
+  <form class="ingest-form mt-2" data-locale-warnexisting="{% translate 'There are already %d individuals uploaded with this label' %}">
     {% csrf_token %}
     <input type="hidden" name="selection" value="" />
     <input type="hidden" name="image_file" >

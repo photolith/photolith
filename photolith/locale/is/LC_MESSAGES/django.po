@@ -462,6 +462,11 @@ msgstr ""
 "myndinni, sem kemur í veg fyrir að sá einstaklingur er færður inn."
 
 #: photolith/templates/ingest/index.html
+#, python-format
+msgid "There are already %%d individuals uploaded with this label"
+msgstr ""
+
+#: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
 msgstr "Lengd kvarða (mm)"
 
