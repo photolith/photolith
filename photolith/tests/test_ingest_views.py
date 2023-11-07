@@ -9,12 +9,23 @@ from .requires_utils import RequiresUtils
 
 
 class UploadViewTest(RequiresUtils, TestCase):
-    def form_post(self, user, ind_data=[], individual=""):
-        image = self.create_image()
+    def form_post(
+        self,
+        user,
+        ind_data=[],
+        sel_individual="",
+        image=None,
+        scale_line=None,
+        scale_mm=None,
+    ):
+        if not image:
+            image = self.create_image()
         post_dict = dict(
             image_content=image.content.name,
-            individual=str(individual),
+            individual=str(sel_individual),
         )
+        post_dict["scale_line"] = json.dumps(scale_line) if scale_line else ""
+        post_dict["scale_mm"] = str(scale_mm or "")
         for i, (data, bounding_box) in enumerate(ind_data):
             post_dict["data:%d" % i] = json.dumps(data)
             post_dict["bounding_box:%d" % i] = json.dumps(bounding_box)
@@ -31,7 +42,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 self.assertEqual(new["image"], image.id)
                 self.assertEqual(
                     new["bounding_box"],
-                    ind_data[int(individual) if individual else i][1],
+                    ind_data[int(sel_individual) if sel_individual else i][1],
                 )
             return out["created_individuals"]
         raise ValueError(str(out))
@@ -124,7 +135,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                             [[0, 0], [930, 200]],
                         ),
                     ],
-                    individual=1,  # NB: 0-indexed
+                    sel_individual=1,  # NB: 0-indexed
                 )
             ),
             1,
@@ -137,3 +148,34 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
         self.assertEqual(inds[1].bounding_box, [[0, 0], [200, 200]])
         self.assertEqual(inds[2].bounding_box, [[0, 0], [920, 100]])
+
+    def test_post__image_update(self):
+        """Creating individuals updates the scale"""
+        user = self.create_user(groups=["Ingest"])
+        img = self.create_image(scale_line=None, scale_mm=None)
+
+        # Can update scale line at the same time as uploading individuals
+        self.form_post(
+            user,
+            [
+                (
+                    dict(
+                        species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                        length=100,
+                    ),
+                    [[0, 0], [911, 100]],
+                ),
+            ],
+            image=img,
+            scale_line=[(2, 2), (4, 4)],
+            scale_mm=44,
+        )
+        img.refresh_from_db()
+        self.assertEqual(img.scale_line, [[2, 2], [4, 4]])
+        self.assertEqual(img.scale_mm, 44)
+
+        # Can clear values too
+        self.form_post(user, [], image=img, scale_line=None, scale_mm=None)
+        img.refresh_from_db()
+        self.assertEqual(img.scale_line, None)
+        self.assertEqual(img.scale_mm, None)

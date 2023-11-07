@@ -70,9 +70,10 @@
     <div class="row">
       <fieldset class="col" disabled>
         <div class="mb-3 row">
-          <label for="scale-input" class="col-form-label col-sm-3">{% translate "Scale length (mm)" %}</label>
+          <input type="hidden" name="scale_line" value="" />
+          <label for="scale_mm-input" class="col-form-label col-sm-3">{% translate "Scale length (mm)" %}</label>
           <div class="col">
-            <input type="number" name="scale" class="form-control" id="scale-input" value="2" />
+            <input type="number" name="scale_mm" class="form-control" id="scale_mm-input" value="2" />
           </div>
         </div>
         <div class="mb-3 row">
@@ -89,7 +90,6 @@
       </fieldset>
       <div class="col ph-scroll-container">
         <div>
-          <input type="hidden" name="scale_line" value="" />
           <div class="label_help"><h5>Label formats</h5><ul></ul></div>
           <div class="individuals"></div>
           <table class="table table-striped individual-data d-none">

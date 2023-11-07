@@ -91,6 +91,13 @@ class UploadView(PermissionRequiredMixin, View):
     @json_errors
     def post(self, *args, **kwargs):
         image = Image.objects.get(content=self.request.POST["image_content"])
+        image.scale_line = json.loads(self.request.POST["scale_line"] or "null")
+        image.scale_mm = (
+            int(self.request.POST["scale_mm"])
+            if self.request.POST["scale_mm"]
+            else None
+        )
+        image.save()
 
         created_inds = []
         sel_individual = self.request.POST.get("individual", "")
@@ -137,10 +144,6 @@ class UploadImageView(PermissionRequiredMixin, View):
             created_by=self.request.user,
             orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
             mimetype=mimetype,
-            scale_line=json.loads(
-                self.request.META.get("HTTP_X_PHOTOLITH_SCALE_LINE", "None")
-            ),
-            scale_mm=self.request.META.get("HTTP_X_PHOTOLITH_SCALE_MM", None),
         )
         # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
         file = io.BytesIO(self.request.read())

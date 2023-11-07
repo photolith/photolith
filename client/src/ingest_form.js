@@ -91,9 +91,7 @@ function formSubmit (elForm) {
       headers: {
         'X-CSRFToken': elForm.csrfmiddlewaretoken.value,
         'X-Photolith-fileset': elForm.image_file.value,
-        'X-Photolith-filename': elForm.image_file.phBlob.name,
-        'X-Photolith-scale-line': elForm.scale_line.value,
-        'X-Photolith-scale-mm': elForm.scale.value
+        'X-Photolith-filename': elForm.image_file.phBlob.name
       }
     }).then((data) => {
       elForm.image_content.value = data.content;
