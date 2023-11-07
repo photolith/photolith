@@ -54,6 +54,8 @@ class Image(models.Model):
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
     def px_to_mm(self):
+        if not self.scale_mm:
+            return float("NaN")
         return self.scale_mm / euclidean_dist(self.scale_line[0], self.scale_line[1])
 
 

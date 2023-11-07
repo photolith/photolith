@@ -1,4 +1,5 @@
 import datetime
+import math
 
 from django.test import TestCase
 
@@ -17,6 +18,8 @@ class ImageTest(RequiresUtils, TestCase):
             px_to_mm([(10, 20), (30, 50)], 10),
             0.2773500981126146,
         )
+
+        self.assertTrue(math.isnan(px_to_mm([(10, 20), (30, 50)], None)))
 
 
 class IndividualTest(RequiresUtils, TestCase):
