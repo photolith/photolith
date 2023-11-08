@@ -42,6 +42,8 @@ export class PhViewer {
       const zoom = this.getZoom();
       const img = this.backgroundImage;
 
+      if (this.phSetScale) this.phSetScale();
+
       // vpt: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix
       // Or [zoomLevel, 0, 0, zoomLevel, newLeft, newTop]
       if (!img) {
@@ -141,6 +143,31 @@ export class PhViewer {
     });
   }
 
+  configureScale (scaleEl) {
+    this.fabCanvas.phSetScale = undefined;
+    if (!scaleEl) return;
+    const mmToPx = parseFloat(scaleEl.getAttribute('data-mm-to-px'));
+    if (isNaN(mmToPx)) return;
+
+    const innerEl = scaleEl.firstElementChild;
+    this.fabCanvas.phSetScale = function () {
+      const mmToBrowserPx = mmToPx * this.getZoom();
+
+      let mmDisplay = 1;
+      if (scaleEl.clientWidth) {
+        // Work out scale unit that makes the inner fit the space
+        mmDisplay = scaleEl.clientWidth / (20 * mmToBrowserPx);
+        // Round to nearest power-of-10
+        mmDisplay = Math.pow(10, Math.ceil(Math.log10(mmDisplay)));
+      }
+
+      scaleEl.classList.remove('d-none');
+      // NB: innerEl has 20 segments (as each is 5% in viewer.css)
+      innerEl.style.width = (mmToBrowserPx * mmDisplay * 20) + 'px';
+      innerEl.textContent = mmDisplay + 'mm';
+    };
+  }
+
   load (blob, boundingBox) {
     this.fabCanvas.setBackgroundImage(undefined);
     this.fabCanvas.requestRenderAll();
@@ -164,6 +191,7 @@ export class PhViewer {
 
       // Zoom viewport to fit boundingBox, or Image
       this.fabCanvas.phFitBoundingBox(boundingBox || [[0, 0], [img.width, img.height]]);
+      if (this.fabCanvas.phSetScale) this.fabCanvas.phSetScale();
 
       this.refreshFilters();
     }).finally(() => {

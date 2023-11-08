@@ -10,6 +10,8 @@ export function init (parent) {
       v.setSyncForm(document.querySelector(elViewer.getAttribute('data-sync-form')));
     }
 
+    v.configureScale(elViewer.querySelector(':scope > .scale'));
+
     if (elViewer.hasAttribute('data-src')) {
       v.startRendering();
       window.fetch(elViewer.getAttribute('data-src')).then((resp) => {

@@ -320,6 +320,37 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=user4),
 
+    def test_get_individual(self):
+        def get_ind(individual):
+            request = RequestFactory().get(
+                "/",
+                dict(
+                    individual_id=individual.id,
+                    annotation_id="",
+                    project="",
+                ),
+            )
+            v = AnnotateView()
+            v.setup(request, **(request.GET.dict()))
+            out = v.get_individual()
+            return out
+
+        # scale & inverse populated from image
+        out = get_ind(
+            self.create_individual(
+                image=self.create_image(scale_line=[(0, 0), (1, 0)], scale_mm=10),
+            )
+        )
+        self.assertAlmostEqual(out["image__px_to_mm"], 10)
+        self.assertAlmostEqual(out["image__mm_to_px"], 0.1)
+        out = get_ind(
+            self.create_individual(
+                image=self.create_image(scale_line=[(0, 0), (1, 0)], scale_mm=None),
+            )
+        )
+        self.assertAlmostEqual(out["image__px_to_mm"], None)
+        self.assertAlmostEqual(out["image__mm_to_px"], None)
+
     def test_get_context_data(self):
         def ctx_data(individual, annotation=None, project=None, user=None):
             if isinstance(project, dict):

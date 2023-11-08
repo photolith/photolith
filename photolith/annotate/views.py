@@ -157,6 +157,9 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         out.update(ind.data)
         out["image__content__url"] = ind.image.content.url
         out["image__px_to_mm"] = ind.image.px_to_mm()
+        out["image__mm_to_px"] = (
+            1 / out["image__px_to_mm"] if out["image__px_to_mm"] is not None else None
+        )
         return out
 
     def get_context_data(self, **kwargs):

@@ -34,7 +34,10 @@
 
 {{ ind_data|json_script:"ind_data" }}
 
-<div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_data.image__content__url }}" data-bounding-box="{{ ind_data.bounding_box }}" data-sync-form="form.annotate-form">{% include "../snippet/viewer.html" %}</div>
+<div class="ph-viewer ph-annotate mb-2" data-src="{{ ind_data.image__content__url }}" data-bounding-box="{{ ind_data.bounding_box }}" data-sync-form="form.annotate-form">
+  {% include "../snippet/viewer.html" %}
+  <div class="scale d-none" data-mm-to-px="{{ ind_data.image__mm_to_px }}"><div class="inner"><span>0.1mm</span></div></div>
+</div>
 
 <ul class="nav nav-tabs" role="tablist">
   <li class="nav-item" role="presentation"><button class="nav-link" id="help-tab" data-bs-toggle="tab" data-bs-target="#help-tab-pane" type="button" role="tab" aria-controls="help-tab-pane" aria-selected="true">

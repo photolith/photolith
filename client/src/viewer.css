@@ -32,6 +32,22 @@
   right: 10px;
 }
 
+.ph-viewer > .scale {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  font-size: 10px;
+}
+
+.ph-viewer > .scale > .inner {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent, transparent 5%,
+    #333 5%, #333 10%);
+}
+
 @keyframes spinner {
   to {transform: rotate(360deg);}
 }
