@@ -97,6 +97,7 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     const canvasToPoly = fabric.util.invertTransform(this.calcTransformMatrix());
     this.points = newPoints.map((p, i) => {
       this.phNodes[i].setPositionByOrigin(p, 'center', 'center');
+      this.phNodes[i].setCoords();
       this.phNodes[i].phNodeIdx = i;
       this.phNodes[i].id = `${this.id}[${i}]`;
 
