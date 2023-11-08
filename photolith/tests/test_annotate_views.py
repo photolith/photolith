@@ -20,6 +20,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             age=kwargs.get("age", 10),
             axis_poly=kwargs.get("axis_poly", [[0, 0], [1, 1], [2, 2]]),
             comment=kwargs.get("comment", "UT comment %f" % random.uniform(100, 1000)),
+            authority=str(0),
             rating=kwargs.get("rating", Annotation.Rating.GOOD),
         )
         qs = ""
@@ -42,57 +43,6 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(int(m.group(1)), ind.id)
         out = Annotation.objects.get(comment=ann_dict["comment"])
         return out
-
-    def test_form_valid_authority(self):
-        """Make sure authority is set appropriately on save"""
-        ind_nospecies = Individual.objects.create(
-            image=self.create_image("moo0.jpg"),
-            bounding_box=[[0, 0], [100, 100]],
-        )
-        ind_fish = Individual.objects.create(
-            image=self.create_image("moo1.jpg"),
-            bounding_box=[[0, 0], [100, 100]],
-        )
-        ind_fish.data = dict(species={"id": 100, "en": "Fish", "is": "Fiskur"})
-        ind_rock = Individual.objects.create(
-            image=self.create_image("moo1.jpg"),
-            bounding_box=[[0, 0], [100, 100]],
-        )
-        ind_rock.data = dict(species={"id": 200, "en": "Rock", "is": "Rockur"})
-
-        # User without profile isn't an authority
-        user1 = self.create_user(groups=["Annotate"])
-        ann = self.form_post(user1, ind_nospecies)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user1, ind_fish)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user1, ind_rock)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-
-        # Add profile, only authority for relevant species
-        user2 = self.create_user(groups=["Annotate"], species_expert=["Fish"])
-        ann = self.form_post(user2, ind_nospecies)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user2, ind_fish)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
-        ann = self.form_post(user2, ind_rock)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-
-        user3 = self.create_user(groups=["Annotate"], species_expert=["Rock"])
-        ann = self.form_post(user3, ind_nospecies)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user3, ind_fish)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user3, ind_rock)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
-
-        user4 = self.create_user(groups=["Annotate"], species_expert=["Fish", "Rock"])
-        ann = self.form_post(user4, ind_nospecies)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.NON_EXPERT)
-        ann = self.form_post(user4, ind_fish)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
-        ann = self.form_post(user4, ind_rock)
-        self.assertEqual(ann.authority, Annotation.AuthorityLevel.EXPERT)
 
     def test_form_valid_project(self):
         """Can only annotate in open projects"""
@@ -496,6 +446,118 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             [a.axis_poly for a in out["all_annotations"]],
             [
                 ann.axis_poly,
+            ],
+        )
+
+    def test_get_context_data__authority(self):
+        def auth_choices(user, individual):
+            request = RequestFactory().get(
+                "/",
+                dict(
+                    individual_id=individual.id,
+                    annotation_id="",
+                    project="",
+                ),
+            )
+            request.user = user
+            v = AnnotateView()
+            v.object = None  # NB: Bodge what should be happening in post()
+            v.setup(request, **(request.GET.dict()))
+            context = v.get_context_data()
+
+            choices = [
+                Annotation.AuthorityLevel(x[0])
+                for x in context["form"].fields["authority"].choices
+            ]
+            # initial choice always smallest value
+            self.assertEqual(context["form"].initial["authority"], min(choices))
+            return choices
+
+        ind_nospecies = self.create_individual()
+        ind_fish = self.create_individual(
+            data=dict(species={"id": 100, "en": "Fish", "is": "Fiskur"}),
+        )
+        ind_rock = self.create_individual(
+            data=dict(species={"id": 200, "en": "Rock", "is": "Rockur"}),
+        )
+
+        # User without profile isn't an authority
+        user = self.create_user(groups=["Annotate"])
+        self.assertEqual(
+            auth_choices(user, ind_nospecies),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+
+        # Add profile, only authority for relevant species
+        user = self.create_user(groups=["Annotate"], species_expert=["Fish"])
+        self.assertEqual(
+            auth_choices(user, ind_nospecies),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_fish),
+            [
+                Annotation.AuthorityLevel.EXPERT,
+                Annotation.AuthorityLevel.EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_rock),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+
+        user = self.create_user(groups=["Annotate"], species_expert=["Rock"])
+        self.assertEqual(
+            auth_choices(user, ind_nospecies),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_fish),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_rock),
+            [
+                Annotation.AuthorityLevel.EXPERT,
+                Annotation.AuthorityLevel.EXPERT_ORIG,
+            ],
+        )
+
+        user = self.create_user(groups=["Annotate"], species_expert=["Fish", "Rock"])
+        self.assertEqual(
+            auth_choices(user, ind_nospecies),
+            [
+                Annotation.AuthorityLevel.NON_EXPERT,
+                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_fish),
+            [
+                Annotation.AuthorityLevel.EXPERT,
+                Annotation.AuthorityLevel.EXPERT_ORIG,
+            ],
+        )
+        self.assertEqual(
+            auth_choices(user, ind_rock),
+            [
+                Annotation.AuthorityLevel.EXPERT,
+                Annotation.AuthorityLevel.EXPERT_ORIG,
             ],
         )
 

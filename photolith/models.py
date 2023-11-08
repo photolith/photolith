@@ -33,6 +33,14 @@ class UserProfile(models.Model):
         limit_choices_to=dict(key="species"),
     )
 
+    def authority_level(self, ind_data):
+        if "id" in ind_data.get("species", dict()):
+            if self.species_expert.filter(
+                identifier=ind_data["species"]["id"]
+            ).exists():
+                return Annotation.AuthorityLevel.EXPERT
+        return Annotation.AuthorityLevel.NON_EXPERT
+
 
 class Image(models.Model):
     """
@@ -310,8 +318,11 @@ class Annotation(models.Model):
 
     class AuthorityLevel(models.IntegerChoices):
         UNKNOWN = 0, _("Unknown")
-        NON_EXPERT = 50, _("Human, non expert")
-        EXPERT = 100, _("Human, expert")
+        AUTOMATED = 20, _("Automated reader")
+        NON_EXPERT = 50, _("Non expert, from image")
+        NON_EXPERT_ORIG = 55, _("Non expert, with original")
+        EXPERT = 100, _("Expert, from image")
+        EXPERT_ORIG = 105, _("Expert, with original")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(

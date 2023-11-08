@@ -68,22 +68,6 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
                     "Project %s closed, cannot edit annotations" % (str(p))
                 )
 
-        # Set authority based on user's profile
-        form.instance.authority = Annotation.AuthorityLevel.NON_EXPERT
-        if hasattr(self.request.user, "userprofile"):
-            ind_data = self.get_individual()
-            if (
-                "id" in ind_data.get("species", dict())
-                and self.request.user.userprofile.species_expert
-            ):
-                if (
-                    self.request.user.userprofile.species_expert.filter(
-                        identifier=ind_data["species"]["id"]
-                    ).count()
-                    > 0
-                ):
-                    form.instance.authority = Annotation.AuthorityLevel.EXPERT
-
         return super().form_valid(form)
 
     def get_object(self, queryset=None):
@@ -181,6 +165,20 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         if self.individual_id:
             context["ind_data"] = self.get_individual()
             context["all_annotations"] = self.get_all_annotations()
+
+            if hasattr(self.request.user, "userprofile"):
+                auth_level = self.request.user.userprofile.authority_level(
+                    context["ind_data"]
+                )
+            else:
+                auth_level = Annotation.AuthorityLevel.NON_EXPERT
+            context["form"].initial["authority"] = auth_level
+            context["form"].fields["authority"].choices = [
+                (v, n)
+                for v, n in context["form"].fields["authority"].choices
+                if (v >= auth_level and v < auth_level + 10)
+            ]
+
             if self.object and self.object.id:
                 # Editing an existing annotation
                 context["default_tab"] = "editor"

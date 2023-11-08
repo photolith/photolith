@@ -20,6 +20,7 @@ class AnnotationForm(ModelForm):
         fields = [
             "individual",
             "rating",
+            "authority",
             "age",
             "comment",
             "axis_poly",

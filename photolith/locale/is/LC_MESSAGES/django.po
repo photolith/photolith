@@ -96,12 +96,24 @@ msgid "Unknown"
 msgstr "Ekki vitað"
 
 #: photolith/models.py
-msgid "Human, non expert"
-msgstr "Manneskja, ekki sérfræðingur"
+msgid "Automated reader"
+msgstr ""
 
 #: photolith/models.py
-msgid "Human, expert"
-msgstr "Manneskja, sérfræðingur"
+msgid "Non expert, from image"
+msgstr ""
+
+#: photolith/models.py
+msgid "Non expert, with original"
+msgstr ""
+
+#: photolith/models.py
+msgid "Expert, from image"
+msgstr ""
+
+#: photolith/models.py
+msgid "Expert, with original"
+msgstr ""
 
 #: photolith/models.py
 msgid "Part of project"
