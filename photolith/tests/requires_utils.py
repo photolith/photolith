@@ -19,6 +19,7 @@ class RequiresUtils:
         # NB: override_settings() would be neater, but it's own teardown complains
         # about lack of SECRET_KEY
         settings.SECRET_KEY = "insecure-ut"
+        settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     def setUp(self):
         super(RequiresUtils, self).setUp()
@@ -35,13 +36,14 @@ class RequiresUtils:
         self._ru_objects.append(o)
         return o
 
-    def create_user(self, username=None, groups=[], species_expert=[]):
+    def create_user(self, username=None, groups=[], species_expert=[], is_active=True):
         if not username:
             username = "ut_user%d" % (get_user_model().objects.count() + 1)
         out = get_user_model().objects.create(
             username=username,
             password="%s123" % username,
             email="%s@example.com" % username,
+            is_active=is_active,
         )
         out.groups.set(Group.objects.filter(name__in=groups))
         self.assertEqual(out.groups.count(), len(groups))

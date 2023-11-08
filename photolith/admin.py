@@ -43,8 +43,30 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
 
 
+@admin.action(description="Activate / Password reset selected users")
+def user_activate(modeladmin, request, queryset):
+    from django.contrib.auth.forms import PasswordResetForm
+
+    # Make sure they are is_active first
+    for u in queryset:
+        u.is_active = True
+        u.save()
+
+    # For each, fill in the PasswordResetForm
+    for row in queryset.values("email"):
+        form = PasswordResetForm(row)
+        form.full_clean()
+        form.save(
+            request=request,
+            use_https=request.is_secure(),
+        )
+
+
 # Redefine UserAdmin to include UserProfileInline
 class UserAdmin(BaseUserAdmin):
+    list_display = ("username", "email", "first_name", "last_name", "is_active")
+    actions = [user_activate]
+
     inlines = [UserProfileInline, TeamInline]
     add_fieldsets = (
         (
