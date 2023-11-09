@@ -97,8 +97,6 @@ export class PhCropper extends PhSyncingViewer {
 
   elementAddRemove () {
     let setActive = false;
-    const elIndividual = this.elSyncForm.elements.individual;
-    const selIndividual = elIndividual.options[elIndividual.selectedIndex].value;
     let boundingBoxPos = 0;
 
     this.fabCanvas.getObjects().forEach((o) => {
@@ -108,7 +106,7 @@ export class PhCropper extends PhSyncingViewer {
       const m = el.name.match(/^bounding_box:(.*)$/);
 
       if (!m) return;
-      if (selIndividual && selIndividual !== m[1]) return;
+      if (el.disabled) return;
       const obj = this.boundingBox(el.name, el.getAttribute('data-label'), boundingBoxPos);
       boundingBoxPos++;
       if (!setActive) {

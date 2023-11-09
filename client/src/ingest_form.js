@@ -62,6 +62,16 @@ function formRefresh (event) {
     });
   }
   if (event.target.name === 'individual') {
+    const selIndividual = event.target.options[event.target.selectedIndex].value;
+
+    // Twiddle disabled on all inputs to match individual dropdown
+    elForm.querySelectorAll(':scope .individuals input').forEach((el) => {
+      if (selIndividual) {
+        el.disabled = !el.name.endsWith(':' + selIndividual);
+      } else {
+        el.disabled = false;
+      }
+    });
     elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
   }
 

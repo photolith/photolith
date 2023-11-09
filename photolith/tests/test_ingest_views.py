@@ -16,7 +16,6 @@ class UploadViewTest(RequiresUtils, TestCase):
         self,
         user,
         ind_data=[],
-        sel_individual="",
         image=None,
         scale_line=None,
         scale_mm=None,
@@ -25,11 +24,12 @@ class UploadViewTest(RequiresUtils, TestCase):
             image = self.create_image()
         post_dict = dict(
             image_content=image.content.name,
-            individual=str(sel_individual),
         )
         post_dict["scale_line"] = json.dumps(scale_line) if scale_line else ""
         post_dict["scale_mm"] = str(scale_mm or "")
         for i, data in enumerate(ind_data):
+            if not data:
+                continue
             post_dict["bounding_box:%d" % i] = json.dumps(data["_bb"])
             if "_id" in data:
                 post_dict["individual_id:%d" % i] = json.dumps(data["_id"])
@@ -47,7 +47,7 @@ class UploadViewTest(RequiresUtils, TestCase):
             for k, id in itertools.chain(
                 out["created_individuals"].items(), out["updated_individuals"].items()
             ):
-                data = ind_data[int(sel_individual) if sel_individual else int(k)]
+                data = ind_data[int(k)]
                 new = Individual.objects.get(pk=id)
                 if not data.get("_id"):
                     self.assertEqual(new.created_by, user)
@@ -109,30 +109,23 @@ class UploadViewTest(RequiresUtils, TestCase):
             {"length": 100.0, "species": {"id": 200, "en": "Cat", "is": "Köttur"}},
         )
 
-        # Create 1 individual, by filtering with the "individual" field
+        # Create 1 individual, with keys that don't start at 1
         user = self.create_user(groups=["Ingest"])
         self.assertEqual(
             len(
                 self.form_post(
                     user,
                     [
-                        dict(
-                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                            length=100,
-                            _bb=[[0, 0], [911, 100]],
-                        ),
+                        None,
+                        None,
+                        None,
+                        None,
                         dict(
                             species={"id": 100, "en": "Fish", "is": "Fiskur"},
                             length=100,
                             _bb=[[0, 0], [920, 100]],
                         ),
-                        dict(
-                            species={"id": 200, "en": "Cat", "is": "Köttur"},
-                            length=100,
-                            _bb=[[0, 0], [930, 200]],
-                        ),
                     ],
-                    sel_individual=1,  # NB: 0-indexed
                 )["created_individuals"]
             ),
             1,
