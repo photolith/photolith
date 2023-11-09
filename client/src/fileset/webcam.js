@@ -63,7 +63,7 @@ export class WebcamFileSet {
     }).then(() => {
       this.video.pause();
       // NB: Can be anything createImageBitmap supports: https://developer.mozilla.org/en-US/docs/Web/API/CreateImageBitmap
-      return { f: this.video };
+      return this.video;
     }).finally(() => {
       // Hide video object, view canvas underneath
       if (this.video) { // NB: close() might have destroyed it already
@@ -71,5 +71,9 @@ export class WebcamFileSet {
         this.video.style.display = 'none';
       }
     });
+  }
+
+  remaining () {
+    return this._remaining;
   }
 }

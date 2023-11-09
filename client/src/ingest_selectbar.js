@@ -22,7 +22,9 @@ function nextSelection (elSelect) {
   elSyncForm.image_file.phBlob = 'start_load';
   elSyncForm.image_file.dispatchEvent(changeEvent());
 
-  return elSelect.fs.next().then(({ f = null, remaining = 0 }) => {
+  return elSelect.fs.next().then((f) => {
+    const remaining = elSelect.fs.remaining();
+
     if (!elSelect.options[0].phOrigText) elSelect.options[0].phOrigText = elSelect.options[0].text;
 
     if (f) {

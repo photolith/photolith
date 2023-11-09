@@ -8,4 +8,8 @@ export class NullFileSet {
   }
 
   close () { }
+
+  remaining () {
+    return undefined;
+  }
 }

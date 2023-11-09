@@ -11,6 +11,7 @@ export class LocalFileSet {
 
   close () {
     if (this.reject) this.reject(new Cancelled());
+    this._remaining = undefined;
   }
 
   next () {
@@ -31,7 +32,12 @@ export class LocalFileSet {
       };
       this.input.click();
     }).then((files) => {
-      return { f: files.shift(), remaining: files.length };
+      this._remaining = files.length;
+      return files.shift();
     });
+  }
+
+  remaining () {
+    return this._remaining;
   }
 }

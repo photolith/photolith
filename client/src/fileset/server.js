@@ -13,15 +13,17 @@ export class ServerFileSet {
     this.prev = null;
   }
 
-  close () { }
+  close () {
+    this._remaining = undefined;
+  }
 
   next (retrying) {
     const url = `/ingest/next-photo/${this.photoDir}/${this.prev ? '?prev=' + this.prev : ''}`;
     return window.fetch(url).then((resp) => {
-      const remaining = parseInt(resp.headers.get('X-Photolith-Remaining') || 0, 10);
+      this._remaining = parseInt(resp.headers.get('X-Photolith-Remaining') || 0, 10);
 
       if (resp.status === 204) {
-        return { f: null, remaining: remaining };
+        return null;
       }
       if (resp.status === 400 && resp.headers.get('Content-Type') === 'text/plain') {
         return resp.text().then((text) => {
@@ -42,11 +44,15 @@ export class ServerFileSet {
             blob.name = 'unknown.jpg';
           }
           this.prev = blob.name;
-          return { f: blob, remaining: remaining };
+          return blob;
         });
       }
       console.error('Failed to fetch next image', resp);
       throw new Error('Failed to fetch next image');
     });
+  }
+
+  remaining () {
+    return this._remaining;
   }
 }
