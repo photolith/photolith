@@ -5,7 +5,7 @@
 <div class="row">
 
 
-<div class="col-lg-5 my-3">
+<div class="col-lg my-3">
   <p>{% translate 'Welcome to Photolith, the otolith image storage and annotation software.' %}</p>
 
   {% if not user.is_authenticated %}
@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<div class="col-lg-6 my-3">
+<div class="col-lg my-3">
   <div class="ph-viewer ph-annotate mb-2"
        style="height: max(400px, 100%); background: black;"
        data-src="/static/homepage-otolith.jpeg"
