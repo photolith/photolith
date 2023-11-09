@@ -27,19 +27,6 @@ export class PhAnnotate extends PhSyncingViewer {
     });
   }
 
-  annotatePoly () {
-    const obj = new EditableLine({
-      id: 'axis_poly',
-      stroke: `rgba(${rgbHighlight}, 0.6)`
-    }, {
-      stroke: `rgba(${rgbHighlight}, 1)`
-    });
-    if (obj.canvas) return obj;
-
-    this.fabCanvas.add(obj);
-    return obj;
-  }
-
   load (blob, boundingBox) {
     return super.load(blob, boundingBox).then(() => {
     }).finally(() => { // NB: Set-up even if loading failed
@@ -57,22 +44,18 @@ export class PhAnnotate extends PhSyncingViewer {
       if ((o.id || '').match(/^axis_poly|^view_poly/)) this.fabCanvas.remove(o);
     });
     Array.from((this.elSyncForm || { elements: [] }).elements).forEach((el) => {
-      const m = el.name.match(/^axis_poly$|^view_poly:(\d+)$/);
+      const m = el.name.match(/^(axis_poly|view_poly):?(\d*)$/);
       if (!m) return;
+      if (el.disabled) return;
 
-      if (el.name === 'axis_poly') {
-        if (!el.disabled) this.annotatePoly();
-        return;
-      }
-
-      const i = parseInt(m[1], 10);
+      const i = parseInt(m[2] || 0, 10);
       const obj = new EditableLine({
         id: el.name,
-        stroke: `rgba(${el.getAttribute('data-stroke')}, 0.6)`
+        stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 0.6)`
       }, {
-        stroke: `rgba(${el.getAttribute('data-stroke')}, 1)`,
+        stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 1)`,
         radius: 10 - (i % 5),
-        selectable: false
+        selectable: m[1] === 'axis_poly'
       });
       this.fabCanvas.add(obj);
     });
