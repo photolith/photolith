@@ -5,13 +5,36 @@ import EditableLine from './editable_line';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 
+function setInitBBs (bbEls, width, height) {
+  // Set initial position based on count
+  const grid = { w: 5, h: 5 };
+  const margin = { w: width / 7, h: height / 7 };
+  const box = {
+    w: (width - margin.w * 2) / grid.w,
+    h: (height - margin.h * 2) / grid.h
+  };
+  const gutter = { w: box.w * 0.1, h: box.h * 0.2 };
+
+  bbEls.forEach((el, i) => {
+    const left = margin.w + (i % grid.w) * box.w;
+    const top = margin.h + Math.min(Math.floor(i / grid.w), grid.h) * box.h;
+
+    el.value = JSON.stringify([
+      [left, top],
+      [left + box.w - gutter.w, top + box.h - gutter.h]
+    ]);
+    // NB: Bodge to ensure the intial fontSize is set correctly
+    el.phInitHeight = box.h - gutter.h;
+  });
+}
+
 export class PhCropper extends PhSyncingViewer {
   constructor (elViewer) {
     super(elViewer);
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
   }
 
-  boundingBox (objId, label, boundingBoxPos) {
+  boundingBox (objId, label, phInitHeight) {
     // http://fabricjs.com/docs/fabric.Textbox.html
     const obj = new fabric.Textbox(label, {
       id: objId,
@@ -31,19 +54,8 @@ export class PhCropper extends PhSyncingViewer {
 
     obj.setControlsVisibility({ mtr: false });
     if (!obj.canvas) {
-      // Set initial position based on boundingBoxPos
-      const countWidth = 5; const countHeight = 5;
-      const marginWidth = this.fabCanvas.backgroundImage.width / 7;
-      const marginHeight = this.fabCanvas.backgroundImage.height / 7;
-      const boxWidth = (this.fabCanvas.backgroundImage.width - marginWidth * 2) / countWidth;
-      const boxHeight = (this.fabCanvas.backgroundImage.height - marginHeight * 2) / countHeight;
-
       obj.set({
-        left: marginWidth + (boundingBoxPos % countWidth) * boxWidth,
-        top: marginHeight + Math.min(Math.floor(boundingBoxPos / countWidth), countHeight) * boxHeight,
-        width: boxWidth * 0.9,
-        height: boxHeight * 0.8,
-        fontSize: boxHeight * 0.8,
+        fontSize: phInitHeight,
         scaleX: 1,
         scaleY: 1
       });
@@ -96,22 +108,23 @@ export class PhCropper extends PhSyncingViewer {
   }
 
   elementAddRemove () {
-    let setActive = false;
-    let boundingBoxPos = 0;
-
     this.fabCanvas.getObjects().forEach((o) => {
       if ((o.id || '').match(/^bounding_box:(.*)$/)) this.fabCanvas.remove(o);
     });
-    Array.from(this.elSyncForm.elements).forEach((el) => {
-      const m = el.name.match(/^bounding_box:(.*)$/);
 
-      if (!m) return;
-      if (el.disabled) return;
-      const obj = this.boundingBox(el.name, el.getAttribute('data-label'), boundingBoxPos);
-      boundingBoxPos++;
-      if (!setActive) {
+    // Find all bounding_box:* elements that aren't disabled
+    const bbEls = Array.from(this.elSyncForm.elements).filter((el) => {
+      return !el.disabled && el.name.match(/^bounding_box:.*$/);
+    });
+
+    // Set bounding boxes into a grid
+    setInitBBs(bbEls, this.fabCanvas.backgroundImage.width, this.fabCanvas.backgroundImage.height);
+
+    // Create canvas elements for each
+    bbEls.forEach((el, i) => {
+      const obj = this.boundingBox(el.name, el.getAttribute('data-label'), el.phInitHeight);
+      if (i === 0) {
         this.fabCanvas.setActiveObject(obj);
-        setActive = true;
       }
     });
   }
