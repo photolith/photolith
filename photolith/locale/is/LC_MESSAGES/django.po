@@ -29,7 +29,7 @@ msgstr "Hópar"
 msgid "Successfully deleted annotation"
 msgstr ""
 
-#: photolith/auth/views.py
+#: photolith/auth/views.py photolith/templates/home/index.html
 msgid "Sign up"
 msgstr ""
 
@@ -393,15 +393,16 @@ msgstr "Skoða/bæta við aldursmerkingu"
 msgid "Photolith"
 msgstr "Kvarnó"
 
-#: photolith/templates/base.html photolith/templates/ingest/index.html
+#: photolith/templates/base.html photolith/templates/home/index.html
+#: photolith/templates/ingest/index.html
 msgid "Ingest"
 msgstr "Hlaða inn myndum"
 
-#: photolith/templates/base.html
+#: photolith/templates/base.html photolith/templates/home/index.html
 msgid "Search"
 msgstr "Leit"
 
-#: photolith/templates/base.html
+#: photolith/templates/base.html photolith/templates/home/index.html
 msgid "Projects"
 msgstr "Verkefni"
 
@@ -412,6 +413,35 @@ msgstr "Vandamál"
 #: photolith/templates/base.html
 msgid "Site administration"
 msgstr "Vefstjórn"
+
+#: photolith/templates/home/index.html
+msgid ""
+"Welcome to Photolith, the otolith image storage and annotation software."
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "Log in"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "Continue annotating in projects you are part of"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "View previous project results"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "Upload new images into Photolith"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "Search for existing otoliths and annotate"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "Guides"
+msgstr ""
 
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"

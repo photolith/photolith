@@ -1,5 +1,72 @@
 {% extends "base.html" %}
 {% load i18n %}
+
 {% block content %}
-  <h1>Photolith: Otholith Image storage &amp; annotation</h1>
+<div class="row">
+
+
+<div class="col-lg-5 my-3">
+  <p>{% translate 'Welcome to Photolith, the otolith image storage and annotation software.' %}</p>
+
+  {% if not user.is_authenticated %}
+    <div class="m-4 text-center">
+      <a href="{% url 'login' %}" class="btn btn-info mx-2">{% translate 'Log in' %}</a>
+      <a href="{% url 'auth:signup' %}" class="btn btn-info mx-2">{% translate 'Sign up' %}</a>
+    </div>
+  {% endif %}
+
+  {% if projects %}<div class="card bg-light bg-gradient my-4">
+    <h5 class="card-header">{% translate 'Projects' %}</h5>
+    <div class="card-body">
+      {% regroup projects by is_open as open_closed_groups %}
+      {% for is_open, object_group in open_closed_groups %}
+        {% if is_open %}
+          <p>{% translate 'Continue annotating in projects you are part of' %}:</p>
+          <ul>
+            {% for object in object_group %}{% if object.team_member %}
+              <li><a href="{% url 'annotate:start' %}?project={{ object.id }}">{{object.name}}</a></li>
+            {% endif %}{% endfor %}
+          </ul>
+        {% else %}
+          <a href="{% url 'project:index' %}" class="card-link">{% translate "View previous project results" %}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>{% endif %}
+
+  {% if perms.photolith.add_individual %}<div class="card bg-light bg-gradient my-4">
+    <h5 class="card-header">{% translate 'Ingest' %}</h5>
+    <div class="card-body">
+      <a href="{% url 'ingest:index' %}" class="card-link">{% translate "Upload new images into Photolith" %}</a>
+    </div>
+  </div>{% endif %}
+
+  {% if perms.photolith.view_individual %}<div class="card bg-light bg-gradient my-4">
+    <h5 class="card-header">{% translate 'Search' %}</h5>
+    <div class="card-body">
+      <a href="{% url 'search:index' %}" class="card-link">{% translate "Search for existing otoliths and annotate" %}</a>
+    </div>
+  </div>{% endif %}
+
+  <div class="card bg-light bg-gradient my-0">
+    <h5 class="card-header">{% translate 'Guides' %}</h5>
+    <div class="card-body">
+      <ul>
+        <li><a href="https://github.com/photolith/photolith/tree/main/doc">Photolith documentation</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-6 my-3">
+  <div class="ph-viewer ph-annotate mb-2"
+       style="height: max(400px, 100%); background: black;"
+       data-src="/static/homepage-otolith.jpeg"
+       >
+    {% include "../snippet/viewer.html" %}
+    <div class="scale d-none" data-mm-to-px="500"><div class="inner"><span>0.1mm</span></div></div>
+  </div>
+</div>
+
+</div>
 {% endblock content %}
