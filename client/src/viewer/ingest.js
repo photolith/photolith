@@ -7,13 +7,20 @@ const rgbHighlight = window.getComputedStyle(document.documentElement).getProper
 
 function setInitBBs (bbEls, width, height) {
   // Set initial position based on count
-  const grid = { w: 5, h: 5 };
-  const margin = { w: width / 7, h: height / 7 };
+  // NB: Special case: A single bounding box covers the entire area
+  const grid = bbEls.length === 1
+    ? { w: 1, h: 1 }
+    : { w: 5, h: 5 };
+  const margin = bbEls.length === 1
+    ? { w: 0, h: 0 }
+    : { w: width / 7, h: height / 7 };
   const box = {
     w: (width - margin.w * 2) / grid.w,
     h: (height - margin.h * 2) / grid.h
   };
-  const gutter = { w: box.w * 0.1, h: box.h * 0.2 };
+  const gutter = bbEls.length === 1
+    ? { w: 0, h: 0 }
+    : { w: box.w * 0.1, h: box.h * 0.2 };
 
   bbEls.forEach((el, i) => {
     const left = margin.w + (i % grid.w) * box.w;
