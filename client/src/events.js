@@ -15,11 +15,14 @@ export function toggleUnloadWarning (state) {
       event.preventDefault();
       return (event.returnValue = '');
     };
+    window.phBeforeUnloadListener.registered = false;
   }
 
-  if (state) {
+  if (state && !window.phBeforeUnloadListener.registered) {
     window.addEventListener('beforeunload', window.phBeforeUnloadListener, { capture: true });
-  } else {
+    window.phBeforeUnloadListener.registered = true;
+  } else if (!state && window.phBeforeUnloadListener.registered) {
     window.removeEventListener('beforeunload', window.phBeforeUnloadListener, { capture: true });
+    window.phBeforeUnloadListener.registered = false;
   }
 }
