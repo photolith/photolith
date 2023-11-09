@@ -61,9 +61,17 @@ class UploadViewTest(RequiresUtils, TestCase):
         user = self.create_user(groups=[])
         self.assertEqual(self.form_post(user), 403)
 
-        # Can create nothing successfully
+        # Can create nothing, but user gets a warning
         user = self.create_user(groups=["Ingest"])
-        self.assertEqual(len(self.form_post(user)["created_individuals"]), 0)
+        self.assertEqual(
+            self.form_post(user),
+            dict(
+                alert_status="warning",
+                alert="No individual boxes on image! Nothing saved.",
+                created_individuals={},
+                updated_individuals={},
+            ),
+        )
 
         # Create 2 individuals
         user = self.create_user(groups=["Ingest"])
@@ -165,6 +173,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             dict(
+                alert_status="success",
                 alert="Created 1 individual. Updated 2 individuals. ",
                 created_individuals={"1": inds[3].id},
                 updated_individuals={"0": inds[2].id, "2": inds[1].id},

@@ -138,6 +138,10 @@ class UploadView(PermissionRequiredMixin, View):
                 )
 
         alert = ""
+        alert_status = "success"
+        if len(created_inds) == 0 and len(updated_inds) == 0:
+            alert += _("No individual boxes on image! Nothing saved.")
+            alert_status = "warning"
         if len(created_inds) > 0:
             alert += ngettext(
                 "Created %(count)d individual. ",
@@ -158,6 +162,7 @@ class UploadView(PermissionRequiredMixin, View):
         return JsonResponse(
             dict(
                 alert=alert,
+                alert_status=alert_status,
                 created_individuals=created_inds,
                 updated_individuals=updated_inds,
             )

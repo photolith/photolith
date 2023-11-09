@@ -115,7 +115,7 @@ function formSubmit (elForm) {
       body: new FormData(elForm)
     });
   }).then((data) => {
-    displayAlert('success', data.alert);
+    displayAlert(data.alert_status, data.alert);
     elForm.querySelector(':scope .individuals').innerHTML += Object.keys(data.created_individuals).map((k) => {
       return `<input type="hidden" name="individual_id:${k}" value="${data.created_individuals[k]}">`;
     }).join('\n') + Object.keys(data.updated_individuals).map((k) => {

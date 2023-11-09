@@ -58,6 +58,10 @@ msgid "Take photo (default camera)"
 msgstr "Taka mynd með tengdri myndavél"
 
 #: photolith/ingest/views.py
+msgid "No individual boxes on image! Nothing saved."
+msgstr ""
+
+#: photolith/ingest/views.py
 #, python-format
 msgid "Created %(count)d individual. "
 msgid_plural "Created %(count)d individuals. "
