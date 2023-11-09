@@ -25,3 +25,13 @@ APP_ALLOWED_HOSTS="photolith.website.org www.photolith.website.org"
 
 # Disable password validation, so overly guessable passwords can be used in development
 #APP_AUTH_PASSWORD_VALIDATORS=""
+
+# E-mail SMTP settings
+# NB: You must set APP_EMAIL_HOST to use SMTP
+#APP_EMAIL_HOST = "localhost"
+#APP_EMAIL_PORT = "587"
+#APP_EMAIL_USE_TLS = "True"
+#APP_EMAIL_HOST_USER = ""
+#APP_EMAIL_HOST_PASSWORD = ""
+#APP_DEFAULT_FROM_EMAIL = "admin@photolith.website.org"
+#APP_SERVER_EMAIL = "errors@photolith.website.org"

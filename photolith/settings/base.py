@@ -155,6 +155,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # FTP upload
 INGEST_ROOT = BASE_DIR.parent / "ingest_root"
 
+# Email
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "admin@photolith.localhost"  # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-DEFAULT_FROM_EMAIL
+SERVER_EMAIL = "errors@photolith.localhost"  # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-SERVER_EMAIL
+
 # Image storage
 STORAGES = {
     "default": {
@@ -195,6 +200,10 @@ for k in os.environ.keys():
             os.environ[k].split(" ") if len(os.environ[k]) > 0 else []
         )
         AUTH_PASSWORD_VALIDATORS = [dict(name=x) for x in AUTH_PASSWORD_VALIDATORS]
+    elif k == "APP_EMAIL_HOST":
+        # Email host set, so also update backend
+        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+        EMAIL_HOST = os.environ[k]
     elif k == "APP_LOG_DB":
         LOGGING["loggers"]["django.db.backends"] = {
             "level": "DEBUG",
