@@ -29,6 +29,14 @@ msgstr "Hópar"
 msgid "Successfully deleted annotation"
 msgstr ""
 
+#: photolith/auth/views.py
+msgid "Sign up"
+msgstr ""
+
+#: photolith/auth/views.py
+msgid "Administrator confirmation required"
+msgstr ""
+
 #: photolith/ingest/views.py
 #, python-format
 msgid "(%(count)d photo)"

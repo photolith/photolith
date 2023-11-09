@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+<div class="card bg-light bg-gradient">
+  <div class="card-body">
+    <h4 class="card-title">{{ title }}</h4>
+
+    <p>{% translate 'Please wait for an administrator to activate your account. When this happens you will get an e-mail' %}</p>
+
+    <a href="{% url 'home:index' %}" class="btn btn-info btn-block">{% translate 'Home' %}</a>
+  </div>
+</div>
+{% endblock %}

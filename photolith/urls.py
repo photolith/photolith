@@ -21,6 +21,7 @@ from django.views import defaults as default_views
 
 urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
+    path("accounts/", include("photolith.auth.urls", namespace="auth")),
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path("", include("photolith.home.urls", namespace="home")),
