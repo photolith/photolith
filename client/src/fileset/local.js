@@ -32,7 +32,7 @@ export class LocalFileSet {
       };
       this.input.click();
     }).then((files) => {
-      this._remaining = files.length;
+      this._remaining = files.length - 1;
       return files.shift();
     });
   }
