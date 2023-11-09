@@ -51,7 +51,9 @@ function formRefresh (event) {
         elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';
-      elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
+      // Lots of individuals, select the first rather than trying to display them all on-screen
+      elForm.elements.individual.selectedIndex = sd.individuals.length > 50 ? 1 : 0;
+      elForm.elements.individual.dispatchEvent(changeEvent());
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
       elForm.selection.value = '';

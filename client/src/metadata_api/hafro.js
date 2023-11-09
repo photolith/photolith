@@ -165,7 +165,7 @@ export default class MetadataApi {
 
     return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
       if (data.otoliths.length === 0) throw this.intlError('No otoliths for sample ID');
-      if (data.otoliths.length > 50) throw this.intlError('Too many ({0}) otoliths for sample ID', data.otoliths.length);
+      if (data.otoliths.length > 500) throw this.intlError('Too many ({0}) otoliths for sample ID', data.otoliths.length);
 
       // Sort incoming data by serialNo (i.e. individual number)
       data.otoliths.sort((a, b) => a.serialNo - b.serialNo);
