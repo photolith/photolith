@@ -15,9 +15,7 @@ function newFileSet (val) {
   throw new Error('Unknown fileset type ' + val.join(':'));
 }
 
-function nextSelection (elSelect) {
-  const elSyncForm = window.document.querySelector(elSelect.getAttribute('data-sync-form'));
-
+function nextSelection (elSelect, elSyncForm) {
   elSyncForm.image_file.value = '';
   elSyncForm.image_file.phBlob = 'start_load';
   elSyncForm.image_file.dispatchEvent(changeEvent());
@@ -36,7 +34,7 @@ function nextSelection (elSelect) {
     elSyncForm.image_file.value = elSelect.fs.name;
     elSyncForm.image_file.phBlob = f;
     elSyncForm.image_file.dispatchEvent(changeEvent());
-    toggleUnloadWarning(remaining > 0);
+    toggleUnloadWarning(true);
   }).catch((err) => {
     // Clear the loading spinner, if still going
     elSyncForm.image_file.value = '';
@@ -54,6 +52,7 @@ function nextSelection (elSelect) {
 export function init (parent) {
   parent.querySelectorAll('.ph-ingest-select-bar').forEach((elSelectBar) => {
     const elSelect = elSelectBar.querySelector(':scope select');
+    const elSyncForm = window.document.querySelector(elSelect.getAttribute('data-sync-form'));
 
     elSelect.fs = newFileSet('null');
 
@@ -62,12 +61,16 @@ export function init (parent) {
       elSelect.fs = newFileSet(elSelect.value);
       elSelect.selectedIndex = 0;
       toggleUnloadWarning(false);
-      nextSelection(elSelect);
+      nextSelection(elSelect, elSyncForm);
     });
 
     elSelectBar.querySelector(':scope *[data-action=next]').addEventListener('click', (event) => {
       event.preventDefault();
-      nextSelection(elSelect);
+      nextSelection(elSelect, elSyncForm);
+    });
+
+    elSyncForm.addEventListener('submit', (event) => {
+      toggleUnloadWarning(elSelect.fs.remaining() > 0);
     });
   });
 }
