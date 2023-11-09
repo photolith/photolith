@@ -21,7 +21,8 @@ USER root
 COPY --chown=build . /srv/app
 
 # Recreate .dockerignore'd directories
-RUN mkdir -p /srv/app/{db,media,ingest_root} && chown -R app /srv/app/{db,media,ingest_root}
+RUN mkdir -p /srv/app/db /srv/app/media /srv/app/ingest_root && chown -R app /srv/app/db /srv/app/media /srv/app/ingest_root
+VOLUME ["/srv/app/db", "/srv/app/media", "/srv/app/ingest_root"]
 
 USER build
 RUN make
