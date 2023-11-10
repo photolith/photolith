@@ -12,6 +12,14 @@ function populateFilter (elForm) {
   const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
   const searchParams = new URLSearchParams(window.location.search);
 
+  // Append any search terms on querystring that aren't included in filter list
+  for (let k of searchParams.keys()) {
+    k = k.replace(/^\w+_/, '');
+    if (!metaLabels[k]) {
+      metaLabels[k] = window.mApi.metaLabels()[k] || k;
+    }
+  }
+
   elBody.innerHTML = ['project'].map((k) => {
     // If not set, don't pollute querystring with hidden field
     if (!searchParams.get(k)) return '';
