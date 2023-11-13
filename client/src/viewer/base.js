@@ -69,6 +69,23 @@ export class PhViewer {
   constructor (elViewer) {
     this.elViewer = elViewer;
 
+    const elDl = this.elViewer.querySelector(':scope .download-link');
+    elDl.addEventListener('click', (event) => {
+      if (!this.fabCanvas.backgroundImage) {
+        // No image, disable download link
+        elDl.href = '#';
+        elDl.download = undefined;
+      } else if (this.origBlob instanceof window.Blob) {
+        // Offer link directly to blob
+        elDl.href = URL.createObjectURL(this.origBlob);
+        elDl.download = this.origBlob.name;
+      } else {
+        // Download from canvas
+        elDl.href = this.fabCanvas.backgroundImage.toDataURL({ format: 'jpeg' });
+        elDl.download = this.origBlob.name + '.jpg';
+      }
+    });
+
     // Never show rotate controls on groups (read: ctrl-drag to select multiple)
     fabric.Group.prototype.lockRotation = true;
 
@@ -225,6 +242,7 @@ export class PhViewer {
   load (blob, boundingBox) {
     this.fabCanvas.setBackgroundImage(undefined);
     this.fabCanvas.requestRenderAll();
+    this.origBlob = blob;
 
     if (blob === 'start_load') {
       // Not a blob, indication we should start spinner
@@ -261,22 +279,6 @@ export class PhViewer {
       if (this.fabCanvas.phSetScale) this.fabCanvas.phSetScale();
 
       this.refreshFilters();
-    }).finally(() => {
-      const elDl = this.elViewer.querySelector(':scope .download-link');
-
-      if (this.fabCanvas.backgroundImage && blob instanceof window.Blob) {
-        // Offer link directly to blob
-        elDl.href = URL.createObjectURL(blob);
-        elDl.download = blob.name;
-      } else if (this.fabCanvas.backgroundImage) {
-        // Download from canvas
-        elDl.href = this.fabCanvas.backgroundImage.toDataURL({ format: 'jpeg' });
-        elDl.download = blob.name + '.jpg';
-      } else {
-        // No image, disable download link
-        elDl.href = '#';
-        elDl.download = undefined;
-      }
     });
   }
 
