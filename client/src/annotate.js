@@ -79,6 +79,13 @@ function allAnnotationsClick (elForm, event) {
         elForm.elements.age.value = newVal;
       }, 100, elSelected.querySelector('.val-age').textContent);
       elForm.elements.rating.value = elSelected.querySelector('.val-rating').getAttribute('data-value');
+      elForm.elements.authority.value = elSelected.querySelector('.val-authority').getAttribute('data-value');
+      if (elForm.elements.authority.selectedIndex === -1) {
+        // Doesn't already exist, so create a new option with this authority level
+        elForm.elements.authority.add(new window.Option(
+          elSelected.querySelector('.val-authority').getAttribute('data-value')));
+        elForm.elements.authority.selectedIndex = elForm.elements.authority.options.length - 1;
+      }
       elForm.elements.comment.value = elSelected.querySelector('.val-comment').textContent;
     } else {
       throw new Error('Unknown button ' + event.target.className);
