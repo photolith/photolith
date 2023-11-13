@@ -44,7 +44,11 @@ export class PhSyncingViewer extends PhFilteringViewer {
     this.elSyncForm.addEventListener('change', (event) => {
       if (event.detail === 999) return; // Break loops
       if (event.target.name === 'image_file') {
-        this.load(event.target.phBlob, null);
+        this.load(event.target.phBlob, null).then(() => {
+          if (!this.imgBlob) return;
+          // Update form with new imgBlob, which may have actually been e.g. a video stream
+          event.target.phBlob = this.imgBlob;
+        });
         return;
       }
 

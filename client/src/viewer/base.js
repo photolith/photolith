@@ -69,20 +69,17 @@ export class PhViewer {
   constructor (elViewer) {
     this.elViewer = elViewer;
 
+    // Update download link with imgBlob contents
     const elDl = this.elViewer.querySelector(':scope .download-link');
     elDl.addEventListener('click', (event) => {
-      if (!this.fabCanvas.backgroundImage) {
+      if (!this.imgBlob) {
         // No image, disable download link
         elDl.href = '#';
         elDl.download = undefined;
-      } else if (this.origBlob instanceof window.Blob) {
-        // Offer link directly to blob
-        elDl.href = URL.createObjectURL(this.origBlob);
-        elDl.download = this.origBlob.name;
       } else {
-        // Download from canvas
-        elDl.href = this.fabCanvas.backgroundImage.toDataURL({ format: 'jpeg' });
-        elDl.download = this.origBlob.name + '.jpg';
+        // Blob download link
+        elDl.href = URL.createObjectURL(this.imgBlob);
+        elDl.download = this.imgBlob.name;
       }
     });
 
@@ -242,7 +239,7 @@ export class PhViewer {
   load (blob, boundingBox) {
     this.fabCanvas.setBackgroundImage(undefined);
     this.fabCanvas.requestRenderAll();
-    this.origBlob = blob;
+    this.imgBlob = null;
 
     if (blob === 'start_load') {
       // Not a blob, indication we should start spinner
@@ -279,6 +276,18 @@ export class PhViewer {
       if (this.fabCanvas.phSetScale) this.fabCanvas.phSetScale();
 
       this.refreshFilters();
+
+      // Set imgBlob, converting canvas content if load() input wasn't blobby enough
+      if (blob instanceof window.Blob) {
+        this.imgBlob = blob;
+      } else {
+        return new Promise((resolve) => {
+          img.toCanvasElement().toBlob(resolve, 'image/jpeg', 0.9);
+        }).then((newBlob) => {
+          this.imgBlob = newBlob;
+          this.imgBlob.name = blob.name;
+        });
+      }
     });
   }
 
