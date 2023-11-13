@@ -53,3 +53,11 @@ export function htmlFetch (resource, options = {}) {
     throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
   });
 }
+
+export function blobFetch (resource, options = {}) {
+  return window.fetch(resource, options).then((response) => {
+    if (response.ok) return response.blob();
+
+    throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
+  });
+}

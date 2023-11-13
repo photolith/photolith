@@ -1,3 +1,4 @@
+import { blobFetch } from './fetch.js';
 import { PhViewer } from './viewer/base';
 import { PhAnnotate } from './viewer/annotate';
 import { PhCropper } from './viewer/ingest';
@@ -14,10 +15,7 @@ export function init (parent) {
 
     if (elViewer.hasAttribute('data-src')) {
       v.startRendering();
-      window.fetch(elViewer.getAttribute('data-src')).then((resp) => {
-        if (!resp.ok) throw new Error(resp.statusText);
-        return resp.blob();
-      }).then((blob) => {
+      return blobFetch(elViewer.getAttribute('data-src')).then((blob) => {
         v.load(blob, JSON.parse(elViewer.getAttribute('data-bounding-box') || 'null'));
       });
     }
