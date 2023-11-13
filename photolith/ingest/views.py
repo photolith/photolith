@@ -175,7 +175,7 @@ class UploadImageView(PermissionRequiredMixin, View):
     @json_errors
     def post(self, *args, **kwargs):
         mimetype = self.request.content_type
-        if mimetype != "image/jpeg":
+        if not mimetype.startswith("image/"):  # e.g. image/jpeg, image/x-nikon-nef
             raise ValueError("Unknown content type %s" % mimetype)
 
         image = Image(

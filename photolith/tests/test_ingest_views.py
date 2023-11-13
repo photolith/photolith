@@ -8,6 +8,7 @@ from django.test import Client, TestCase
 from ..ingest.views import *
 from ..models import Individual, Image
 
+from .binaries import JPEG_VALID, JPEG_TRUNCATED, GIF_VALID
 from .requires_utils import RequiresUtils
 
 
@@ -237,3 +238,73 @@ class UploadViewTest(RequiresUtils, TestCase):
         img.refresh_from_db()
         self.assertEqual(img.scale_line, None)
         self.assertEqual(img.scale_mm, None)
+
+
+class UploadImageViewTest(RequiresUtils, TestCase):
+    def upload_img(
+        self, user, img_data=JPEG_VALID, mimetype="image/jpeg", filename="ut_image.jpeg"
+    ):
+        client = Client()
+        client.force_login(user)
+        resp = client.post(
+            "/ingest/upload-image/",
+            img_data,
+            content_type=mimetype,
+            headers={
+                "X-Photolith-filename": filename,
+            },
+        )
+        if resp.status_code != 200:
+            return resp.status_code
+        out = json.loads(resp.content)
+        return out
+
+    def test_call__permissions(self):
+        """You need to be part of the ingest group to post"""
+        user = self.create_user(groups=[])
+        self.assertEqual(self.upload_img(user), 403)
+        user = self.create_user(groups=["Ingest"])
+        self.assertEqual(self.upload_img(user)["created_by"], user.id)
+
+    def test_call__save(self):
+        """Successfully save image & metadata"""
+        user = self.create_user(groups=["Ingest"])
+
+        out = self.upload_img(
+            user, GIF_VALID, mimetype="image/gif", filename="ut_really_good_image.gif"
+        )
+        i = Image.objects.get(pk=out["id"])
+        self.assertEqual(
+            out,
+            dict(
+                content=i.content.name,
+                created_by=user.id,
+                id=i.id,
+                mimetype="image/gif",
+                orig_filename="ut_really_good_image.gif",
+                scale_line=None,
+                scale_mm=None,
+            ),
+        )
+        self.assertEqual(i.content.read(), GIF_VALID)
+
+        out = self.upload_img(
+            user,
+            JPEG_VALID,
+            mimetype="image/jpeg",
+            filename="ut_really_good_image.jpeg",
+        )
+        i = Image.objects.get(pk=out["id"])
+        self.assertEqual(
+            out,
+            dict(
+                content=i.content.name,
+                created_by=user.id,
+                id=i.id,
+                mimetype="image/jpeg",
+                orig_filename="ut_really_good_image.jpeg",
+                scale_line=None,
+                scale_mm=None,
+            ),
+        )
+        self.assertEqual(i.content.read(), JPEG_VALID)

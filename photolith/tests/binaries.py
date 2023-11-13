@@ -6,3 +6,6 @@ JPEG_VALID = base64.b64decode(
 JPEG_TRUNCATED = base64.b64decode(
     b"/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA="
 )
+GIF_VALID = base64.b64decode(
+    b"R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+)
