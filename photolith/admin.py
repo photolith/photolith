@@ -184,6 +184,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "image_preview",
         "age",
         "rating",
+        "authority",
         "comment",
         "created_by",
         "created_at",
