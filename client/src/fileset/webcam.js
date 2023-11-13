@@ -31,8 +31,10 @@ export class WebcamFileSet {
 
   close () {
     if (this.reject) this.reject(new Cancelled());
-    this.video.srcObject.getTracks().forEach((t) => { t.stop(); });
-    this.elViewer.removeChild(this.video);
+    if (this.video) {
+      this.video.srcObject.getTracks().forEach((t) => { t.stop(); });
+      this.elViewer.removeChild(this.video);
+    }
     this.video = null;
   }
 
