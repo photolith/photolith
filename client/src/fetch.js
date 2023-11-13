@@ -59,5 +59,9 @@ export function blobFetch (resource, options = {}) {
     if (response.ok) return response.blob();
 
     throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
+  }).then((blob) => {
+    // NB: toImageBitmap uses the name to quickly guess JPEG
+    blob.name = resource;
+    return blob;
   });
 }

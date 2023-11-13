@@ -1,9 +1,10 @@
+import { blobFetch } from './fetch.js';
+import { toImageBitmap } from './image.js';
+
 export function init (parent) {
   parent.querySelectorAll('div.ph-cropped-viewer').forEach((elViewer) => {
     elViewer.innerHTML = '<canvas style="max-width: 100%; max-height: 100%;">';
-    const elImage = new window.Image();
     const elCanvas = elViewer.firstChild;
-    const href = elViewer.getAttribute('data-src');
     const boundingBox = JSON.parse(elViewer.getAttribute('data-bounding-box'));
 
     elViewer.setAttribute('class', 'ph-cropped-viewer rendering');
@@ -12,10 +13,12 @@ export function init (parent) {
     elCanvas.width = boundingBox[1][0] - boundingBox[0][0];
     elCanvas.height = boundingBox[1][1] - boundingBox[0][1];
 
-    elImage.onload = (e) => {
+    return blobFetch(elViewer.getAttribute('data-src')).then((blob) => {
+      return toImageBitmap(blob);
+    }).then((imageBitmap) => {
       const ctx = elCanvas.getContext('2d');
       ctx.drawImage(
-        elImage,
+        imageBitmap,
         // Top-left of source image
         boundingBox[0][0],
         boundingBox[0][1],
@@ -29,9 +32,7 @@ export function init (parent) {
         elCanvas.width,
         elCanvas.height
       );
-      elImage.src = '';
       elViewer.classList.remove('rendering');
-    };
-    elImage.src = href;
+    });
   });
 }
