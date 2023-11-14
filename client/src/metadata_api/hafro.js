@@ -193,7 +193,7 @@ export default class MetadataApi {
             out.cruise = od.sampleResponse.station.cruise.name;
             out.station = od.sampleResponse.station.number.toString();
             out.stationDate = od.sampleResponse.station.stationDate;
-            out.stationYear = (new Date(od.sampleResponse.station.stationDate)).getYear();
+            out.stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
             out.stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
           } else {
             if (lbl.cruise) out.cruise = lbl.cruise;
