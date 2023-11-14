@@ -352,7 +352,7 @@ msgid "Delete annotation"
 msgstr ""
 
 #: photolith/templates/annotate/annotate.html
-msgid "Save outside project"
+msgid "Save as general annotation"
 msgstr ""
 
 #: photolith/templates/annotate/annotate.html
