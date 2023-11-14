@@ -17,11 +17,11 @@ class ProjectListViewTest(RequiresUtils, TestCase):
         return out
 
     def test_get_queryset__visibility(self):
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
-        user3 = self.create_user(groups=["Annotate"])
-        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
-        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
+        user3 = self.create_user(groups=["General Annotation Editor"])
+        userA1 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
+        userA2 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
 
         self.create_project(
             name="p1.1",
@@ -90,10 +90,10 @@ class ProjectListViewTest(RequiresUtils, TestCase):
         )
 
     def test_get_queryset__annotation_counts(self):
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
-        user3 = self.create_user(groups=["Annotate"])
-        userA = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
+        user3 = self.create_user(groups=["General Annotation Editor"])
+        userA = self.create_user(groups=["General Annotation Editor", "Project Admin"])
         self.assertEqual(
             self.query(user1, "name", "is_open", "num_annotations", "num_individuals"),
             [],
@@ -306,10 +306,10 @@ class ProjectUpdateViewTest(RequiresUtils, TestCase):
         )
 
     def test_call(self):
-        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
-        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
+        userA1 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
+        userA2 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
 
         p1 = self.create_project(
             name="A1_project",
@@ -342,10 +342,10 @@ class ProjectDeleteViewTest(RequiresUtils, TestCase):
         )
 
     def test_call(self):
-        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
-        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
+        userA1 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
+        userA2 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
 
         p1 = self.create_project(
             name="A1_project",

@@ -26,11 +26,11 @@ class TemplatesProjectListTest(RequiresUtils, TestCase):
         return out
 
     def test_get_queryset__visibility(self):
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
-        user3 = self.create_user(groups=["Annotate"])
-        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
-        userA2 = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=[])
+        user2 = self.create_user(groups=[])
+        user3 = self.create_user(groups=[])
+        userA1 = self.create_user(groups=["Project Admin"])
+        userA2 = self.create_user(groups=["Project Admin"])
 
         projects = [
             self.create_project(

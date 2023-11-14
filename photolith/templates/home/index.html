@@ -41,8 +41,8 @@
     </div>
   </div>{% endif %}
 
-  {% if perms.photolith.view_individual %}<div class="card bg-light bg-gradient my-4">
-    <h5 class="card-header">{% translate 'Search' %}</h5>
+  {% if perms.photolith.view_annotation %}<div class="card bg-light bg-gradient my-4">
+    <h5 class="card-header">{% translate 'General annotation' %}</h5>
     <div class="card-body">
       <a href="{% url 'search:index' %}" class="card-link">{% translate "Search for existing otoliths and annotate" %}</a>
     </div>

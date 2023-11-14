@@ -2,7 +2,7 @@ import csv
 import datetime
 import itertools
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.views.generic import TemplateView
 from django.http import JsonResponse, StreamingHttpResponse
@@ -21,10 +21,10 @@ from ..models import (
     Taxonomy,
 )
 from ..nullagg import NullAgg
+from ..perm_utils import check_annotate_access
 
 
-class IndexView(PermissionRequiredMixin, TemplateView):
-    permission_required = ("photolith.view_individual",)
+class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "search/index.html"
 
     def get_meta_fields(self):
@@ -58,22 +58,25 @@ class IndexView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        p = (
+            get_object_or_404(Project, pk=self.request.GET.get("project"))
+            if self.request.GET.get("project")
+            else None
+        )
+        check_annotate_access(p, self.request.user, rw=False)
+
         context["meta_fields"] = cache.get_or_set(
             "photolith_meta_fields",
             lambda: self.get_meta_fields(),
             timeout=600,  # Seconds
         )
         context["qs"] = self.request.META["QUERY_STRING"]
-        if self.request.GET.get("project"):
-            context["project"] = get_object_or_404(
-                Project, pk=self.request.GET.get("project")
-            )
+
         return context
 
 
-class DataView(PermissionRequiredMixin, View):
-    permission_required = ("photolith.view_individual",)
-
+class DataView(LoginRequiredMixin, View):
     def query(self, with_annotations="", with_image_url=False):
         qs = Individual.objects
         qs = (
@@ -86,8 +89,13 @@ class DataView(PermissionRequiredMixin, View):
         )
 
         # If searching for a project, only search within individuals part of project
-        if "project" in self.request.GET:
-            p = get_object_or_404(Project, pk=self.request.GET.get("project"))
+        p = (
+            get_object_or_404(Project, pk=self.request.GET.get("project"))
+            if self.request.GET.get("project")
+            else None
+        )
+        check_annotate_access(p, self.request.user, rw=False)
+        if p:
             qs = qs.filter(project=p)
 
         for k, vs in self.request.GET.lists():

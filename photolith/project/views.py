@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Count, Exists, OuterRef, Q
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -10,8 +10,7 @@ from .forms import ProjectForm
 
 
 # https://docs.djangoproject.com/en/4.2/ref/class-based-views/generic-display/#listview
-class ProjectListView(PermissionRequiredMixin, ListView):
-    permission_required = ("photolith.view_project",)
+class ProjectListView(LoginRequiredMixin, ListView):
     template_name = "project/list.html"
     model = Project
 

@@ -29,7 +29,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
         client = Client()
         client.force_login(user)
-        resp = client.post("/annotate/%d/?%s" % (ind.id, qs), ann_dict)
+        resp = client.post(
+            "/annotate/%d/%s?%s" % (ind.id, kwargs.get("annotation_id", ""), qs),
+            ann_dict,
+        )
         if resp.status_code == 403:
             # Reconstitute python error if we can
             m = re.search(
@@ -44,15 +47,46 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         out = Annotation.objects.get(comment=ann_dict["comment"])
         return out
 
-    def test_form_valid_project(self):
+    def test_form_valid__general(self):
+        """Can only annotate if a general Annotation Editor"""
+        user0 = self.create_user(groups=[])
+        user1 = self.create_user(groups=["General Annotation Viewer"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
+        ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
+
+        # Viewers can't save
+        with self.assertRaisesRegex(PermissionDenied, "general annotation"):
+            ann = self.form_post(user0, ind)
+        with self.assertRaisesRegex(PermissionDenied, "general annotation"):
+            ann = self.form_post(user1, ind)
+
+        # Editors can
+        ann = self.form_post(user2, ind)
+        self.assertEqual(ann.project, None)
+
+        # Can't save someone else's annotation
+        user3 = self.create_user(groups=["General Annotation Editor"])
+        with self.assertRaisesRegex(PermissionDenied, "do not own"):
+            ann = self.form_post(user3, ind, annotation_id=ann.id)
+
+    def test_form_valid__project(self):
         """Can only annotate in open projects"""
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
         ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
         p1 = [self.create_project(team=[user1]) for _ in range(random.randrange(1, 9))][
             -1
         ]
+
+        # Can't save to project we're not part of
+        with self.assertRaisesRegex(PermissionDenied, "added to this project"):
+            ann = self.form_post(user2, ind, project=p1, qs_project=None)
+
         self.close_project(p1)
+
+        # Can't save to closed project
+        with self.assertRaisesRegex(PermissionDenied, p1.name):
+            ann = self.form_post(user1, ind, project=p1, qs_project=p1)
 
         # The querystring project wasn't used
         # Can save outside a valid project
@@ -64,7 +98,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(ann.project, None)
 
     def test_get_initial(self):
-        user1 = self.create_user("user1")
+        user1 = self.create_user("user1", groups=["General Annotation Viewer"])
 
         def get_initial(ind, ann=None, **kwargs):
             kwargs["individual_id"] = ind.id
@@ -149,12 +183,13 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
-        self.assertEqual(get_all_annotations(ind), [])
-        user1 = self.create_user("user1")
+        user1 = self.create_user("user1", groups=["General Annotation Viewer"])
         user2 = self.create_user("user2")
         user3 = self.create_user("user3")
         user4 = self.create_user("user4")
         userA = self.create_user("userA", groups=["Project Admin"])
+
+        self.assertEqual(get_all_annotations(ind, user=user1), [])
 
         # Create 4 annotations, see all 4, newest first
         self.create_annotation(ind, user1, created_delta=dict(days=-3))
@@ -162,7 +197,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.create_annotation(ind, user2, created_delta=dict(days=-3))
         self.create_annotation(ind, user3, created_delta=dict(days=-3))
         self.assertEqual(
-            get_all_annotations(ind),
+            get_all_annotations(ind, user=user1),
             [
                 "10-user1-2",
                 "10-user1-3",
@@ -232,7 +267,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
         # Don't see project annotations outside project
         self.assertEqual(
-            get_all_annotations(ind),
+            get_all_annotations(ind, user=user1),
             [
                 "10-user1-2",
                 "10-user1-3",
@@ -322,13 +357,18 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             out = v.get_context_data()
             return out
 
-        user1 = self.create_user()
-        user2 = self.create_user()
-        user3 = self.create_user()
+        user0 = self.create_user(groups=[])
+        user1 = self.create_user(groups=["General Annotation Viewer"])
+        user2 = self.create_user(groups=["General Annotation Viewer"])
+        user3 = self.create_user(groups=["General Annotation Viewer"])
+        ind = self.create_individual()
+
+        # Need to be at least a General Annotation Viewer to view general annotations
+        with self.assertRaisesRegex(PermissionDenied, "general"):
+            out = ctx_data(ind, user=user0)
 
         # No annotations, displaying editor
-        ind = self.create_individual()
-        out = ctx_data(ind)
+        out = ctx_data(ind, user=user1)
         self.assertEqual(out["default_tab"], "editor")
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
 
@@ -339,17 +379,17 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         ann2 = self.create_annotation(
             ind, axis_poly=[[6, 1], [4, 5], [2, 3]], created_by=user1
         )
-        out = ctx_data(ind)
+        out = ctx_data(ind, user=user1)
         self.assertEqual(out["default_tab"], "existing")
         self.assertEqual(out["form"].instance.id, None)
         self.assertEqual(out["form"].initial["axis_poly"], [[50.0, 50.0], [5, 5]])
 
         # Can explicitly edit either
-        out = ctx_data(ind, annotation=ann1)
+        out = ctx_data(ind, annotation=ann1, user=user1)
         self.assertEqual(out["default_tab"], "editor")
         self.assertEqual(out["form"].instance.id, ann1.id)
         self.assertEqual(out["form"].initial["axis_poly"], ann1.axis_poly)
-        out = ctx_data(ind, annotation=ann2)
+        out = ctx_data(ind, annotation=ann2, user=user1)
         self.assertEqual(out["default_tab"], "editor")
         self.assertEqual(out["form"].instance.id, ann2.id)
         self.assertEqual(out["form"].initial["axis_poly"], ann2.axis_poly)
@@ -482,7 +522,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
 
         # User without profile isn't an authority
-        user = self.create_user(groups=["Annotate"])
+        user = self.create_user(groups=["General Annotation Editor"])
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
@@ -492,7 +532,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
 
         # Add profile, only authority for relevant species
-        user = self.create_user(groups=["Annotate"], species_expert=["Fish"])
+        user = self.create_user(
+            groups=["General Annotation Editor"], species_expert=["Fish"]
+        )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
@@ -515,7 +557,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
-        user = self.create_user(groups=["Annotate"], species_expert=["Rock"])
+        user = self.create_user(
+            groups=["General Annotation Editor"], species_expert=["Rock"]
+        )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
@@ -538,7 +582,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
-        user = self.create_user(groups=["Annotate"], species_expert=["Fish", "Rock"])
+        user = self.create_user(
+            groups=["General Annotation Editor"], species_expert=["Fish", "Rock"]
+        )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
@@ -625,17 +671,12 @@ class AnnotateDeleteViewTest(RequiresUtils, TestCase):
         )
 
     def test_call(self):
-        user1 = self.create_user(groups=["Annotate"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
         ind = self.create_individual()
         ann = self.create_annotation(ind, created_by=user1)
 
-        # Can't delete if not part of the annotate group
-        user3 = self.create_user(groups=[])
-        out = self.ann_del(ann, user3)
-        self.assertEqual(out[0], 403)
-
         # Can't delete something you don't own
-        user2 = self.create_user(groups=["Annotate"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
         out = self.ann_del(ann, user2)
         self.assertEqual(
             out,

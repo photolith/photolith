@@ -29,8 +29,8 @@
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><a href="{% url 'home:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'home' %}text-secondary{% else %}text-white{% endif %}">{% translate "Home" %}</a></li>
           {% if perms.photolith.add_individual %}<li><a href="{% url 'ingest:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'ingest' %}text-secondary{% else %}text-white{% endif %}">{% translate "Ingest" %}</a></li>{% endif %}
-          {% if perms.photolith.view_individual %}<li><a href="{% url 'search:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'search' %}text-secondary{% else %}text-white{% endif %}">{% translate "Search" %}</a></li>{% endif %}
-          {% if perms.photolith.view_project %}<li><a href="{% url 'project:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'project' %}text-secondary{% else %}text-white{% endif %}">{% translate "Projects" %}</a></li>{% endif %}
+          {% if perms.photolith.view_annotation %}<li><a href="{% url 'search:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'search' %}text-secondary{% else %}text-white{% endif %}">{% translate "Search" %}</a></li>{% endif %}
+          <li><a href="{% url 'project:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'project' %}text-secondary{% else %}text-white{% endif %}">{% translate "Projects" %}</a></li>
         </ul>
 
         <div class="text-end">

@@ -402,7 +402,7 @@ msgstr "Kvarnó"
 msgid "Ingest"
 msgstr "Hlaða inn myndum"
 
-#: photolith/templates/base.html photolith/templates/home/index.html
+#: photolith/templates/base.html
 msgid "Search"
 msgstr "Leit"
 
@@ -437,6 +437,10 @@ msgstr ""
 
 #: photolith/templates/home/index.html
 msgid "Upload new images into Photolith"
+msgstr ""
+
+#: photolith/templates/home/index.html
+msgid "General annotation"
 msgstr ""
 
 #: photolith/templates/home/index.html

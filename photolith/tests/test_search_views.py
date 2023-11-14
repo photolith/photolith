@@ -1,12 +1,67 @@
 import csv
 import datetime
+import json
 
-from django.test import Client, TestCase
+from django.core.exceptions import PermissionDenied
+from django.test import Client, TestCase, RequestFactory
 
-from ..search.views import ExportView
+from ..search.views import IndexView
 from ..models import Annotation, Individual, Image, Project
 
 from .requires_utils import RequiresUtils
+
+
+class IndexViewTest(RequiresUtils, TestCase):
+    maxDiff = None
+
+    def ctx_data(self, user, search=dict()):
+        request = RequestFactory().get("/", search)
+        request.user = user
+        v = IndexView()
+        v.setup(request, **(request.GET.dict()))
+        out = v.get_context_data()
+        return out
+
+    def test_call__perms(self):
+        """Not allowed access without general annotation / project"""
+        user = self.create_user(groups=[])
+
+        with self.assertRaisesRegex(PermissionDenied, "general annotation"):
+            out = self.ctx_data(user)
+        with self.assertRaisesRegex(PermissionDenied, "project"):
+            p = self.create_project()
+            out = self.ctx_data(user, dict(project=p.id))
+
+
+class DataViewTest(RequiresUtils, TestCase):
+    maxDiff = None
+
+    def data(self, user, search=dict()):
+        client = Client()
+        client.force_login(user)
+        resp = client.get("/search/data/", search)
+        out = json.loads(resp.content)
+        return out
+
+    def test_call__perms(self):
+        """Not allowed access without general annotation / project"""
+        user = self.create_user(groups=[])
+
+        self.assertEqual(
+            self.data(user),
+            dict(
+                error_class="PermissionDenied",
+                error="Contact an administrator to be added to the general annotation group",
+            ),
+        )
+        p = self.create_project()
+        self.assertEqual(
+            self.data(user, dict(project=p.id)),
+            dict(
+                error_class="PermissionDenied",
+                error="Contact an administrator to be added to this project",
+            ),
+        )
 
 
 class ExportViewTest(RequiresUtils, TestCase):
@@ -38,8 +93,20 @@ class ExportViewTest(RequiresUtils, TestCase):
             # Remove empty entries to simplify output dicts
             yield {k: v for k, v in r.items() if v != ""}
 
+    def test_call__perms(self):
+        """Not allowed access without general annotation / project"""
+        user = self.create_user(groups=[])
+
+        with self.assertRaisesRegex(PermissionDenied, "general annotation"):
+            out = list(self.export(user, "all"))
+        with self.assertRaisesRegex(PermissionDenied, "project"):
+            p = self.create_project()
+            out = list(self.export(user, "all", dict(project=p.id)))
+
     def test_call(self):
-        userA = self.create_user("userA", groups=["Annotate", "Project Admin"])
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
 
         img = self.create_image(
             # Scale should multiply distances by 2
@@ -139,7 +206,9 @@ class ExportViewTest(RequiresUtils, TestCase):
         )
 
     def test_call__noscale(self):
-        userA = self.create_user("userA", groups=["Annotate", "Project Admin"])
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
 
         img = self.create_image(
             scale_line=[(0, 0), (1, 0)],

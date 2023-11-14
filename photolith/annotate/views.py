@@ -1,5 +1,5 @@
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -14,10 +14,10 @@ from ..errors import json_errors
 from ..models import Individual, Annotation, Project
 
 from .forms import AnnotationForm
+from ..perm_utils import check_annotate_access
 
 
-class AnnotateView(PermissionRequiredMixin, UpdateView):
-    permission_required = ("photolith.view_annotation",)
+class AnnotateView(LoginRequiredMixin, UpdateView):
     template_name = "annotate/annotate.html"
     model = Annotation
     form_class = AnnotationForm
@@ -37,11 +37,6 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         )
 
     def form_valid(self, form):
-        if not self.request.user.has_perms(
-            ("photolith.add_annotation", "photolith.change_annotation")
-        ):
-            raise PermissionDenied("Not allowed to edit annotations")
-
         # Set / check created_by
         if self.object:
             if not (
@@ -55,18 +50,7 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
         # Cannot add extra annotations to a closed project
         # NB: Use form.instance.project instead of querystring in case we are copying an annotation outside a project,
         #     QS will be closed project, form.instance.project will be unset
-        if p := form.instance.project:
-            if not (
-                p.team.users.contains(self.request.user)
-                or p.created_by == self.request.user
-            ):
-                raise PermissionDenied(
-                    "Contact an administrator to be added to this project"
-                )
-            if not p.is_open:
-                raise PermissionDenied(
-                    "Project %s closed, cannot edit annotations" % (str(p))
-                )
+        check_annotate_access(form.instance.project, self.request.user, rw=True)
 
         return super().form_valid(form)
 
@@ -91,17 +75,12 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
     @cached_property
     def current_project(self):
         """Return the current project object based on the querystring"""
-        p_id = self.request.GET.get("project")
-        if not p_id:
-            return None
-        p = get_object_or_404(Project, pk=p_id)
-        if not (
-            p.team.users.contains(self.request.user)
-            or p.created_by == self.request.user
-        ):
-            raise PermissionDenied(
-                "Contact an administrator to be added to this project"
-            )
+        p = (
+            get_object_or_404(Project, pk=self.request.GET.get("project"))
+            if self.request.GET.get("project")
+            else None
+        )
+        check_annotate_access(p, self.request.user, rw=False)
         return p
 
     @cached_property
@@ -210,7 +189,6 @@ class AnnotateView(PermissionRequiredMixin, UpdateView):
 
 
 class AnnotateSnippetView(AnnotateView):
-    permission_required = ("photolith.view_individual",)
     template_name = "annotate/snippet.html"
     # As above, but an HTML snippet for the search form
 
@@ -240,9 +218,7 @@ class AnnotateStartView(AnnotateView):
         return context
 
 
-class DeleteView(PermissionRequiredMixin, View):
-    permission_required = ("photolith.delete_annotation",)
-
+class DeleteView(LoginRequiredMixin, View):
     @json_errors
     def post(self, *args, **kwargs):
         obj = get_object_or_404(Annotation, pk=int(self.kwargs["annotation_id"]))

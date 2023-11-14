@@ -24,9 +24,9 @@ class IndexViewTest(RequiresUtils, TestCase):
 
     def test_get_context_data__projects(self):
         """Nab the projects from ProjectListView"""
-        user1 = self.create_user(groups=["Annotate"])
-        user2 = self.create_user(groups=["Annotate"])
-        userA1 = self.create_user(groups=["Annotate", "Project Admin"])
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        user2 = self.create_user(groups=["General Annotation Editor"])
+        userA1 = self.create_user(groups=["General Annotation Editor", "Project Admin"])
 
         self.create_project(
             name="p1.1",
