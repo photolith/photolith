@@ -39,7 +39,7 @@ export function jsonFetch (resource, options = {}) {
       console.error('Failed to parse error response', e);
       return { error: response.status };
     }).then((errData) => {
-      throw new Error(`Failed to fetch ${resource}: ${errData.error}`);
+      throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
     });
   });
 }
