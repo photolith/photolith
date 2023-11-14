@@ -95,6 +95,7 @@ function formSubmit (elForm) {
   return Promise.resolve().then(() => {
     if (elForm.image_content.value) return;
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
+    elForm.classList.add('rendering');
 
     // Image not already uploaded, so upload it
     return jsonFetch('/ingest/upload-image/', {
@@ -109,7 +110,6 @@ function formSubmit (elForm) {
       elForm.image_content.value = data.content;
     });
   }).then(() => {
-    elForm.classList.add('rendering');
     return jsonFetch('/ingest/upload/', {
       method: 'POST',
       body: new FormData(elForm)
