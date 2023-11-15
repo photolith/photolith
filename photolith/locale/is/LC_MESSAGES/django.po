@@ -22,6 +22,18 @@ msgid "team"
 msgstr "Teymi"
 
 #: photolith/admin.py
+msgid "Personal info"
+msgstr "Persónuupplýsingar"
+
+#: photolith/admin.py
+msgid "Permissions"
+msgstr "Réttindi"
+
+#: photolith/admin.py
+msgid "Important dates"
+msgstr "Mikilvægar dagsetningar"
+
+#: photolith/admin.py
 msgid "Groups"
 msgstr "Hópar"
 
