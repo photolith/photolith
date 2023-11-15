@@ -1,6 +1,5 @@
 import { parse } from 'content-disposition-header';
 
-import { displayAlert } from '../alert';
 import { Cancelled } from '../errors';
 
 function timedPromise (rv, timeout) {
@@ -47,8 +46,7 @@ export class ServerFileSet {
 
           this.prev = resp.headers.get('X-Photolith-Name');
           if (overridePrev === undefined && text.match(/truncated/i)) {
-            displayAlert('warning', text + ', waiting 5s and retrying...');
-            return this.cancellable(timedPromise(true, 5000)).then(this.next.bind(this, oldPrev));
+            return this.cancellable(timedPromise(true, 1500)).then(this.next.bind(this, oldPrev));
           }
           throw new Error('Failed to fetch next image: ' + text);
         });
