@@ -92,7 +92,7 @@ export function init (parent) {
     DataTable.ext.errMode = 'throw';
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
-      language: { url: lang === 'en-us' ? undefined : `/static/datatables.net-plugins/i18n/${lang}.json` },
+      language: { url: lang === 'en-us' ? undefined : `/static/datatables.net-plugins/i18n/${lang.replace(/-\w*/, (x) => x.toUpperCase())}.json` },
       // Allow table to resize with browser
       autoWidth: false,
       ajax: function (data, callback) {
