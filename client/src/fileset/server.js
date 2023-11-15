@@ -27,7 +27,7 @@ export class ServerFileSet {
       }
       if (resp.status === 400 && resp.headers.get('Content-Type') === 'text/plain') {
         return resp.text().then((text) => {
-          if (!retrying && text.indexOf('truncated') > -1) {
+          if (!retrying && text.match(/truncated/i)) {
             displayAlert('warning', text + ', waiting 5s and retrying...');
             return timedPromise(true, 5000).then(this.next.bind(this));
           }
