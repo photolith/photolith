@@ -29,7 +29,7 @@ compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOC
 	npm run build
 
 test: compile
-	./manage.py test
+	./manage.py test --settings $(PROJECT).settings.unittest
 
 coverage: compile lib/.requirements-dev.txt
 	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test $(PROJECT)

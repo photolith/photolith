@@ -15,11 +15,11 @@ class RequiresUtils:
     @classmethod
     def setUpClass(cls):
         super(RequiresUtils, cls).setUpClass()
-        # Force SECRET_KEY to be set in all unit-tests, don't worry about teardown
-        # NB: override_settings() would be neater, but it's own teardown complains
-        # about lack of SECRET_KEY
-        settings.SECRET_KEY = "insecure-ut"
-        settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+        if not getattr(settings, "UNITTEST_SETTINGS", False):
+            raise ValueError(
+                "Run tests with: ./manage.py test --settings photolith.settings.unittest"
+            )
 
     def setUp(self):
         super(RequiresUtils, self).setUp()
