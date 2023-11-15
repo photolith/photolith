@@ -40,6 +40,7 @@ export class WebcamFileSet {
 
   next () {
     return Promise.resolve().then(() => {
+      if (this.reject) this.reject(new Cancelled());
       // Already have a video, keep using existing video
       if (this.video) return;
 
