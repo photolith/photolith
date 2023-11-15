@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
-from .photo_dir import get_next_photo, list_photo_dirs
+from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
 from ..models import Image, Individual
 
@@ -185,8 +185,8 @@ class UploadImageView(PermissionRequiredMixin, View):
         )
         # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
         file = io.BytesIO(self.request.read())
-        # NB: to_python performs image validation
-        image.content.save(image.orig_filename, image.content.field.to_python(file))
+        # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
+        image.content.save(image.orig_filename, file)
         image.save()
         out = model_to_dict(image)
         out["content"] = out["content"].name

@@ -68,3 +68,11 @@ def get_next_photo(base, photo_dir, prev=None):
         mime=mimetypes.guess_type(file_path)[0],
         remaining=remaining,
     )
+
+
+def verify_image(file):
+    # NB: This can't verify .nef, so currently unused
+    image = Image.open(file)
+    image.verify()
+    if hasattr(file, "seek") and callable(file.seek):
+        file.seek(0)
