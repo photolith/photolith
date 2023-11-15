@@ -185,6 +185,19 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
                 context["default_tab"] = (
                     "existing" if len(context["all_annotations"]) > 0 else "editor"
                 )
+
+        # See if saving will be allowed, if not page should be read only
+        try:
+            check_annotate_access(
+                context["form"].initial["project"],
+                self.request.user,
+                rw=True,
+            )
+            context["read_only"] = False
+        except PermissionDenied:
+            context["read_only"] = True
+            context["default_tab"] = "existing"
+
         return context
 
 

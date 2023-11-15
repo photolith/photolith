@@ -50,9 +50,11 @@
   <li class="nav-item" role="presentation"><button class="nav-link {% if default_tab == 'existing' %}active{% endif %}" id="existing-tab" data-bs-toggle="tab" data-bs-target="#existing-tab-pane" type="button" role="tab" aria-controls="existing-tab-pane" aria-selected="true">
     {% translate 'Existing Annotations' %}
   </button></li>
+  {% if not read_only %}{% comment %}NB: Keep form tab, so we can use it to sync viewer, just remove link to switch there{% endcomment %}
   <li class="nav-item" role="presentation"><button class="nav-link {% if default_tab == 'editor' %}active{% endif %}" id="editor-tab" data-bs-toggle="tab" data-bs-target="#editor-tab-pane" type="button" role="tab" aria-controls="editor-tab-pane" aria-selected="true">
     {% translate 'Annotate' %}
   </button></li>
+  {% endif %}
   <li class="nav-item flex-fill" role="presentation"><button class="nav-link float-end" id="minimise-tab" data-bs-toggle="tab" data-bs-target="#minimise-tab-pane" type="button" role="tab" aria-controls="minimise-tab-pane" aria-selected="true" title="{% translate 'Maximise annotation view' %}">
     <!-- https://icons.getbootstrap.com/icons/arrows-fullscreen/ -->
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16" style="position: relative; top: -2px">
