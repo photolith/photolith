@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.db.models import Prefetch, Subquery, Min, Max
+from django.db.models import Count, Prefetch, Subquery, Min, Max, Q
 
 from ..errors import json_errors
 from ..models import (
@@ -98,6 +98,18 @@ class DataView(LoginRequiredMixin, View):
         check_annotate_access(p, self.request.user, rw=False)
         if p:
             qs = qs.filter(project=p)
+
+        # Count annotations within this project / general annotations
+        # NB: In theory we'd also check if the project is open, and only count our annotations,
+        #     but this view is only accessible once a project is over / owners who can see everything.
+        qs = qs.annotate(
+            num_annotations=Count(
+                "annotation",
+                filter=Q(
+                    annotation__project=p,
+                ),
+            )
+        )
 
         for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):

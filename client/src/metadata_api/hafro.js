@@ -26,6 +26,7 @@ const metaLabels = {
     stationDate: 'Date',
     gear: 'Gear',
     meshSize: 'Mesh Size',
+    num_annotations: '# Annotations',
     created_at: 'Uploaded'
   },
   is: {
@@ -44,6 +45,7 @@ const metaLabels = {
     stationDate: 'Dagsetning leiðangurs',
     gear: 'Veiðarfæri',
     meshSize: 'Möskvastærð',
+    num_annotations: '# Aldursmerkingar',
     created_at: 'Fært inn'
   }
 };
@@ -56,6 +58,7 @@ const fieldsFor = {
     'stationYear',
     'stationMonth',
     'species',
+    'num_annotations',
     'length',
     'weight',
     'sex',
