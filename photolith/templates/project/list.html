@@ -72,7 +72,7 @@
 {% endfor %}
 
 
-{% if perms.photolith.create_project  %}
+{% if perms.photolith.add_project  %}
   <p><a href="{% url 'search:index' %}">{% translate "Create a project by <kbd>searching</kbd>." %}</a>{% translate "Then click <kbd>Save as project</kbd> in the top right corner." %}</p>
 {% endif %}
 
