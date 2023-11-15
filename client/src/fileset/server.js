@@ -1,6 +1,7 @@
 import { parse } from 'content-disposition-header';
 
 import { displayAlert } from '../alert';
+import { Cancelled } from '../errors';
 
 function timedPromise (rv, timeout) {
   return new Promise((resolve) => window.setTimeout(resolve.bind(null, rv), timeout));
@@ -15,11 +16,26 @@ export class ServerFileSet {
 
   close () {
     this._remaining = undefined;
+    this.cancel();
   }
 
-  next (retrying) {
-    const url = `/ingest/next-photo/${this.photoDir}/${this.prev ? '?prev=' + this.prev : ''}`;
-    return window.fetch(url).then((resp) => {
+  cancellable (p) {
+    this.cancel();
+    return Promise.race([p, new Promise((resolve, reject) => {
+      this.reject = reject;
+    })]);
+  }
+
+  cancel () {
+    if (this.reject) {
+      this.reject(new Cancelled());
+      this.reject = undefined;
+    }
+  }
+
+  next (overridePrev) {
+    const url = `/ingest/next-photo/${this.photoDir}/?prev=${overridePrev !== undefined ? (overridePrev || '') : this.prev ? this.prev : ''}`;
+    return this.cancellable(window.fetch(url)).then((resp) => {
       this._remaining = parseInt(resp.headers.get('X-Photolith-Remaining') || 0, 10);
 
       if (resp.status === 204) {
@@ -27,11 +43,13 @@ export class ServerFileSet {
       }
       if (resp.status === 400 && resp.headers.get('Content-Type') === 'text/plain') {
         return resp.text().then((text) => {
-          if (!retrying && text.match(/truncated/i)) {
-            displayAlert('warning', text + ', waiting 5s and retrying...');
-            return timedPromise(true, 5000).then(this.next.bind(this));
-          }
+          const oldPrev = this.prev;
+
           this.prev = resp.headers.get('X-Photolith-Name');
+          if (overridePrev === undefined && text.match(/truncated/i)) {
+            displayAlert('warning', text + ', waiting 5s and retrying...');
+            return this.cancellable(timedPromise(true, 5000)).then(this.next.bind(this, oldPrev));
+          }
           throw new Error('Failed to fetch next image: ' + text);
         });
       }
