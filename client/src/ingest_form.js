@@ -8,6 +8,9 @@ function checkExisting (labels, warnMsg) {
   // Filter by any of the labels we provided
   labels.forEach((l) => sp.append('ch_slideLabel', l));
 
+  // Nothing to search for, don't bother.
+  if (sp.toString() === '') return;
+
   jsonFetch('/search/data/?' + sp).then((data) => {
     if (!data.data.length) return;
     displayAlert('warning',
