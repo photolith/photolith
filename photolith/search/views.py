@@ -65,6 +65,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
             else None
         )
         check_annotate_access(p, self.request.user, rw=False)
+        context["project"] = p
 
         context["meta_fields"] = cache.get_or_set(
             "photolith_meta_fields",
