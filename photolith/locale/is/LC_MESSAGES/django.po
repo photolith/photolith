@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: photolith/admin.py
-msgid "team"
+msgid "Team"
 msgstr "Teymi"
 
 #: photolith/admin.py
@@ -39,15 +39,15 @@ msgstr "Hópar"
 
 #: photolith/annotate/views.py
 msgid "Successfully deleted annotation"
-msgstr ""
+msgstr "Aldursmerkingu var eytt"
 
 #: photolith/auth/views.py photolith/templates/home/index.html
 msgid "Sign up"
-msgstr ""
+msgstr "Búa til aðgang"
 
 #: photolith/auth/views.py
 msgid "Administrator confirmation required"
-msgstr ""
+msgstr "Þarf staðfestingu stjórnanda"
 
 #: photolith/ingest/views.py
 #, python-format
@@ -71,25 +71,25 @@ msgstr "Taka mynd með tengdri myndavél"
 
 #: photolith/ingest/views.py
 msgid "No individual boxes on image! Nothing saved."
-msgstr ""
+msgstr "Engin box fyrir einstaklinga á mynd! Ekkert vistað."
 
 #: photolith/ingest/views.py
 #, python-format
 msgid "Created %(count)d individual. "
 msgid_plural "Created %(count)d individuals. "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bjó til %(count)d einstakling."
+msgstr[1] "Bjó til %(count)d einstaklinga."
 
 #: photolith/ingest/views.py
 #, python-format
 msgid "Updated %(count)d individual. "
 msgid_plural "Updated %(count)d individuals. "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)d einstaklingur uppfærður."
+msgstr[1] "%(count)d einstaklingar uppfærðir."
 
 #: photolith/ingest/views.py
 msgid "Show individuals"
-msgstr ""
+msgstr "Sýna einstaklinga"
 
 #: photolith/models.py photolith/models.py photolith/models.py
 msgid "Created by"
@@ -117,27 +117,27 @@ msgstr "Auðveld"
 
 #: photolith/models.py
 msgid "Unknown"
-msgstr "Ekki vitað"
+msgstr "Óvíst"
 
 #: photolith/models.py
 msgid "Automated reader"
-msgstr ""
+msgstr "Sjálfvirkur aldurslesari"
 
 #: photolith/models.py
 msgid "Non expert, from image"
-msgstr ""
+msgstr "Óreyndur, með mynd"
 
 #: photolith/models.py
-msgid "Non expert, with original"
-msgstr ""
+msgid "Non expert, with original otoliths or slides"
+msgstr "Óreyndur, með upprunalegu kvarnirnar eða glerin"
 
 #: photolith/models.py
 msgid "Expert, from image"
-msgstr ""
+msgstr "Sérfræðingur, með mynd"
 
 #: photolith/models.py
-msgid "Expert, with original"
-msgstr ""
+msgid "Expert, with original otoliths or slides"
+msgstr "Sérfræðingur, með upprunalegu kvarnirnar eða glerin"
 
 #: photolith/models.py
 msgid "Part of project"
@@ -149,7 +149,7 @@ msgstr "Síðast breytt"
 
 #: photolith/models.py
 msgid "Image rating"
-msgstr "Einkunn myndar"
+msgstr "Einkunn"
 
 #: photolith/models.py
 msgid "Reader authority"
@@ -169,7 +169,7 @@ msgstr "Nafn verkefnis"
 
 #: photolith/models.py
 msgid "The set of users that should be included in the project"
-msgstr "Hópur notenda sem eiga að taka þátt í verkefninu"
+msgstr "Notentur sem eiga að taka þátt í verkefninu"
 
 #: photolith/models.py
 msgid "Project end date"
@@ -177,7 +177,7 @@ msgstr "Lokadagsetning verkefnis"
 
 #: photolith/models.py
 msgid "Base axis on user"
-msgstr "Staðsetja ás út frá notanda"
+msgstr "Staðsetja lestrarás út frá notanda"
 
 #: photolith/models.py
 msgid ""
@@ -197,7 +197,7 @@ msgstr "Aðilar í teymi"
 
 #: photolith/project/forms.py
 msgid "No base axis"
-msgstr "Ekki fastur ás"
+msgstr "Ekki fastur lestrarás"
 
 #: photolith/templates/403.html photolith/templates/403.html
 #: photolith/templates/429.html photolith/templates/429.html
@@ -221,11 +221,11 @@ msgstr "Síða finnst ekki"
 
 #: photolith/templates/500.html photolith/templates/500.html
 msgid "Server Error"
-msgstr "Villa frá server"
+msgstr "Villa á server"
 
 #: photolith/templates/500.html
 msgid "There was an issue with the server"
-msgstr "Það er vandamál á servernum"
+msgstr "Það kom upp vandamál á servernum"
 
 #: photolith/templates/500.html
 msgid "Reload page"
@@ -262,7 +262,7 @@ msgstr "Hjálp"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Individual Metadata"
-msgstr "Einstaklingsgögn"
+msgstr "Gögn einstaklings"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Existing Annotations"
@@ -340,16 +340,16 @@ msgstr ""
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
 msgid "Key"
-msgstr "Upplýsingar"
+msgstr "Gögn"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
 msgid "Value"
-msgstr "Gildi úr gagnagrunn"
+msgstr "Gildi"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Select an annotation first"
-msgstr ""
+msgstr "Veldu aldursmerkingu fyrst"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Copy full annotation"
@@ -361,11 +361,11 @@ msgstr "Afrita aðeins lestrarásinn"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Delete annotation"
-msgstr ""
+msgstr "Eyða aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Save as general annotation"
-msgstr ""
+msgstr "Vista sem almenna aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -375,15 +375,15 @@ msgstr "Vista"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Annuli"
-msgstr "Ár"
+msgstr "Árhringir"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Distance between (mm)"
-msgstr "Fjarlægð á milli (mm)"
+msgstr "Fjarlægð á milli ára (mm)"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Cumulative (mm)"
-msgstr "Samtals lengd (mm)"
+msgstr "Uppsöfnuð lengd (mm)"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Press <kbd>Next</kbd> to start"
@@ -434,34 +434,35 @@ msgstr "Vefstjórn"
 msgid ""
 "Welcome to Photolith, the otolith image storage and annotation software."
 msgstr ""
+"Velkomin í Kvarnó, hugbúnaðinn sem heldur utan um kvarnamyndir og aldursmerkingar."
 
 #: photolith/templates/home/index.html
 msgid "Log in"
-msgstr ""
+msgstr "Skrá inn"
 
 #: photolith/templates/home/index.html
-msgid "Continue annotating in projects you are part of"
-msgstr ""
+msgid "Continue annotating in projects you are part of."
+msgstr "Halda áfram að aldursmerkja í verkefnum sem þú ert hluti af."
 
 #: photolith/templates/home/index.html
-msgid "View previous project results"
-msgstr ""
+msgid "View previous project results."
+msgstr "Skoða niðurstöður fyrri verkefna."
 
 #: photolith/templates/home/index.html
-msgid "Upload new images into Photolith"
-msgstr ""
+msgid "Upload new images."
+msgstr "Hlaða inn nýjum myndum."
 
 #: photolith/templates/home/index.html
-msgid "General annotation"
-msgstr ""
+msgid "General annotation."
+msgstr "Almennar aldursmerkingar."
 
 #: photolith/templates/home/index.html
-msgid "Search for existing otoliths and annotate"
-msgstr ""
+msgid "Search for existing otoliths and annotate."
+msgstr "Leiða að kvörnum og aldursmerkja."
 
 #: photolith/templates/home/index.html
 msgid "Guides"
-msgstr ""
+msgstr "Leiðbeiningar"
 
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"
@@ -482,7 +483,7 @@ msgstr "Næsta mynd"
 #: photolith/templates/ingest/index.html
 msgid "First, select an import option using the grey bar at the top."
 msgstr ""
-"Veldu viðeigandi innflutningsmöguleika í dálknum efst á síðunni til að færa "
+"Veldu viðeigandi innflutningsmöguleika í dálknum efst á síðunni til að hlaða "
 "inn mynd."
 
 #: photolith/templates/ingest/index.html
@@ -490,25 +491,27 @@ msgid ""
 "Then enter the sample ID and species number (f.ex. <kbd>542871 1</kbd> for "
 "species no. 1). Press <kbd>enter</kbd>."
 msgstr ""
-"Sláðu inn raðnúmer (id sýnis) og tegundanúmer (t.d. <kbd>542871 1</kbd> "
+"Sláðu svo inn raðnúmer (id sýnis) og tegundanúmer (t.d. <kbd>542871 1</kbd> "
 "fyrir tegund nr. 1). Ýttu á <kbd>enter</kbd>."
 
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
 msgstr ""
 "Eftir að raðnúmer hefur verið slegið inn þá birtast box fyrir hvern "
-"einstakling inni á myndinni."
+"einstakling á kvarnaglerinu inni á myndinni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Position each over the relevant individual, the scale line over the scale "
 "and press <kbd>Save</kbd>. It is important that the scale line is correctly "
-"set so that measurements on the otoliths are correct."
+"set so that measurements on the otoliths are correct. If there is no scale "
+"on the image then you can put 0 as the length of the scale. "
 msgstr ""
 "Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
 "birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
 "Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu "
-"réttar."
+"réttar. Ef enginn kvarði er á myndinni þá er hægt að slá inn 0 sem lengd "
+"á kvarða. "
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -527,7 +530,7 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 msgid ""
 "Drag individual boxes or resize them by clicking on one and dragging it's "
-"corners"
+"corners."
 msgstr ""
 "Dragðu hvert box yfir viðeigandi kvörn með því að smella á það og færa það "
 "með músinni. Einnig er hægt að minnka og stækka boxin eftir þörfum."
@@ -552,7 +555,7 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 #, python-format
 msgid "There are already %%d individuals uploaded with this label"
-msgstr ""
+msgstr "Það eru nú þegar %%d einstaklingar með þetta raðnúmer"
 
 #: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
@@ -560,7 +563,7 @@ msgstr "Lengd kvarða (mm)"
 
 #: photolith/templates/ingest/index.html
 msgid "Label:Individual"
-msgstr "Raðnúmer:Einstakingsnúmer"
+msgstr "Raðnúmer:Einstakingur"
 
 #: photolith/templates/project/list.html
 msgid "All projects"
@@ -572,7 +575,7 @@ msgstr "Virk verkefni"
 
 #: photolith/templates/project/list.html
 msgid "Individuals annotated"
-msgstr "Einstaklingar aldursmerktir"
+msgstr "Aldursmerktir einstaklingar"
 
 #: photolith/templates/project/list.html
 msgid "Annotate project"
@@ -590,7 +593,7 @@ msgstr "Breyta"
 
 #: photolith/templates/project/list.html
 msgid "Closed projects"
-msgstr "Kláruð verkefni"
+msgstr "Verkefni sem eru búin"
 
 #: photolith/templates/project/list.html
 msgid "Create a project by <kbd>searching</kbd>."
@@ -608,7 +611,7 @@ msgstr "Verkefni"
 
 #: photolith/templates/project/update.html
 msgid "Cancel"
-msgstr ""
+msgstr "Hætta við"
 
 #: photolith/templates/project/update.html
 msgid "Delete"
@@ -670,7 +673,7 @@ msgstr "Greining jaðars"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"
-msgstr "Hlaða niður óbreyttri mynd"
+msgstr "Ná í upprunalega mynd"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Reset"
