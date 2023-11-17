@@ -6,8 +6,8 @@
     <div class="ph-cropped-viewer" data-src="{{ ind_data.image__content__url }}" data-bounding-box="{{ ind_data.bounding_box }}"></div>
   </div>
   <div class="col-7">
-    <table class="table table-striped" style="">
-      <thead><tr>
+    <table class="table table-bordered" style="">
+      <thead><tr class="text-center" style="background-color: var(--bs-border-color);">
         <th class="text-nowrap">{{ object_model|verbose_name:"created_at" }}</th>
         <th class="text-nowrap">{{ object_model|verbose_name:"created_by" }}</th>
         <th class="text-nowrap">{{ object_model|verbose_name:"authority" }}</th>
