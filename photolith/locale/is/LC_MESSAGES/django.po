@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -18,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: photolith/admin.py
-msgid "Team"
-msgstr "Teymi"
+msgid "team"
+msgstr "teymi"
 
 #: photolith/admin.py
 msgid "Personal info"
@@ -434,7 +433,8 @@ msgstr "Vefstjórn"
 msgid ""
 "Welcome to Photolith, the otolith image storage and annotation software."
 msgstr ""
-"Velkomin í Kvarnó, hugbúnaðinn sem heldur utan um kvarnamyndir og aldursmerkingar."
+"Velkomin í Kvarnó, hugbúnaðinn sem heldur utan um kvarnamyndir og "
+"aldursmerkingar."
 
 #: photolith/templates/home/index.html
 msgid "Log in"
@@ -505,13 +505,13 @@ msgid ""
 "Position each over the relevant individual, the scale line over the scale "
 "and press <kbd>Save</kbd>. It is important that the scale line is correctly "
 "set so that measurements on the otoliths are correct. If there is no scale "
-"on the image then you can put 0 as the length of the scale. "
+"on the image then you can blank the scale field."
 msgstr ""
 "Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
 "birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
 "Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu "
-"réttar. Ef enginn kvarði er á myndinni þá er hægt að slá inn 0 sem lengd "
-"á kvarða. "
+"réttar. Ef enginn kvarði er á myndinni þá er hægt að slá inn '' sem lengd á "
+"kvarða. "
 
 #: photolith/templates/ingest/index.html
 msgid ""

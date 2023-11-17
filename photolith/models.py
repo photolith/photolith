@@ -320,9 +320,9 @@ class Annotation(models.Model):
         UNKNOWN = 0, _("Unknown")
         AUTOMATED = 20, _("Automated reader")
         NON_EXPERT = 50, _("Non expert, from image")
-        NON_EXPERT_ORIG = 55, _("Non expert, with original")
+        NON_EXPERT_ORIG = 55, _("Non expert, with original otoliths or slides")
         EXPERT = 100, _("Expert, from image")
-        EXPERT_ORIG = 105, _("Expert, with original")
+        EXPERT_ORIG = 105, _("Expert, with original otoliths or slides")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(

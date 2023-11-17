@@ -21,14 +21,14 @@
       {% regroup projects by is_open as open_closed_groups %}
       {% for is_open, object_group in open_closed_groups %}
         {% if is_open %}
-          <p>{% translate 'Continue annotating in projects you are part of' %}:</p>
+          <p>{% translate 'Continue annotating in projects you are part of.' %}:</p>
           <ul>
             {% for object in object_group %}{% if object.team_member %}
               <li><a href="{% url 'annotate:start' %}?project={{ object.id }}">{{object.name}}</a></li>
             {% endif %}{% endfor %}
           </ul>
         {% else %}
-          <a href="{% url 'project:index' %}" class="card-link">{% translate "View previous project results" %}</a>
+          <a href="{% url 'project:index' %}" class="card-link">{% translate "View previous project results." %}</a>
         {% endif %}
       {% endfor %}
     </div>
@@ -37,14 +37,14 @@
   {% if perms.photolith.add_individual %}<div class="card bg-light bg-gradient my-4">
     <h5 class="card-header">{% translate 'Ingest' %}</h5>
     <div class="card-body">
-      <a href="{% url 'ingest:index' %}" class="card-link">{% translate "Upload new images into Photolith" %}</a>
+      <a href="{% url 'ingest:index' %}" class="card-link">{% translate "Upload new images." %}</a>
     </div>
   </div>{% endif %}
 
   {% if perms.photolith.view_annotation %}<div class="card bg-light bg-gradient my-4">
-    <h5 class="card-header">{% translate 'General annotation' %}</h5>
+    <h5 class="card-header">{% translate 'General annotation.' %}</h5>
     <div class="card-body">
-      <a href="{% url 'search:index' %}" class="card-link">{% translate "Search for existing otoliths and annotate" %}</a>
+      <a href="{% url 'search:index' %}" class="card-link">{% translate "Search for existing otoliths and annotate." %}</a>
     </div>
   </div>{% endif %}
 
