@@ -1,6 +1,19 @@
+table.table-bordered > thead > tr {
+  background-color: #b6dbe2;
+}
+
 /* stylelint-disable selector-class-pattern */
+.dataTables_wrapper {
+  clear: both;
+}
+
 table.dataTable tr.dt-hasChild td {
   border-bottom: none!important;
+}
+
+table.table-bordered.dataTable table.table-bordered:not(.dataTable) td {
+  /* dataTable doesn't cancel it's styles for sub-tables */
+  border-left-width: 1px;
 }
 /* stylelint-enable selector-class-pattern */
 
