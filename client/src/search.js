@@ -143,8 +143,10 @@ export function init (parent) {
 
       // Open/close row
       if (row.child.isShown()) {
+        row.selector.rows.classList.remove('table-info');
         row.child.hide();
       } else {
+        row.selector.rows.classList.add('table-info');
         row.child.show();
       }
     });
