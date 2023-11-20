@@ -42,9 +42,9 @@ function populateFilter (elForm) {
       </div>`;
     } else if (mf.filter_name.startsWith('nm')) {
       controlHtml = `<div class="input-group">
-          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
+          <input type="number" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
-          <input type="text" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
+          <input type="number" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
         </div>`;
     } else if (mf.filter_name.startsWith('tx')) {
       controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
