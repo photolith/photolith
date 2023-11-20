@@ -137,7 +137,7 @@ class RequiresUtils:
     ):
         if isinstance(individuals, int):
             individuals = [
-                self.create_individual(created_by=created_by, data=dict(idx=i))
+                self.create_individual(created_by=created_by, data=dict(nm_idx=i))
                 for i in range(individuals)
             ]
         out = Project.objects.create(

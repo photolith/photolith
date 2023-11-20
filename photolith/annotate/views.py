@@ -116,8 +116,8 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
         )
         ind = get_object_or_404(qs)
 
-        out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
-        out.update(ind.data)
+        out = ind.full_data()
+        out["bounding_box"] = ind.bounding_box
         out["image__content__url"] = ind.image.content.url
         out["image__px_to_mm"] = ind.image.px_to_mm()
         out["image__mm_to_px"] = (

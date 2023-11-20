@@ -31,63 +31,63 @@ class IndividualTest(RequiresUtils, TestCase):
         self.assertEqual(ind1.data, dict())
 
         # Set length
-        ind1.data = dict(length=42, name="frank")
-        self.assertEqual(ind1.data, dict(length=42, name="frank"))
+        ind1.data = dict(nm_length=42, ch_name="frank")
+        self.assertEqual(ind1.data, dict(nm_length=42, ch_name="frank"))
 
         # Set length on second individual, forces type
-        ind1.data = dict(length="39", name=5)
-        self.assertEqual(ind1.data, dict(length=39, name="5"))
-        ind2.data = dict(length="40", name=22)
-        self.assertEqual(ind2.data, dict(length=40, name="22"))
+        ind1.data = dict(nm_length="39", ch_name=5)
+        self.assertEqual(ind1.data, dict(nm_length=39, ch_name="5"))
+        ind2.data = dict(nm_length="40", ch_name=22)
+        self.assertEqual(ind2.data, dict(nm_length=40, ch_name="22"))
 
         # ISO dates get translated
-        ind1.data = dict(length=39, name="5", time="20230912T082738Z")
+        ind1.data = dict(nm_length=39, ch_name="5", dt_time="20230912T082738Z")
         self.assertTrue(isinstance(MetaDT.objects.all()[0].value, datetime.datetime))
         self.assertEqual(
             ind1.data,
             dict(
-                length=39,
-                name="5",
-                time=MetaDT.objects.all()[0].value,
+                nm_length=39,
+                ch_name="5",
+                dt_time=MetaDT.objects.all()[0].value,
             ),
         )
 
         # Taxonomy values added, recycled
         ind1.data = dict(
-            length=39,
-            name="5",
-            time="20230912T082738Z",
-            species={"id": 100, "en": "Fish", "is": "Fiskur"},
+            nm_length=39,
+            ch_name="5",
+            dt_time="20230912T082738Z",
+            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
         )
         self.assertEqual(
             ind1.data,
             dict(
-                length=39,
-                name="5",
-                species={"en": "Fish", "id": 100, "is": "Fiskur"},
-                time=MetaDT.objects.all()[0].value,
+                nm_length=39,
+                ch_name="5",
+                tx_species={"en": "Fish", "id": 100, "is": "Fiskur"},
+                dt_time=MetaDT.objects.all()[0].value,
             ),
         )
         ind2.data = dict(
-            length="40", name=22, species={"id": 200, "en": "Cat", "is": "Köttur"}
+            nm_length="40", ch_name=22, tx_species={"id": 200, "en": "Cat", "is": "Köttur"}
         )
         self.assertEqual(
             ind2.data,
             dict(
-                length=40,
-                name="22",
-                species={"id": 200, "en": "Cat", "is": "Köttur"},
+                nm_length=40,
+                ch_name="22",
+                tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
             ),
         )
         ind2.data = dict(
-            length="40", name=22, species={"id": 100, "en": "Fish", "is": "Fiskur"}
+            nm_length="40", ch_name=22, tx_species={"id": 100, "en": "Fish", "is": "Fiskur"}
         )
         self.assertEqual(
             ind2.data,
             dict(
-                length=40,
-                name="22",
-                species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                nm_length=40,
+                ch_name="22",
+                tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
             ),
         )
         self.assertEqual(
@@ -100,18 +100,18 @@ class IndividualTest(RequiresUtils, TestCase):
 
         # But not across terms
         ind2.data = dict(
-            length="40",
-            name=22,
-            species={"id": 200, "en": "Cat", "is": "Köttur"},
-            eats={"id": 100, "en": "Fish", "is": "Fiskur"},
+            nm_length="40",
+            ch_name=22,
+            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+            tx_eats={"id": 100, "en": "Fish", "is": "Fiskur"},
         )
         self.assertEqual(
             ind2.data,
             dict(
-                length=40,
-                name="22",
-                species={"id": 200, "en": "Cat", "is": "Köttur"},
-                eats={"id": 100, "en": "Fish", "is": "Fiskur"},
+                nm_length=40,
+                ch_name="22",
+                tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                tx_eats={"id": 100, "en": "Fish", "is": "Fiskur"},
             ),
         )
         self.assertEqual(
@@ -134,7 +134,7 @@ class IndividualTest(RequiresUtils, TestCase):
             str(
                 self.create_individual(
                     data=dict(
-                        slideLabel="UT slide 01",
+                        ch_slideLabel="UT slide 01",
                     )
                 )
             ),
@@ -144,8 +144,8 @@ class IndividualTest(RequiresUtils, TestCase):
             str(
                 self.create_individual(
                     data=dict(
-                        slideLabel="UT slide 02",
-                        individualLabel="009",
+                        ch_slideLabel="UT slide 02",
+                        ch_individualLabel="009",
                     )
                 )
             ),

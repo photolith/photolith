@@ -14,7 +14,6 @@ function populateFilter (elForm) {
 
   // Append any search terms on querystring that aren't included in filter list
   for (let k of searchParams.keys()) {
-    k = k.replace(/^\w+_/, '');
     if (!metaLabels[k]) {
       metaLabels[k] = window.mApi.metaLabels()[k] || k;
     }
@@ -32,29 +31,29 @@ function populateFilter (elForm) {
     // If no metaFields, then we can't filter this
     if (!mf) return '';
 
-    if (mf.filter_name.startsWith('ch')) {
-      let vs = searchParams.getAll(mf.filter_name).filter((v) => !!v);
+    if (k.startsWith('ch')) {
+      let vs = searchParams.getAll(k).filter((v) => !!v);
       if (vs.length === 0) vs = ['']; // Should be at least one box, so we have something to copy
 
       controlHtml = `<div class="input-group">
-          ${vs.map((v) => `<input type="text" name="${mf.filter_name}" value="${v}" class="form-control">`).join('\n')}
+          ${vs.map((v) => `<input type="text" name="${k}" value="${v}" class="form-control">`).join('\n')}
           <button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>
       </div>`;
-    } else if (mf.filter_name.startsWith('nm')) {
+    } else if (k.startsWith('nm')) {
       controlHtml = `<div class="input-group">
-          <input type="number" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
+          <input type="number" name="${k}" value="${searchParams.getAll(k)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
-          <input type="number" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
+          <input type="number" name="${k}" value="${searchParams.getAll(k)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
         </div>`;
-    } else if (mf.filter_name.startsWith('tx')) {
-      controlHtml = `<select multiple name="${mf.filter_name}" class="form-select" id="${controlId}">
-          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(mf.filter_name).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
+    } else if (k.startsWith('tx')) {
+      controlHtml = `<select multiple name="${k}" class="form-select" id="${controlId}">
+          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(k).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
         </select>`;
-    } else if (mf.filter_name.startsWith('dt')) {
+    } else if (k.startsWith('dt')) {
       controlHtml = `<div class="input-group">
-          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[0] || ''}" class="form-control range-start" id="${controlId}">
+          <input type="date" name="${k}" value="${searchParams.getAll(k)[0] || ''}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
-          <input type="date" name="${mf.filter_name}" value="${searchParams.getAll(mf.filter_name)[1] || ''}" class="form-control range-end" id="${controlId}-2">
+          <input type="date" name="${k}" value="${searchParams.getAll(k)[1] || ''}" class="form-control range-end" id="${controlId}-2">
         </div>`;
     }
 

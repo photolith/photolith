@@ -34,9 +34,9 @@ class UserProfile(models.Model):
     )
 
     def authority_level(self, ind_data):
-        if "id" in ind_data.get("species", dict()):
+        if "id" in ind_data.get("tx_species", dict()):
             if self.species_expert.filter(
-                identifier=ind_data["species"]["id"]
+                identifier=ind_data["tx_species"]["id"]
             ).exists():
                 return Annotation.AuthorityLevel.EXPERT
         return Annotation.AuthorityLevel.NON_EXPERT
@@ -85,49 +85,37 @@ class Individual(models.Model):
     )
     modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
 
+    def full_data(self):
+        """Dict of data, including values outside the meta table"""
+        out = dict(
+            id=self.id,
+            dt_created_at=self.created_at,
+            dt_modified_at=self.modified_at,
+        )
+        out.update(self.data)
+        out["__str__"] = str(self)
+        return out
+
     @property
     def data(self):
         out = {}
         for m in self.metanumeric_set.all():
-            out[m.key] = m.value
+            out["nm_" + m.key] = m.value
         for m in self.metachar_set.all():
-            out[m.key] = m.value
+            out["ch_" + m.key] = m.value
         for m in self.metadt_set.all():
-            out[m.key] = m.value
+            out["dt_" + m.key] = m.value
         for m in self.metatx_set.all():
-            out[m.key] = m.value.dict
+            out["tx_" + m.key] = m.value.dict
         return out
 
     @data.setter
     def data(self, new_value):
-        # Build lookup of current meta keys
-        schema = {}
-        for k in MetaNumeric.objects.values("key").distinct():
-            schema[k["key"]] = "nm"
-        for k in MetaChar.objects.values("key").distinct():
-            schema[k["key"]] = "ch"
-        for k in MetaDT.objects.values("key").distinct():
-            schema[k["key"]] = "dt"
-        for k in MetaTx.objects.values("key").distinct():
-            schema[k["key"]] = "tx"
-
-        # Return meta-type for given k/v
-        def meta_schema_for(k, v):
-            if k in schema:
-                return schema[k]
-            if isinstance(v, numbers.Number):
-                return "nm"
-            if isinstance(v, str) and isisoformat(v):
-                return "dt"
-            if isinstance(v, str):
-                return "ch"
-            if isinstance(v, dict):
-                return "tx"
-            raise ValueError("Unknown type of %s: %s" % (k, str(v)))
-
         # TODO: Not removing old values
         for k, v in new_value.items():
-            t = meta_schema_for(k, v)
+            if '_' not in k:
+                raise ValueError("'%s' has no type prefix" % k)
+            t, k = k.split('_', 2)
             if t == "nm":
                 self.metanumeric_set.add(
                     MetaNumeric(

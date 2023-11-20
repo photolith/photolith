@@ -82,19 +82,19 @@ class UploadViewTest(RequiresUtils, TestCase):
                     user,
                     [
                         dict(
-                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                            length=100,
+                            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                            nm_length=100,
                             _bb=[[0, 0], [100, 100]],
                         ),
                         dict(
-                            species={"id": 200, "en": "Cat", "is": "Köttur"},
-                            length=100,
+                            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                            nm_length=100,
                             _bb=[[0, 0], [200, 200]],
                         ),
                         dict(
                             # NB: Will be ignored since there's no bounding box
-                            species={"id": 200, "en": "Cat", "is": "Köttur"},
-                            length=300,
+                            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                            nm_length=300,
                             _bb=None,
                         ),
                     ],
@@ -110,12 +110,12 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
         self.assertEqual(
             inds[0].data,
-            {"length": 100.0, "species": {"id": 100, "en": "Fish", "is": "Fiskur"}},
+            {"nm_length": 100.0, "tx_species": {"id": 100, "en": "Fish", "is": "Fiskur"}},
         )
         self.assertEqual(inds[1].bounding_box, [[0, 0], [200, 200]])
         self.assertEqual(
             inds[1].data,
-            {"length": 100.0, "species": {"id": 200, "en": "Cat", "is": "Köttur"}},
+            {"nm_length": 100.0, "tx_species": {"id": 200, "en": "Cat", "is": "Köttur"}},
         )
 
         # Create 1 individual, with keys that don't start at 1
@@ -130,8 +130,8 @@ class UploadViewTest(RequiresUtils, TestCase):
                         None,
                         None,
                         dict(
-                            species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                            length=100,
+                            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                            nm_length=100,
                             _bb=[[0, 0], [920, 100]],
                         ),
                     ],
@@ -152,19 +152,19 @@ class UploadViewTest(RequiresUtils, TestCase):
             user,
             [
                 dict(
-                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                    length=100,
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
                     _bb=[[0, 0], [925, 100]],
                     _id=inds[2].id,
                 ),
                 dict(
-                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                    length=100,
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
                     _bb=[[0, 0], [930, 100]],
                 ),
                 dict(
-                    species={"id": 200, "en": "Cat", "is": "Köttur"},
-                    length=100,
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=100,
                     _bb=[[0, 0], [205, 200]],
                     _id=inds[1].id,
                 ),
@@ -190,15 +190,15 @@ class UploadViewTest(RequiresUtils, TestCase):
             user,
             [
                 dict(
-                    slideLabel="AB-01",
+                    ch_slideLabel="AB-01",
                     _bb=[[0, 0], [100, 100]],
                 ),
                 dict(
-                    slideLabel="AB-01",
+                    ch_slideLabel="AB-01",
                     _bb=[[0, 0], [200, 200]],
                 ),
                 dict(
-                    slideLabel="AB-02",
+                    ch_slideLabel="AB-02",
                     _bb=[[0, 0], [300, 300]],
                 ),
             ],
@@ -220,8 +220,8 @@ class UploadViewTest(RequiresUtils, TestCase):
             user,
             [
                 dict(
-                    species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                    length=100,
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
                     _bb=[[0, 0], [911, 100]],
                 ),
             ],

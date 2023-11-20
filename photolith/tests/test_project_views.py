@@ -103,12 +103,12 @@ class ProjectListViewTest(RequiresUtils, TestCase):
             image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
-        ind_fish.data = dict(species={"id": 100, "en": "Fish", "is": "Fiskur"})
+        ind_fish.data = dict(tx_species={"id": 100, "en": "Fish", "is": "Fiskur"})
         ind_rock = Individual.objects.create(
             image=self.create_image("moo1.jpg"),
             bounding_box=[[0, 0], [100, 100]],
         )
-        ind_rock.data = dict(species={"id": 200, "en": "Rock", "is": "Rockur"})
+        ind_rock.data = dict(tx_species={"id": 200, "en": "Rock", "is": "Rockur"})
 
         # Create projects, see number of individuals
         p1 = self.create_project(

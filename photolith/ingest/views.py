@@ -131,10 +131,10 @@ class UploadView(PermissionRequiredMixin, View):
                 updated_inds[post_key.replace("data:", "")] = ind.id
             else:
                 created_inds[post_key.replace("data:", "")] = ind.id
-            if ind_data.get("slideLabel"):
+            if ind_data.get("ch_slideLabel"):
                 # NB: search_query is a set, we don't repeat values
                 search_query.add(
-                    urllib.parse.urlencode({"ch_slideLabel": ind_data["slideLabel"]})
+                    urllib.parse.urlencode({"ch_slideLabel": ind_data["ch_slideLabel"]})
                 )
 
         alert = ""

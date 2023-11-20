@@ -11,70 +11,70 @@ const errorTemplates = {
 
 const metaLabels = {
   en: {
-    sampleId: 'Sample Id',
-    slideLabel: 'Slide Label',
-    individualLabel: 'Individual No.',
-    length: 'Length',
-    weight: 'Weight',
-    sex: 'Sex',
-    maturity: 'Maturity',
-    species: 'Species',
-    cruise: 'Cruise',
-    station: 'Station',
-    stationYear: 'Year',
-    stationMonth: 'Month',
-    stationDate: 'Date',
-    gear: 'Gear',
-    meshSize: 'Mesh Size',
+    ch_sampleId: 'Sample Id',
+    ch_slideLabel: 'Slide Label',
+    ch_individualLabel: 'Individual No.',
+    nm_length: 'Length',
+    nm_weight: 'Weight',
+    tx_sex: 'Sex',
+    tx_maturity: 'Maturity',
+    tx_species: 'Species',
+    ch_cruise: 'Cruise',
+    ch_station: 'Station',
+    nm_stationYear: 'Year',
+    nm_stationMonth: 'Month',
+    dt_stationDate: 'Date',
+    ch_gear: 'Gear',
+    nm_meshSize: 'Mesh Size',
     num_annotations: '# Annotations',
-    created_at: 'Uploaded'
+    dt_created_at: 'Uploaded'
   },
   is: {
-    sampleId: 'Raðnúmer sýnis (id)',
-    slideLabel: 'Merking á gleri',
-    individualLabel: 'Einstaklingur nr.',
-    length: 'Lengd',
-    weight: 'þyngd',
-    sex: 'Kyn',
-    maturity: 'Kynþroski',
-    species: 'Tegund',
-    cruise: 'Leiðangur',
-    station: 'Stöð',
-    stationYear: 'Ár',
-    stationMonth: 'Mánuður',
-    stationDate: 'Dagsetning leiðangurs',
-    gear: 'Veiðarfæri',
-    meshSize: 'Möskvastærð',
+    ch_sampleId: 'Raðnúmer sýnis (id)',
+    ch_slideLabel: 'Merking á gleri',
+    ch_individualLabel: 'Einstaklingur nr.',
+    nm_length: 'Lengd',
+    nm_weight: 'þyngd',
+    tx_sex: 'Kyn',
+    tx_maturity: 'Kynþroski',
+    tx_species: 'Tegund',
+    ch_cruise: 'Leiðangur',
+    ch_station: 'Stöð',
+    nm_stationYear: 'Ár',
+    nm_stationMonth: 'Mánuður',
+    dt_stationDate: 'Dagsetning leiðangurs',
+    ch_gear: 'Veiðarfæri',
+    nm_meshSize: 'Möskvastærð',
     num_annotations: '# Aldursmerkingar',
-    created_at: 'Fært inn'
+    dt_created_at: 'Fært inn'
   }
 };
 
 const fieldsFor = {
   search_columns: [
-    'sampleId',
-    'cruise',
-    'station',
-    'stationYear',
-    'stationMonth',
-    'species',
+    'ch_sampleId',
+    'ch_cruise',
+    'ch_station',
+    'nm_stationYear',
+    'nm_stationMonth',
+    'tx_species',
     'num_annotations',
-    'length',
-    'weight',
-    'sex',
-    'maturity',
-    'created_at'
+    'nm_length',
+    'nm_weight',
+    'tx_sex',
+    'tx_maturity',
+    'dt_created_at'
   ],
   search_filter: [
-    'cruise',
-    'station',
-    'species',
-    'length',
-    'weight',
-    'sex',
-    'stationYear',
-    'stationMonth',
-    'maturity'
+    'ch_cruise',
+    'ch_station',
+    'tx_species',
+    'nm_length',
+    'nm_weight',
+    'tx_sex',
+    'nm_stationYear',
+    'nm_stationMonth',
+    'tx_maturity'
   ]
 };
 
@@ -125,7 +125,7 @@ export default class MetadataApi {
 
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
-    return ind.individualLabel;
+    return ind.ch_individualLabel;
   }
 
   parseSlideLabel (s) {
@@ -177,58 +177,58 @@ export default class MetadataApi {
 
       return {
         individuals: data.otoliths.map((od, i) => {
-          // NB: Add slideLabel now so it sits at the top
-          const out = { slideLabel: null };
+          // NB: Add ch_slideLabel now so it sits at the top
+          const out = { ch_slideLabel: null };
 
           if (od.measureDTO) {
-            out.length = od.measureDTO.length;
-            out.sex = od.measureDTO.sexNo;
-            out.maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
+            out.nm_length = od.measureDTO.length;
+            out.tx_sex = od.measureDTO.sexNo;
+            out.tx_maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
           }
           if (od.speciesDTO) {
-            out.species = {
+            out.tx_species = {
               id: od.speciesDTO.id,
               en: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`,
               is: `${od.speciesDTO.name} [${od.speciesDTO.code3a}]`
             };
           }
           if (od.sampleResponse && od.sampleResponse.station) {
-            out.cruise = od.sampleResponse.station.cruise.name;
-            out.station = od.sampleResponse.station.number.toString();
-            out.stationDate = od.sampleResponse.station.stationDate;
-            out.stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
-            out.stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
+            out.ch_cruise = od.sampleResponse.station.cruise.name;
+            out.ch_station = od.sampleResponse.station.number.toString();
+            out.dt_stationDate = od.sampleResponse.station.stationDate;
+            out.nm_stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
+            out.nm_stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
           } else {
-            if (lbl.cruise) out.cruise = lbl.cruise;
-            if (lbl.station) out.station = lbl.station.toString();
-            if (lbl.year) out.stationYear = lbl.year;
-            if (lbl.month) out.stationMonth = lbl.month;
+            if (lbl.cruise) out.ch_cruise = lbl.cruise;
+            if (lbl.station) out.ch_station = lbl.station.toString();
+            if (lbl.year) out.nm_stationYear = lbl.year;
+            if (lbl.month) out.nm_stationMonth = lbl.month;
           }
           if (od.sampleResponse) {
-            out.gear = od.sampleResponse.gear.isscfgNo;
-            out.meshSize = od.sampleResponse.meshSize;
+            out.ch_gear = od.sampleResponse.gear.isscfgNo;
+            out.nm_meshSize = od.sampleResponse.meshSize;
           }
 
-          out.sampleId = od.sampleId.toString();
-          out.measureId = od.measureId.toString();
-          out.individualLabel = od.serialNo.toString();
+          out.ch_sampleId = od.sampleId.toString();
+          out.ch_measureId = od.measureId.toString();
+          out.ch_individualLabel = od.serialNo.toString();
 
           // re-build slideLabel based on what we now know
-          if (!out.sampleId || !out.cruise || !out.station || !out.species || !out.stationMonth) {
+          if (!out.ch_sampleId || !out.ch_cruise || !out.ch_station || !out.tx_species || !out.nm_stationMonth) {
             console.warn('label', lbl);
             console.warn('API', od);
             console.warn('Combined', out);
             throw this.intlError('Not enough information from API to reconstruct slide label: Contact IT or enter entire slide label');
           }
-          out.slideLabel = [
-            out.sampleId,
-            [out.cruise, out.station].join('/'),
-            out.species.id,
-            (out.stationMonth < 10 ? '0' : '') + out.stationMonth
+          out.ch_slideLabel = [
+            out.ch_sampleId,
+            [out.ch_cruise, out.ch_station].join('/'),
+            out.tx_species.id,
+            (out.nm_stationMonth < 10 ? '0' : '') + out.nm_stationMonth
           ].join(' ');
 
-          if (!suppressWarnings && out.slideLabel !== slideLabel) {
-            displayAlert('warning', `The API returned a slide label of "${out.slideLabel}", you entered "${slideLabel}"`);
+          if (!suppressWarnings && out.ch_slideLabel !== slideLabel) {
+            displayAlert('warning', `The API returned a slide label of "${out.ch_slideLabel}", you entered "${slideLabel}"`);
             suppressWarnings = true;
           }
 

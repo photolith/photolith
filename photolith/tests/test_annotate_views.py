@@ -530,10 +530,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
         ind_nospecies = self.create_individual()
         ind_fish = self.create_individual(
-            data=dict(species={"id": 100, "en": "Fish", "is": "Fiskur"}),
+            data=dict(tx_species={"id": 100, "en": "Fish", "is": "Fiskur"}),
         )
         ind_rock = self.create_individual(
-            data=dict(species={"id": 200, "en": "Rock", "is": "Rockur"}),
+            data=dict(tx_species={"id": 200, "en": "Rock", "is": "Rockur"}),
         )
 
         # User without profile isn't an authority
@@ -636,7 +636,7 @@ class AnnotateStartViewTest(RequiresUtils, TestCase):
             v = AnnotateStartView()
             v.setup(request, **(request.GET.dict()))
             out = v.project_progress()
-            return [(int(o.data["idx"]), o.num_annotations) for o in out]
+            return [(int(o.data["nm_idx"]), o.num_annotations) for o in out]
 
         user1 = self.create_user()
         user2 = self.create_user()

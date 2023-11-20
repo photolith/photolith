@@ -1,6 +1,7 @@
 import csv
 import datetime
 import itertools
+import re
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
@@ -29,17 +30,17 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     def get_meta_fields(self):
         out = dict(
-            created_at=dict(filter_name="dt_created_at"),
+            dt_created_at=dict(),
         )
         for m in MetaNumeric.objects.values("key").annotate(
             min=Min("value"), max=Max("value")
         ):
-            out[m["key"]] = dict(
-                filter_name="nm_%s" % m["key"], min=m["min"], max=m["max"]
+            out["nm_" + m["key"]] = dict(
+                min=m["min"], max=m["max"]
             )
 
         for m in MetaChar.objects.values("key").annotate(x=NullAgg()):
-            out[m["key"]] = dict(filter_name="ch_%s" % m["key"], char=True)
+            out["ch_" + m["key"]] = dict(char=True)
 
         # First work out a mapping of key to DB query names for all languages
         str_keys = dict(id="value__identifier")
@@ -51,8 +52,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
             x=NullAgg()
         ):
             if m["key"] not in out:
-                out[m["key"]] = dict(filter_name="tx_%s" % m["key"], choices=[])
-            out[m["key"]]["choices"].append({k: m[v] for k, v in str_keys.items()})
+                out["tx_" + m["key"]] = dict(choices=[])
+            out["tx_" + m["key"]]["choices"].append({k: m[v] for k, v in str_keys.items()})
 
         return out
 
@@ -189,9 +190,8 @@ class DataView(LoginRequiredMixin, View):
             )
 
         for ind in qs:
-            out = {k: v for k, v in vars(ind).items() if not k.startswith("_")}
-            out.update(ind.data)
-            out["__str__"] = str(ind)
+            out = ind.full_data()
+            out["bounding_box"] = ind.bounding_box
 
             if with_image_url:
                 out["image__content__url"] = self.request.build_absolute_uri(
@@ -256,7 +256,7 @@ class ExportView(DataView):
                 fieldnames = [
                     k
                     for k in first_row.keys()
-                    if k not in ("id", "image_id", "created_by_id", "__str__")
+                    if k not in ("id", "__str__")
                 ] + ["growth_%d" % i for i in range(1, 21)]
                 # Put first row back again
                 rows = itertools.chain([first_row], rows)
@@ -265,7 +265,7 @@ class ExportView(DataView):
                 return
 
             writer = csv.writer(Echo())
-            yield writer.writerow(fieldnames)
+            yield writer.writerow(re.sub(r'^\w{2}_', '', f) for f in fieldnames)
             for row in rows:
                 row_out = []
                 for n in fieldnames:
