@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from .models import UserProfile, Image, Individual, Annotation, Project, Team
+from .models import *
 
 
 def image_preview_html(href, bounding_box):
@@ -182,6 +182,22 @@ class IndividualAdmin(admin.ModelAdmin):
         """Force created_by to current user"""
         obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(Taxonomy)
+class TaxonomyAdmin(admin.ModelAdmin):
+    list_display = [
+        "identifier",
+        "str_en",
+        "str_is",
+    ]
+    list_filter = ["key"]
+    fields = [
+        "key",
+        "identifier",
+        "str_en",
+        "str_is",
+    ]
 
 
 @admin.register(Annotation)

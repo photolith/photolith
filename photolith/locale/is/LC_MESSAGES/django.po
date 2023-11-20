@@ -103,6 +103,18 @@ msgid "Modified at"
 msgstr "Breytt"
 
 #: photolith/models.py
+msgid "Metadata key"
+msgstr ""
+
+#: photolith/models.py
+msgid "English"
+msgstr "Enska"
+
+#: photolith/models.py
+msgid "Icelandic"
+msgstr "Íslenska"
+
+#: photolith/models.py
 msgid "Unreadable"
 msgstr "Ólæsileg"
 

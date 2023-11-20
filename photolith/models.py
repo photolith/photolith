@@ -273,10 +273,27 @@ class Taxonomy(models.Model):
 
     # NB: key isn't generally needed, but key/identifier is our business-logic key, and
     #     we compare this when upserting
-    key = models.CharField(max_length=255, blank=False, null=False)
-    identifier = models.IntegerField(null=True)
-    str_en = models.CharField(max_length=255, blank=False, null=False)
-    str_is = models.CharField(max_length=255, blank=False, null=False)
+    key = models.CharField(
+        verbose_name=_("Metadata key"),
+        max_length=255,
+        blank=False,
+        null=False,
+    )
+    identifier = models.IntegerField(
+        null=True,
+    )
+    str_en = models.CharField(
+        verbose_name=_("English"),
+        max_length=255,
+        blank=False,
+        null=False,
+    )
+    str_is = models.CharField(
+        verbose_name=_("Icelandic"),
+        max_length=255,
+        blank=False,
+        null=False,
+    )
 
     class Meta:
         constraints = (
@@ -288,6 +305,7 @@ class Taxonomy(models.Model):
         indexes = [
             models.Index(fields=["key", "identifier"]),
         ]
+        verbose_name_plural = "Taxonomies"
 
     @property
     def dict(self):
