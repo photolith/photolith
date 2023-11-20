@@ -43,7 +43,9 @@ export class PhAnnotate extends PhSyncingViewer {
       // NB: Have to remove poly & sub-objects
       if ((o.id || '').match(/^axis_poly|^view_poly/)) this.fabCanvas.remove(o);
     });
-    Array.from((this.elSyncForm || { elements: [] }).elements).forEach((el) => {
+    const els = Array.from((this.elSyncForm || { elements: [] }).elements);
+    els.reverse(); // NB: Reverse so we draw the polys in table order
+    els.forEach((el) => {
       const m = el.name.match(/^(axis_poly|view_poly):?(\d*)$/);
       if (!m) return;
       if (el.disabled) return;
