@@ -279,6 +279,12 @@ class Taxonomy(models.Model):
     str_is = models.CharField(max_length=255, blank=False, null=False)
 
     class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                name="taxonomy_key_identifier",
+                fields=("key", "identifier"),
+            ),
+        )
         indexes = [
             models.Index(fields=["key", "identifier"]),
         ]
