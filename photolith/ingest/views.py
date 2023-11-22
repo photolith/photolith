@@ -13,7 +13,7 @@ from django.views.generic import TemplateView
 
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
-from ..models import Image, Individual
+from ..models import Image, Individual, Taxonomy
 
 
 class IndexView(PermissionRequiredMixin, TemplateView):
@@ -34,9 +34,16 @@ class IndexView(PermissionRequiredMixin, TemplateView):
         yield dict(name="fileselect:", description=_("Upload files from computer"))
         yield dict(name="webcam:", description=_("Take photo (default camera)"))
 
+    def full_taxonomy(self):
+        out = {}
+        for tx in Taxonomy.objects.all().order_by("key", "identifier"):
+            out.setdefault(tx.key, []).append(tx.dict)
+        return out
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["image_sources"] = self.image_sources()
+        context["full_taxonomy"] = self.full_taxonomy()
         return context
 
 

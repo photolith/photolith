@@ -62,6 +62,7 @@
 
   <form class="ingest-form mt-2" data-locale-warnexisting="{% translate 'There are already %d individuals uploaded with this label' %}">
     {% csrf_token %}
+    {{ full_taxonomy|json_script:"full_taxonomy" }}
     <input type="hidden" name="selection" value="" />
     <input type="hidden" name="image_file" >
     <input type="hidden" name="image_content" >

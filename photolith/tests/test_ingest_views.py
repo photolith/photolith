@@ -3,13 +3,57 @@ import json
 import urllib.parse
 import re
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, RequestFactory
 
 from ..ingest.views import *
-from ..models import Individual, Image
+from ..models import Individual, Image, Taxonomy
 
 from .binaries import JPEG_VALID, JPEG_TRUNCATED, GIF_VALID
 from .requires_utils import RequiresUtils
+
+
+class IndexViewTest(RequiresUtils, TestCase):
+    maxDiff = None
+
+    def ctx_data(self, user=None):
+        request = RequestFactory().get("/ingest", dict())
+        request.user = user
+        v = IndexView()
+        v.setup(request, **(request.GET.dict()))
+        out = v.get_context_data()
+        return out
+
+    def test_context_data__full_taxonomy(self):
+        user = self.create_user(groups=["Ingest"])
+
+        def ft():
+            return self.ctx_data(user)["full_taxonomy"]
+
+        # Initially empty
+        self.assertEqual(ft(), {})
+
+        # Add items in jumbled order, get sorted
+        Taxonomy.objects.create(
+            key="species", identifier=200, str_en="Cat", str_is="Köttur"
+        )
+        Taxonomy.objects.create(
+            key="species", identifier=100, str_en="Fish", str_is="Fiskur"
+        )
+        Taxonomy.objects.create(key="sex", identifier=1, str_en="Male", str_is="M")
+        Taxonomy.objects.create(key="sex", identifier=2, str_en="Female", str_is="F")
+        self.assertEqual(
+            ft(),
+            dict(
+                sex=[
+                    {"en": "Male", "id": 1, "is": "M"},
+                    {"en": "Female", "id": 2, "is": "F"},
+                ],
+                species=[
+                    {"en": "Fish", "id": 100, "is": "Fiskur"},
+                    {"en": "Cat", "id": 200, "is": "Köttur"},
+                ],
+            ),
+        )
 
 
 class UploadViewTest(RequiresUtils, TestCase):
