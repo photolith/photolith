@@ -135,7 +135,7 @@ STATICFILES_DIRS = (
 
 
 # Default clientside settings (exported )
-CS_METADATA_API = "DummyMetadataApi"
+CS_METADATA_API = "BaseMetadataApi"
 CS_METADATA_BASE = ""
 CS_GIT_REVISION = GIT_REVISION
 # Export anything CS_ via. django_settings_export
