@@ -139,8 +139,11 @@ export default class MetadataApi extends BaseMetadataApi {
     try {
       lbl = this.parseSlideLabel(slideLabel);
     } catch (error) {
-      // Convert parse errors into rejects, so we handle the UI properly
-      return Promise.reject(error);
+      return super.sampleDetail(slideLabel).then((individuals) => {
+        // Pressed cancel, so reject with original error
+        if (individuals === null) throw error;
+        return individuals;
+      });
     }
 
     return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
