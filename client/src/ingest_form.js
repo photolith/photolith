@@ -120,6 +120,29 @@ function formRefresh (event) {
     // Put data back again
     dataEl.value = JSON.stringify(data);
   }
+
+  if (event.target.classList.contains('ph-meta-copy')) {
+    // Sync current data up with any other
+    const sourceDataEl = elForm[elForm.elements.selection.value.replace(/^bounding_box:/, 'data:')];
+    if (!sourceDataEl) return;
+    const sourceData = JSON.parse(sourceDataEl.value || '{}');
+
+    elForm.querySelectorAll(':scope input[name^="data:"]').forEach((dataEl) => {
+      if (dataEl === sourceDataEl) return;
+      const data = JSON.parse(dataEl.value || '{}');
+
+      let modified = false;
+      for (const [k, v] of Object.entries(sourceData)) {
+        if (!(k in data)) {
+          data[k] = v;
+          modified = true;
+        }
+      }
+      if (modified) dataEl.value = JSON.stringify(data);
+    });
+
+    displayAlert('success', event.target.getAttribute('data-locale-success'));
+  }
 }
 
 function formSubmit (elForm) {

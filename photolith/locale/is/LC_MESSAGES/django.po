@@ -581,6 +581,20 @@ msgstr "Raðnúmer:Einstakingur"
 msgid "Add"
 msgstr "Bæta"
 
+#: photolith/templates/ingest/index.html
+msgid ""
+"Copy metadata values to all other individuals, unless a value has already "
+"been set"
+msgstr ""
+
+#: photolith/templates/ingest/index.html
+msgid "Copied values"
+msgstr ""
+
+#: photolith/templates/ingest/index.html
+msgid "Copy to all individuals"
+msgstr ""
+
 #: photolith/templates/project/list.html
 msgid "All projects"
 msgstr "Öll verkefni"

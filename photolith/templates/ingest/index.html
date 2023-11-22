@@ -102,6 +102,12 @@
                 <option value="" selected="selected">{% translate "Add" %}...</option>
               </select>
             </td><td>
+              <button type="button"
+                  onclick="this.dispatchEvent(new UIEvent('change', {bubbles: true}));"
+                  class="btn btn-outline-dark ph-meta-copy"
+                  title="{% translate 'Copy metadata values to all other individuals, unless a value has already been set' %}"
+                  data-locale-success="{% translate 'Copied values' %}"
+                  >{% translate "Copy to all individuals" %}</button>
             </td></tr></tfoot>
           </table>
         </div>
