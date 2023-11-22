@@ -1,9 +1,9 @@
 // https://datatables.net/download/npm
 import DataTable from 'datatables.net-bs5';
 
-import { changeEvent } from './events';
+import { changeEvent } from './events.js';
 
-const { DateTime } = require('luxon');
+import { DateTime } from 'luxon';
 
 const ISO_DT_REGEX = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/;
 

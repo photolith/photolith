@@ -16,11 +16,15 @@
     "build-js": "esbuild ./client/src/app.js --bundle --minify --sourcemap --outfile=./client/dist/app.js",
     "build": "npm run build-js && npm run build-css && npm run collectstatic",
     "lint": "semistandard --fix && stylelint client/src/*.css",
+    "test": "tape client/tests/test_*.js",
     "end": ""
   },
+  "type": "module",
   "devDependencies": {
+    "jsdom": "^22.1.0",
     "semistandard": "^16.0.1",
     "stylelint": "^15.7.0",
-    "stylelint-config-standard": "^33.0.0"
+    "stylelint-config-standard": "^33.0.0",
+    "tape": "^5.7.2"
   }
 }

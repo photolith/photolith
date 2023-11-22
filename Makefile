@@ -28,8 +28,9 @@ $(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/djang
 compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
 	npm run build
 
-test: compile
+test: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	./manage.py test --settings $(PROJECT).settings.unittest
+	npm run test
 
 coverage: compile lib/.requirements-dev.txt
 	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test $(PROJECT)
