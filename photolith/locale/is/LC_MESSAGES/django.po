@@ -577,6 +577,10 @@ msgstr "Lengd kvarða (mm)"
 msgid "Label:Individual"
 msgstr "Raðnúmer:Einstakingur"
 
+#: photolith/templates/ingest/index.html
+msgid "Add"
+msgstr "Bæta"
+
 #: photolith/templates/project/list.html
 msgid "All projects"
 msgstr "Öll verkefni"

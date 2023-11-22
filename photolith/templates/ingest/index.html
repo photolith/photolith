@@ -96,6 +96,13 @@
           <table class="table table-striped individual-data d-none">
             <thead><tr><th>{% translate "Key" %}</th><th>{% translate "Value" %}</th></tr></thead>
             <tbody></tbody>
+            <tfoot><tr><td colspan="1">
+              <!-- NB: No name so we don't submit the select -->
+              <select class="form-select add-new-metadata" style="width: 6rem;">
+                <option value="" selected="selected">{% translate "Add" %}...</option>
+              </select>
+            </td><td>
+            </td></tr></tfoot>
           </table>
         </div>
       </div>

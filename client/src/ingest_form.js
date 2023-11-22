@@ -90,7 +90,35 @@ function formRefresh (event) {
 
   if (event.target.name === 'selection') {
     const ids = JSON.parse((elForm[event.target.value.replace(/^bounding_box:/, 'data:')] || {}).value || '{}');
-    populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'));
+    populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
+  }
+
+  if (event.target.classList.contains('ph-meta')) {
+    // Sync ph-meta elements up with JSON, which gets submitted server-side
+    // NB: Sending ph-meta elements directly server-side may be more sensible long-term
+    const dataEl = elForm[elForm.elements.selection.value.replace(/^bounding_box:/, 'data:')];
+    if (!dataEl) return;
+    const data = JSON.parse(dataEl.value || '{}');
+    const key = event.target.getAttribute('data-key');
+    const newValue = event.target.value;
+
+    if (newValue === '') {
+      // Delete empty values
+      delete data[key];
+    } else if (key.startsWith('nm_')) {
+      data[key] = parseFloat(newValue);
+    } else if (key.startsWith('tx_')) {
+      data[key] = JSON.parse(newValue);
+      if (data[key].id === undefined) {
+        // Empty value
+        delete data[key];
+      }
+    } else {
+      data[key] = newValue;
+    }
+
+    // Put data back again
+    dataEl.value = JSON.stringify(data);
   }
 }
 

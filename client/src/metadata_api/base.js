@@ -69,6 +69,23 @@ export default class MetadataApi {
     })));
   }
 
+  txFor (txName, txCurrent) {
+    // NB: Assumes that {{ full_taxonomy|json_script:"full_taxonomy" }} has happened in template
+    if (!this._fullTx) {
+      const txEl = document.getElementById('full_taxonomy');
+      this._fullTx = JSON.parse(txEl.textContent);
+    }
+    const out = this._fullTx[txName] || [];
+
+    // Replace / append txCurrent
+    if (txCurrent) {
+      const idxCurrent = out.findIndex((tx) => tx.id === txCurrent.id);
+      out[idxCurrent === -1 ? out.length : idxCurrent] = txCurrent;
+    }
+
+    return out;
+  }
+
   fetch (endpoint) {
     return window.fetch(this.baseHref + endpoint).then((resp) => {
       if (!resp.ok) {

@@ -1,6 +1,8 @@
 // https://datatables.net/download/npm
 import DataTable from 'datatables.net-bs5';
 
+import { changeEvent } from './events';
+
 const { DateTime } = require('luxon');
 
 const ISO_DT_REGEX = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/;
@@ -15,10 +17,29 @@ function htmlEscape (s) {
 // https://datatables.net/reference/option/columns.render#function
 export function renderMetaCell (k, data, type, row, meta) {
   let out = data;
+  const lang = document.documentElement.lang.replace(/\W.*/, '');
+
+  if (type === 'form') {
+    // NB: We use data-key so these values don't get submitted themselves, we sync JSON blob separately
+    if (k.startsWith('nm_')) {
+      return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${out === null ? '' : out}">`;
+    }
+    if (k.startsWith('dt_')) {
+      return `<input type="date" class="form-control ph-meta" data-key="${k}" name="" value="${out === null ? '' : out.replace(/T.*/, '')}">`;
+    }
+    if (k.startsWith('tx_')) {
+      return `<select class="form-select ph-meta" data-key="${k}" name=""><option value="" ${!out ? 'selected' : ''}>----</option>${window.mApi.txFor(k.replace(/^tx_/, ''), out).map((tx) => new window.Option(
+        `${tx.id}: ${tx[lang] || tx.en}`,
+        JSON.stringify(tx),
+        out ? (tx.id === out.id) : false
+      ).outerHTML)}</select>`;
+    }
+    return `<input type="text" class="form-control ph-meta" data-key="${k}" name="" value="${out}">`;
+  }
 
   if (typeof out === 'object' && out.id && out.en) {
     // Resolve language, stripping off any -GB
-    out = out[document.documentElement.lang.replace(/\W.*/, '')] || out.en;
+    out = out[lang] || out.en;
   }
 
   if (type && type !== 'display') {
@@ -54,20 +75,64 @@ export function renderMetaCell (k, data, type, row, meta) {
   return `<code>${htmlEscape(out)}</code>`;
 }
 
-export function renderMetaLabel (metaLabel) {
-  return htmlEscape(metaLabel);
+export function renderMetaLabel (k, type) {
+  const metaLabels = window.mApi.metaLabels();
+
+  if (type === 'form') {
+    return `<label class="col-form-label">${htmlEscape(metaLabels[k])}</label>`;
+  }
+  return htmlEscape(metaLabels[k]);
 }
 
-export function populateIndividualData (indData, elTableBody) {
+export function renderMetaRow (k, indData, tableMode) {
+  // NB: Individual values missing means no row, but no data at all is allowed
+  if (indData && indData[k] === undefined) return '';
+
+  return `<tr>
+    <td>${renderMetaLabel(k, tableMode)}</td>
+    <td>${renderMetaCell(k, indData ? indData[k] : null, tableMode, indData || {}, undefined)}</td>
+  </tr>`;
+}
+
+export function populateIndividualData (indData, elTableBody, tableMode = 'display') {
   const metaLabels = window.mApi.metaLabels();
+  const missingMeta = [null];
 
   if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
 
   // NB: Don't list values when undefined (i.e. in ingest when created_at is nonsensical)
-  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => indData[k] === undefined
-    ? ''
-    : `<tr>
-    <td>${renderMetaLabel(metaLabels[k])}</td>
-    <td>${renderMetaCell(k, indData[k], 'display', indData, undefined)}</td>
-  </tr>`).join('\n');
+  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => {
+    const out = renderMetaRow(k, indData, tableMode);
+    if (!out) missingMeta.push(k);
+    return out;
+  }).join('\n');
+
+  // Populate add-new-metadata if present
+  const elAddSelect = elTableBody.parentElement.querySelector(':scope>tfoot select.add-new-metadata');
+  if (elAddSelect) {
+    elAddSelect.innerHTML = missingMeta.map((k) => {
+      // Fill in reserved spot for "Add..." prompt
+      if (!k) return elAddSelect.options[0].outerHTML;
+      // Ignore values without type prefix
+      if (!k.match(/^(ch|nm|tx|dt)_/)) return '';
+      return new window.Option(metaLabels[k], k).outerHTML;
+    }).join('\n');
+
+    // Wire up add select to append extra items
+    if (!elAddSelect.classList.contains('meta-listening')) {
+      elAddSelect.addEventListener('change', (event) => {
+        const elContainer = document.createElement('TBODY');
+        elContainer.innerHTML = renderMetaRow(event.target.value, undefined, 'form');
+
+        // Append & Fire a change event for form control
+        elTableBody.appendChild(elContainer.firstElementChild).querySelectorAll(':scope .ph-meta').forEach((el) => {
+          el.dispatchEvent(changeEvent());
+        });
+
+        event.target.removeChild(event.target.options[event.target.selectedIndex]);
+        event.target.selectedIndex = 0;
+      });
+      elAddSelect.classList.add('meta-listening');
+    }
+  }
 }

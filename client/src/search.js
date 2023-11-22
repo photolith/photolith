@@ -13,7 +13,7 @@ function populateFilter (elForm) {
   const searchParams = new URLSearchParams(window.location.search);
 
   // Append any search terms on querystring that aren't included in filter list
-  for (let k of searchParams.keys()) {
+  for (const k of searchParams.keys()) {
     if (!metaLabels[k]) {
       metaLabels[k] = window.mApi.metaLabels()[k] || k;
     }
@@ -103,7 +103,7 @@ export function init (parent) {
         return {
           data: k,
           defaultContent: '',
-          title: renderMetaLabel(metaLabels[k]),
+          title: renderMetaLabel(k),
           // https://datatables.net/reference/option/columns.createdCell
           createdCell: function (td, cellData) {
             if (typeof cellData === 'number') td.classList.add('text-end');
