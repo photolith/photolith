@@ -110,12 +110,18 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(inds[0].bounding_box, [[0, 0], [100, 100]])
         self.assertEqual(
             inds[0].data,
-            {"nm_length": 100.0, "tx_species": {"id": 100, "en": "Fish", "is": "Fiskur"}},
+            {
+                "nm_length": 100.0,
+                "tx_species": {"id": 100, "en": "Fish", "is": "Fiskur"},
+            },
         )
         self.assertEqual(inds[1].bounding_box, [[0, 0], [200, 200]])
         self.assertEqual(
             inds[1].data,
-            {"nm_length": 100.0, "tx_species": {"id": 200, "en": "Cat", "is": "Köttur"}},
+            {
+                "nm_length": 100.0,
+                "tx_species": {"id": 200, "en": "Cat", "is": "Köttur"},
+            },
         )
 
         # Create 1 individual, with keys that don't start at 1

@@ -69,7 +69,9 @@ class IndividualTest(RequiresUtils, TestCase):
             ),
         )
         ind2.data = dict(
-            nm_length="40", ch_name=22, tx_species={"id": 200, "en": "Cat", "is": "Köttur"}
+            nm_length="40",
+            ch_name=22,
+            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
         )
         self.assertEqual(
             ind2.data,
@@ -80,7 +82,9 @@ class IndividualTest(RequiresUtils, TestCase):
             ),
         )
         ind2.data = dict(
-            nm_length="40", ch_name=22, tx_species={"id": 100, "en": "Fish", "is": "Fiskur"}
+            nm_length="40",
+            ch_name=22,
+            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
         )
         self.assertEqual(
             ind2.data,

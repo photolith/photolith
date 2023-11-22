@@ -1,5 +1,4 @@
 import datetime
-import numbers
 import re
 
 from django.conf import settings
@@ -113,9 +112,9 @@ class Individual(models.Model):
     def data(self, new_value):
         # TODO: Not removing old values
         for k, v in new_value.items():
-            if '_' not in k:
+            if "_" not in k:
                 raise ValueError("'%s' has no type prefix" % k)
-            t, k = k.split('_', 2)
+            t, k = k.split("_", 2)
             if t == "nm":
                 self.metanumeric_set.add(
                     MetaNumeric(

@@ -35,9 +35,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         for m in MetaNumeric.objects.values("key").annotate(
             min=Min("value"), max=Max("value")
         ):
-            out["nm_" + m["key"]] = dict(
-                min=m["min"], max=m["max"]
-            )
+            out["nm_" + m["key"]] = dict(min=m["min"], max=m["max"])
 
         for m in MetaChar.objects.values("key").annotate(x=NullAgg()):
             out["ch_" + m["key"]] = dict(char=True)
@@ -53,7 +51,9 @@ class IndexView(LoginRequiredMixin, TemplateView):
         ):
             if m["key"] not in out:
                 out["tx_" + m["key"]] = dict(choices=[])
-            out["tx_" + m["key"]]["choices"].append({k: m[v] for k, v in str_keys.items()})
+            out["tx_" + m["key"]]["choices"].append(
+                {k: m[v] for k, v in str_keys.items()}
+            )
 
         return out
 
@@ -254,9 +254,7 @@ class ExportView(DataView):
                 first_row = next(rows)
                 # NB: Cheat and assume fish are at most 20 years old, we don't know at this point
                 fieldnames = [
-                    k
-                    for k in first_row.keys()
-                    if k not in ("id", "__str__")
+                    k for k in first_row.keys() if k not in ("id", "__str__")
                 ] + ["growth_%d" % i for i in range(1, 21)]
                 # Put first row back again
                 rows = itertools.chain([first_row], rows)
@@ -265,7 +263,7 @@ class ExportView(DataView):
                 return
 
             writer = csv.writer(Echo())
-            yield writer.writerow(re.sub(r'^\w{2}_', '', f) for f in fieldnames)
+            yield writer.writerow(re.sub(r"^\w{2}_", "", f) for f in fieldnames)
             for row in rows:
                 row_out = []
                 for n in fieldnames:
