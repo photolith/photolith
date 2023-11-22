@@ -1,6 +1,7 @@
 import { displayAlert } from '../alert';
+import BaseMetadataApi from './base';
 
-const errorTemplates = {
+const intlTemplates = {
   is: {
     '"{0}" isn\'t recognisable as a slide label': 'Kannast ekki við "{0}" sem merkingu á gleri',
     'No otoliths for sample ID': 'Engar kvarnir eru skráðar á þetta raðnúmer',
@@ -89,43 +90,17 @@ const labelHelp = {
   ]
 };
 
-export default class MetadataApi {
+export default class MetadataApi extends BaseMetadataApi {
   constructor (lang, baseHref) {
-    // Strip -gb from en-gb
-    this.lang = lang.replace(/\W.*/, '');
+    super(lang);
     this.baseHref = baseHref || '';
-  }
-
-  fetch (endpoint) {
-    return window.fetch(this.baseHref + endpoint).then((resp) => {
-      if (!resp.ok) {
-        throw this.intlError('Fetching {0} failed ({1})', endpoint, resp.status);
-      }
-      return resp.json();
-    });
-  }
-
-  intlError (errTmpl, ...values) {
-    if (errorTemplates[this.lang]) {
-      errTmpl = errorTemplates[this.lang][errTmpl];
-    }
-    return new Error(errTmpl.replace(/{(\d)}/g, (_, i) => values[Number(i)]));
+    this.intlExtend(this._intlTemplates, intlTemplates);
+    this.intlExtend(this._metaLabels, metaLabels);
+    this._fieldsFor = fieldsFor;
   }
 
   labelHelp () {
     return labelHelp[this.lang];
-  }
-
-  metaLabels (view) {
-    const out = metaLabels[this.lang] || metaLabels.en;
-    // If a view given, filter by fieldsFor
-    if (view) return Object.fromEntries(fieldsFor[view].map((k) => [k, out[k]]));
-    return out;
-  }
-
-  /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
-  individualLabel (ind) {
-    return ind.ch_individualLabel;
   }
 
   parseSlideLabel (s) {
