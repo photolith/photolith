@@ -14,65 +14,84 @@ function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 
+function attribEscape (s) {
+  return (new window.Option('', s)).outerHTML.match(/value="(.*?)"/)[1];
+}
+
 // https://datatables.net/reference/option/columns.render#function
 export function renderMetaCell (k, data, type, row, meta) {
-  let out = data;
+  // Resolve language, stripping off any -GB
   const lang = document.documentElement.lang.replace(/\W.*/, '');
+
+  if (type === undefined) return data;
 
   if (type === 'form') {
     // NB: We use data-key so these values don't get submitted themselves, we sync JSON blob separately
     if (k.startsWith('nm_')) {
-      return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${out === null ? '' : out}">`;
+      return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data)}">`;
     }
     if (k.startsWith('dt_')) {
-      return `<input type="date" class="form-control ph-meta" data-key="${k}" name="" value="${out === null ? '' : out.replace(/T.*/, '')}">`;
+      return `<input type="date" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data.replace(/T.*/, ''))}">`;
     }
     if (k.startsWith('tx_')) {
-      return `<select class="form-select ph-meta" data-key="${k}" name=""><option value="" ${!out ? 'selected' : ''}>----</option>${Object.values(window.mApi.txFor(k.replace(/^tx_/, ''), out)).map((tx) => new window.Option(
+      return `<select class="form-select ph-meta" data-key="${k}" name=""><option value="" ${!data ? 'selected' : ''}>----</option>${Object.values(window.mApi.txFor(k.replace(/^tx_/, ''), data)).map((tx) => new window.Option(
         `${tx.id}: ${tx[lang] || tx.en}`,
         JSON.stringify(tx),
-        out ? (tx.id === out.id) : false
-      ).outerHTML)}</select>`;
+        data ? (tx.id === data.id) : false
+      ).outerHTML).join('')}</select>`;
     }
-    return `<input type="text" class="form-control ph-meta" data-key="${k}" name="" value="${out}">`;
+    return `<input type="text" class="form-control ph-meta" data-key="${k}" name="" value="${attribEscape(data)}">`;
   }
 
-  if (typeof out === 'object' && out.id && out.en) {
-    // Resolve language, stripping off any -GB
-    out = out[lang] || out.en;
-  }
-
-  if (type && type !== 'display') {
-    // DataTables.net requesting non-display format, stop here.
-    return out;
-  }
-
-  if (typeof out === 'number' && k.endsWith('Year')) {
-    // Pass years through verbatim, without thousand separators
-  } else if (typeof out === 'number') {
-    // https://datatables.net/manual/data/renderers#Number-helper
-    renderNumber = renderNumber || DataTable.render.number(
-      document.documentElement.getAttribute('data-thousand-separator') || ',',
-      document.documentElement.getAttribute('data-decimal-separator') || '.'
-    ).display;
-    out = renderNumber(out);
-  }
-
-  if (ISO_DT_REGEX.test(out)) {
-    // Convert ISO string to human-readable before continuing
-    const dt = DateTime.fromISO(out);
-    try {
-      // Try first using the django locale
-      // NB: Hafro browsers are set to en-US, even though they really want en-GB dates.
-      //     Django only recognises en-gb, so this should do the "right" thing in this case.
-      out = dt.setLocale(document.documentElement.lang).toLocaleString(DateTime.DATETIME_SHORT);
-    } catch (e) {
-      console.warn('Date formatting failed, trying without locale', e);
-      out = dt.toLocaleString(DateTime.DATETIME_SHORT);
+  if (type === 'type' || type === 'sort') {
+    if (typeof data === 'object' && data.id) {
+      // Use taxonomy numeric ID for sorting
+      return data.id;
     }
+    return data;
   }
 
-  return `<code>${htmlEscape(out)}</code>`;
+  if (type === 'filter') {
+    if (typeof data === 'object' && data.id) {
+      return data[lang] || data.en;
+    }
+    return data;
+  }
+
+  if (type === 'display') {
+    let out = data;
+
+    if (typeof out === 'object' && out.id && out.en) {
+      out = out[lang] || out.en;
+    } else if (typeof out === 'number' && (k.endsWith('Year') || k.endsWith('Month'))) {
+      // Pass years through verbatim, without thousand separators
+
+    } else if (typeof out === 'number') {
+      // https://datatables.net/manual/data/renderers#Number-helper
+      // NB: Under nodeJS, we need to do DataTable(). In-browser, DataTable.render is fine
+      renderNumber = renderNumber || (DataTable.render || DataTable().render).number(
+        document.documentElement.getAttribute('data-thousand-separator') || ',',
+        document.documentElement.getAttribute('data-decimal-separator') || '.',
+        2
+      ).display;
+      out = renderNumber(out);
+    } else if (ISO_DT_REGEX.test(out)) {
+      // Convert ISO string to human-readable before continuing
+      const dt = DateTime.fromISO(out);
+      try {
+        // Try first using the django locale
+        // NB: Hafro browsers are set to en-US, even though they really want en-GB dates.
+        //     Django only recognises en-gb, so this should do the "right" thing in this case.
+        out = dt.setLocale(document.documentElement.lang).toLocaleString(DateTime.DATETIME_SHORT);
+      } catch (e) {
+        console.warn('Date formatting failed, trying without locale', e);
+        out = dt.toLocaleString(DateTime.DATETIME_SHORT);
+      }
+    }
+    return `<code>${htmlEscape(out)}</code>`;
+  }
+
+  throw new Error(`Unknown display type ${type}`);
 }
 
 export function renderMetaLabel (k, type) {
