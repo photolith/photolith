@@ -150,66 +150,64 @@ export default class MetadataApi extends BaseMetadataApi {
       // Sort incoming data by serialNo (i.e. individual number)
       data.otoliths.sort((a, b) => a.serialNo - b.serialNo);
 
-      return {
-        individuals: data.otoliths.map((od, i) => {
-          // NB: Add ch_slideLabel now so it sits at the top
-          const out = { ch_slideLabel: null };
+      return data.otoliths.map((od, i) => {
+        // NB: Add ch_slideLabel now so it sits at the top
+        const out = { ch_slideLabel: null };
 
-          if (od.measureDTO) {
-            out.nm_length = od.measureDTO.length;
-            out.tx_sex = od.measureDTO.sexNo;
-            out.tx_maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
-          }
-          if (od.speciesDTO) {
-            out.tx_species = {
-              id: od.speciesDTO.id,
-              en: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`,
-              is: `${od.speciesDTO.name} [${od.speciesDTO.code3a}]`
-            };
-          }
-          if (od.sampleResponse && od.sampleResponse.station) {
-            out.ch_cruise = od.sampleResponse.station.cruise.name;
-            out.ch_station = od.sampleResponse.station.number.toString();
-            out.dt_stationDate = od.sampleResponse.station.stationDate;
-            out.nm_stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
-            out.nm_stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
-          } else {
-            if (lbl.cruise) out.ch_cruise = lbl.cruise;
-            if (lbl.station) out.ch_station = lbl.station.toString();
-            if (lbl.year) out.nm_stationYear = lbl.year;
-            if (lbl.month) out.nm_stationMonth = lbl.month;
-          }
-          if (od.sampleResponse) {
-            out.ch_gear = od.sampleResponse.gear.isscfgNo;
-            out.nm_meshSize = od.sampleResponse.meshSize;
-          }
+        if (od.measureDTO) {
+          out.nm_length = od.measureDTO.length;
+          out.tx_sex = od.measureDTO.sexNo;
+          out.tx_maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
+        }
+        if (od.speciesDTO) {
+          out.tx_species = {
+            id: od.speciesDTO.id,
+            en: `${od.speciesDTO.englishName} [${od.speciesDTO.code3a}]`,
+            is: `${od.speciesDTO.name} [${od.speciesDTO.code3a}]`
+          };
+        }
+        if (od.sampleResponse && od.sampleResponse.station) {
+          out.ch_cruise = od.sampleResponse.station.cruise.name;
+          out.ch_station = od.sampleResponse.station.number.toString();
+          out.dt_stationDate = od.sampleResponse.station.stationDate;
+          out.nm_stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
+          out.nm_stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
+        } else {
+          if (lbl.cruise) out.ch_cruise = lbl.cruise;
+          if (lbl.station) out.ch_station = lbl.station.toString();
+          if (lbl.year) out.nm_stationYear = lbl.year;
+          if (lbl.month) out.nm_stationMonth = lbl.month;
+        }
+        if (od.sampleResponse) {
+          out.ch_gear = od.sampleResponse.gear.isscfgNo;
+          out.nm_meshSize = od.sampleResponse.meshSize;
+        }
 
-          out.ch_sampleId = od.sampleId.toString();
-          out.ch_measureId = od.measureId.toString();
-          out.ch_individualLabel = od.serialNo.toString();
+        out.ch_sampleId = od.sampleId.toString();
+        out.ch_measureId = od.measureId.toString();
+        out.ch_individualLabel = od.serialNo.toString();
 
-          // re-build slideLabel based on what we now know
-          if (!out.ch_sampleId || !out.ch_cruise || !out.ch_station || !out.tx_species || !out.nm_stationMonth) {
-            console.warn('label', lbl);
-            console.warn('API', od);
-            console.warn('Combined', out);
-            throw this.intlError('Not enough information from API to reconstruct slide label: Contact IT or enter entire slide label');
-          }
-          out.ch_slideLabel = [
-            out.ch_sampleId,
-            [out.ch_cruise, out.ch_station].join('/'),
-            out.tx_species.id,
-            (out.nm_stationMonth < 10 ? '0' : '') + out.nm_stationMonth
-          ].join(' ');
+        // re-build slideLabel based on what we now know
+        if (!out.ch_sampleId || !out.ch_cruise || !out.ch_station || !out.tx_species || !out.nm_stationMonth) {
+          console.warn('label', lbl);
+          console.warn('API', od);
+          console.warn('Combined', out);
+          throw this.intlError('Not enough information from API to reconstruct slide label: Contact IT or enter entire slide label');
+        }
+        out.ch_slideLabel = [
+          out.ch_sampleId,
+          [out.ch_cruise, out.ch_station].join('/'),
+          out.tx_species.id,
+          (out.nm_stationMonth < 10 ? '0' : '') + out.nm_stationMonth
+        ].join(' ');
 
-          if (!suppressWarnings && out.ch_slideLabel !== slideLabel) {
-            displayAlert('warning', `The API returned a slide label of "${out.ch_slideLabel}", you entered "${slideLabel}"`);
-            suppressWarnings = true;
-          }
+        if (!suppressWarnings && out.ch_slideLabel !== slideLabel) {
+          displayAlert('warning', `The API returned a slide label of "${out.ch_slideLabel}", you entered "${slideLabel}"`);
+          suppressWarnings = true;
+        }
 
-          return out;
-        })
-      };
+        return out;
+      });
     });
   }
 }

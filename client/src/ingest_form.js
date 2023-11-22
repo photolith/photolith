@@ -38,24 +38,24 @@ function formRefresh (event) {
     elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
-    return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve({ individuals: [] })).then((sd) => {
+    return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve([])).then((individuals) => {
       // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
-      checkExisting(new Set(sd.individuals.map((x) => x.slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
+      checkExisting(new Set(individuals.map((x) => x.slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
 
-      elForm.querySelector(':scope .individuals').innerHTML = sd.individuals.map((ind, indIdx) => {
+      elForm.querySelector(':scope .individuals').innerHTML = individuals.map((ind, indIdx) => {
         return `
           <input type="hidden" name="data:${indIdx}" value="">
           <input type="hidden" name="bounding_box:${indIdx}" value="">
         `;
       }).join('\n');
-      sd.individuals.forEach((ind, indIdx) => {
+      individuals.forEach((ind, indIdx) => {
         elForm.elements.individual.append(new window.Option(window.mApi.individualLabel(ind), indIdx));
         elForm[`data:${indIdx}`].value = JSON.stringify(ind);
         elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';
       // Lots of individuals, select the first rather than trying to display them all on-screen
-      elForm.elements.individual.selectedIndex = sd.individuals.length > 50 ? 1 : 0;
+      elForm.elements.individual.selectedIndex = individuals.length > 50 ? 1 : 0;
       elForm.elements.individual.dispatchEvent(changeEvent());
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
