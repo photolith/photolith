@@ -28,7 +28,7 @@ export function renderMetaCell (k, data, type, row, meta) {
       return `<input type="date" class="form-control ph-meta" data-key="${k}" name="" value="${out === null ? '' : out.replace(/T.*/, '')}">`;
     }
     if (k.startsWith('tx_')) {
-      return `<select class="form-select ph-meta" data-key="${k}" name=""><option value="" ${!out ? 'selected' : ''}>----</option>${window.mApi.txFor(k.replace(/^tx_/, ''), out).map((tx) => new window.Option(
+      return `<select class="form-select ph-meta" data-key="${k}" name=""><option value="" ${!out ? 'selected' : ''}>----</option>${Object.values(window.mApi.txFor(k.replace(/^tx_/, ''), out)).map((tx) => new window.Option(
         `${tx.id}: ${tx[lang] || tx.en}`,
         JSON.stringify(tx),
         out ? (tx.id === out.id) : false

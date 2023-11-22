@@ -90,6 +90,16 @@ const labelHelp = {
   ]
 };
 
+const txHardcoded = {
+  sex: [
+    { id: 1, en: 'Male [M]', is: 'Karlkyns [M]' },
+    { id: 2, en: 'Female [F]', is: 'Kvenkyns [F]' },
+    { id: 3, en: 'Mixed [X]', is: 'Blandað [X]' },
+    { id: 4, en: 'Indeterminate [N]', is: 'Óákveðið [N]' },
+    { id: 5, en: 'Unknown [U]', is: 'Óþekktur [U]' }
+  ]
+};
+
 export default class MetadataApi extends BaseMetadataApi {
   constructor (lang, baseHref) {
     super(lang);
@@ -97,6 +107,7 @@ export default class MetadataApi extends BaseMetadataApi {
     this.intlExtend(this._intlTemplates, intlTemplates);
     this.intlExtend(this._metaLabels, metaLabels);
     this._fieldsFor = fieldsFor;
+    this._txHardcoded = txHardcoded;
   }
 
   labelHelp () {
@@ -160,6 +171,7 @@ export default class MetadataApi extends BaseMetadataApi {
         if (od.measureDTO) {
           out.nm_length = od.measureDTO.length;
           out.tx_sex = od.measureDTO.sexNo;
+          out.tx_sex = this.txFor('sex')[out.tx_sex] || { id: out.tx_sex, en: 'Unknown' };
           out.tx_maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
         }
         if (od.speciesDTO) {

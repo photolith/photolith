@@ -25,6 +25,7 @@ export default class MetadataApi {
     this._intlTemplates = intlTemplates;
     this._metaLabels = {};
     this._fieldsFor = {};
+    this._txHardcoded = {};
   }
 
   labelHelp () {
@@ -69,18 +70,32 @@ export default class MetadataApi {
     })));
   }
 
+  /** Return a taxonomy, as an object of {(i): {id: (i), en: "..."}} */
   txFor (txName, txCurrent) {
+    function toObj (ar) {
+      return !ar ? {} : ar.reduce((a, v) => ({ ...a, [v.id]: v }), {});
+    }
+
     // NB: Assumes that {{ full_taxonomy|json_script:"full_taxonomy" }} has happened in template
     if (!this._fullTx) {
       const txEl = document.getElementById('full_taxonomy');
-      this._fullTx = JSON.parse(txEl.textContent);
-    }
-    const out = this._fullTx[txName] || [];
+      const txServer = JSON.parse(txEl ? txEl.textContent : '{}');
 
+      this._fullTx = {};
+      for (const txName of new Set([].concat(Object.keys(this._txHardcoded), Object.keys(txServer)))) {
+        this._fullTx[txName] = Object.assign(
+          {},
+          toObj(this._txHardcoded[txName]),
+          toObj(txServer[txName])
+        );
+      }
+    }
+
+    let out = this._fullTx[txName] || {};
     // Replace / append txCurrent
     if (txCurrent) {
-      const idxCurrent = out.findIndex((tx) => tx.id === txCurrent.id);
-      out[idxCurrent === -1 ? out.length : idxCurrent] = txCurrent;
+      out = Object.assign({}, out); // Shallow copy, so we don't replace original
+      out[txCurrent.id] = txCurrent;
     }
 
     return out;
