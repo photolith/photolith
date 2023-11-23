@@ -1,12 +1,19 @@
 Photolith documentation
 =======================
 
+.. rst-class:: user-guide-toctree
+
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: User guides:
 
    ingest
    projects
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Other topics:
+
    administration/index
    advanced/index
 
