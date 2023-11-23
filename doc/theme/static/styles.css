@@ -1,0 +1,33 @@
+@import url("bizstyle.css");
+
+body {
+  background-image: none;
+  border: none;
+  margin: auto;
+  letter-spacing: 0;
+}
+
+body > * {
+  -webkit-box-shadow: none!important;
+}
+
+body > .related {
+  max-width: none;
+}
+body > .related > ul {
+  border: none;
+  padding: 1rem 2rem;
+  background-color: #eee;
+}
+body > .related > ul,
+body > .related > ul * {
+  color: var(--bs-body-color) !important;
+}
+
+body > .footer {
+  max-width: none;
+  border: none;
+  padding-bottom: 0.5rem;
+  background-color: #eee;
+  color: #666;
+}
