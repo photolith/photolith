@@ -29,3 +29,5 @@
 
 # Coverage
 /.coverage
+
+/doc/_build/

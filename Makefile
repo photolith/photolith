@@ -26,6 +26,7 @@ $(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/djang
 	./manage.py compilemessages --ignore=site-packages --ignore=registration
 
 compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
+	make -C doc html
 	npm run build
 
 test: compile lib/.requirements-dev.txt node_modules/.package-dev.json

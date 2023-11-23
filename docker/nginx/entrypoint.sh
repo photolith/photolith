@@ -94,6 +94,10 @@ server {
         alias /srv/app/media/;
     }
 
+    location /doc/ {
+        alias /srv/app/doc/_build/html/;
+    }
+
     location / {
         # Originating IP address
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;

@@ -15,7 +15,7 @@
     "build-css": "esbuild ./client/src/app.css --bundle --minify --sourcemap --outfile=./client/dist/app.css",
     "build-js": "esbuild ./client/src/app.js --bundle --minify --sourcemap --outfile=./client/dist/app.js",
     "build": "npm run build-js && npm run build-css && npm run collectstatic",
-    "lint": "semistandard --fix && stylelint client/src/*.css",
+    "lint": "semistandard --fix client/ && stylelint client/src/*.css",
     "test": "tape client/tests/test_*.js",
     "end": ""
   },
