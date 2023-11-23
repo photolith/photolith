@@ -5,7 +5,8 @@ Photolith documentation
    :maxdepth: 1
    :caption: Contents:
 
-
+   administration/index
+   advanced/index
 
 Indices and tables
 ==================
