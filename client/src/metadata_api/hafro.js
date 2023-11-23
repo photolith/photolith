@@ -82,11 +82,13 @@ const fieldsFor = {
 const labelHelp = {
   en: [
     'Full label, e.g. <kbd>537572 TG1-2023/110 1 03</kbd>',
-    '"(sample-id) (species no)", e.g. <kbd>537572 1</kbd>'
+    '"(sample-id) (species no)", e.g. <kbd>537572 1</kbd>',
+    '"(cruise)/(station) (species no)", e.g. <kbd>B17-79/25 9</kbd>'
   ],
   is: [
     'Full merking á gleri, t.d. <kbd>537572 TG1-2023/110 1 03</kbd>',
-    '"(raðnúmer) (tegund nr.)", t.d. <kbd>537572 1</kbd>'
+    '"(raðnúmer) (tegund nr.)", t.d. <kbd>537572 1</kbd>',
+    '"(leiðangur)/(stöð) (tegund nr.)", t.d. <kbd>B17-79/25 9</kbd>'
   ]
 };
 
@@ -118,7 +120,7 @@ export default class MetadataApi extends BaseMetadataApi {
     let m;
 
     /** Full: 537572 TG1-2023/110 1 03 */
-    m = s.match(/^\s*(?<sampleId>\d+) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d+)\/(?<station>\d+) (?<species>\d+) (?<month>\d+)\s*$/);
+    m = s.match(/^\s*(?<sampleId>\d{4,}) (?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d{2,4})\/(?<station>\d+) (?<species>\d+) (?<month>\d+)\s*$/);
     if (m) {
       return {
         sampleId: parseInt(m.groups.sampleId, 10),
@@ -131,7 +133,7 @@ export default class MetadataApi extends BaseMetadataApi {
     }
 
     /** Partial: 537572 1 */
-    m = s.match(/^\s*(?<sampleId>\d+)\s+(?<species>\d+)\s*$/);
+    m = s.match(/^\s*(?<sampleId>\d{4,})\s+(?<species>\d+)\s*$/);
     if (m) {
       return {
         sampleId: parseInt(m.groups.sampleId, 10),
@@ -139,7 +141,28 @@ export default class MetadataApi extends BaseMetadataApi {
       };
     }
 
+    /** Partial: TG1-2023/110 1 */
+    m = s.match(/^\s*(?<cruise>[a-zA-Z0-9]+)[-=](?<year>\d{2,4})\/(?<station>\d+) (?<species>\d+)\s*$/);
+    if (m) {
+      return {
+        cruise: [m.groups.cruise, m.groups.year].join('-'),
+        station: parseInt(m.groups.station, 10),
+        species: parseInt(m.groups.species, 10),
+        year: parseInt(m.groups.year, 10)
+      };
+    }
+
     throw this.intlError('"{0}" isn\'t recognisable as a slide label', s);
+  }
+
+  urlFor (lbl) {
+    if (lbl.sampleId && lbl.species) {
+      return `/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`;
+    }
+    if (lbl.cruise && lbl.station && lbl.species) {
+      return `/biota/otolith/sample/combined/filter?speciesNo=${lbl.species}&cruise=${lbl.cruise}&stationNo=${lbl.station}`;
+    }
+    throw new Error('Not enough data available for API query: ' + JSON.stringify(lbl));
   }
 
   sampleDetail (slideLabel) {
@@ -157,8 +180,9 @@ export default class MetadataApi extends BaseMetadataApi {
       });
     }
 
-    return this.fetch(`/biota/otolith/sample/${lbl.sampleId}/combined/filter?speciesNo=${lbl.species}`).then((data) => {
-      if (data.otoliths.length === 0) throw this.intlError('No otoliths for sample ID');
+    return this.fetch(this.urlFor(lbl)).then((data) => {
+      if (Array.isArray(data) && data.length === 1) data = data[0]; // NB: Temporary bodge for sample/combined form output being wrapped in an array
+      if (!data || !data.otoliths || data.otoliths.length === 0) throw this.intlError('No otoliths for sample ID');
       if (data.otoliths.length > 500) throw this.intlError('Too many ({0}) otoliths for sample ID', data.otoliths.length);
 
       // Sort incoming data by serialNo (i.e. individual number)
