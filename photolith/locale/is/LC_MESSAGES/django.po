@@ -480,6 +480,10 @@ msgstr "Leiða að kvörnum og aldursmerkja."
 msgid "Guides"
 msgstr "Leiðbeiningar"
 
+#: photolith/templates/home/index.html
+msgid "Image Ingest: Adding images to Photolith"
+msgstr ""
+
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"
 msgstr "Færa inn myndir"
