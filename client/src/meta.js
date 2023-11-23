@@ -114,7 +114,7 @@ export function renderMetaRow (k, indData, tableMode) {
 }
 
 export function populateIndividualData (indData, elTableBody, tableMode = 'display') {
-  const metaLabels = window.mApi.metaLabels();
+  const metaLabels = window.mApi.metaLabels('table_' + tableMode);
   const missingMeta = [null];
 
   if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');

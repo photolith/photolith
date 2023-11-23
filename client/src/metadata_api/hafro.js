@@ -76,6 +76,22 @@ const fieldsFor = {
     'nm_stationYear',
     'nm_stationMonth',
     'tx_maturity'
+  ],
+  table_form: [ // i.e. ingest metadata table
+    'ch_sampleId',
+    'ch_slideLabel',
+    'ch_individualLabel',
+    'nm_length',
+    'nm_weight',
+    'tx_sex',
+    'tx_maturity',
+    'tx_species',
+    'ch_cruise',
+    'ch_station',
+    'nm_stationYear',
+    'nm_stationMonth',
+    'ch_gear',
+    'nm_meshSize'
   ]
 };
 
