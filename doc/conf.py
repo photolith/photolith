@@ -13,7 +13,11 @@ author = 'Jamie Lentin, Petrún Sigurðardóttir'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.extlinks',
+]
+autosectionlabel_prefix_document = True
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -23,5 +27,5 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'classic'
+html_theme = 'bizstyle'  # https://www.sphinx-doc.org/en/master/usage/theming.html#builtin-themes
 html_static_path = ['_static']
