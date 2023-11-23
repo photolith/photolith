@@ -47,7 +47,7 @@ function populateFilter (elForm) {
         </div>`;
     } else if (k.startsWith('tx')) {
       controlHtml = `<select multiple name="${k}" class="form-select" id="${controlId}">
-          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(k).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx['str_' + document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
+          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(k).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
         </select>`;
     } else if (k.startsWith('dt')) {
       controlHtml = `<div class="input-group">

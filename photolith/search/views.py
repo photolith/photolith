@@ -46,14 +46,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
             if f.name.startswith("str_"):
                 str_keys[f.name] = "value__%s" % f.name
 
-        for m in MetaTx.objects.values(*(["key"] + list(str_keys.values()))).annotate(
-            x=NullAgg()
-        ):
-            if m["key"] not in out:
-                out["tx_" + m["key"]] = dict(choices=[])
-            out["tx_" + m["key"]]["choices"].append(
-                {k: m[v] for k, v in str_keys.items()}
-            )
+        for tx in Taxonomy.objects.all().order_by("key", "identifier"):
+            out.setdefault("tx_" + tx.key, dict(choices=[]))["choices"].append(tx.dict)
 
         return out
 
