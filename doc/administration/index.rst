@@ -5,3 +5,4 @@ Administration
    :maxdepth: 1
 
    users
+   camera

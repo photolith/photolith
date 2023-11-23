@@ -5,6 +5,8 @@ Photolith documentation
    :maxdepth: 1
    :caption: Contents:
 
+   ingest
+   projects
    administration/index
    advanced/index
 
