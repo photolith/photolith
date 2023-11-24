@@ -63,7 +63,7 @@ export function renderMetaCell (k, data, type, row, meta) {
 
     if (typeof out === 'object' && out.id && out.en) {
       out = out[lang] || out.en;
-    } else if (typeof out === 'number' && (k.endsWith('Year') || k.endsWith('Month'))) {
+    } else if (typeof out === 'number' && Number.isInteger(out)) {
       // Pass years through verbatim, without thousand separators
 
     } else if (typeof out === 'number') {

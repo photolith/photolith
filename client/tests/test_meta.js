@@ -47,8 +47,8 @@ test('renderMetaCell:display', function (test) {
   // HTML-encased & quoted
   test.deepEqual(renderMetaCell('ch_chchanges', '<hello>world</hello>', 'display'), '<code>&lt;hello&gt;world&lt;/hello&gt;</code>');
 
-  // Use custom thousand & decimals, rounded to 2 dp.
-  test.deepEqual(renderMetaCell('nm_n', 123456, 'display'), '<code>123:456•00</code>');
+  // Use custom thousand & decimals, rounded to 2 dp if floats
+  test.deepEqual(renderMetaCell('nm_n', 123456, 'display'), '<code>123456</code>');
   test.deepEqual(renderMetaCell('nm_n', 1234567.4562, 'display'), '<code>1:234:567•46</code>');
 
   // Year/Month fields don't get numeric formatting
