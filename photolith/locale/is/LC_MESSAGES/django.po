@@ -484,6 +484,10 @@ msgstr "Leiðbeiningar"
 msgid "Image Ingest: Adding images to Photolith"
 msgstr ""
 
+#: photolith/templates/home/index.html
+msgid "Viewing & editing annotations"
+msgstr ""
+
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"
 msgstr "Færa inn myndir"

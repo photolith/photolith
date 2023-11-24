@@ -8,6 +8,7 @@ Photolith documentation
    :caption: User guides:
 
    ingest
+   annotate
    projects
 
 .. toctree::
