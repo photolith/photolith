@@ -37,8 +37,8 @@ export default class MetadataApi {
 
   metaLabels (view) {
     const out = this._metaLabels[this.lang] || this._metaLabels.en;
-    // If a view given, filter by fieldsFor
-    if (view) return Object.fromEntries(this._fieldsFor[view].map((k) => [k, out[k]]));
+    // If a view given & we have a filter, filter by fieldsFor
+    if (this._fieldsFor[view]) return Object.fromEntries(this._fieldsFor[view].map((k) => [k, out[k]]));
     return out;
   }
 
