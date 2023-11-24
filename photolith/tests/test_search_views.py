@@ -146,6 +146,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "bounding_box": "[[0, 0], [0, 0]]",
                     "image__content__url": img.content.url,
+                    "num_annotations": "0",
                 },
                 {
                     "age": "10",
@@ -159,6 +160,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_4": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
+                    "num_annotations": "2",
                 },
                 {
                     "age": "10",
@@ -170,10 +172,12 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_2": "4.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
+                    "num_annotations": "2",
                 },
                 {
                     "bounding_box": "[[1, 1], [2, 2]]",
                     "image__content__url": img.content.url,
+                    "num_annotations": "0",
                 },
             ],
         )
@@ -183,6 +187,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "bounding_box": "[[0, 0], [0, 0]]",
                     "image__content__url": img.content.url,
+                    "num_annotations": "0",
                 },
                 {
                     "age": "10",
@@ -196,11 +201,13 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_4": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
+                    "num_annotations": "2",
                 },
                 # NB: The not-very-good annotation isn't here
                 {
                     "bounding_box": "[[1, 1], [2, 2]]",
                     "image__content__url": img.content.url,
+                    "num_annotations": "0",
                 },
             ],
         )
@@ -234,6 +241,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "image__content__url": img.content.url,
                     "rating": "100",
+                    "num_annotations": "1",
                 }
             ],
         )
@@ -253,6 +261,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_2": "2.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
+                    "num_annotations": "1",
                 }
             ],
         )

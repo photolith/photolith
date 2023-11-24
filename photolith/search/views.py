@@ -186,6 +186,7 @@ class DataView(LoginRequiredMixin, View):
         for ind in qs:
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
+            out["num_annotations"] = ind.num_annotations
 
             if with_image_url:
                 out["image__content__url"] = self.request.build_absolute_uri(
