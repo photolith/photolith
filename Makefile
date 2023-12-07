@@ -34,7 +34,7 @@ test: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	npm run test
 
 coverage: compile lib/.requirements-dev.txt
-	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test $(PROJECT)
+	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test --settings $(PROJECT).settings.unittest $(PROJECT)
 	./bin/coverage report
 	./bin/coverage html -d staticfiles/htmlcov/
 	echo "Visit https://.../static/htmlcov/"
