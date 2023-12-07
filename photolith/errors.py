@@ -18,9 +18,9 @@ def json_errors(func):
             return JsonResponse(
                 dict(
                     error_class=e.__class__.__name__,
-                    error=str(e),
+                    error=getattr(e, "message", str(e)),
                 ),
-                status=500,
+                status=getattr(e, "code", 500),
             )
 
     return wrapper

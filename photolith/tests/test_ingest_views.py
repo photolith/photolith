@@ -86,7 +86,10 @@ class UploadViewTest(RequiresUtils, TestCase):
         client.force_login(user)
         resp = client.post("/ingest/upload/", post_dict)
         if resp.status_code != 200:
-            return resp.status_code
+            try:
+                return resp.status_code, json.loads(resp.content)
+            except:
+                return resp.status_code
         out = json.loads(resp.content)
         if "created_individuals" in out:
             for k, id in itertools.chain(
@@ -288,6 +291,33 @@ class UploadViewTest(RequiresUtils, TestCase):
         img.refresh_from_db()
         self.assertEqual(img.scale_line, None)
         self.assertEqual(img.scale_mm, None)
+
+    def test_post__nulldata(self):
+        """null entries in data generate an error"""
+
+        user = self.create_user(groups=["Ingest"])
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    ch_slideLabel="slideLabel",
+                    ch_individualLabel="44",
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=None,
+                    _bb=[[0, 0], [911, 100]],
+                ),
+            ],
+        )
+        self.assertEqual(
+            out,
+            (
+                400,
+                dict(
+                    error_class="ValidationError",
+                    error="'length' is missing for slideLabel : 44",
+                ),
+            ),
+        )
 
 
 class UploadImageViewTest(RequiresUtils, TestCase):

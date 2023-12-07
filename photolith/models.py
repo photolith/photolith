@@ -2,6 +2,7 @@ import datetime
 import re
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
@@ -115,6 +116,11 @@ class Individual(models.Model):
             if "_" not in k:
                 raise ValueError("'%s' has no type prefix" % k)
             t, k = k.split("_", 2)
+            if v is None:
+                # We don't allow nulls in, means an empty required field in UI
+                raise ValidationError(
+                    "'%s' is missing for %s" % (k, str(self)), code=400
+                )
             if t == "nm":
                 self.metanumeric_set.add(
                     MetaNumeric(
