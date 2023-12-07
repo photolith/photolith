@@ -31,6 +31,7 @@ const metaLabels = {
     ch_sampleId: 'Sample Id',
     ch_slideLabel: 'Slide Label',
     ch_individualLabel: 'Individual No.',
+    tx_sampleType: 'Sample Type',
     nm_length: 'Length',
     nm_weight: 'Weight',
     tx_sex: 'Sex',
@@ -50,6 +51,7 @@ const metaLabels = {
     ch_sampleId: 'Raðnúmer sýnis (id)',
     ch_slideLabel: 'Merking á gleri',
     ch_individualLabel: 'Einstaklingur nr.',
+    tx_sampleType: 'Tegund Sýnis',
     nm_length: 'Lengd',
     nm_weight: 'þyngd',
     tx_sex: 'Kyn',
@@ -91,12 +93,14 @@ const fieldsFor = {
     'tx_sex',
     'nm_stationYear',
     'nm_stationMonth',
+    'tx_sampleType',
     'tx_maturity'
   ],
   table_form: [ // i.e. ingest metadata table
     'ch_sampleId',
     'ch_slideLabel',
     'ch_individualLabel',
+    'tx_sampleType',
     'nm_length',
     'nm_weight',
     'tx_sex',
@@ -131,6 +135,10 @@ const txHardcoded = {
     { id: 3, en: 'Mixed [X]', is: 'Blandað [X]' },
     { id: 4, en: 'Indeterminate [N]', is: 'Óákveðið [N]' },
     { id: 5, en: 'Unknown [U]', is: 'Óþekktur [U]' }
+  ],
+  sampleType: [
+    { id: 1, en: 'Otolith', is: 'Kvarnir' },
+    { id: 2, en: 'Scale', is: 'Scale' }
   ]
 };
 
@@ -256,6 +264,7 @@ export default class MetadataApi extends BaseMetadataApi {
           out.nm_meshSize = od.sampleResponse.meshSize;
         }
 
+        out.tx_sampleType = txHardcoded.sampleType[0];
         out.ch_sampleId = od.sampleId.toString();
         out.ch_measureId = od.measureId.toString();
         out.ch_individualLabel = od.serialNo.toString();
