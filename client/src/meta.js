@@ -40,7 +40,7 @@ export function renderMetaCell (k, data, type, row, meta) {
         data ? (tx.id === data.id) : false
       ).outerHTML).join('')}</select>`;
     }
-    return `<input type="text" class="form-control ph-meta" data-key="${k}" name="" value="${attribEscape(data)}">`;
+    return `<input type="text" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data)}">`;
   }
 
   if (type === 'type' || type === 'sort') {
