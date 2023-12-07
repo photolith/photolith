@@ -17,10 +17,12 @@
     "build": "npm run build-js && npm run build-css && npm run collectstatic",
     "lint": "semistandard --fix client/ && stylelint client/src/*.css",
     "test": "tape client/tests/test_*.js",
+    "coverage": "c8 -o staticfiles/clientcov/ -n 'client/src/**/*.js' npm test && c8 report -o staticfiles/clientcov/ -r html -n 'client/src/**/*.js'",
     "end": ""
   },
   "type": "module",
   "devDependencies": {
+    "c8": "^8.0.1",
     "jsdom": "^22.1.0",
     "semistandard": "^16.0.1",
     "stylelint": "^15.7.0",

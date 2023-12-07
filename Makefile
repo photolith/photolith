@@ -33,11 +33,12 @@ test: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	./manage.py test --settings $(PROJECT).settings.unittest
 	npm run test
 
-coverage: compile lib/.requirements-dev.txt
+coverage: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/coverage run --source='$(PROJECT)' --omit='$(PROJECT)/tests/*,$(PROJECT)/[aw]sgi.py' ./manage.py test --settings $(PROJECT).settings.unittest $(PROJECT)
 	./bin/coverage report
 	./bin/coverage html -d staticfiles/htmlcov/
-	echo "Visit https://.../static/htmlcov/"
+	npm run coverage
+	echo "Visit https://.../static/htmlcov/ & https://.../static/clientcov/
 
 lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/autoflake -r  --imports django,requests photolith/ | patch -p1
