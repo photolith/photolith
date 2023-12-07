@@ -48,7 +48,7 @@ export default class MetadataApi {
   }
 
   sampleDetail (slideLabel) {
-    let individuals = window.prompt(this.tmpl('how_many_individuals'));
+    let individuals = window.prompt(this.tmpl('how_many_individuals', slideLabel));
 
     // Pressed cancel
     if (individuals === null) return Promise.resolve(null);

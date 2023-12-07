@@ -2,7 +2,23 @@ import { displayAlert } from '../alert';
 import BaseMetadataApi from './base';
 
 const intlTemplates = {
+  en: {
+    how_many_individuals: [
+      'The database could not find the slide label "{0}". Is this a typo? Press [Cancel] if so.',
+      '',
+      'Alternatively, enter how many individuals are contained on this image and press [OK]. Either:',
+      '• The total number of individuals, e.g. "10" for individuals 1..10',
+      '• The labels of each individual, each separated with a space, e.g. "a b c" for 3 individuals'
+    ].join('\n')
+  },
   is: {
+    how_many_individuals: [
+      'Gagnagrunnurinn fann ekki skyggnumerkið "{0}". Er þetta prentvilla? Ýttu á [Cancel] ef svo er.',
+      '',
+      'Að öðrum kosti, sláðu inn hversu margir einstaklingar eru á þessari mynd og ýttu á [OK]. Annaðhvort:',
+      '• Heildarfjöldi einstaklinga, s.s. "10" fyrir einstaklinga 1..10',
+      '• Merki hvers einstaklings, hvert aðskilið með bili, t.d. "a b c" fyrir 3 einstaklinga'
+    ].join('\n'),
     '"{0}" isn\'t recognisable as a slide label': 'Kannast ekki við "{0}" sem merkingu á gleri',
     'No otoliths for sample ID': 'Engar kvarnir eru skráðar á þetta raðnúmer',
     'Fetching {0} failed ({1})': 'Tókst ekki að sækja {0} ({1})',
