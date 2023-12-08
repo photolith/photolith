@@ -38,7 +38,7 @@ coverage: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/coverage report
 	./bin/coverage html -d staticfiles/htmlcov/
 	npm run coverage
-	echo "Visit https://.../static/htmlcov/ & https://.../static/clientcov/
+	echo "Visit https://.../static/htmlcov/ & https://.../static/clientcov/"
 
 lint: lib/.requirements-dev.txt node_modules/.package-dev.json
 	./bin/autoflake -r  --imports django,requests photolith/ | patch -p1
