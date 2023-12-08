@@ -1,0 +1,65 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023, Marine and Freshwater Research Institute (Iceland)
+# This file is distributed under the same license as the photolith package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: photolith \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-08 11:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: is\n"
+"Language-Team: is <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: ../../administration/camera.rst:2
+msgid "Direct upload from cameras to Photolith"
+msgstr ""
+
+#: ../../administration/camera.rst:4
+msgid "Photolith can be configured to accept direct uploads from cameras."
+msgstr ""
+
+#: ../../administration/camera.rst:6
+msgid ""
+"A new username/password combination first has to be configured using the "
+"``ftp-add-user`` command, see :ref:`advanced/production:Configuration`"
+msgstr ""
+
+#: ../../administration/camera.rst:9
+msgid "Configuring a camera for direct upload"
+msgstr ""
+
+#: ../../administration/camera.rst:11
+msgid ""
+"The precise options available depends on the camera, but the settings "
+"should be approximately:"
+msgstr ""
+
+#: ../../administration/camera.rst:13
+msgid "**Server type**: ``SFTP``"
+msgstr ""
+
+#: ../../administration/camera.rst:14
+msgid "**Name**: The photolith address, e.g. ``photolith.website.org``"
+msgstr ""
+
+#: ../../administration/camera.rst:15
+msgid "**Folder**: The provided FTP username, e.g. ``ftpuser``"
+msgstr ""
+
+#: ../../administration/camera.rst:16
+msgid "**Username**: The provided FTP username, e.g. ``ftpuser``"
+msgstr ""
+
+#: ../../administration/camera.rst:17
+msgid "**Password**: The provided FTP password, e.g. ``ftppass``"
+msgstr ""
+

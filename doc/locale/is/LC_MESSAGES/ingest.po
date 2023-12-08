@@ -1,0 +1,189 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023, Marine and Freshwater Research Institute (Iceland)
+# This file is distributed under the same license as the photolith package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: photolith \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-08 11:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: is\n"
+"Language-Team: is <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: ../../ingest.rst:2
+msgid "Image Ingest: Adding images to Photolith"
+msgstr ""
+
+#: ../../ingest.rst:4
+msgid ""
+"To have access to the ingest section, you need to be added to the "
+"\"Ingest\" group, if you are a site administrator, see "
+":ref:`administration/users:Ingest/Upload new images` for how to add this."
+msgstr ""
+
+#: ../../ingest.rst:6
+msgid "The `image ingest page can be found here </ingest/>`_"
+msgstr ""
+
+#: ../../ingest.rst:9
+msgid "Selecting an image source"
+msgstr ""
+
+#: ../../ingest.rst:11
+msgid ""
+"Firstly, choose an image source using the drop-down next to *Choose an "
+"image source:*"
+msgstr ""
+
+#: ../../ingest.rst:13
+msgid ""
+"**Uploaded by ...**: View images that have been uploaded directly to "
+"Photolith (see :ref:`administration/camera:Configuring a camera for "
+"direct upload`)"
+msgstr ""
+
+#: ../../ingest.rst:14
+msgid ""
+"**Upload files from computer**: Select images stored on your computer. "
+"Multiple images can be selected in one go by holding Ctrl"
+msgstr ""
+
+#: ../../ingest.rst:15
+msgid ""
+"**Take Photo**: Take photo using a webcam or USB microscope attached to "
+"your computer. You will see a live view, which you can then click to take"
+" a photo"
+msgstr ""
+
+#: ../../ingest.rst:17
+msgid ""
+"If you have more than one camera attached, you will be able to select "
+"which camera from the drop-down, but only after first selecting to take a"
+" photo with the default camera"
+msgstr ""
+
+#: ../../ingest.rst:19
+msgid ""
+"The photolith image viewer allows you to pan by dragging the image, and "
+"zoom in & out with the scrollwheel or pinching. Various image effects can"
+" be activated by pressing the magic wand icon in the top right."
+msgstr ""
+
+#: ../../ingest.rst:22
+msgid "Setting image scale"
+msgstr ""
+
+#: ../../ingest.rst:24
+msgid ""
+"On loading an image, there will be a short blue line in the top-left side"
+" of the image. This is the scale marker."
+msgstr ""
+
+#: ../../ingest.rst:26
+msgid ""
+"Drag the handles on each end so that they sit over the scale marker in "
+"the image, and enter the corresponding distance in mm in the *Scale "
+"length* box."
+msgstr ""
+
+#: ../../ingest.rst:28
+msgid "If the image has no scale, then set the *Scale length* box blank."
+msgstr ""
+
+#: ../../ingest.rst:31
+msgid "Marking up individuals"
+msgstr ""
+
+#: ../../ingest.rst:33
+msgid ""
+"Next, you need to fill in the *Label* text-box with a slide or image "
+"label for this image. Once a value is entered, photolith will attempt to "
+"fetch metadata on the image automatically, see the help to the right for "
+"information on label formats it recognises. If no data can be found, then"
+" photolith will prompt you to say how many individuals are in the current"
+" image."
+msgstr ""
+
+#: ../../ingest.rst:37
+msgid ""
+"Now this is done, there will be a set of boxes on top of the image. These"
+" should be positioned on top of each individual."
+msgstr ""
+
+#: ../../ingest.rst:40
+msgid ""
+"Click on a box to select it, and then use the handles around the edge to "
+"resize it"
+msgstr ""
+
+#: ../../ingest.rst:41
+msgid ""
+"You can use Ctrl-drag to select multiple boxes, and drag/resize them as a"
+" group"
+msgstr ""
+
+#: ../../ingest.rst:43
+msgid ""
+"The label may be used for multiple images, in which case not all the "
+"individuals will be part of the image. You can either:"
+msgstr ""
+
+#: ../../ingest.rst:46
+msgid ""
+"Drag individuals that aren't part of this image to the hatched area "
+"outside, they will not be saved"
+msgstr ""
+
+#: ../../ingest.rst:47
+msgid ""
+"Select a single individual using the drop-down to the right of the "
+"*Label* text-box. All other individuals will be removed"
+msgstr ""
+
+#: ../../ingest.rst:50
+msgid "Adding metadata to individuals"
+msgstr ""
+
+#: ../../ingest.rst:52
+msgid ""
+"When an individual is selected, a table will appear in the lower half of "
+"the screen with metadata. Use this to either check that information was "
+"retrieved from the API correctly, or to add metadata manually."
+msgstr ""
+
+#: ../../ingest.rst:55
+msgid "Use the *Add...* drop-down at the bottom to add further fields"
+msgstr ""
+
+#: ../../ingest.rst:56
+msgid "Edit individual fields"
+msgstr ""
+
+#: ../../ingest.rst:58
+msgid ""
+"If you need to add values for multiple individuals, for instance Species,"
+" fill in metadata for the first inidividual then press *Copy to all "
+"individuals*. This will copy metadata from the current individual to all "
+"other individuals, provided they don't already have a value."
+msgstr ""
+
+#: ../../ingest.rst:62
+msgid "Saving"
+msgstr ""
+
+#: ../../ingest.rst:64
+msgid ""
+"Once all individuals have been marked up on the image & have metadata, "
+"press *Save*. You can then advance to the next available image with *Next"
+" Image >*."
+msgstr ""
+

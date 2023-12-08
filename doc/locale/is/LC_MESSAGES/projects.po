@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023, Marine and Freshwater Research Institute (Iceland)
+# This file is distributed under the same license as the photolith package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: photolith \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-08 11:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: is\n"
+"Language-Team: is <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: ../../projects.rst:2
+msgid "Projects"
+msgstr ""
+
+#: ../../projects.rst:6
+msgid "Exporting annotations out of a closed project"
+msgstr ""
+
+#: ../../projects.rst:8
+msgid "Once a project is closed, annotations can be copied out of a project."
+msgstr ""
+
+#: ../../projects.rst:10
+msgid "Go to the projects list page"
+msgstr ""
+
+#: ../../projects.rst:11
+msgid "Press :kbd:`View results` on the relevant project"
+msgstr ""
+
+#: ../../projects.rst:12
+msgid "Open the first annotation, and press :kbd:`View/add annotation`"
+msgstr ""
+
+#: ../../projects.rst:13
+msgid ""
+"Select the most representative annotation from existing annotations, and "
+"press :kbd:`Copy full annotations`"
+msgstr ""
+
+#: ../../projects.rst:14
+msgid "Make any changes if necessary, and press :kbd:`Save`"
+msgstr ""
+
+#: ../../projects.rst:15
+msgid "Press :kbd:`Next` to move on to the next individual."
+msgstr ""
+

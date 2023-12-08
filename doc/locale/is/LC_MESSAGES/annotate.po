@@ -1,0 +1,202 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023, Marine and Freshwater Research Institute (Iceland)
+# This file is distributed under the same license as the photolith package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: photolith \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-08 11:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: is\n"
+"Language-Team: is <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: ../../annotate.rst:2
+msgid "Viewing & editing annotations"
+msgstr ""
+
+#: ../../annotate.rst:4
+msgid "There are 2 ways to get to the photolith annotation editor:"
+msgstr ""
+
+#: ../../annotate.rst:6
+msgid ""
+"Via :ref:`projects:Projects`, if you are part of an open project you can "
+"add annotations"
+msgstr ""
+
+#: ../../annotate.rst:7
+msgid ""
+"As :ref:`administration/users:General annotations`, if you are a general "
+"annotator you can add annotations to any otolith"
+msgstr ""
+
+#: ../../annotate.rst:9
+msgid ""
+"Once you have opened the annotator, you an switch between individuals "
+"within your project or search using the bar at the top of the page. "
+"Different modes are available by selecting the tabs below."
+msgstr ""
+
+#: ../../annotate.rst:12
+msgid ""
+"The \"full view\" button on the right of the tab bar hides the bottom "
+"half of the screen, allowing a full view of the individual to annotate."
+msgstr ""
+
+#: ../../annotate.rst:15
+msgid "Individual Metadata"
+msgstr ""
+
+#: ../../annotate.rst:17
+msgid "Lets you view all metadata held for this indivdual"
+msgstr ""
+
+#: ../../annotate.rst:20
+msgid "Existing Annotations"
+msgstr ""
+
+#: ../../annotate.rst:22
+msgid ""
+"Here you an view previous annotations, if allowed (you are not allowed to"
+" view other annotations when viewing an open project). All existing "
+"annotations will be visible on screen, with a color legend along the side"
+" of the table."
+msgstr ""
+
+#: ../../annotate.rst:25
+msgid ""
+"You can view a single annotation by clicking on it, this will also allow "
+"you to:"
+msgstr ""
+
+#: ../../annotate.rst:27
+msgid "Copy full annotation"
+msgstr ""
+
+#: ../../annotate.rst:28
+msgid "Copy the entire annotation into the *Annotate* tab, for editing"
+msgstr ""
+
+#: ../../annotate.rst:29
+msgid "Copy line only"
+msgstr ""
+
+#: ../../annotate.rst:30
+msgid ""
+"Copy just the start and end points into the *Annotate* tab, so your "
+"annotation can be based on the same axis"
+msgstr ""
+
+#: ../../annotate.rst:33
+msgid "Delete annotation"
+msgstr ""
+
+#: ../../annotate.rst:32
+msgid "If the annotation was your own, you can also delete it"
+msgstr ""
+
+#: ../../annotate.rst:36
+msgid "Annotate"
+msgstr ""
+
+#: ../../annotate.rst:38
+msgid ""
+"When in the *Annotate* tab, a blue annotation line will be visible. To "
+"annotate:"
+msgstr ""
+
+#: ../../annotate.rst:40
+msgid "Drag the end points of the axis to the centre & edge of the otolith"
+msgstr ""
+
+#: ../../annotate.rst:41
+msgid "Double-click anywhere on the axis to add an annuli marker"
+msgstr ""
+
+#: ../../annotate.rst:42
+msgid "Double-click an existing marker to remove it"
+msgstr ""
+
+#: ../../annotate.rst:43
+msgid "Drag existing markers to change their position"
+msgstr ""
+
+#: ../../annotate.rst:45
+msgid ""
+"You can zoom into the image using the scroll-wheel, or pinching. The "
+"image enhancement controls in the top-right menu allow you to adjust for "
+"a clearer view."
+msgstr ""
+
+#: ../../annotate.rst:48
+msgid ""
+"By default, markers will be added along the existing axis. If you want "
+"free-form marks, hold down ``Ctrl``:"
+msgstr ""
+
+#: ../../annotate.rst:50
+msgid ""
+"``Ctrl`` double click to create a marker anywhere (rather than the "
+"nearest point along the axis)"
+msgstr ""
+
+#: ../../annotate.rst:51
+msgid "``Ctrl`` drag to move a marker anywhere"
+msgstr ""
+
+#: ../../annotate.rst:53
+msgid "Before saving, the form below also needs filling in:"
+msgstr ""
+
+#: ../../annotate.rst:55
+msgid "Age reading"
+msgstr ""
+
+#: ../../annotate.rst:56
+msgid ""
+"Your final age reading, by default populated by number of annuli but can "
+"be edited"
+msgstr ""
+
+#: ../../annotate.rst:57
+msgid "Image rating"
+msgstr ""
+
+#: ../../annotate.rst:58
+msgid "A rating for how easy the age reading was"
+msgstr ""
+
+#: ../../annotate.rst:59
+msgid "Reader authority"
+msgstr ""
+
+#: ../../annotate.rst:60
+msgid ""
+"How highly regarded your reading will be. This mostly depends of you are "
+"one of the :ref:`administration/users:Species Experts` for the current "
+"species."
+msgstr ""
+
+#: ../../annotate.rst:62
+msgid "Comments"
+msgstr ""
+
+#: ../../annotate.rst:62
+msgid "Any other comments you may have"
+msgstr ""
+
+#: ../../annotate.rst:64
+msgid ""
+"Once done, press *Save* and then *Next >* in the individual selection bar"
+" at the top of the page."
+msgstr ""
+

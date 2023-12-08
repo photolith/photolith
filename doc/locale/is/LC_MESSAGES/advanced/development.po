@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023, Marine and Freshwater Research Institute (Iceland)
+# This file is distributed under the same license as the photolith package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: photolith \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-08 11:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: is\n"
+"Language-Team: is <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: ../../advanced/development.rst:2
+msgid "Development notes"
+msgstr ""
+
+#: ../../advanced/development.rst:5
+msgid "Installation"
+msgstr ""
+
+#: ../../advanced/development.rst:7
+msgid "Check out the repository, install rerequisites and build source::"
+msgstr ""
+
+#: ../../advanced/development.rst:13
+msgid "You can start a development server with::"
+msgstr ""
+
+#: ../../advanced/development.rst:17
+msgid ""
+"If you prefer, you can make a ``photolith/settings/local.py`` overriding "
+"settings, rather than specifying them in environment variables."
+msgstr ""
+
+#: ../../advanced/development.rst:19
+msgid "You can re-build just the clientside javascript with::"
+msgstr ""
+
+#: ../../advanced/development.rst:23
+msgid "Other commands are as with any other Django project, e.g::"
+msgstr ""
+
+#: ../../advanced/development.rst:30
+msgid "Precommit checks"
+msgstr ""
+
+#: ../../advanced/development.rst:32
+msgid "Before committing any code, you should run ``make precommit`` to:"
+msgstr ""
+
+#: ../../advanced/development.rst:34
+msgid "Check all code formatting"
+msgstr ""
+
+#: ../../advanced/development.rst:35
+msgid "Ensure translation files are up-to-date"
+msgstr ""
+
+#: ../../advanced/development.rst:37
+msgid "For example: ``make precommit && git add -p``."
+msgstr ""
+
