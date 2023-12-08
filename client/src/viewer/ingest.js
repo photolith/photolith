@@ -30,8 +30,6 @@ function setInitBBs (bbEls, width, height) {
       [left, top],
       [left + box.w - gutter.w, top + box.h - gutter.h]
     ]);
-    // NB: Bodge to ensure the intial fontSize is set correctly
-    el.phInitHeight = box.h - gutter.h;
   });
 }
 
@@ -41,7 +39,7 @@ export class PhCropper extends PhSyncingViewer {
     this.fabCanvas.uniformScaling = false; // Don't try to preserve aspect-ratio when resizing rects
   }
 
-  boundingBox (objId, label, phInitHeight) {
+  boundingBox (objId, label) {
     // http://fabricjs.com/docs/fabric.Textbox.html
     const obj = new fabric.Textbox(label, {
       id: objId,
@@ -62,7 +60,6 @@ export class PhCropper extends PhSyncingViewer {
     obj.setControlsVisibility({ mtr: false });
     if (!obj.canvas) {
       obj.set({
-        fontSize: phInitHeight,
         scaleX: 1,
         scaleY: 1
       });
@@ -72,13 +69,16 @@ export class PhCropper extends PhSyncingViewer {
 
         // Instead of scaling the text, change the fontSize to suit
         // NB: Ideally the final value of fontSize would take into account the width too, but close enough
+        const height = obj.height * (obj.scaleY || 1);
         obj.set({
           width: obj.width * (obj.scaleX || 1),
-          height: obj.height * (obj.scaleY || 1),
-          fontSize: obj.fontSize * (obj.scaleY || 1),
+          fontSize: height * 0.9, // Line up text to center better
           scaleX: 1,
           scaleY: 1
         });
+        // Set height after fontSize, to defeat the font oversizing the box
+        obj.set({ height: height });
+        obj.setCoords();
       });
 
       this.fabCanvas.add(obj);
@@ -129,7 +129,7 @@ export class PhCropper extends PhSyncingViewer {
 
     // Create canvas elements for each
     bbEls.forEach((el, i) => {
-      const obj = this.boundingBox(el.name, el.getAttribute('data-label'), el.phInitHeight);
+      const obj = this.boundingBox(el.name, el.getAttribute('data-label'));
       if (i === 0) {
         this.fabCanvas.setActiveObject(obj);
       }

@@ -114,8 +114,9 @@ export class PhSyncingViewer extends PhFilteringViewer {
       obj.left = val[0][0];
       obj.top = val[0][1];
       obj.width = val[1][0] - val[0][0];
-      obj.height = val[1][0] - val[1][0];
+      obj.height = val[1][1] - val[0][1];
       obj.setCoords(); // http://fabricjs.com/fabric-gotchas
+      obj.fire('scaling', { transform: { target: obj } });
 
       if (this.canvas) {
         this.canvas.fire('object:modified', { target: this });
