@@ -133,6 +133,8 @@ export class PhCropper extends PhSyncingViewer {
       if (i === 0) {
         this.fabCanvas.setActiveObject(obj);
       }
+      // Stack objects backwards, so scale line is on top
+      this.fabCanvas.sendToBack(obj);
     });
   }
 }
