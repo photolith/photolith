@@ -55,7 +55,8 @@ function formRefresh (event) {
       });
       elForm.selection.value = '';
       // Lots of individuals, select the first rather than trying to display them all on-screen
-      elForm.elements.individual.selectedIndex = individuals.length > 50 ? 1 : 0;
+      // Single individual, select it rather than '*', so we always show it's metadata.
+      elForm.elements.individual.selectedIndex = individuals.length > 50 || individuals.length === 1 ? 1 : 0;
       elForm.elements.individual.dispatchEvent(changeEvent());
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
@@ -78,6 +79,7 @@ function formRefresh (event) {
       }
     });
     elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
+    elForm.selection.dispatchEvent(changeEvent());
   }
 
   if (event.target.name === 'image_file') {
@@ -89,7 +91,10 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'selection') {
-    const ids = JSON.parse((elForm[event.target.value.replace(/^bounding_box:/, 'data:')] || {}).value || '{}');
+    // If a single individual is shown, show it's metadata regardless. Otherwise show selected bounding box metadata
+    const selIndividual = elForm.individual.options[elForm.individual.selectedIndex].value || event.target.value.replace(/^bounding_box:/, '');
+
+    const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
     populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
   }
 

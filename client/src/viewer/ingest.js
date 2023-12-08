@@ -130,7 +130,9 @@ export class PhCropper extends PhSyncingViewer {
     // Create canvas elements for each
     bbEls.forEach((el, i) => {
       const obj = this.boundingBox(el.name, el.getAttribute('data-label'));
-      if (i === 0) {
+      // If more than one, by default select the first
+      // (otherwise leave unselected, as metadata will be shown regardless & it makes it easier to select scale line)
+      if (bbEls.length > 1 && i === 0) {
         this.fabCanvas.setActiveObject(obj);
       }
       // Stack objects backwards, so scale line is on top
