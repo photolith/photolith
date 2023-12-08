@@ -30,4 +30,3 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'theme'
 html_theme_path = ['.']
 
-html_static_path = ['_static']
