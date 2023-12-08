@@ -32,7 +32,7 @@
           {% if perms.photolith.add_individual %}<li><a href="{% url 'ingest:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'ingest' %}text-secondary{% else %}text-white{% endif %}">{% translate "Ingest" %}</a></li>{% endif %}
           {% if perms.photolith.view_annotation %}<li><a href="{% url 'search:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'search' %}text-secondary{% else %}text-white{% endif %}">{% translate "Search" %}</a></li>{% endif %}
           <li><a href="{% url 'project:index' %}" class="nav-link px-2 {% if request.resolver_match.namespace == 'project' %}text-secondary{% else %}text-white{% endif %}">{% translate "Projects" %}</a></li>
-          <li><a href="/doc/" class="nav-link px-2 text-white">{% translate "Documentation" %}</a></li>
+          <li><a href="/doc/{{ LANGUAGE_CODE|slice:':2' }}" class="nav-link px-2 text-white">{% translate "Documentation" %}</a></li>
         </ul>
 
         <div class="text-end">

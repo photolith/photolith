@@ -30,3 +30,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'theme'
 html_theme_path = ['.']
 
+# -- Options for i18n --------------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/advanced/intl.html
+language = 'en'
+locale_dirs = ['locale/']   # path is example but recommended.
+gettext_compact = True

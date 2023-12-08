@@ -26,7 +26,7 @@ $(PROJECT)/locale/%/LC_MESSAGES/django.mo: $(PROJECT)/locale/%/LC_MESSAGES/djang
 	./manage.py compilemessages --ignore=site-packages --ignore=registration
 
 compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOCALE_FILES:.po=.mo) node_modules/.package.json
-	make -C doc html
+	make -C doc html-all-lang
 	npm run build
 
 test: compile lib/.requirements-dev.txt node_modules/.package-dev.json
@@ -61,6 +61,7 @@ makemessages: manage.py
 	./manage.py makemessages --all --ignore=site-packages --ignore=registration
 	sed -i '/POT-Creation-Date/d' photolith/locale/*/LC_MESSAGES/django.po
 	sed -Ei '/^#: /{s/:[0-9]+//g}' photolith/locale/*/LC_MESSAGES/django.po
+	make -C doc makemessages
 
 precommit: lint makemessages
 
