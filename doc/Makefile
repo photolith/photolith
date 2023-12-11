@@ -15,6 +15,7 @@ help:
 makemessages:
 	make gettext
 	../bin/sphinx-intl update -p _build/gettext
+	sed -i '/POT-Creation-Date/d' locale/*/LC_MESSAGES/*.po
 
 html-all-lang:
 	for lang in en $(shell ls -1 locale); do $(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html/$$lang" -D language="$$lang"; done

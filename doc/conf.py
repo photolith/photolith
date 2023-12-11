@@ -35,3 +35,4 @@ html_theme_path = ['.']
 language = 'en'
 locale_dirs = ['locale/']   # path is example but recommended.
 gettext_compact = True
+gettext_location = False  # No line numbers in output
