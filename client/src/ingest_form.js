@@ -92,7 +92,7 @@ function formRefresh (event) {
 
   if (event.target.name === 'selection') {
     // If a single individual is shown, show it's metadata regardless. Otherwise show selected bounding box metadata
-    const selIndividual = elForm.individual.options[elForm.individual.selectedIndex].value || event.target.value.replace(/^bounding_box:/, '');
+    const selIndividual = (elForm.individual.options[elForm.individual.selectedIndex] || {}).value || event.target.value.replace(/^bounding_box:/, '');
 
     const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
     populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
