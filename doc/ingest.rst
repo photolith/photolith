@@ -5,6 +5,9 @@ To have access to the ingest section, you need to be added to the "Ingest" group
 
 The `image ingest page can be found here </ingest/>`_
 
+.. _figure-ingest-overview:
+.. figure:: images/ingest-overview.png
+
 Selecting an image source
 -------------------------
 
