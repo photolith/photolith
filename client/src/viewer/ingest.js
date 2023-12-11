@@ -54,36 +54,30 @@ export class PhCropper extends PhSyncingViewer {
       hasBorders: false,
       hasControls: true,
       lockRotation: true,
-      transparentCorners: false
+      transparentCorners: false,
+      scaleX: 1,
+      scaleY: 1
     });
-
     obj.setControlsVisibility({ mtr: false });
-    if (!obj.canvas) {
+
+    obj.on('scaling', (opt) => {
+      const obj = opt.transform.target;
+
+      // Instead of scaling the text, change the fontSize to suit
+      // NB: Ideally the final value of fontSize would take into account the width too, but close enough
+      const height = obj.height * (obj.scaleY || 1);
       obj.set({
+        width: obj.width * (obj.scaleX || 1),
+        fontSize: height * 0.9, // Line up text to center better
         scaleX: 1,
         scaleY: 1
       });
+      // Set height after fontSize, to defeat the font oversizing the box
+      obj.set({ height: height });
+      obj.setCoords();
+    });
 
-      obj.on('scaling', (opt) => {
-        const obj = opt.transform.target;
-
-        // Instead of scaling the text, change the fontSize to suit
-        // NB: Ideally the final value of fontSize would take into account the width too, but close enough
-        const height = obj.height * (obj.scaleY || 1);
-        obj.set({
-          width: obj.width * (obj.scaleX || 1),
-          fontSize: height * 0.9, // Line up text to center better
-          scaleX: 1,
-          scaleY: 1
-        });
-        // Set height after fontSize, to defeat the font oversizing the box
-        obj.set({ height: height });
-        obj.setCoords();
-      });
-
-      this.fabCanvas.add(obj);
-    }
-
+    this.fabCanvas.add(obj);
     return obj;
   }
 
