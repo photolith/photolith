@@ -65,15 +65,13 @@ export class PhCropper extends PhSyncingViewer {
 
       // Instead of scaling the text, change the fontSize to suit
       // NB: Ideally the final value of fontSize would take into account the width too, but close enough
-      const height = obj.height * (obj.scaleY || 1);
       obj.set({
         width: obj.width * (obj.scaleX || 1),
-        fontSize: height * 0.9, // Line up text to center better
+        // NB: Set fontSize instead of height, so we size text to fit
+        fontSize: (obj.height * (obj.scaleY || 1)) / obj._fontSizeMult, // Convert line height back to font size
         scaleX: 1,
         scaleY: 1
       });
-      // Set height after fontSize, to defeat the font oversizing the box
-      obj.set({ height: height });
       obj.setCoords();
     });
 
