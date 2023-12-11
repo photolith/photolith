@@ -19,7 +19,9 @@ Firstly, choose an image source using the drop-down next to *Choose an image sou
 
     * If you have more than one camera attached, you will be able to select which camera from the drop-down, but only after first selecting to take a photo with the default camera
 
-The photolith image viewer allows you to pan by dragging the image, and zoom in & out with the scrollwheel or pinching. Various image effects can be activated by pressing the magic wand icon in the top right.
+The photolith image viewer allows you to pan by dragging the image with either left or right mouse button,
+and zoom in & out with the scrollwheel or pinching.
+Various image effects can be activated by pressing the magic wand icon in the top right.
 
 Setting image scale
 -------------------
@@ -47,6 +49,7 @@ The label may be used for multiple images, in which case not all the individuals
 You can either:
 
 * Drag individuals that aren't part of this image to the hatched area outside, they will not be saved
+* Use the right mouse button to drag the image, even when over indivduals (this is useful when there is one individual covering the entire image)
 * Select a single individual using the drop-down to the right of the *Label* text-box. All other individuals will be removed
 
 Adding metadata to individuals

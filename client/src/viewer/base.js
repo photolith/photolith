@@ -34,7 +34,11 @@ export class PhViewer {
     // Never show rotate controls on groups (read: ctrl-drag to select multiple)
     fabric.Group.prototype.lockRotation = true;
 
-    this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'));
+    this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'), {
+      fireMiddleClick: true,
+      fireRightClick: true,
+      stopContextMenu: true
+    });
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
     // NB: Any previous height will grow the elViewer container when page is shrinking,
@@ -127,13 +131,15 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:down', function (opt) {
-      // NB: Don't drag canvas on ctrl-mouse, to allow for selecting groups
-      if (!opt.target && !opt.e.ctrlKey) {
-        // Mouse down not on an object, drag canvas
-        this.isDragging = true;
-        this.selection = false;
-        this.lastPoint = getEventPoint(opt.e);
-      }
+      // Don't drag canvas on ctrl-mouse, to allow for selecting groups
+      if (opt.e.ctrlKey) return;
+      // Don't drag on left button when over a target (interact with target instead)
+      if (opt.e.button === 0 && opt.target) return;
+
+      // Start canvas drag
+      this.isDragging = true;
+      this.selection = false;
+      this.lastPoint = getEventPoint(opt.e);
     });
     this.fabCanvas.on('mouse:move', function (opt) {
       if (this.isDragging) {
