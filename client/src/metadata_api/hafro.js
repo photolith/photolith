@@ -138,7 +138,7 @@ const txHardcoded = {
   ],
   sampleType: [
     { id: 1, en: 'Otolith', is: 'Kvarnir' },
-    { id: 2, en: 'Scale', is: 'Scale' }
+    { id: 2, en: 'Scale', is: 'Hreistur' }
   ]
 };
 
