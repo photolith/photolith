@@ -95,6 +95,19 @@ export class PhSyncingViewer extends PhFilteringViewer {
     // If any of the points of this object are out-of-bounds, consider the whole thing out-of-bounds
     if (newVal.indexOf(undefined) > -1) newVal = undefined;
 
+    // If there are phInvalid properties, set them based on current newVal
+    if (obj.phInvalid) {
+      // Build phValid using the current value of all properties
+      if (!obj.phValid) {
+        obj.phValid = {};
+        Object.keys(obj.phInvalid).forEach((k) => {
+          obj.phValid[k] = obj[k];
+        });
+      }
+
+      obj.set(newVal === undefined ? obj.phInvalid : obj.phValid);
+    }
+
     newVal = newVal === undefined ? '' : JSON.stringify(newVal);
     if (formEl.value !== newVal) {
       formEl.value = newVal;

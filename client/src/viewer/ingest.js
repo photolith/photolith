@@ -4,6 +4,7 @@ import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
+const rgbInvalid = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-danger-rgb');
 
 function setInitBBs (bbEls, width, height) {
   // Set initial position based on count
@@ -48,6 +49,10 @@ export class PhCropper extends PhSyncingViewer {
       fontWeight: 'bold',
       backgroundColor: `rgba(${rgbHighlight},0.3)`,
       stroke: `rgba(${rgbHighlight},1)`,
+      phInvalid: {
+        backgroundColor: `rgba(${rgbInvalid},0.3)`,
+        stroke: `rgba(${rgbInvalid},1)`
+      },
       fill: 'black',
       textAlign: 'center',
       editable: false,
@@ -137,7 +142,10 @@ export class PhCropper extends PhSyncingViewer {
   scaleLine () {
     const obj = new EditableLine({
       id: 'scale_line',
-      stroke: `rgba(${rgbHighlight}, 0.6)`
+      stroke: `rgba(${rgbHighlight}, 0.6)`,
+      phInvalid: {
+        stroke: `rgba(${rgbInvalid}, 0.6)`
+      }
     }, {
       stroke: `rgba(${rgbHighlight}, 1)`
     });
