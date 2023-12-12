@@ -3,6 +3,7 @@ import json
 import urllib.parse
 import re
 
+from django.core.cache import cache
 from django.test import Client, TestCase, RequestFactory
 
 from ..ingest.views import *
@@ -318,6 +319,38 @@ class UploadViewTest(RequiresUtils, TestCase):
                 ),
             ),
         )
+
+    def test_post__cacheempty(self):
+        """Will empty search's cache"""
+        user = self.create_user(groups=["Ingest", "General Annotation Editor"])
+        img = self.create_image(scale_line=None, scale_mm=None)
+
+        # Do a search, made a cache
+        client = Client()
+        client.force_login(user)
+        resp = client.get("/search/", {})
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(cache.get("photolith_meta_fields") is not None)
+
+        # Ingest, it's gone
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    ch_slideLabel="AB-01",
+                    _bb=[[0, 0], [100, 100]],
+                ),
+                dict(
+                    ch_slideLabel="AB-01",
+                    _bb=[[0, 0], [200, 200]],
+                ),
+                dict(
+                    ch_slideLabel="AB-02",
+                    _bb=[[0, 0], [300, 300]],
+                ),
+            ],
+        )
+        self.assertTrue(cache.get("photolith_meta_fields") is None)
 
 
 class UploadImageViewTest(RequiresUtils, TestCase):

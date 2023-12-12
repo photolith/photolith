@@ -4,6 +4,7 @@ import urllib.parse
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.utils.translation import ngettext
@@ -143,6 +144,10 @@ class UploadView(PermissionRequiredMixin, View):
                 search_query.add(
                     urllib.parse.urlencode({"ch_slideLabel": ind_data["ch_slideLabel"]})
                 )
+
+        if len(created_inds) > 0 or len(updated_inds) > 0:
+            # Clear meta_fields cache created in search/views
+            cache.delete("photolith_meta_fields")
 
         alert = ""
         alert_status = "success"
