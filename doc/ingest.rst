@@ -5,9 +5,6 @@ To have access to the ingest section, you need to be added to the "Ingest" group
 
 The `image ingest page can be found here </ingest/>`_
 
-.. _figure-ingest-overview:
-.. figure:: images/ingest-overview.png
-
 Selecting an image source
 -------------------------
 
@@ -30,6 +27,9 @@ On loading an image, there will be a short blue line in the top-left side of the
 
 Drag the handles on each end so that they sit over the scale marker in the image, and enter the corresponding distance in mm in the *Scale length* box.
 
+.. _figure-scale-bar:
+.. figure:: images/scale-bar.jpg
+
 If the image has no scale, then set the *Scale length* box blank.
 
 Marking up individuals
@@ -41,6 +41,9 @@ If no data can be found, then photolith will prompt you to say how many individu
 
 Now this is done, there will be a set of boxes on top of the image.
 These should be positioned on top of each individual.
+
+.. _figure-ingest-overview:
+.. figure:: images/ingest-overview.png
 
 * Click on a box to select it, and then use the handles around the edge to resize it
 * You can use Ctrl-drag to select multiple boxes, and drag/resize them as a group
