@@ -77,6 +77,7 @@ const fieldsFor = {
     'nm_stationYear',
     'nm_stationMonth',
     'tx_species',
+    'ch_individualLabel',
     'num_annotations',
     'nm_length',
     'nm_weight',
