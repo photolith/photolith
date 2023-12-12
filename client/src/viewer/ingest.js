@@ -60,6 +60,59 @@ export class PhCropper extends PhSyncingViewer {
     });
     obj.setControlsVisibility({ mtr: false });
 
+    obj.phSnapToEdge = function (moving = false) {
+      const tolerance = 10 / this.canvas.getZoom();
+
+      // If moving, we should keep the width/height constant, and move the box
+      // Otherwise, we should vary width/height and steady the boxes position
+      if (Math.abs(this.top) < tolerance) {
+        this.set(moving
+          ? { top: 0 }
+          : {
+              top: 0,
+              fontSize: (this.height + this.top) / this._fontSizeMult
+            });
+      }
+      if (Math.abs(this.left) < tolerance) {
+        this.set(moving
+          ? { left: 0 }
+          : {
+              left: 0,
+              width: this.width + this.left
+            });
+      }
+      const heightDiff = this.top + this.height - this.canvas.backgroundImage.height;
+      if (Math.abs(heightDiff) < tolerance) {
+        this.set(moving
+          ? { top: this.top - heightDiff }
+          : {
+              fontSize: (this.height - heightDiff) / this._fontSizeMult
+            });
+      }
+      const widthDiff = this.left + this.width - this.canvas.backgroundImage.width;
+      if (Math.abs(widthDiff) < tolerance) {
+        this.set(moving
+          ? { left: this.left - widthDiff }
+          : {
+              width: this.width - widthDiff
+            });
+      }
+    };
+
+    obj.on('moving', (opt) => {
+      const obj = opt.transform.target;
+
+      obj.phSnapToEdge(true);
+      obj.setCoords();
+    });
+
+    obj.on('resizing', (opt) => {
+      const obj = opt.transform.target;
+
+      // Middle-left & middle-right controls resize, not scale
+      obj.phSnapToEdge();
+      obj.setCoords();
+    });
     obj.on('scaling', (opt) => {
       const obj = opt.transform.target;
 
@@ -72,6 +125,8 @@ export class PhCropper extends PhSyncingViewer {
         scaleX: 1,
         scaleY: 1
       });
+
+      obj.phSnapToEdge();
       obj.setCoords();
     });
 
