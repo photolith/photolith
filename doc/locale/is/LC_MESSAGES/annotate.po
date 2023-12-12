@@ -96,9 +96,10 @@ msgstr ""
 msgid "Annotate"
 msgstr ""
 
-msgid ""
-"When in the *Annotate* tab, a blue axis line will be visible on the "
-"image. To annotate:"
+msgid "When in the *Annotate* tab, a blue axis line will be visible on the image."
+msgstr ""
+
+msgid "To annotate:"
 msgstr ""
 
 msgid ""
