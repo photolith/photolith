@@ -10,7 +10,7 @@
 
 <div class="ph-annotate-select-bar d-flex flex-wrap border-bottom justify-content-center px-sm-5 py-3" style="background: #eee">
   <div class="">
-    <button data-action="prev" class="btn ml-2" style="background-color: #ccc">&lt; {% translate "Prev" %}</button>
+    <button data-action="prev" class="btn ml-2" style="background-color: #ccc">&lt; {% translate "Previous" %}</button>
   </div>
   <div class="flex-grow-1 mx-5">
     <select class="form-select" data-sync-form="form.ingest-form">
@@ -76,7 +76,7 @@
       <li>{% translate "There is an axis line that shows up on the image. Drag the start and end points to mark the centre & edge of the otolith." %}</li>
       <li>{% translate "Double-click on the line to add a ring marker, drag a ring marker to move it" %}</li>
       <li>{% translate "Double-click a ring marker to remove" %}</li>
-      <li>{% translate "Generally the annotations follow the axis line. If you want to move an annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker freeform." %}</li>
+      <li>{% translate "Generally the annotations follow the axis line. If you want to move an annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker freeform. You can also add annuli away from the axis line by holding in <kbd>Ctrl</kbd> and double click where you want the annuli." %}</li>
     </ul>
   </div>
 
@@ -117,7 +117,7 @@
       </table>
       {% if object.id is None %}
         <button class="btn btn-info btn-block ph-copy-full">{% translate 'Copy full annotation' %}</button>
-        <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy line only' %}</button>
+        <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy axis line only' %}</button>
         <button class="btn btn-danger btn-block float-end ph-delete d-none">{% translate 'Delete annotation' %}</button>
       {% endif %}
     </div>

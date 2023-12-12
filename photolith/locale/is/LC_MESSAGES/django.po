@@ -601,8 +601,8 @@ msgid ""
 "Copy metadata values to all other individuals, unless a value has already "
 "been set"
 msgstr ""
-"Geyma þessi gildi fyrir næstu einstaklinga sem verða færðir inn, nema það séu "
-"gildi til staðar fyrir."
+"Geyma þessi gildi fyrir næstu einstaklinga sem verða færðir inn, nema það "
+"séu gildi til staðar fyrir."
 
 #: photolith/templates/ingest/index.html
 msgid "Copied values"
