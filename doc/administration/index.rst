@@ -5,4 +5,5 @@ Administration
    :maxdepth: 1
 
    users
+   taxonomy
    camera

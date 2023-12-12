@@ -67,6 +67,9 @@ Use this to either check that information was retrieved from the API correctly, 
 If you need to add values for multiple individuals, for instance Species, fill in metadata for the first inidividual then press *Copy to all individuals*.
 This will copy metadata from the current individual to all other individuals, provided they don't already have a value.
 
+If a dropdown is missing a value, for example a species isn't listed, then an administrator will need to add the option first.
+See :ref:`administration/taxonomy:Adding manual entries`.
+
 Saving
 ------
 

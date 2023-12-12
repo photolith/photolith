@@ -154,6 +154,12 @@ msgid ""
 "other individuals, provided they don't already have a value."
 msgstr ""
 
+msgid ""
+"If a dropdown is missing a value, for example a species isn't listed, "
+"then an administrator will need to add the option first. See "
+":ref:`administration/taxonomy:Adding manual entries`."
+msgstr ""
+
 msgid "Saving"
 msgstr ""
 
