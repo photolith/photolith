@@ -37,10 +37,23 @@ To deselect any chosen annotation, you click them again.
 Annotate
 --------
 
-When in the *Annotate* tab, a blue axis line will be visible on the image. To annotate:
+When in the *Annotate* tab, a blue axis line will be visible on the image. 
+
+.. _figure-axis-line-first:
+.. figure:: images/axis-line-first.jpg
+
+To annotate:
 
 * Drag the end points of the axis to the centre & edge of the otolith in the direction you want to annotate.
+
+.. _figure-axis-line-moved:
+.. figure:: images/axis-line-moved.jpg
+
 * Double-click anywhere on the axis to add an annuli marker.
+
+.. _figure-axis-line-annotations:
+.. figure:: images/axis-line-annotations.jpg
+
 * Double-click an existing marker to remove it.
 * Drag existing markers to change their position on the axis line.
 * Drag annotations away from the axis line by holding ``Ctrl`` and dragging.
