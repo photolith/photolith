@@ -70,7 +70,7 @@ msgstr "Taka mynd með tengdri myndavél"
 
 #: photolith/ingest/views.py
 msgid "No individual boxes on image! Nothing saved."
-msgstr "Engin box fyrir einstaklinga á mynd! Ekkert vistað."
+msgstr "Engin einstaklingsbox á myndinni! Ekkert vistað."
 
 #: photolith/ingest/views.py
 #, python-format
@@ -104,7 +104,7 @@ msgstr "Breytt"
 
 #: photolith/models.py
 msgid "Metadata key"
-msgstr ""
+msgstr "Upplýsingar úr gagnagrunni"
 
 #: photolith/models.py
 msgid "English"
@@ -217,7 +217,7 @@ msgstr "Aðgangur bannaður"
 
 #: photolith/templates/403.html photolith/templates/429.html
 msgid "You are not allowed to visit this page"
-msgstr "Þú hefur ekki leyfi til að skoða þessa síðu"
+msgstr "Þú hefur ekki aðgang að þessari síðu"
 
 #: photolith/templates/403.html photolith/templates/404.html
 #: photolith/templates/429.html photolith/templates/500.html
@@ -232,11 +232,11 @@ msgstr "Síða finnst ekki"
 
 #: photolith/templates/500.html photolith/templates/500.html
 msgid "Server Error"
-msgstr "Villa á server"
+msgstr "Villa frá gagnagrunni"
 
 #: photolith/templates/500.html
 msgid "There was an issue with the server"
-msgstr "Það kom upp vandamál á servernum"
+msgstr "Villa frá gagnagrunni"
 
 #: photolith/templates/500.html
 msgid "Reload page"
@@ -251,7 +251,7 @@ msgid "Annotate Individual"
 msgstr "Aldursmerkja einstakling"
 
 #: photolith/templates/annotate/annotate.html
-msgid "Prev"
+msgid "Previous"
 msgstr "Fyrri"
 
 #: photolith/templates/annotate/annotate.html
@@ -325,8 +325,8 @@ msgid ""
 "points to mark the centre & edge of the otolith."
 msgstr ""
 "Það birtist lína á myndinni sem er lestrarásinn. Það þarf að draga punktana "
-"á endunum þannig að hann byrjar í miðju og fer út í jaðar eftir þeirri línu "
-"sem hentar best. "
+"á endunum þannig að ásinn byrji í miðju kvarnarinnar og fer út í jaðar eftir "
+"þeirri línu sem hentar best. "
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
@@ -343,10 +343,13 @@ msgstr "Tvíklikkaðu á merkingu til að fjarlægja hana."
 msgid ""
 "Generally the annotations follow the axis line. If you want to move an "
 "annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker "
-"freeform."
+"freeform. You can also add annuli away from the axis line by holding in "
+"<kbd>Ctrl</kbd> and double click where you want the annuli."
 msgstr ""
 "Merkingar fylgja ásnum sem er settur. Ef þú vilt færa merkinguna út af "
-"ásnum, smelltu þá á hana, haltu inni <kbd>Ctrl</kbd> og dragðu hana til."
+"ásnum, smelltu þá á hana, haltu inni <kbd>Ctrl</kbd> og dragðu hana til. "
+"Einnig getur þú sett inn ár fjarri lestrarásnum með því að halda inni "
+"<kbd>Ctrl</kbd> og tvíklikka þar sem þú vilt setja árið."
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -364,10 +367,10 @@ msgstr "Veldu aldursmerkingu fyrst"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Copy full annotation"
-msgstr "Afrita fyrri aldursmerkingu"
+msgstr "Afrita aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
-msgid "Copy line only"
+msgid "Copy axis line only"
 msgstr "Afrita aðeins lestrarásinn"
 
 #: photolith/templates/annotate/annotate.html
@@ -376,7 +379,7 @@ msgstr "Eyða aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Save as general annotation"
-msgstr "Vista sem almenna aldursmerkingu"
+msgstr "Vista í gagnagrunn"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -435,7 +438,7 @@ msgstr "Verkefni"
 
 #: photolith/templates/base.html
 msgid "Documentation"
-msgstr "Skjölun"
+msgstr "Hjálp"
 
 #: photolith/templates/base.html
 msgid "Issues"
@@ -482,15 +485,15 @@ msgstr "Leiðbeiningar"
 
 #: photolith/templates/home/index.html
 msgid "Image Ingest: Adding images to Photolith"
-msgstr ""
+msgstr "Hlaða inn myndum í Kvarnó"
 
 #: photolith/templates/home/index.html
 msgid "Viewing & editing annotations"
-msgstr ""
+msgstr "Skoða og breyta aldursmerkingum"
 
 #: photolith/templates/ingest/index.html
 msgid "Image Ingest"
-msgstr "Færa inn myndir"
+msgstr "Hlaða inn myndum"
 
 #: photolith/templates/ingest/index.html
 msgid "Choose an image source:"
@@ -579,7 +582,7 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 #, python-format
 msgid "There are already %%d individuals uploaded with this label"
-msgstr "Það eru nú þegar %%d einstaklingar með þetta raðnúmer"
+msgstr "Það eru nú þegar %%d einstaklingar með þetta raðnúmer í kerfinu"
 
 #: photolith/templates/ingest/index.html
 msgid "Scale length (mm)"
@@ -598,14 +601,16 @@ msgid ""
 "Copy metadata values to all other individuals, unless a value has already "
 "been set"
 msgstr ""
+"Geyma þessi gildi fyrir næstu einstaklinga sem verða færðir inn, nema það séu "
+"gildi til staðar fyrir."
 
 #: photolith/templates/ingest/index.html
 msgid "Copied values"
-msgstr ""
+msgstr "Geymd gildi"
 
 #: photolith/templates/ingest/index.html
 msgid "Copy to all individuals"
-msgstr ""
+msgstr "Geyma fyrir alla einstaklinga"
 
 #: photolith/templates/project/list.html
 msgid "All projects"
