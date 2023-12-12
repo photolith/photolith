@@ -80,6 +80,12 @@ export class PhSyncingViewer extends PhFilteringViewer {
       newVal = obj.points.map((p) => {
         return roundPoint(fabric.util.transformPoint(p, objToCanvas));
       });
+    } else if (obj instanceof fabric.Textbox) {
+      // NB: Using left/top/... is more accurate than obj.calcACoords()
+      newVal = [
+        roundPoint({ x: obj.left, y: obj.top }),
+        roundPoint({ x: obj.left + obj.width, y: obj.top + obj.height })
+      ];
     } else {
       const ac = obj.calcACoords();
 
