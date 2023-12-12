@@ -18,166 +18,181 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.13.1\n"
 
-#: ../../administration/camera.rst:2
 msgid "Direct upload from cameras to Photolith"
 msgstr ""
 
-#: ../../administration/camera.rst:4
 msgid "Photolith can be configured to accept direct uploads from cameras."
 msgstr ""
 
-#: ../../administration/camera.rst:6
 msgid ""
 "A new username/password combination first has to be configured using the "
 "``ftp-add-user`` command, see :ref:`advanced/production:Configuration`"
 msgstr ""
 
-#: ../../administration/camera.rst:9
 msgid "Configuring a camera for direct upload"
 msgstr ""
 
-#: ../../administration/camera.rst:11
 msgid ""
 "The precise options available depends on the camera, but the settings "
 "should be approximately:"
 msgstr ""
 
-#: ../../administration/camera.rst:13
 msgid "**Server type**: ``SFTP``"
 msgstr ""
 
-#: ../../administration/camera.rst:14
 msgid "**Name**: The photolith address, e.g. ``photolith.website.org``"
 msgstr ""
 
-#: ../../administration/camera.rst:15
 msgid "**Folder**: The provided FTP username, e.g. ``ftpuser``"
 msgstr ""
 
-#: ../../administration/camera.rst:16
 msgid "**Username**: The provided FTP username, e.g. ``ftpuser``"
 msgstr ""
 
-#: ../../administration/camera.rst:17
 msgid "**Password**: The provided FTP password, e.g. ``ftppass``"
 msgstr ""
 
-#: ../../administration/index.rst:2
 msgid "Administration"
 msgstr ""
 
-#: ../../administration/users.rst:2
+msgid "Taxonomies"
+msgstr ""
+
+msgid ""
+"Taxonomies, are translated restricted lists of values, for example *sex*,"
+" *species*."
+msgstr ""
+
+msgid ""
+"When ingesting or searching, you will get a drop-down list to choose from"
+" existing values."
+msgstr ""
+
+msgid "Adding manual entries"
+msgstr ""
+
+msgid ""
+"By default these are populated by API calls when ingesting new values. If"
+" the API provides a value not yet known by photolith, it will be added. "
+"However, an administrator can add new choices themselves"
+msgstr ""
+
+msgid ""
+"Go to the `\"Taxonomies\" section in site administration "
+"</admin/photolith/taxonomy/>`_"
+msgstr ""
+
+msgid "Press \"+ Add\""
+msgstr ""
+
+msgid ""
+"The \"Metadata key\" must exactly match another member in the taxonomy "
+"(e.g. \"species\"), and should not start with a capital letter for "
+"example"
+msgstr ""
+
+msgid ""
+"The \"Identifier\" should be a unique number within the \"Metadata key\"."
+" A ``1`` for \"species\" and a ``1`` for \"sex\" is fine, but ``1`` "
+"cannot be repeated within \"species\"."
+msgstr ""
+
+msgid "Enter a text name along with any translations."
+msgstr ""
+
+msgid "Press \"SAVE\""
+msgstr ""
+
+msgid "The new taxonomy values should be now be available in the ingest page."
+msgstr ""
+
 msgid "Users"
 msgstr ""
 
-#: ../../administration/users.rst:5
 msgid "Creating & activating users"
 msgstr ""
 
-#: ../../administration/users.rst:7
 msgid ""
 "Anyone can request an account by filling in their details on the \"Sign "
 "up\" page. However, they cannot use the system until activated by an "
 "administrator."
 msgstr ""
 
-#: ../../administration/users.rst:10
 msgid "Ask new users to fill in the \"Sign up\" form if they haven't already"
 msgstr ""
 
-#: ../../administration/users.rst:11
 msgid "Go to the \"Users\" page in site administration"
 msgstr ""
 
-#: ../../administration/users.rst:12
 msgid "Filter \"By active\" \"No\" in the right-hand \"Filter\" panel"
 msgstr ""
 
-#: ../../administration/users.rst:13
 msgid "Check the checkbox next to any user you wish to activate"
 msgstr ""
 
-#: ../../administration/users.rst:14
 msgid "Select \"Activate / password reset\" from the action dropdown"
 msgstr ""
 
-#: ../../administration/users.rst:15
 msgid "Press \"Go\""
 msgstr ""
 
-#: ../../administration/users.rst:18
 msgid "User permissions"
 msgstr ""
 
-#: ../../administration/users.rst:20
 msgid ""
 "A new user cannot do anything in Photolith, until an administrator edits "
 "the user. Add permissions by editing the user in the site administration "
 "page."
 msgstr ""
 
-#: ../../administration/users.rst:24
 msgid "Ingest/Upload new images"
 msgstr ""
 
-#: ../../administration/users.rst:26
 msgid ""
 "The **Ingest** group activates the ingest tab, which allows that user to "
 "upload new images to the database."
 msgstr ""
 
-#: ../../administration/users.rst:28 ../../administration/users.rst:35
-#: ../../administration/users.rst:56
 msgid ""
 "In the \"Groups\" section, add the group by clicking the arrow that moves"
 " it to \"Chosen groups\"."
 msgstr ""
 
-#: ../../administration/users.rst:31
 msgid "General annotations"
 msgstr ""
 
-#: ../../administration/users.rst:33
 msgid ""
 "The **General Annotation Viewer** and **General Annotation Editor** "
 "groups allow a user to view/add annotations outside a project."
 msgstr ""
 
-#: ../../administration/users.rst:38
 msgid "Project teams"
 msgstr ""
 
-#: ../../administration/users.rst:40
 msgid "To participate in a project, a user needs to be part of a project team."
 msgstr ""
 
-#: ../../administration/users.rst:42
 msgid ""
 "In the \"Teams\" section, select \"Add another Team\" and select the team"
 " from the dropdown."
 msgstr ""
 
-#: ../../administration/users.rst:45
 msgid "Species experts"
 msgstr ""
 
-#: ../../administration/users.rst:47
 msgid ""
 "A user can be marked as a species expert, enabling higher *Authority* "
 "values, making their annotations win over non-experts."
 msgstr ""
 
-#: ../../administration/users.rst:49
 msgid ""
 "In the \"User Profile\" section, add any relevant species by clicking the"
 " arrow that moves it to \"Chosen groups\"."
 msgstr ""
 
-#: ../../administration/users.rst:52
 msgid "Project administrators"
 msgstr ""
 
-#: ../../administration/users.rst:54
 msgid "The **Project Admin** group allows the user to create new projects."
 msgstr ""
 
