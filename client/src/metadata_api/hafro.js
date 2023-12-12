@@ -13,11 +13,11 @@ const intlTemplates = {
   },
   is: {
     how_many_individuals: [
-      'Gagnagrunnurinn fann ekki skyggnumerkið "{0}". Er þetta prentvilla? Ýttu á [Cancel] ef svo er.',
+      'Fannst ekki í gagnagrunni "{0}". Er þetta rétt slegið inn? Ýttu á [Cancel] ef svo er.',
       '',
-      'Að öðrum kosti, sláðu inn hversu margir einstaklingar eru á þessari mynd og ýttu á [OK]. Annaðhvort:',
-      '• Heildarfjöldi einstaklinga, s.s. "10" fyrir einstaklinga 1..10',
-      '• Merki hvers einstaklings, hvert aðskilið með bili, t.d. "a b c" fyrir 3 einstaklinga'
+      'Ef merkingin er rétt og er ekki til í gagnagrunninum, sláðu þá inn fjölda einstaklinga sem eru á myndinni og ýttu á [OK]. Annaðhvort:',
+      '• Heildarfjölda einstaklinga, s.s. "10" fyrir einstaklinga 1 upp í 10',
+      '• Merki hvers einstaklings, aðskilið með bili, t.d. "a b c" fyrir 3 einstaklinga með merkin a, b og c'
     ].join('\n'),
     '"{0}" isn\'t recognisable as a slide label': 'Kannast ekki við "{0}" sem merkingu á gleri',
     'No otoliths for sample ID': 'Engar kvarnir eru skráðar á þetta raðnúmer',
@@ -48,12 +48,12 @@ const metaLabels = {
     dt_created_at: 'Uploaded'
   },
   is: {
-    ch_sampleId: 'Raðnúmer sýnis (id)',
+    ch_sampleId: 'Raðnúmer (id)',
     ch_slideLabel: 'Merking á gleri',
     ch_individualLabel: 'Einstaklingur nr.',
-    tx_sampleType: 'Tegund Sýnis',
+    tx_sampleType: 'Tegund sýnis',
     nm_length: 'Lengd',
-    nm_weight: 'þyngd',
+    nm_weight: 'Þyngd',
     tx_sex: 'Kyn',
     tx_maturity: 'Kynþroski',
     tx_species: 'Tegund',
@@ -64,7 +64,7 @@ const metaLabels = {
     dt_stationDate: 'Dagsetning leiðangurs',
     ch_gear: 'Veiðarfæri',
     nm_meshSize: 'Möskvastærð',
-    num_annotations: '# Aldursmerkingar',
+    num_annotations: 'Fjöldi aldursmerkinga',
     dt_created_at: 'Fært inn'
   }
 };
@@ -123,7 +123,7 @@ const labelHelp = {
     '"(cruise)/(station) (species no)", e.g. <kbd>B17-79/25 9</kbd>'
   ],
   is: [
-    'Full merking á gleri, t.d. <kbd>537572 TG1-2023/110 1 03</kbd>',
+    'Merking á gleri, t.d. <kbd>537572 TG1-2023/110 1 03</kbd>',
     '"(raðnúmer) (tegund nr.)", t.d. <kbd>537572 1</kbd>',
     '"(leiðangur)/(stöð) (tegund nr.)", t.d. <kbd>B17-79/25 9</kbd>'
   ]
@@ -131,11 +131,11 @@ const labelHelp = {
 
 const txHardcoded = {
   sex: [
-    { id: 1, en: 'Male [M]', is: 'Karlkyns [M]' },
-    { id: 2, en: 'Female [F]', is: 'Kvenkyns [F]' },
-    { id: 3, en: 'Mixed [X]', is: 'Blandað [X]' },
-    { id: 4, en: 'Indeterminate [N]', is: 'Óákveðið [N]' },
-    { id: 5, en: 'Unknown [U]', is: 'Óþekktur [U]' }
+    { id: 1, en: 'Male [M]', is: 'Hængur' },
+    { id: 2, en: 'Female [F]', is: 'Hrygna' },
+    { id: 3, en: 'Mixed [X]', is: 'Blandað' },
+    { id: 4, en: 'Indeterminate [N]', is: 'Óákveðið' },
+    { id: 5, en: 'Unknown [U]', is: 'Ekki vitað' }
   ],
   sampleType: [
     { id: 1, en: 'Otolith', is: 'Kvarnir' },
