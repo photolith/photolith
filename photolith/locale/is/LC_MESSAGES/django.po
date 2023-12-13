@@ -529,15 +529,15 @@ msgstr ""
 
 #: photolith/templates/ingest/index.html
 msgid ""
-"Position each over the relevant individual, the scale line over the scale "
+"Position each box over the relevant individual, the scale line over the scale "
 "and press <kbd>Save</kbd>. It is important that the scale line is correctly "
 "set so that measurements on the otoliths are correct. If there is no scale "
-"on the image then you can blank the scale field."
+"on the image then you can blank the scale field or write 0."
 msgstr ""
 "Færðu hvert box yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
-"birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> allt er tilbúið."
+"birtist efst á hverri mynd. Ýttu á <kbd>Vista</kbd> þegar allt er tilbúið. "
 "Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu "
-"réttar. Ef enginn kvarði er á myndinni þá er hægt að slá inn '' sem lengd á "
+"réttar. Ef enginn kvarði er á myndinni þá er hægt að slá inn 0 sem lengd á "
 "kvarða. "
 
 #: photolith/templates/ingest/index.html
