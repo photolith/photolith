@@ -56,7 +56,7 @@ export class PhAnnotate extends PhSyncingViewer {
         stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 0.6)`
       }, {
         stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 1)`,
-        radius: 10 - (i % 5),
+        radius: 5 + (i % 5),
         selectable: m[1] === 'axis_poly'
       });
       this.fabCanvas.add(obj);
