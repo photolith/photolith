@@ -378,6 +378,24 @@ msgid "Delete annotation"
 msgstr "Eyða aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
+msgid ""
+"Annuli will be added/moved freeform. Pressing Ctrl will add/move along axis"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Free-form"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid ""
+"Annuli will be added/moved along axis. Pressing Ctrl will add/move freeform"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
+msgid "Snap to axis"
+msgstr ""
+
+#: photolith/templates/annotate/annotate.html
 msgid "Save as general annotation"
 msgstr "Vista í gagnagrunn"
 

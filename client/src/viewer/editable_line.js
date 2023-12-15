@@ -123,13 +123,16 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   poly.phAddNode = function (newPoint, opt) {
     let i;
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    // snap when this.canvas.phSnapToAxis or ctrl
+    const snapToAxis = (this.canvas.phSnapToAxis && !opt.e.ctrlKey) || (!this.canvas.phSnapToAxis && opt.e.ctrlKey);
 
     // Find first point that is further than the origin than our point, splice in new point here.
     for (i = 0; i < points.length; i++) {
       if (points[i].distanceFrom(points[0]) > newPoint.distanceFrom(points[0])) break;
     }
-    if (opt.e.ctrlKey) {
-      // ctrl held, no snapping to point
+
+    if (!snapToAxis) {
+      // no snapping to point
     } else if (i === points.length) {
       // Beyond end of line, use 2 previous points
       if (points.length > 1) newPoint = snapLine(points[points.length - 2], points[points.length - 1], newPoint, true);
@@ -145,10 +148,11 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    // snap when both this.canvas.phSnapToAxis opt.e.ctrlKey on or off
+    const snapToAxis = (this.canvas.phSnapToAxis && !opt.e.ctrlKey) || (!this.canvas.phSnapToAxis && opt.e.ctrlKey);
 
-    // Snap to line between siblings unless ctrl is held
-    if (opt.e.ctrlKey) {
-      // ctrl held, no snapping to point
+    if (!snapToAxis) {
+      // no snapping to point
     } else if (phNode.phNodeIdx === 0) {
       // Start: Snap to line formed by previous point
       if (points.length > 2) points[phNode.phNodeIdx] = snapLine(points[2], points[1], points[0]);

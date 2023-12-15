@@ -151,11 +151,27 @@
         <div class="mb-3">
           {{ form.comment|as_crispy_field }}
         </div>
-        <div class="col" style="text-align: right;">
-          <input type="submit"
-                 name="save"
-                 value="{% if project_closed %}{% translate 'Save as general annotation' %}{% else %}{% translate 'Save' %}{% endif %}"
-                 class="btn btn-success" />
+        <div class="row">
+          <div class="col-sm-3"></div>
+          <div class="col">
+            <span class="form-check form-switch btn btn-link ms-4" style="color: var(--bs-body-color)">
+              <input type="checkbox" class="form-check-input" role="switch" id="ph-viewer-snap-to-axis" autocomplete="off" checked>
+              <label for="ph-viewer-snap-to-axis">
+                <span class="unchecked" title="{% translate 'Annuli will be added/moved freeform. Pressing Ctrl will add/move along axis' %}">{% translate "Free-form" %}</span>
+                <span class="checked" title="{% translate 'Annuli will be added/moved along axis. Pressing Ctrl will add/move freeform' %}">{% translate "Snap to axis" %}</span>
+              </label>
+              <style>
+                #ph-viewer-snap-to-axis + label > * { display: none; }
+                #ph-viewer-snap-to-axis:checked + label > .checked { display: block; }
+                #ph-viewer-snap-to-axis:not(:checked) + label > .unchecked { display: block; }
+              </style>
+            </span>
+
+            <input type="submit"
+                   name="save"
+                   value="{% if project_closed %}{% translate 'Save as general annotation' %}{% else %}{% translate 'Save' %}{% endif %}"
+                   class="btn btn-success float-end" />
+          </div>
         </div>
 
       </div>
