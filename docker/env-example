@@ -27,7 +27,7 @@ APP_ALLOWED_HOSTS="photolith.website.org www.photolith.website.org"
 #APP_AUTH_PASSWORD_VALIDATORS=""
 
 # E-mail SMTP settings
-# NB: You must set APP_EMAIL_HOST to use SMTP
+# NB: You must set APP_EMAIL_HOST to send any e-mails, even if it's to localhost
 #APP_EMAIL_HOST = "localhost"
 #APP_EMAIL_PORT = "587"
 #APP_EMAIL_USE_TLS = "True"
