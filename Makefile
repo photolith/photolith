@@ -65,4 +65,8 @@ makemessages: manage.py
 
 precommit: lint makemessages
 
-.PHONY: all compile test lint start makemessages ./photolith/settings/version.py
+outdated:
+	./bin/pip list --outdated
+	npm outdated
+
+.PHONY: all compile test lint start makemessages ./photolith/settings/version.py outdated
