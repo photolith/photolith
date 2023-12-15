@@ -11,13 +11,18 @@ export class PhAnnotate extends PhSyncingViewer {
 
     // Sync phSnapToAxis state with canvas & sessionStorage
     const phSnapToAxis = document.querySelector('#ph-viewer-snap-to-axis');
-    phSnapToAxis.addEventListener('change', (event) => {
-      window.sessionStorage.setItem('ph-viewer-snap-to-axis', event.target.checked ? 'on' : 'off');
+    if (phSnapToAxis) {
+      phSnapToAxis.addEventListener('change', (event) => {
+        window.sessionStorage.setItem('ph-viewer-snap-to-axis', event.target.checked ? 'on' : 'off');
+        this.fabCanvas.phSnapToAxis = phSnapToAxis.checked;
+      });
+      // NB: The control defaults to checked, so do the same here
+      phSnapToAxis.checked = (window.sessionStorage.getItem('ph-viewer-snap-to-axis') || 'on') === 'on';
       this.fabCanvas.phSnapToAxis = phSnapToAxis.checked;
-    });
-    // NB: The control defaults to checked, so do the same here
-    phSnapToAxis.checked = (window.sessionStorage.getItem('ph-viewer-snap-to-axis') || 'on') === 'on';
-    this.fabCanvas.phSnapToAxis = phSnapToAxis.checked;
+    } else {
+      // No control found (e.g. homepage), assume it's on
+      this.fabCanvas.phSnapToAxis = true;
+    }
 
     this.fabCanvas.on('mouse:dblclick', (opt) => {
       const obj = this.fabCanvas.getObjects().find((obj) => obj.id === 'axis_poly');
