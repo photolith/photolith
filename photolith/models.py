@@ -330,7 +330,7 @@ class Annotation(models.Model):
 
     class Rating(models.IntegerChoices):
         UNREADABLE = 0, _("Unreadable")
-        DIFFICULT = 50, _("Difficult (+/- one year)")
+        DIFFICULT = 50, _("+/- 1 year")
         GOOD = 100, _("Easy to read")
 
     class AuthorityLevel(models.IntegerChoices):
