@@ -14,10 +14,10 @@ const intlTemplates = {
   },
   is: {
     how_many_individuals: [
-      '"{0}" fannst ekki í gagnagrunni. Er þetta rétt slegið inn?', 
+      '"{0}" fannst ekki í gagnagrunni. Er þetta rétt slegið inn?',
       'Ýttu á [Cancel] ef svo er.',
       '',
-      'Ef merkingin er rétt og er ekki til í gagnagrunninum, sláðu þá inn fjölda einstaklinga sem eru á myndinni og ýttu á [OK].', 
+      'Ef merkingin er rétt og er ekki til í gagnagrunninum, sláðu þá inn fjölda einstaklinga sem eru á myndinni og ýttu á [OK].',
       'Sláðu annaðhvort inn:',
       '• Heildarfjölda einstaklinga, s.s. "10" fyrir einstaklinga 1 upp í 10',
       '• Merki hvers einstaklings, aðskilið með bili, t.d. "a b c" fyrir 3 einstaklinga með merkin a, b og c'
