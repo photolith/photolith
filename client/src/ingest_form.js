@@ -40,7 +40,7 @@ function formRefresh (event) {
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve([])).then((individuals) => {
       // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
-      checkExisting(new Set(individuals.map((x) => x.slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
+      checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
 
       elForm.querySelector(':scope .individuals').innerHTML = individuals.map((ind, indIdx) => {
         return `
