@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: photolith/admin.py
-msgid "team"
-msgstr "teymi"
+msgid "Team"
+msgstr "Teymi"
 
 #: photolith/admin.py
 msgid "Personal info"
@@ -119,8 +119,8 @@ msgid "Unreadable"
 msgstr "Ólæsileg"
 
 #: photolith/models.py
-msgid "Difficult (+/- one year)"
-msgstr "Erfið (+/- eitt ár)"
+msgid "+/- 1 year"
+msgstr "+/- 1 ár"
 
 #: photolith/models.py
 msgid "Easy to read"
@@ -196,7 +196,7 @@ msgid ""
 "will be used as a starting point for annotations"
 msgstr ""
 "Ef valinn er notandi þá mun nýlegasta aldursmerking þess notanda á hverjum "
-"einstakling vera notuð sem upphafsstaður fyrir merkingar"
+"einstakling vera notuð sem upphafsstaður fyrir aldursmerkingar"
 
 #: photolith/models.py
 msgid "Team name"
@@ -264,7 +264,7 @@ msgstr "Aftur í leit"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Next"
-msgstr "Næsti"
+msgstr "Næsta"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -289,13 +289,13 @@ msgid "Maximise annotation view"
 msgstr "Stækka mynd"
 
 #: photolith/templates/annotate/annotate.html
-msgid "Annotate by marking the annuli in the image."
+msgid "Annotate by double clicking on the annuli in the image."
 msgstr "Settu inn ár með því að tvísmella á myndina."
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"Then choose an image rating, write comments if needed and press <kbd>Save</"
-"kbd> to commit the age reading to the database."
+"Then choose an image rating, write comments if needed and press <kbd>Save</kbd>"
+" to commit the age reading to the database."
 msgstr ""
 "Veldu svo einkunn, settu inn athugasemdir ef einhverjar og ýttu á "
 "<kbd>Vista</kbd> til að færa aldursmerkinguna inn í gagnagrunninn."
@@ -303,19 +303,19 @@ msgstr ""
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
 msgid "You can:"
-msgstr "Þú getur:"
+msgstr ""
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
-msgid "Zoom in/out by pinching or scrolling the mouse"
-msgstr "Þysjað inn/út með því að skrolla með músinni"
+msgid "Zoom in/out by pinching or scrolling the mouse."
+msgstr "Þysjaðu inn/út með því að skrolla með músinni."
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
 "Adjust image contrast or download using the magic wand menu, increasing ring "
 "detail by decreasing gamma, e.g."
 msgstr ""
-"Breytt contrast, gamma o.þ.h. með því að ýta á galdrasprotann á myndinni. "
+"Breyttu contrast, gamma o.þ.h. með því að ýta á galdrasprotann á myndinni. "
 "Breyting á Gamma og/eða Contrast getur aukið smáatriði á myndinni og gert "
 "árhringi skýrari."
 
@@ -344,12 +344,16 @@ msgid ""
 "Generally the annotations follow the axis line. If you want to move an "
 "annotation away from the line, <kbd>Ctrl</kbd>-drag to move a ring marker "
 "freeform. You can also add annuli away from the axis line by holding in "
-"<kbd>Ctrl</kbd> and double click where you want the annuli."
+"<kbd>Ctrl</kbd> and double click where you want the annuli. "
+"If you want to freeform add annulis away from the reading axis, you can "
+"toggle <kbd>snap to axis</kbd> on/off on the bottom of the annotation tab. "
 msgstr ""
 "Merkingar fylgja ásnum sem er settur. Ef þú vilt færa merkinguna út af "
 "ásnum, smelltu þá á hana, haltu inni <kbd>Ctrl</kbd> og dragðu hana til. "
 "Einnig getur þú sett inn ár fjarri lestrarásnum með því að halda inni "
-"<kbd>Ctrl</kbd> og tvíklikka þar sem þú vilt setja árið."
+"<kbd>Ctrl</kbd> og tvíklikka þar sem þú vilt setja árið. "
+"Ef þú vilt bæta inn aldursmerkingum án þess að fylgja lestrarás þá geturðu "
+"ýtt á <kbd>Merkingar fylgja sjálfkrafa lestrarás</kbd> í aldursmerkingarglugganum til að merkingarnar fylgi ekki ásnum."
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
@@ -381,19 +385,23 @@ msgstr "Eyða aldursmerkingu"
 msgid ""
 "Annuli will be added/moved freeform. Pressing Ctrl will add/move along axis"
 msgstr ""
+"Aldursmerkingar fylgja ekki lestrarás. Með því að ýta á Ctrl er hægt að "
+"láta merkingarnar fylgja lestrarásnum."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Free-form"
-msgstr ""
+msgstr "Merkingar fylgja ekki lestarás"
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
 "Annuli will be added/moved along axis. Pressing Ctrl will add/move freeform"
 msgstr ""
+"Aldursmerkingar fylgja lestrarás. Með því að ýta á Ctrl "
+"er hægt að færa þær frá ásnum eða merkja fjarri ásnum."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Snap to axis"
-msgstr ""
+msgstr "Merkingar fylgja sjálfkrafa lestrarás"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Save as general annotation"
@@ -607,12 +615,12 @@ msgid "Scale length (mm)"
 msgstr "Lengd kvarða (mm)"
 
 #: photolith/templates/ingest/index.html
-msgid "Label:Individual"
-msgstr "Raðnúmer:Einstakingur"
+msgid "Label species_no : Individual_no"
+msgstr "Raðnúmer tegund_nr : Einstakingur_nr"
 
 #: photolith/templates/ingest/index.html
 msgid "Add"
-msgstr "Bæta"
+msgstr "Bæta við"
 
 #: photolith/templates/ingest/index.html
 msgid ""
