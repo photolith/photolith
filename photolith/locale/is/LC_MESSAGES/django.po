@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: photolith/admin.py
-msgid "Team"
-msgstr "Teymi"
+msgid "team"
+msgstr "teymi"
 
 #: photolith/admin.py
 msgid "Personal info"
