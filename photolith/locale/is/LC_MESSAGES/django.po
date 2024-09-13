@@ -61,7 +61,11 @@ msgid "Uploaded by %(photo_dir)s"
 msgstr "Hlaðið upp af %(photo_dir)s"
 
 #: photolith/ingest/views.py
-msgid "Upload files from computer"
+msgid "Upload directory from computer"
+msgstr "Sækja möppu..."
+
+#: photolith/ingest/views.py
+msgid "Upload selected files from computer"
 msgstr "Sækja skrár..."
 
 #: photolith/ingest/views.py

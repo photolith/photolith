@@ -1,6 +1,7 @@
 import { changeEvent, toggleUnloadWarning } from './events';
 import { Cancelled } from './errors';
 import { LocalFileSet } from './fileset/local';
+import { LocalDirectoryFileSet } from './fileset/local_directory';
 import { NullFileSet } from './fileset/null';
 import { ServerFileSet } from './fileset/server';
 import { WebcamFileSet } from './fileset/webcam';
@@ -10,6 +11,7 @@ function newFileSet (val) {
 
   if (val[0] === 'null') return new NullFileSet();
   if (val[0] === 'fileselect') return new LocalFileSet();
+  if (val[0] === 'localdirselect') return new LocalDirectoryFileSet();
   if (val[0] === 'server') return new ServerFileSet(val[1]);
   if (val[0] === 'webcam') return new WebcamFileSet(val[1]);
   throw new Error('Unknown fileset type ' + val.join(':'));
@@ -41,7 +43,7 @@ function nextSelection (elSelect, elSyncForm) {
     elSyncForm.image_file.phBlob = null;
     elSyncForm.image_file.dispatchEvent(changeEvent());
 
-    if (err instanceof Cancelled) {
+    if (err instanceof Cancelled || (err instanceof DOMException && err.code === err.ABORT_ERR)) {
       // File select cancelled, don't change anything.
       return;
     }

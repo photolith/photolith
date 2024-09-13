@@ -32,7 +32,12 @@ class IndexView(PermissionRequiredMixin, TemplateView):
                 name="server:%s" % d,
                 description=_("Uploaded by %(photo_dir)s") % dict(photo_dir=d),
             )
-        yield dict(name="fileselect:", description=_("Upload files from computer"))
+        yield dict(
+            name="localdirselect:", description=_("Upload directory from computer")
+        )
+        yield dict(
+            name="fileselect:", description=_("Upload selected files from computer")
+        )
         yield dict(name="webcam:", description=_("Take photo (default camera)"))
 
     def full_taxonomy(self):
