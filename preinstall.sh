@@ -3,15 +3,16 @@ set -eu
 . /etc/os-release
 
 apt-get $* update
-apt-get $* install make curl
 
+# General build dependencies
+apt-get $* --no-install-recommends install make curl
 
 # Server dependencies
-apt-get $* install \
+apt-get $* --no-install-recommends install \
     python3-venv python3-wheel \
     libpq-dev libpython3-dev \
     gettext \
 
 # Client dependencies
-apt-get $* install \
+apt-get $* --no-install-recommends install \
     nodejs npm
