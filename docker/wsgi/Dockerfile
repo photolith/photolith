@@ -19,6 +19,7 @@ RUN npm --verbose ci --production && touch node_modules/.package.json && npm cac
 
 USER root
 COPY --chown=build . /srv/app
+COPY --chown=root --chmod=755 ./docker/wsgi/entrypoint.sh /entrypoint.sh
 
 # Recreate .dockerignore'd directories
 RUN mkdir -p /srv/app/db /srv/app/media /srv/app/ingest_root && chown -R app /srv/app/db /srv/app/media /srv/app/ingest_root
@@ -28,4 +29,4 @@ USER build
 RUN make
 
 USER app
-ENTRYPOINT ["/srv/app/docker/wsgi/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
