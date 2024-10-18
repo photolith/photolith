@@ -147,7 +147,7 @@ msgid ""
 "Use the right mouse button to drag the image, even when over indivduals "
 "(this is useful when there is one individual covering the entire image)"
 msgstr "Nota hægri músahnappinn til að draga myndina, jafnvel yfir aðra "
-"einstaklinga" sem getur verið hentugt þegar það er einn einstaklingur sem "
+"einstaklinga sem getur verið hentugt þegar það er einn einstaklingur sem "
 "þekur alla myndina."
 
 msgid ""
