@@ -20,11 +20,11 @@ msgstr ""
 
 #: ../../index.rst:6
 msgid "User guides:"
-msgstr ""
+msgstr "Notendaleiðbeiningar"
 
 #: ../../index.rst:14
 msgid "Other topics:"
-msgstr ""
+msgstr "Önnur viðfangsefni:"
 
 #: ../../index.rst:2
 msgid "Photolith documentation"
@@ -32,7 +32,7 @@ msgstr "Velkomin í Kvarnó"
 
 #: ../../index.rst:22
 msgid "Indices and tables"
-msgstr ""
+msgstr "Gröf og töflur "
 
 #: ../../index.rst:24
 msgid ":ref:`genindex`"
