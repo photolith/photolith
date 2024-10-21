@@ -19,10 +19,10 @@ msgstr ""
 "Generated-By: Babel 2.13.1\n"
 
 msgid "Direct upload from cameras to Photolith"
-msgstr ""
+msgstr "Færsta mynda beint úr myndavél í Photolith"
 
 msgid "Photolith can be configured to accept direct uploads from cameras."
-msgstr ""
+msgstr "Hægt er að stilla Photolith til að taka á móti myndum beint úr myndavél."
 
 msgid ""
 "A new username/password combination first has to be configured using the "
@@ -53,10 +53,10 @@ msgid "**Password**: The provided FTP password, e.g. ``ftppass``"
 msgstr ""
 
 msgid "Administration"
-msgstr ""
+msgstr "Stjórnun"
 
 msgid "Taxonomies"
-msgstr ""
+msgstr "Flokkunarfræði"
 
 msgid ""
 "Taxonomies, are translated restricted lists of values, for example *sex*,"
@@ -66,24 +66,28 @@ msgstr ""
 msgid ""
 "When ingesting or searching, you will get a drop-down list to choose from"
 " existing values."
-msgstr ""
+msgstr "Þegar verið er að bæta inn myndum eða leita þá er hægt að leita úr "
+"gildum sem eru þegar til með fellilista."
 
 msgid "Adding manual entries"
-msgstr ""
+msgstr "Bæta við handvirkum upplýsingum"
 
 msgid ""
 "By default these are populated by API calls when ingesting new values. If"
 " the API provides a value not yet known by photolith, it will be added. "
 "However, an administrator can add new choices themselves"
-msgstr ""
+msgstr "Gögnin koma sjálfkrafa inn með API föllum þegar nýar myndir eru settar "
+"inn. Ef API kemur með gögn sem Photolith þekkir ekki ennþá þá er því bætt við. "
+"Stjórnandi getur hinsvegar bætt þessum valmöguleikum við sjálfur."
 
 msgid ""
 "Go to the `\"Taxonomies\" section in site administration "
 "</admin/photolith/taxonomy/>`_"
-msgstr ""
+msgstr "Farðu í `\"Flokkunarfræði\" hlutann af stjórnunarsínunni "
+"</admin/photolith/flokkunarfraedi/>`_"
 
 msgid "Press \"+ Add\""
-msgstr ""
+msgstr "Ýttu á \"+ Bæta við\"
 
 msgid ""
 "The \"Metadata key\" must exactly match another member in the taxonomy "
@@ -98,101 +102,114 @@ msgid ""
 msgstr ""
 
 msgid "Enter a text name along with any translations."
-msgstr ""
+msgstr "Settu inn heiti ásamt þýðingum"
 
 msgid "Press \"SAVE\""
-msgstr ""
+msgstr "Ýttu á \"VISTA\""
 
 msgid "The new taxonomy values should be now be available in the ingest page."
-msgstr ""
+msgstr "Nýju flokkunarfræði gildin ættu nú að vera til í síðunni þar sem "
+"myndum er bætt inn."
 
 msgid "Users"
-msgstr ""
+msgstr "Notendur"
 
 msgid "Creating & activating users"
-msgstr ""
+msgstr "Að búa til og virkja notanda"
 
 msgid ""
 "Anyone can request an account by filling in their details on the \"Sign "
 "up\" page. However, they cannot use the system until activated by an "
 "administrator."
-msgstr ""
+msgstr "Hver sem er getur sótt um aðgang með því að fylla inn upplýsingarnar "
+"sínar í \"Skrá mig\" síðunni. Hinsvegar geta þau ekki notað kerfið þar til "
+"stjórnandi hefur virkjað aðganginn."
 
 msgid "Ask new users to fill in the \"Sign up\" form if they haven't already"
-msgstr ""
+msgstr "Biddu nýja notendur um að fylla inn \"Skrá mig\" skjalið ef þeir eru "
+"ekki búnir að því nú þegar."
 
 msgid "Go to the \"Users\" page in site administration"
-msgstr ""
+msgstr "Farði í \"Notendur\" síðuna innan stjórnendaborðsins."
 
 msgid "Filter \"By active\" \"No\" in the right-hand \"Filter\" panel"
-msgstr ""
+msgstr "Sortera \"Eftir virkni\" \"Nei\" efst í hægra horni \"Sía\" dálkinum"
 
 msgid "Check the checkbox next to any user you wish to activate"
-msgstr ""
+msgstr "Veldu boxið við hvern þann notenda sem þú vilt virkja"
 
 msgid "Select \"Activate / password reset\" from the action dropdown"
-msgstr ""
+msgstr "Veldu \"Virkja / endursetja lykilorð\" í fellilistanum."
 
 msgid "Press \"Go\""
-msgstr ""
+msgstr "Ýttu á \"Áfram\""
 
 msgid "User permissions"
-msgstr ""
+msgstr "Leyfi notenda"
 
 msgid ""
 "A new user cannot do anything in Photolith, until an administrator edits "
 "the user. Add permissions by editing the user in the site administration "
 "page."
-msgstr ""
+msgstr "Nýr notandi getur ekki gert neitt í Photolith þar til stjórnandi fer "
+"yfir leyfi notandans. Bættu við leyfum með því að breyta notandanum á "
+"stjórnendasíðunni.
 
 msgid "Ingest/Upload new images"
-msgstr ""
+msgstr "Bæta við nýjum myndum"
 
 msgid ""
 "The **Ingest** group activates the ingest tab, which allows that user to "
 "upload new images to the database."
-msgstr ""
+msgstr "**Bæta við myndum** hópurinn gefur notanda leyfi til að bæta "
+"við nýjum myndum inn í gagnagrunninn.
 
 msgid ""
 "In the \"Groups\" section, add the group by clicking the arrow that moves"
 " it to \"Chosen groups\"."
-msgstr ""
+msgstr "Í \"Hópar\" hlutanum þá geturðu bætt hóp við með því að ýta á örina "
+"sem færir þann hóp yfir í \"Velinn hóp\"."
 
 msgid "General annotations"
-msgstr ""
+msgstr "Almennar aldursmerkingar"
 
 msgid ""
 "The **General Annotation Viewer** and **General Annotation Editor** "
 "groups allow a user to view/add annotations outside a project."
-msgstr ""
+msgstr "Hóparnir **Almennur skoðandi aldurslestur** og **Almennur aldursmerkjari** "
+"leyfa notanda að skoða eða bæta við aldursmerkingum utan verkefna."
 
 msgid "Project teams"
-msgstr ""
+msgstr "Teymi"
 
 msgid "To participate in a project, a user needs to be part of a project team."
-msgstr ""
+msgstr "Til að taka þátt í verkefni þá þarf notandi að vera hluti af teymi."
 
 msgid ""
 "In the \"Teams\" section, select \"Add another Team\" and select the team"
 " from the dropdown."
-msgstr ""
+msgstr "Í \"Teymi\" hluta síðunnar, veldu \"Bæta við öðru teymi\" og veldu "
+"teymið úr fellilistanum."
 
 msgid "Species experts"
-msgstr ""
+msgstr "Sérfræðingar tegunda"
 
 msgid ""
 "A user can be marked as a species expert, enabling higher *Authority* "
 "values, making their annotations win over non-experts."
-msgstr ""
+msgstr "Notandi getur verið skráður sem sérfræðingur tegundar sem gefur "
+"þeim hærra vald og gerir aldursmerkingar þeirra mikilvægari en frá fólki "
+"sem eru ekki merktir sem sérfræðingar tegundarinnar."
 
 msgid ""
 "In the \"User Profile\" section, add any relevant species by clicking the"
 " arrow that moves it to \"Chosen groups\"."
-msgstr ""
+msgstr "Í \"Notandi\" hluta síðunnar þá er hægt að bæta við viðeigandi tegund "
+"með því að ýta á örona sem færir hana yfir í \"Valdar tegundir\".
 
 msgid "Project administrators"
-msgstr ""
+msgstr "Stjórnendur verkefna"
 
 msgid "The **Project Admin** group allows the user to create new projects."
-msgstr ""
+msgstr "**Stjórnendur verkefna** hópurinn leyfir notanta að búa til ný verkefni."
 
