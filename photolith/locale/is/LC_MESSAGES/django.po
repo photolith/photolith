@@ -307,7 +307,7 @@ msgstr ""
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
 msgid "You can:"
-msgstr ""
+msgstr "Þú getur:"
 
 #: photolith/templates/annotate/annotate.html
 #: photolith/templates/ingest/index.html
