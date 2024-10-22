@@ -87,7 +87,7 @@ msgstr "Farðu í `\"Flokkunarfræði\" hlutann af stjórnunarsínunni "
 "</admin/photolith/flokkunarfraedi/>`_"
 
 msgid "Press \"+ Add\""
-msgstr "Ýttu á \"+ Bæta við\"
+msgstr "Ýttu á \"+ Bæta við\""
 
 msgid ""
 "The \"Metadata key\" must exactly match another member in the taxonomy "
@@ -153,7 +153,7 @@ msgid ""
 "page."
 msgstr "Nýr notandi getur ekki gert neitt í Photolith þar til stjórnandi fer "
 "yfir leyfi notandans. Bættu við leyfum með því að breyta notandanum á "
-"stjórnendasíðunni.
+"stjórnendasíðunni."
 
 msgid "Ingest/Upload new images"
 msgstr "Bæta við nýjum myndum"
@@ -162,7 +162,7 @@ msgid ""
 "The **Ingest** group activates the ingest tab, which allows that user to "
 "upload new images to the database."
 msgstr "**Bæta við myndum** hópurinn gefur notanda leyfi til að bæta "
-"við nýjum myndum inn í gagnagrunninn.
+"við nýjum myndum inn í gagnagrunninn."
 
 msgid ""
 "In the \"Groups\" section, add the group by clicking the arrow that moves"
@@ -205,7 +205,7 @@ msgid ""
 "In the \"User Profile\" section, add any relevant species by clicking the"
 " arrow that moves it to \"Chosen groups\"."
 msgstr "Í \"Notandi\" hluta síðunnar þá er hægt að bæta við viðeigandi tegund "
-"með því að ýta á örona sem færir hana yfir í \"Valdar tegundir\".
+"með því að ýta á örona sem færir hana yfir í \"Valdar tegundir\"."
 
 msgid "Project administrators"
 msgstr "Stjórnendur verkefna"

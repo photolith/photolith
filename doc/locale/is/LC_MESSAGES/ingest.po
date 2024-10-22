@@ -141,7 +141,7 @@ msgid ""
 "Drag individuals that aren't part of this image to the hatched area "
 "outside, they will not be saved"
 msgstr "Draga einstaklinga sem eru ekki partur af myndinni út fyrir, "
-"og þá vistast þeir einstaklingar ekki inn.
+"og þá vistast þeir einstaklingar ekki inn."
 
 msgid ""
 "Use the right mouse button to drag the image, even when over indivduals "
@@ -200,5 +200,5 @@ msgid ""
 " Image >*."
 msgstr "Þegar allir einstaklingar hafa verið merktir á myndina og hafa viðeigandi "
 "gögn, ýttu þá á *Vista*. Svo er hægt að halda áfram á næstu mynd með "
-"*Næsta mynd >*.
+"*Næsta mynd >*."
 
