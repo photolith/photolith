@@ -107,6 +107,8 @@ test('MetadataApi:metaLabels', function (test) {
   // Default, returns everything in correct language, or en if we don't have it
   mApi = createMetadataApi(test, Object.assign({}, mApiOpts, { lang: 'en-gb' }));
   test.deepEqual(mApi.metaLabels(), {
+    ch_slideLabel: 'Slide Label',
+    ch_individualLabel: 'Individual No.',
     ch_eyes: 'Eyes',
     ch_nose: 'Nose',
     ch_mouth: 'Mouth',
@@ -123,6 +125,8 @@ test('MetadataApi:metaLabels', function (test) {
   });
   mApi = createMetadataApi(test, Object.assign({}, mApiOpts, { lang: 'ge' }));
   test.deepEqual(mApi.metaLabels(), {
+    ch_slideLabel: 'Slide Label',
+    ch_individualLabel: 'Individual No.',
     ch_eyes: 'Eyes',
     ch_nose: 'Nose',
     ch_mouth: 'Mouth',
@@ -138,6 +142,8 @@ test('MetadataApi:metaLabels', function (test) {
     ch_mouth: 'Mouth'
   });
   test.deepEqual(mApi.metaLabels('some_unknown_value'), {
+    ch_slideLabel: 'Slide Label',
+    ch_individualLabel: 'Individual No.',
     ch_eyes: 'Eyes',
     ch_nose: 'Nose',
     ch_mouth: 'Mouth',
