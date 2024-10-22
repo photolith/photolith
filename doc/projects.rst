@@ -8,7 +8,7 @@ Creating projects
 ---------------------------------------------
 
 To create a project, go to the :kbd:`Search` tab and use the filter to search for the relevant information needed for the project.
-You can search for specific species, years, months etc.
+You can search for specific species, years, cruises etc.
 
 .. _figure-filters:
 .. figure:: images/filters.jpg
