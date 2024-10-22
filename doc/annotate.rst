@@ -63,8 +63,8 @@ The image enhancement controls in the top-right menu allow you to adjust for a c
 
 By default, markers will be added along the existing axis. If you want marks away from the axis, hold down ``Ctrl``:
 
-* ``Ctrl`` double click to create a marker anywhere (rather than the nearest point along the axis)
-* ``Ctrl`` drag to move a marker anywhere
+* ``Ctrl`` double click to create a marker anywhere (rather than the nearest point along the axis).
+* ``Ctrl`` drag to move a marker anywhere.
 
 Before saving, the form below also needs filling in:
 
