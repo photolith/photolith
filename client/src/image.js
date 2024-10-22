@@ -1,17 +1,15 @@
 import UTIF from 'utif2';
 
 export function toImageBitmap (blob) {
-  if (!(blob instanceof window.Blob)) {
-    // Not really a blob (video element, e.g.)
-    return window.createImageBitmap(blob);
-  }
-  if (blob.name.match(/\.jpe?g$/i)) {
-    // JPEG can be parsed directly by createImageBitmap
-    return window.createImageBitmap(blob);
-  }
-  return blob.arrayBuffer().then((buff) => {
+  // Try creating bitmap, should work for video elements, JPEG blobs, etc.
+  // https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap
+  return window.createImageBitmap(blob).catch((err) => {
+    console.warn(`createImageBitmap on ${blob.name} failed:`, err);
+
     // Try decoding as TIFF/NEF, turn whatever we get back into an ImageBitmap
-    return window.createImageBitmap(decodeTIFF(buff, blob.name));
+    return blob.arrayBuffer().then((buff) => {
+      return window.createImageBitmap(decodeTIFF(buff, blob.name));
+    });
   });
 }
 
