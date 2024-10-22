@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('photolith', '0024_taxonomy_taxonomy_key_identifier'),
+        ("photolith", "0024_taxonomy_taxonomy_key_identifier"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='annotation',
-            name='rating',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'Unreadable'), (50, '+/- 1 year'), (100, 'Easy to read')], null=True, verbose_name='Image rating'),
+            model_name="annotation",
+            name="rating",
+            field=models.PositiveSmallIntegerField(
+                choices=[(0, "Unreadable"), (50, "+/- 1 year"), (100, "Easy to read")],
+                null=True,
+                verbose_name="Image rating",
+            ),
         ),
     ]
