@@ -24,6 +24,12 @@ const metaLabels = {
   }
 };
 
+const labelHelp = {
+  en: [
+    'Full label'
+  ]
+};
+
 export default class MetadataApi {
   constructor (lang, baseHref) {
     // Strip -gb from en-gb
@@ -32,14 +38,12 @@ export default class MetadataApi {
     this._intlTemplates = intlTemplates;
     this._metaLabels = metaLabels;
     this._fieldsFor = {};
+    this._labelHelp = labelHelp;
     this._txHardcoded = {};
   }
 
   labelHelp () {
-    return {
-      en: [
-      ]
-    };
+    return this._labelHelp[this.lang] || this._labelHelp.en || [];
   }
 
   metaLabels (view) {

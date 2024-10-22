@@ -82,6 +82,25 @@ test('MetadataApi:txFor', function (test) {
   test.end();
 });
 
+test('MetadataApi:labelHelp', function (test) {
+  let mApi;
+  const mApiOpts = {
+  };
+
+  mApi = createMetadataApi(test, Object.assign({}, mApiOpts, { lang: 'en-gb' }));
+  test.deepEqual(mApi.labelHelp(), [
+    'Full label'
+  ]);
+
+  // Unknown language, returns english
+  mApi = createMetadataApi(test, Object.assign({}, mApiOpts, { lang: 'ge' }));
+  test.deepEqual(mApi.labelHelp(), [
+    'Full label'
+  ]);
+
+  test.end();
+});
+
 test('MetadataApi:metaLabels', function (test) {
   let mApi;
   const mApiOpts = {

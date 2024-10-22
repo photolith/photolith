@@ -152,12 +152,9 @@ export default class MetadataApi extends BaseMetadataApi {
     this.baseHref = baseHref || '';
     this.intlExtend(this._intlTemplates, intlTemplates);
     this.intlExtend(this._metaLabels, metaLabels);
+    this._labelHelp = labelHelp;
     this._fieldsFor = fieldsFor;
     this._txHardcoded = txHardcoded;
-  }
-
-  labelHelp () {
-    return labelHelp[this.lang];
   }
 
   parseSlideLabel (s) {
