@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load get_format %}
+{% load static %}
 {% get_current_language as LANGUAGE_CODE %}
 <!doctype html>
 <html lang="{{ LANGUAGE_CODE }}" data-thousand-separator="{% get_format "THOUSAND_SEPARATOR" %}" data-decimal-separator="{% get_format "DECIMAL_SEPARATOR" %}" class="h-100">
@@ -7,13 +8,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
-    <link href="/static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/tom-select/dist/css/tom-select.bootstrap5.css" rel="stylesheet" >
-    <link href="/static/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" >
-    <link href="/static/app.css" rel="stylesheet">
-    <script defer src="/static/@popperjs/core/dist/umd/popper.min.js"></script>
-    <script defer src="/static/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script defer src="/static/app.js"></script>
+    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'tom-select/dist/css/tom-select.bootstrap5.css' %}" rel="stylesheet" >
+    <link href="{% static 'datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" >
+    <link href="{% static 'app.css' %}" rel="stylesheet">
+    <script defer src="{% static '@popperjs/core/dist/umd/popper.min.js' %}"></script>
+    <script defer src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script defer src="{% static 'app.js' %}"></script>
     {% include "snippet/cs_config.html" %}
 
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
