@@ -68,6 +68,9 @@ server {
 
     client_max_body_size 10G;
 
+    # We don't know what port is used by docker, so absolute redirects will be broken
+    absolute_redirect off;
+
     location = /favicon.ico {
         return 301 /static/images/favicon.ico;
     }

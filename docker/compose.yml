@@ -7,6 +7,7 @@ services:
       dockerfile: docker/wsgi/Dockerfile
     volumes:
       - static:/srv/app/staticfiles
+      - doc:/srv/app/doc/_build/html
       - db:/srv/app/db
       - media:/srv/app/media
       - ingest:/srv/app/ingest_root
@@ -20,6 +21,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static:/srv/app/staticfiles
+      - doc:/srv/app/doc/_build/html
       - certs:/var/lib/dehydrated/certs
     ports:
       - 8443:443
@@ -51,6 +53,8 @@ volumes:
   db:
   # Pre-generated static resources hosted directly by NGINX. See https://docs.djangoproject.com/en/4.2/howto/static-files/
   static:
+  # Pre-generated documentation hosted directly by NGINX
+  doc:
   # Storage area for uploaded assets. See photolith/media/views.py
   media:
   # Temporary holding area for FTP-uploaded images, regularly emptied. See docker/ftpd/entrypoint.sh
