@@ -5,7 +5,7 @@ set -eu
 apt-get $* update
 
 # General build dependencies
-apt-get $* --no-install-recommends install make curl
+apt-get $* --no-install-recommends install make curl git
 
 # Server dependencies
 apt-get $* --no-install-recommends install \

@@ -19,6 +19,8 @@ RUN npm --verbose ci --production && touch node_modules/.package.json && npm cac
 
 USER root
 COPY --chown=build . /srv/app
+# Include .git repo for populating ./photolith/settings/version.py
+COPY --chown=build .git /srv/app/.git
 COPY --chown=root --chmod=755 ./docker/wsgi/entrypoint.sh /entrypoint.sh
 
 # Recreate .dockerignore'd directories
