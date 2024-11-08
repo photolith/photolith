@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static:/srv/app/staticfiles
+      - media:/srv/app/media
       - doc:/srv/app/doc/_build/html
       - certs:/var/lib/dehydrated/certs
     ports:
