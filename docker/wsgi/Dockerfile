@@ -30,5 +30,10 @@ VOLUME ["/srv/app/db", "/srv/app/media", "/srv/app/ingest_root"]
 USER build
 RUN make
 
+# Allow app to modify staticfiles, so we can collectstatic in /entrypoint.sh
+USER root
+RUN chown -R app /srv/app/staticfiles
+VOLUME ["/srv/app/staticfiles"]
+
 USER app
 ENTRYPOINT ["/entrypoint.sh"]
