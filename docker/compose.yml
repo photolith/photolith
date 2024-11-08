@@ -6,7 +6,8 @@ services:
       context: ../
       dockerfile: docker/wsgi/Dockerfile
     volumes:
-      - static:/srv/app/staticfiles
+      # NB: Anonymous volume, can be rebuilt with docker compose up --renew-anon-volumes
+      - /srv/app/staticfiles
       - doc:/srv/app/doc/_build/html
       - db:/srv/app/db
       - media:/srv/app/media
@@ -19,10 +20,9 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    volumes_from:
+      - wsgi:ro
     volumes:
-      - static:/srv/app/staticfiles
-      - media:/srv/app/media
-      - doc:/srv/app/doc/_build/html
       - certs:/var/lib/dehydrated/certs
     ports:
       - 8443:443
@@ -52,8 +52,6 @@ volumes:
   certs:
   # The default SQLite database, if used.
   db:
-  # Pre-generated static resources hosted directly by NGINX. See https://docs.djangoproject.com/en/4.2/howto/static-files/
-  static:
   # Pre-generated documentation hosted directly by NGINX
   doc:
   # Storage area for uploaded assets. See photolith/media/views.py
