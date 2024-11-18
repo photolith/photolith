@@ -4,6 +4,11 @@ Users
 Creating & activating users
 ---------------------------
 
+Either users can request an account, or accounts can be created by administrators.
+
+Approving account requests
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Anyone can request an account by filling in their details on the "Sign up" page.
 However, they cannot use the system until activated by an administrator.
 
@@ -13,6 +18,22 @@ However, they cannot use the system until activated by an administrator.
 4. Check the checkbox next to any user you wish to activate
 5. Select "Activate / password reset" from the action dropdown
 6. Press "Go"
+
+The new user will then receive an e-mail which they can use to reset their password,
+and set a new one.
+At this point they can log in.
+
+Manually creating accounts
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Administrators can create new users and set their password.
+
+1. Go to the "Users" page in site administration
+2. Click the "ADD USER +" button on the right
+3. Fill in new account details, assign them a password
+
+Now either tell the new user their initial username or password,
+or trigger "Activate / password reset" as above so they get e-mailed a link.
 
 User permissions
 ----------------
