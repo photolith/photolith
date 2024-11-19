@@ -111,6 +111,21 @@ msgid "Metadata key"
 msgstr "Upplýsingar úr gagnagrunni"
 
 #: photolith/models.py
+msgid ""
+"The taxonomy this entry is added to, a lower-case identifier, e.g. 'species'"
+msgstr ""
+"Flokkunin sem þessari færslu er bætt við, auðkenni með lágstöfum, t.d. "
+"'tegund'"
+
+#: photolith/models.py
+msgid ""
+"A numeric identifier. Should be unique for each key, can repeat 1 for "
+"'species' & 'sex', but cannot have 2 entries with both 1 & 'species'"
+msgstr ""
+"Tölulegt auðkenni. Ætti að vera einstakt fyrir hvern lykil, getur endurtekið "
+"1 fyrir 'tegund' og 'kyn', en má ekki hafa 2 færslur með bæði 1 og 'tegund'"
+
+#: photolith/models.py
 msgid "English"
 msgstr "Enska"
 

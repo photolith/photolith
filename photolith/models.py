@@ -271,9 +271,15 @@ class Taxonomy(models.Model):
         max_length=255,
         blank=False,
         null=False,
+        help_text=_(
+            "The taxonomy this entry is added to, a lower-case identifier, e.g. 'species'"
+        ),
     )
     identifier = models.IntegerField(
         null=True,
+        help_text=_(
+            "A numeric identifier. Should be unique for each key, can repeat 1 for 'species' & 'sex', but cannot have 2 entries with both 1 & 'species'"
+        ),
     )
     str_en = models.CharField(
         verbose_name=_("English"),
