@@ -83,8 +83,11 @@ Moving on:
 * Click save, can click the link in the pop-up to view the individuals created
 * Or click "Next Image" to move to the next image, we remember slide label from previous assuming it will be similar
 
-## Search
+## Annotation
 
+Start off by searching for individuals:
+
+* Login, head to "search" tab
 * Put in something to search for
   * Fill in any filter to find results for that species (e.g)
   * Use the "+" button to search for multiple species
@@ -92,8 +95,6 @@ Moving on:
   * Can return to filters by clicking funnel
 * Click each entry & expands to show image, & annotations
 * Can click to start annotating
-
-## Annotation
 
 Similar interface to before:
 
