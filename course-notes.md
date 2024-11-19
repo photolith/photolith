@@ -4,11 +4,12 @@ Notes on what should happen in a course on Photolith, running through all functi
 
 ## Prerequisites
 
-* [ ] Set of physical slides to take photos of
-* [ ] Set of sample images with slide labels known to work
-* [ ] A user that can perform all actions (probably the admin user)
-* [ ] Search query for individuals with already populated annotations
-* [ ] Example closed project with some annotations already in
+1. Photolith instance URL
+2. A user that can perform all actions (probably the admin user)
+3. Set of physical slides to take photos of
+4. Set of sample images with slide labels known to work
+5. Search query for individuals with already populated annotations
+6. Example closed project with some annotations already in
 
 ## Ingest
 
@@ -27,8 +28,8 @@ Photolith aims to:
 
 UI quick introduction:
 
-* Photolith is web based, need the URL
-* Need a login before you can do anything
+* Photolith is web based, need the URL **P1**
+* Need a login before you can do anything **P2**
 * User menu, lets you change language & password
 * Documentation link, in both English & Icelandic
 
@@ -42,12 +43,12 @@ Camera setup:
 
 Basics:
 
-* Login, head to ingest
-* Choosing image sources (directory) - choose directory digicamcontrol created
+* Login, head to ingest **P2**
+* Choosing image sources (directory) - choose directory digicamcontrol created **P3**
 * Image viewer:
   * Can zoom with scroll-wheel
   * Can pan by dragging, use right mouse button to not drag items on image
-  * Enhancement options: Increase gamma to bring out chalk marks. NB: These don't alter the image, just your view
+  * Enhancement options: Increase gamma to bring out slide marks. NB: These don't alter the image, just your view
   * Use arrow button to maximise view, select "Ingest" to bring back
 * Help tab explains what you can do
 
@@ -74,7 +75,6 @@ Slide individuals:
 Slide metadata:
 
 * Select an individual, the metadata appears on right
-* Available metadata now on right hand side
 * We can add to it by using the "Add" dropdown
 * "Copy to all individuals" will copy new items to all individuals
 
@@ -87,8 +87,8 @@ Moving on:
 
 Start off by searching for individuals:
 
-* Login, head to "search" tab
-* Put in something to search for
+* Login, head to "search" tab **P2**
+* Put in something to search for **P1**
   * Fill in any filter to find results for that species (e.g)
   * Use the "+" button to search for multiple species
   * Click Apply
@@ -144,7 +144,7 @@ What is a project:
 
 Making a project:
 
-* A search can be turned into a project
+* A search can be turned into a project **P5**
 * Assigned a team (a group of users)
 * Recycling axis from an annotation done by a user
 * End date, after which results are fixed
@@ -156,7 +156,7 @@ Participating in a project:
 
 Project end:
 
-* Can see all annotations as we did with search
+* Can see all annotations as we did with search **P6**
 * Admin can choose one to be considered the general annotation for that individual
 
 ## Administration
