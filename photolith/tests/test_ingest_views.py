@@ -421,3 +421,28 @@ class UploadImageViewTest(RequiresUtils, TestCase):
             ),
         )
         self.assertEqual(i.content.read(), JPEG_VALID)
+
+        out2 = self.upload_img(
+            user,
+            JPEG_VALID,
+            mimetype="image/jpeg",
+            filename="ut_really_good_image.jpeg",
+        )
+        i2 = Image.objects.get(pk=out2["id"])
+        self.assertEqual(
+            out,
+            dict(
+                content=i.content.name,
+                created_by=user.id,
+                id=i.id,
+                mimetype="image/jpeg",
+                orig_filename="ut_really_good_image.jpeg",
+                scale_line=None,
+                scale_mm=None,
+            ),
+        )
+        # We got separate uploads, with different content names
+        self.assertNotEqual(i.id, i2.id)
+        self.assertNotEqual(i.content.name, i2.content.name)
+        # Unique, so get back one object (i.e. what UploadView tries to do)
+        self.assertEqual(Image.objects.get(content=i2.content.name).id, i2.id)
