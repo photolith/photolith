@@ -152,6 +152,9 @@ class Individual(models.Model):
                 )
 
             elif t == "tx":
+                if "id" not in v:
+                    # Empty dict() passed in, possibly not filled-in form fields. Ignore.
+                    continue
                 tx, created = Taxonomy.objects.get_or_create(key=k, identifier=v["id"])
                 v["key"] = k
                 tx.dict = v

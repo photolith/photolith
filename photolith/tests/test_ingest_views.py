@@ -235,6 +235,30 @@ class UploadViewTest(RequiresUtils, TestCase):
             ),
         )
 
+        # Ignore any empty taxonomy fields
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    _bb=[[0, 0], [925, 100]],
+                    tx_species=dict(),
+                    nm_length=100,
+                )
+            ],
+        )
+        inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(len(inds), 5)
+        self.assertEqual(
+            out["created_individuals"],
+            {"0": inds[4].id},
+        )
+        self.assertEqual(
+            inds[4].data,
+            dict(
+                nm_length=100,
+            ),
+        )
+
     def test_post__searchquerystring(self):
         """Can add a search querystring to the output"""
         user = self.create_user(groups=["Ingest"])
