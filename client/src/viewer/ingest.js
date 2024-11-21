@@ -34,6 +34,17 @@ function setInitBBs (bbEls, width, height) {
   });
 }
 
+function validScale (l, bgWidth, bgHeight) {
+  // l must have 2 points, both within the image
+  if (l.length !== 2) return false;
+  if (l[0].length !== 2 || l[1].length !== 2) return false;
+  if (l[0][0] < 0 || l[0][0] > bgWidth) return false;
+  if (l[0][1] < 0 || l[0][1] > bgHeight) return false;
+  if (l[1][0] < 0 || l[1][0] > bgWidth) return false;
+  if (l[1][1] < 0 || l[1][1] > bgHeight) return false;
+  return true;
+}
+
 export class PhCropper extends PhSyncingViewer {
   constructor (elViewer) {
     super(elViewer);
@@ -139,7 +150,7 @@ export class PhCropper extends PhSyncingViewer {
     return obj;
   }
 
-  scaleLine () {
+  scaleLine (formInput) {
     const obj = new EditableLine({
       id: 'scale_line',
       stroke: `rgba(${rgbHighlight}, 0.6)`,
@@ -149,30 +160,40 @@ export class PhCropper extends PhSyncingViewer {
     }, {
       stroke: `rgba(${rgbHighlight}, 1)`
     });
-    if (!obj.canvas) this.fabCanvas.add(obj);
+
+    this.fabCanvas.add(obj);
+    // NB: We can't rely on timer in editable_line, so bodge here.
+    obj.fire('phCanvasZoom');
+
+    // If scale value is invalid, reset based on bacgroundImage size
+    if (!validScale(
+      JSON.parse(formInput.value || '[]'),
+      this.fabCanvas.backgroundImage.width,
+      this.fabCanvas.backgroundImage.height
+    )) {
+      const defScale = [
+        [this.fabCanvas.backgroundImage.width / 10, this.fabCanvas.backgroundImage.height / 10],
+        [this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10]
+      ];
+      formInput.value = JSON.stringify(defScale);
+      obj.phSetPoints(defScale.map((p) => new fabric.Point(p[0], p[1])));
+    }
     return obj;
   }
 
   load (blob, boundingBox) {
     return super.load(blob, boundingBox).then(() => {
     }).finally(() => { // NB: Set-up bounding box even if loading failed
-      this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
-
-      if (this.fabCanvas.backgroundImage) {
-        const scaleLine = this.scaleLine();
-
-        scaleLine.phSetPoints([
-          new fabric.Point(this.fabCanvas.backgroundImage.width / 10, this.fabCanvas.backgroundImage.height / 10),
-          new fabric.Point(this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10)
-        ]);
-      }
+      this.elementAddRemove();
     });
   }
 
   elementAddRemove () {
-    this.fabCanvas.getObjects().forEach((o) => {
-      if ((o.id || '').match(/^bounding_box:(.*)$/)) this.fabCanvas.remove(o);
-    });
+    this.fabCanvas.getObjects().forEach((o) => this.fabCanvas.remove(o));
+    if (!this.fabCanvas.backgroundImage) return;
+
+    // Add scale_line
+    this.scaleLine(this.elSyncForm.elements.scale_line);
 
     // Find all bounding_box:* elements that aren't disabled
     const bbEls = Array.from(this.elSyncForm.elements).filter((el) => {

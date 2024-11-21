@@ -193,7 +193,8 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
 
   // Wait for a bit, zoom to init canvas
   window.setTimeout(() => {
-    poly.fire('phCanvasZoom');
+    // NB: This is failing for inital setup of scaleLine()
+    if (poly.canvas) poly.fire('phCanvasZoom');
   }, 10);
   return poly;
 }
