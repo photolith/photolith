@@ -91,6 +91,13 @@ msgstr[0] "%(count)d einstaklingur uppfærður."
 msgstr[1] "%(count)d einstaklingar uppfærðir."
 
 #: photolith/ingest/views.py
+#, python-format
+msgid "Deleted %(count)d individual. "
+msgid_plural "Deleted %(count)d individuals. "
+msgstr[0] "%(count)d einstaklingur eytt."
+msgstr[1] "%(count)d einstaklingar eytt."
+
+#: photolith/ingest/views.py
 msgid "Show individuals"
 msgstr "Sýna einstaklinga"
 

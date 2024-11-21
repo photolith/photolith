@@ -115,6 +115,7 @@ class UploadView(PermissionRequiredMixin, View):
 
         created_inds = {}
         updated_inds = {}
+        deleted_inds = {}
         search_query = set()
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
@@ -124,17 +125,24 @@ class UploadView(PermissionRequiredMixin, View):
                 self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
-            if not ind_bounding_box:
-                # Ignore individuals that don't have a bounding box
-                continue
+
+            # If an ID is given, fetch any existant individual
             ind_id = self.request.POST.get(
                 post_key.replace("data:", "individual_id:", 1)
             )
+            ind = Individual.objects.filter(pk=int(ind_id)).first() if ind_id else None
 
-            if ind_id:
-                ind = Individual.objects.get(pk=int(ind_id))
-            else:
+            # No bounding box --> this individual shouldn't exist
+            if not ind_bounding_box:
+                if ind:
+                    deleted_inds[post_key.replace("data:", "")] = ind.id
+                    ind.delete()
+                continue
+
+            # If no individual was found, create one at this point
+            if not ind:
                 ind = Individual(created_by=self.request.user)
+
             ind.image = image
             ind.bounding_box = ind_bounding_box
             ind.save()
@@ -171,6 +179,12 @@ class UploadView(PermissionRequiredMixin, View):
                 "Updated %(count)d individuals. ",
                 len(updated_inds),
             ) % dict(count=len(updated_inds))
+        if len(deleted_inds) > 0:
+            alert += ngettext(
+                "Deleted %(count)d individual. ",
+                "Deleted %(count)d individuals. ",
+                len(deleted_inds),
+            ) % dict(count=len(deleted_inds))
         if len(search_query) > 0:
             alert += '<br><a href="/search/?%s" target="_blank">%s</a>' % (
                 "&".join(search_query),
@@ -182,6 +196,7 @@ class UploadView(PermissionRequiredMixin, View):
                 alert_status=alert_status,
                 created_individuals=created_inds,
                 updated_individuals=updated_inds,
+                deleted_individuals=deleted_inds,
             )
         )
 

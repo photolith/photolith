@@ -119,6 +119,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 alert="No individual boxes on image! Nothing saved.",
                 created_individuals={},
                 updated_individuals={},
+                deleted_individuals={},
             ),
         )
 
@@ -232,6 +233,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 alert="Created 1 individual. Updated 2 individuals. ",
                 created_individuals={"1": inds[3].id},
                 updated_individuals={"0": inds[2].id, "2": inds[1].id},
+                deleted_individuals={},
             ),
         )
 
@@ -258,6 +260,75 @@ class UploadViewTest(RequiresUtils, TestCase):
                 nm_length=100,
             ),
         )
+
+        # Can remove items by getting rid of their bounding box
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=100,
+                    _bb=None,
+                    _id=inds[1].id,
+                ),
+                dict(
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [925, 100]],
+                    _id=inds[2].id,
+                ),
+            ],
+        )
+        self.assertEqual(
+            out,
+            dict(
+                alert_status="success",
+                alert="Updated 1 individual. Deleted 1 individual. ",
+                created_individuals={},
+                updated_individuals={"1": 3},
+                deleted_individuals={"0": 2},
+            ),
+        )
+        inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(
+            [i.id for i in inds],
+            [1, 3, 4, 5],
+        )
+
+        # Restore it again, ID isn;t recycled
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [101010, 123]],
+                    _id=2,
+                ),
+                dict(
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [925, 100]],
+                    _id=3,
+                ),
+            ],
+        )
+        self.assertEqual(
+            out,
+            dict(
+                alert_status="success",
+                alert="Updated 2 individuals. ",
+                created_individuals={},
+                updated_individuals={"0": 6, "1": 3},
+                deleted_individuals={},
+            ),
+        )
+        inds = Individual.objects.all().order_by("pk")
+        self.assertEqual(
+            [i.id for i in inds],
+            [1, 3, 4, 5, 6],
+        )
+        self.assertEqual(inds[4].bounding_box, [[0, 0], [101010, 123]])
 
     def test_post__searchquerystring(self):
         """Can add a search querystring to the output"""
