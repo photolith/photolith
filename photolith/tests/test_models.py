@@ -127,6 +127,17 @@ class IndividualTest(RequiresUtils, TestCase):
             ],
         )
 
+        # Deleting taxonomy items removes entries in individuals
+        Taxonomy.objects.get(str_en="Cat").delete()
+        self.assertEqual(
+            ind2.data,
+            dict(
+                nm_length=40.0,
+                ch_name="22",
+                tx_eats={"id": 100, "en": "Fish", "is": "Fiskur"},
+            ),
+        )
+
         # Unknown types are an error
         with self.assertRaisesRegex(ValueError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])

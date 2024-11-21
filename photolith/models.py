@@ -159,14 +159,15 @@ class Individual(models.Model):
                 v["key"] = k
                 tx.dict = v
                 tx.save()
-                self.metatx_set.add(
-                    MetaTx(
-                        individual=self,
-                        key=k,
-                        value=tx,
-                    ),
-                    bulk=False,
+                # upsert many-to-many
+                mtx, created = self.metatx_set.get_or_create(
+                    individual=self,
+                    key=k,
+                    defaults=dict(value=tx),
                 )
+                if not created:
+                    mtx.value = tx
+                    mtx.save()
 
             else:  # pragma: no cover
                 raise ValueError("Unknown type of %s: %s" % (k, str(v)))
@@ -254,7 +255,7 @@ class MetaTx(models.Model):
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     key = models.CharField(max_length=255, blank=False, null=False)
-    value = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True)
+    value = models.ForeignKey("Taxonomy", on_delete=models.CASCADE, null=False)
 
     class Meta:
         indexes = [
