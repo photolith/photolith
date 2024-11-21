@@ -174,7 +174,6 @@ class UploadViewTest(RequiresUtils, TestCase):
         )
 
         # Create 1 individual, with keys that don't start at 1
-        user = self.create_user(groups=["Ingest"])
         self.assertEqual(
             len(
                 self.form_post(
@@ -329,6 +328,31 @@ class UploadViewTest(RequiresUtils, TestCase):
             [1, 3, 4, 5, 6],
         )
         self.assertEqual(inds[4].bounding_box, [[0, 0], [101010, 123]])
+
+        # Can't update someone else's individuals
+        user2 = self.create_user(groups=["Ingest"])
+        out = self.form_post(
+            user2,
+            [
+                dict(
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [1025, 100]],
+                    _id=3,
+                ),
+            ],
+        )
+        self.assertEqual(
+            out,
+            dict(
+                alert_status="success",
+                alert="Updated 1 individual. ",
+                created_individuals={},
+                # NB: ID has changed
+                updated_individuals={"0": 7},
+                deleted_individuals={},
+            ),
+        )
 
     def test_post__searchquerystring(self):
         """Can add a search querystring to the output"""

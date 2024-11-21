@@ -130,7 +130,14 @@ class UploadView(PermissionRequiredMixin, View):
             ind_id = self.request.POST.get(
                 post_key.replace("data:", "individual_id:", 1)
             )
-            ind = Individual.objects.filter(pk=int(ind_id)).first() if ind_id else None
+            ind = (
+                Individual.objects.filter(
+                    pk=int(ind_id),
+                    created_by=self.request.user,
+                ).first()
+                if ind_id
+                else None
+            )
 
             # No bounding box --> this individual shouldn't exist
             if not ind_bounding_box:
