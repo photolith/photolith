@@ -172,6 +172,7 @@ STORAGES = {
 }
 MEDIA_ROOT = BASE_DIR.parent / "media"
 MEDIA_URL = "/media/"
+AWS_S3_OBJECT_PARAMETERS = {}
 
 # Logging
 LOGGING = {
@@ -193,6 +194,10 @@ for k in os.environ.keys():
         STORAGES["default"]["BACKEND"] = os.environ[k]
     elif k.startswith("APP_STORAGE_"):
         STORAGES["default"]["OPTIONS"][k.replace("APP_STORAGE_", "")] = os.environ[k]
+    elif k.startswith("AWS_S3_OBJECT_PARAMETERS_"):
+        AWS_S3_OBJECT_PARAMETERS[
+            k.replace("AWS_S3_OBJECT_PARAMETERS_", "")
+        ] = os.environ[k]
     elif k == "APP_ALLOWED_HOSTS":
         ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")
     elif k == "APP_AUTH_PASSWORD_VALIDATORS":

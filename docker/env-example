@@ -14,10 +14,12 @@ APP_ALLOWED_HOSTS="photolith.website.org www.photolith.website.org"
 
 # Configure S3 storage for images
 # See: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+# See also AWS_S3_OBJECT_PARAMETERS in settings/base.py
 #APP_STORAGE_BACKEND="storages.backends.s3.S3Storage"
 #APP_STORAGE_bucket_name="otolith-bucket"
 #AWS_ACCESS_KEY_ID="123456789"
 #AWS_SECRET_ACCESS_KEY="secret"
+#AWS_S3_OBJECT_PARAMETERS_CacheControl="public, max-age=3600, immutable"
 
 # Configure API adapter to use
 #APP_CS_METADATA_API="HafroMetadataApi"
