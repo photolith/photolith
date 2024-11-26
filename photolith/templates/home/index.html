@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 {% block content %}
 <div class="row">
@@ -52,8 +53,8 @@
     <h5 class="card-header">{% translate 'Guides' %}</h5>
     <div class="card-body">
       <ul>
-        <li><a href="/doc/ingest.html">{% translate 'Image Ingest: Adding images to Photolith' %}</a></li>
-        <li><a href="/doc/annotate.html">{% translate 'Viewing & editing annotations' %}</a></li>
+        <li><a href="/doc/{{ LANGUAGE_CODE|slice:':2' }}/ingest.html">{% translate 'Image Ingest: Adding images to Photolith' %}</a></li>
+        <li><a href="/doc/{{ LANGUAGE_CODE|slice:':2' }}/annotate.html">{% translate 'Viewing & editing annotations' %}</a></li>
       </ul>
     </div>
   </div>
