@@ -159,6 +159,9 @@ export function init (parent) {
     populateIndividualData(indData);
 
     parent.querySelectorAll('button#existing-tab').forEach((elExistingBtn) => {
+      // Find matching editor button
+      const elEditorBtn = elExistingBtn.closest('ul').querySelector(':scope button#editor-tab');
+
       if (elExistingBtn.classList.contains('active')) {
         // Selected by default, populate now
         elForm.elements.axis_poly.disabled = true;
@@ -166,13 +169,15 @@ export function init (parent) {
           elForm,
           document.querySelector('.ph-all-annotations>table>tbody'));
       }
+      // Show existing / new annotation when existing / editor tabs are selected
+      // When selecting help/metadata/full-screen, we should show the previous view
       elExistingBtn.addEventListener('shown.bs.tab', function (event) {
         elForm.elements.axis_poly.disabled = true;
         existingAnnotationsPopulate(
           elForm,
           document.querySelector('.ph-all-annotations>table>tbody'));
       });
-      elExistingBtn.addEventListener('hide.bs.tab', function (event) {
+      elEditorBtn.addEventListener('shown.bs.tab', function (event) {
         elForm.elements.axis_poly.disabled = false;
         existingAnnotationsPopulate(
           elForm,
