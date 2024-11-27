@@ -1,5 +1,15 @@
 export function displayAlert (level, messageHTML, timeout) {
   const elAlert = document.createElement('DIV');
+  const elContainer = document.getElementById('alert-container');
+  const curTime = Math.floor(Date.now() / 1000);
+
+  // If we haven't shown any new alerts for a while, clear out old ones
+  if (elContainer.phLastAlert && curTime - elContainer.phLastAlert > 10) {
+    Array.from(elContainer.children).forEach((elAlert) => {
+      if (elAlert.isConnected) new window.bootstrap.Alert(elAlert).close();
+    });
+  }
+  elContainer.phLastAlert = curTime;
 
   elAlert.className = `alert alert-${level} alert-dismissible fade show`;
   elAlert.setAttribute('role', 'alert');
@@ -19,7 +29,7 @@ export function displayAlert (level, messageHTML, timeout) {
       elAlert.displayAlertTimeout = undefined;
     }
   });
-  document.getElementById('alert-container').append(elAlert);
+  elContainer.append(elAlert);
 
   if (timeout === undefined) timeout = 5000;
   if (timeout > 0) {

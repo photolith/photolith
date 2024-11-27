@@ -149,7 +149,7 @@ function formRefresh (event) {
       if (modified) dataEl.value = JSON.stringify(data);
     });
 
-    displayAlert('success', event.target.getAttribute('data-locale-success'));
+    displayAlert('success', event.target.getAttribute('data-locale-success'), 0);
   }
 }
 
