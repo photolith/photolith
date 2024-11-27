@@ -1,10 +1,10 @@
-import { jsonFetchCached } from './fetch';
+import { jsonFetch } from './fetch';
 
 function individualPopulate (elSelect) {
   if (elSelect.options.length > 0) return;
 
   elSelect.form.classList.add('rendering');
-  return jsonFetchCached('/search/data/', window.document.location.search, {}).then((data) => {
+  return jsonFetch('/search/data/' + window.document.location.search, {}).then((data) => {
     data.data.forEach((row) => {
       const opt = new window.Option(row.__str__);
 

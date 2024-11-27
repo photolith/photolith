@@ -1,8 +1,8 @@
 import { changeEvent } from './events';
-import { jsonFetchCached } from './fetch';
+import { jsonFetch } from './fetch';
 
 function selectPopulate (elSelect) {
-  return jsonFetchCached('/search/data/', window.document.location.search, {}).then((data) => {
+  return jsonFetch('/search/data/' + window.document.location.search, {}).then((data) => {
     data.data.forEach((row) => {
       const opt = new window.Option(row.__str__);
 

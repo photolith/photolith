@@ -1,6 +1,6 @@
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
-import { jsonFetch, clearFetchCache } from './fetch';
+import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
 function checkExisting (labels, warnMsg) {
@@ -196,7 +196,6 @@ function formSubmit (elForm) {
     }).join('\n') + Object.keys(data.updated_individuals).map((k) => {
       return `<input type="hidden" name="individual_id:${k}" value="${data.updated_individuals[k]}">`;
     }).join('\n');
-    clearFetchCache(); // Remove cached search results, so new ingests show up.
   }).finally(() => {
     elForm.classList.remove('rendering');
   });
