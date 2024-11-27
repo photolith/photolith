@@ -60,6 +60,14 @@ export class PhSyncingViewer extends PhFilteringViewer {
     const obj = opt.target;
     let newVal;
 
+    /* TODO: This won't work, we need to upgrade to v6: https://github.com/photolith/photolith/issues/110
+    // If we get a selection, sync everything within it
+    if (obj && obj.get("type") === "activeSelection") {
+      obj.getObjects().forEach((o) => { this.syncForm({ target: o })});
+      return;
+    }
+    */
+
     // No point without an associated form element
     if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
     const formEl = this.elSyncForm.elements[obj.id];

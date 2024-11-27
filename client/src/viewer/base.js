@@ -132,8 +132,10 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:down', function (opt) {
+      /* TODO: Disable ctrl-drag support, it's too buggy - https://github.com/photolith/photolith/issues/110
       // Don't drag canvas on ctrl-mouse, to allow for selecting groups
       if (opt.e.ctrlKey) return;
+      */
       // Don't drag on left button when over a target (interact with target instead)
       if (opt.e.button === 0 && opt.target) return;
 
