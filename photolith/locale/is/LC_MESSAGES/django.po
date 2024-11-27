@@ -102,6 +102,7 @@ msgid "Show individuals"
 msgstr "Sýna einstaklinga"
 
 #: photolith/models.py photolith/models.py photolith/models.py
+#: photolith/templates/annotate/annotate.html
 msgid "Created by"
 msgstr "Búið til af"
 

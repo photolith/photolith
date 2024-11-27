@@ -87,6 +87,8 @@ function allAnnotationsClick (elForm, event) {
         elForm.elements.authority.selectedIndex = elForm.elements.authority.options.length - 1;
       }
       elForm.elements.comment.value = elSelected.querySelector('.val-comment').textContent;
+      if (elForm.elements.comment.value) elForm.elements.comment.value += '\n';
+      elForm.elements.comment.value += elSelected.querySelector('.val-created_by').getAttribute('data-locale-created_by') + ' ' + elSelected.querySelector('.val-created_by').textContent;
     } else {
       throw new Error('Unknown button ' + event.target.className);
     }
