@@ -6,7 +6,7 @@ export class LocalFileSet {
     this.input = document.createElement('input');
     this.input.type = 'file';
     this.input.multiple = true;
-    this.input.accept = 'image/*';
+    this.input.accept = 'image/*,.nef';
   }
 
   close () {
