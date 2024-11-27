@@ -120,7 +120,8 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:wheel', function (opt) {
-      const delta = opt.e.deltaY;
+      // https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/deltaMode: 1 --> delta in Pixels
+      const delta = opt.e.deltaMode === 1 ? opt.e.deltaY * 25 : opt.e.deltaY;
       let zoom = this.getZoom();
       zoom *= 0.999 ** delta;
       this.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
