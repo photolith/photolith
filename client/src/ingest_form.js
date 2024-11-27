@@ -94,11 +94,24 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'selection') {
-    // If a single individual is shown, show it's metadata regardless. Otherwise show selected bounding box metadata
-    const selIndividual = (elForm.individual.options[elForm.individual.selectedIndex] || {}).value || event.target.value.replace(/^bounding_box:/, '');
+    let selIndividual = null;
 
-    const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
-    populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
+    if (elForm.individual.selectedIndex > 0) {
+      // Single individual is selected, show it's metadata regardless
+      selIndividual = elForm.individual.options[elForm.individual.selectedIndex].value;
+    } else if (event.target.value.startsWith('bounding_box:')) {
+      // Bounding box is selected, show it's metadata
+      selIndividual = event.target.value.replace(/^bounding_box:/, '');
+    }
+
+    // Hide form if nothing selected
+    elForm.querySelector(':scope .label_help').classList.toggle('d-none', selIndividual !== null);
+    elForm.querySelector(':scope .individual-data').classList.toggle('d-none', selIndividual === null);
+
+    if (selIndividual !== null) {
+      const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
+      populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
+    }
   }
 
   if (event.target.classList.contains('ph-meta')) {
