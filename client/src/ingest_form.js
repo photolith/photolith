@@ -41,6 +41,8 @@ function formRefresh (event) {
     elForm.classList.add('rendering');
     // Update rest of form to match new sample
     return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve([])).then((individuals) => {
+      if (!individuals) individuals = []; // Do nothing if no individuals returned
+
       // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
       checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
 
