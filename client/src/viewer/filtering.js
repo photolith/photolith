@@ -57,6 +57,13 @@ export class PhFilteringViewer extends PhViewer {
       }));
     }
 
+    if (phFilters.huesubtract && phFilters.huesubtract !== '0') {
+      img.filters.push(new fabric.Image.filters.BlendColor({
+        color: 'hsl(' + Math.floor(parseFloat(phFilters.huesubtract) * 360) + ',100%,50%)',
+        mode: 'subtract'
+      }));
+    }
+
     if (phFilters.vibrance && phFilters.vibrance !== '0') {
       img.filters.push(new fabric.Image.filters.Vibrance({
         vibrance: parseFloat(phFilters.vibrance)

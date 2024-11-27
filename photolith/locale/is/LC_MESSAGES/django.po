@@ -764,6 +764,10 @@ msgid "Saturation"
 msgstr "Saturation"
 
 #: photolith/templates/snippet/viewer.html
+msgid "Subtract Hue"
+msgstr "Subtract Hue"
+
+#: photolith/templates/snippet/viewer.html
 msgid "Vibrance"
 msgstr "Vibrance"
 
