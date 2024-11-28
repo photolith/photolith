@@ -1,5 +1,7 @@
+import hashlib
 import io
 import json
+import os.path
 import urllib.parse
 
 from django.conf import settings
@@ -217,16 +219,34 @@ class UploadImageView(PermissionRequiredMixin, View):
         if not mimetype.startswith("image/"):  # e.g. image/jpeg, image/x-nikon-nef
             raise ValueError("Unknown content type %s" % mimetype)
 
-        image = Image(
-            created_by=self.request.user,
-            orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
-            mimetype=mimetype,
-        )
+        # Read file into memory
         # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
         file = io.BytesIO(self.request.read())
+        orig_filename = self.request.META.get("HTTP_X_PHOTOLITH_FILENAME")
         # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
-        image.content.save(image.orig_filename, file)
+
+        # Generate content-addressed filename to store as
+        digest = hashlib.file_digest(file, hashlib.sha256)
+        _, file_ext = os.path.splitext(orig_filename)
+        digest_filename = "%s%s" % (digest.hexdigest(), file_ext or "")
+        digest_path = Image.content.field.generate_filename(None, digest_filename)
+
+        # If we already have an image with that sha1 sum, otherwise create & save to storage
+        image, created = Image.objects.get_or_create(
+            content=digest_path,
+            defaults=dict(
+                created_by=self.request.user,
+                orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
+                mimetype=mimetype,
+            ),
+        )
+
+        # If the image file doesn't exist, save it afresh
+        if not image.content.storage.exists(image.content.name):
+            image.content.save(digest_filename, file)
+
         image.save()
+
         out = model_to_dict(image)
         out["content"] = out["content"].name
         return JsonResponse(out)

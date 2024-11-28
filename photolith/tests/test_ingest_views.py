@@ -560,8 +560,8 @@ class UploadImageViewTest(RequiresUtils, TestCase):
                 scale_mm=None,
             ),
         )
-        # We got separate uploads, with different content names
-        self.assertNotEqual(i.id, i2.id)
-        self.assertNotEqual(i.content.name, i2.content.name)
-        # Unique, so get back one object (i.e. what UploadView tries to do)
-        self.assertEqual(Image.objects.get(content=i2.content.name).id, i2.id)
+        # We get the same content back
+        self.assertEqual(i.id, i2.id)
+        self.assertEqual(i.content.name, i2.content.name)
+        # UploadView can get the unique ID back
+        self.assertEqual(Image.objects.get(content=i2.content.name).id, i.id)
