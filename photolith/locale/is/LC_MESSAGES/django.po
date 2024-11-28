@@ -101,6 +101,14 @@ msgstr[1] "%(count)d einstaklingar eytt."
 msgid "Show individuals"
 msgstr "Sýna einstaklinga"
 
+#: photolith/models.py
+msgid "Image"
+msgstr "Mynd"
+
+#: photolith/models.py
+msgid "Images"
+msgstr "Myndum"
+
 #: photolith/models.py photolith/models.py photolith/models.py
 #: photolith/templates/annotate/annotate.html
 msgid "Created by"
@@ -113,6 +121,14 @@ msgstr "Búið til"
 #: photolith/models.py
 msgid "Modified at"
 msgstr "Breytt"
+
+#: photolith/models.py photolith/templates/annotate/annotate.html
+msgid "Individual"
+msgstr "Einstakingsnúmer"
+
+#: photolith/models.py
+msgid "Individuals"
+msgstr "Einstaklingar"
 
 #: photolith/models.py
 msgid "Metadata key"
@@ -140,6 +156,14 @@ msgstr "Enska"
 #: photolith/models.py
 msgid "Icelandic"
 msgstr "Íslenska"
+
+#: photolith/models.py
+msgid "Taxonomy"
+msgstr "Flokkunarfræði"
+
+#: photolith/models.py
+msgid "Taxonomies"
+msgstr "Flokkunarfræði"
 
 #: photolith/models.py
 msgid "Unreadable"
@@ -202,6 +226,14 @@ msgid "Comments"
 msgstr "Athugasemdir"
 
 #: photolith/models.py
+msgid "Annotation"
+msgstr "Aldursmerkingar"
+
+#: photolith/models.py photolith/templates/annotate/annotate.html
+msgid "Annotations"
+msgstr "Aldursmerkingar"
+
+#: photolith/models.py
 msgid "Project name"
 msgstr "Nafn verkefnis"
 
@@ -225,6 +257,15 @@ msgstr ""
 "Ef valinn er notandi þá mun nýlegasta aldursmerking þess notanda á hverjum "
 "einstakling vera notuð sem upphafsstaður fyrir aldursmerkingar"
 
+#: photolith/models.py photolith/templates/project/update.html
+msgid "Project"
+msgstr "Verkefni"
+
+#: photolith/models.py photolith/templates/base.html
+#: photolith/templates/home/index.html
+msgid "Projects"
+msgstr "Verkefni"
+
 #: photolith/models.py
 msgid "Team name"
 msgstr "Nafn teymis"
@@ -232,6 +273,14 @@ msgstr "Nafn teymis"
 #: photolith/models.py
 msgid "Team members"
 msgstr "Aðilar í teymi"
+
+#: photolith/models.py
+msgid "Team"
+msgstr "Teymi"
+
+#: photolith/models.py
+msgid "Teams"
+msgstr "Teymis"
 
 #: photolith/project/forms.py
 msgid "No base axis"
@@ -457,14 +506,6 @@ msgstr "Uppsöfnuð lengd (mm)"
 msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 
-#: photolith/templates/annotate/annotate.html
-msgid "Individual"
-msgstr "Einstakingsnúmer"
-
-#: photolith/templates/annotate/annotate.html
-msgid "Annotations"
-msgstr "Aldursmerkingar"
-
 #: photolith/templates/annotate/snippet.html
 msgid "View annotations"
 msgstr "Skoða aldursmerkingar"
@@ -485,10 +526,6 @@ msgstr "Hlaða inn myndum"
 #: photolith/templates/base.html
 msgid "Search"
 msgstr "Leit"
-
-#: photolith/templates/base.html photolith/templates/home/index.html
-msgid "Projects"
-msgstr "Verkefni"
 
 #: photolith/templates/base.html
 msgid "Documentation"
@@ -705,10 +742,6 @@ msgid "Then click <kbd>Save as project</kbd> in the top right corner."
 msgstr ""
 "Leitaðu að þeim eiginleikum sem þarf fyrir verkefnið og ýttu svo á "
 "<kbd>Vista sem verkefni</kbd>."
-
-#: photolith/templates/project/update.html
-msgid "Project"
-msgstr "Verkefni"
 
 #: photolith/templates/project/update.html
 msgid "Cancel"

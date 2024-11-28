@@ -61,6 +61,10 @@ class Image(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
+    class Meta:
+        verbose_name = _("Image")
+        verbose_name_plural = _("Images")
+
     def px_to_mm(self):
         if not self.scale_mm:
             return None
@@ -84,6 +88,10 @@ class Individual(models.Model):
         _("Created at"), auto_now_add=True, editable=False
     )
     modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
+
+    class Meta:
+        verbose_name = _("Individual")
+        verbose_name_plural = _("Individuals")
 
     def full_data(self):
         """Dict of data, including values outside the meta table"""
@@ -299,6 +307,8 @@ class Taxonomy(models.Model):
     )
 
     class Meta:
+        verbose_name = _("Taxonomy")
+        verbose_name_plural = _("Taxonomies")
         constraints = (
             models.UniqueConstraint(
                 name="taxonomy_key_identifier",
@@ -385,6 +395,8 @@ class Annotation(models.Model):
     axis_poly = models.JSONField(null=True)
 
     class Meta:
+        verbose_name = _("Annotation")
+        verbose_name_plural = _("Annotations")
         indexes = [
             models.Index(fields=["individual"]),
             models.Index(fields=["created_by", "individual"]),
@@ -492,6 +504,10 @@ class Project(models.Model):
 
         return out
 
+    class Meta:
+        verbose_name = _("Project")
+        verbose_name_plural = _("Projects")
+
     def __str__(self):
         return self.name
 
@@ -515,6 +531,10 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    class Meta:
+        verbose_name = _("Team")
+        verbose_name_plural = _("Teams")
 
     def __str__(self):
         return self.name
