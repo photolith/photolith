@@ -64,11 +64,16 @@ class RequiresUtils:
         out.groups.set(Group.objects.filter(name__in=groups))
         self.assertEqual(out.groups.count(), len(groups))
 
-        up = UserProfile.objects.create(user=out)
+        up = None
         if base_authority_level is not None:
+            if up is None:
+                up = UserProfile.objects.create(user=out)
             up.base_authority_level = base_authority_level
 
         for species_name, level in species_authority:
+            if up is None:
+                # NB: Profile is needed to access UserSpeciesAuthority
+                up = UserProfile.objects.create(user=out)
             UserSpeciesAuthority.objects.create(
                 user=out,
                 species=Taxonomy.objects.get(key="species", str_en=species_name),

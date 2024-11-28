@@ -49,9 +49,13 @@ class AnnotateViewTest(RequiresUtils, TestCase):
 
     def test_form_valid__general(self):
         """Can only annotate if a general Annotation Editor"""
-        user0 = self.create_user(groups=[])
-        user1 = self.create_user(groups=["General Annotation Viewer"])
-        user2 = self.create_user(groups=["General Annotation Editor"])
+        user0 = self.create_user(groups=[], base_authority_level=50)
+        user1 = self.create_user(
+            groups=["General Annotation Viewer"], base_authority_level=50
+        )
+        user2 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
         ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
 
         # Viewers can't save
@@ -65,14 +69,20 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(ann.project, None)
 
         # Can't save someone else's annotation
-        user3 = self.create_user(groups=["General Annotation Editor"])
+        user3 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
         with self.assertRaisesRegex(PermissionDenied, "do not own"):
             ann = self.form_post(user3, ind, annotation_id=ann.id)
 
     def test_form_valid__project(self):
         """Can only annotate in open projects"""
-        user1 = self.create_user(groups=["General Annotation Editor"])
-        user2 = self.create_user(groups=["General Annotation Editor"])
+        user1 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
+        user2 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
         ind = [self.create_individual() for _ in range(random.randrange(1, 9))][-1]
         p1 = [self.create_project(team=[user1]) for _ in range(random.randrange(1, 9))][
             -1
@@ -98,7 +108,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(ann.project, None)
 
     def test_get_initial(self):
-        user1 = self.create_user("user1", groups=["General Annotation Viewer"])
+        user1 = self.create_user(
+            "user1", groups=["General Annotation Viewer"], base_authority_level=50
+        )
 
         def get_initial(ind, ann=None, **kwargs):
             kwargs["individual_id"] = ind.id
@@ -524,7 +536,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             if hasattr(user, "userprofile"):
                 auth_level = user.userprofile.authority_level(individual.data)
             else:
-                auth_level = UserSpeciesAuthority.AuthorityLevel.NON_EXPERT
+                auth_level = UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
             self.assertEqual(context["form"].initial["authority"], auth_level)
 
             return context["form"].fields["authority"].choices

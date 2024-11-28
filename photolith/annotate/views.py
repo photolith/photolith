@@ -11,7 +11,7 @@ from django.views.generic.edit import UpdateView
 
 
 from ..errors import json_errors
-from ..models import Individual, Annotation, Project
+from ..models import Individual, Annotation, Project, UserSpeciesAuthority
 
 from .forms import AnnotationForm
 from ..perm_utils import check_annotate_access
@@ -150,7 +150,7 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
                     context["ind_data"]
                 )
             else:
-                auth_level = UserSpeciesAuthority.AuthorityLevel.NON_EXPERT
+                auth_level = UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
             context["form"].initial["authority"] = auth_level
             context["form"].fields["authority"].choices = [
                 (v, n)
