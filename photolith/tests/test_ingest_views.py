@@ -69,7 +69,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         if not image:
             image = self.create_image()
         post_dict = dict(
-            image_content=image.content.name,
+            image_id=image.id,
         )
         post_dict["scale_line"] = json.dumps(scale_line) if scale_line else ""
         post_dict["scale_mm"] = str(scale_mm or "")

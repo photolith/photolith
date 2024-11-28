@@ -88,8 +88,8 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'image_file') {
-    // Image file changed, so image_content is no longer valid
-    elForm.image_content.value = '';
+    // Image file changed, so image_id is no longer valid
+    elForm.image_id.value = '';
 
     // If there's an image, we'll be able to fill in form
     elForm.querySelector('fieldset').disabled = !event.target.value;
@@ -170,7 +170,7 @@ function formRefresh (event) {
 
 function formSubmit (elForm) {
   return Promise.resolve().then(() => {
-    if (elForm.image_content.value) return;
+    if (elForm.image_id.value) return;
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
     elForm.classList.add('rendering');
 
@@ -184,7 +184,7 @@ function formSubmit (elForm) {
         'X-Photolith-filename': elForm.image_file.phBlob.name
       }
     }).then((data) => {
-      elForm.image_content.value = data.content;
+      elForm.image_id.value = data.id;
     });
   }).then(() => {
     return jsonFetch('/ingest/upload/', {

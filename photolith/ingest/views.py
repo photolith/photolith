@@ -104,7 +104,7 @@ class UploadView(PermissionRequiredMixin, View):
 
     @json_errors
     def post(self, *args, **kwargs):
-        image = Image.objects.get(content=self.request.POST["image_content"])
+        image = Image.objects.get(pk=self.request.POST["image_id"])
         image.scale_line = json.loads(self.request.POST["scale_line"] or "null")
         image.scale_mm = (
             int(self.request.POST["scale_mm"])
