@@ -206,6 +206,7 @@ export default class MetadataApi extends BaseMetadataApi {
     throw new Error('Not enough data available for API query: ' + JSON.stringify(lbl));
   }
 
+  /** Returns a list of metadata, one per individual on-slide, for a given (slideLabel) string */
   sampleDetail (slideLabel) {
     let suppressWarnings = false;
     let lbl;

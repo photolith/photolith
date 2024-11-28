@@ -42,6 +42,7 @@ export default class MetadataApi {
     this._txHardcoded = {};
   }
 
+  /** Return a list of strings to display as instructions for what to put as a slide label */
   labelHelp () {
     return this._labelHelp[this.lang] || this._labelHelp.en || [];
   }
@@ -58,6 +59,7 @@ export default class MetadataApi {
     return ind.ch_individualLabel;
   }
 
+  /** Returns a list of metadata, one per individual on-slide, for a given (slideLabel) string */
   sampleDetail (slideLabel) {
     let individuals = window.prompt(this.tmpl('how_many_individuals', slideLabel));
 
@@ -81,7 +83,9 @@ export default class MetadataApi {
     })));
   }
 
-  /** Return a taxonomy, as an object of {(i): {id: (i), en: "..."}} */
+  /** Returns all possible taxonomy values of the (txName) taxonomy, as a list of {(i): {id: (i), en: "..."}}
+    * Optionally ensuring that the (txCurrent) taxonomy item is included
+    */
   txFor (txName, txCurrent) {
     function toObj (ar) {
       return !ar ? {} : ar.reduce((a, v) => ({ ...a, [v.id]: v }), {});
@@ -112,6 +116,7 @@ export default class MetadataApi {
     return out;
   }
 
+  /** Wrapper around window.fetch, adding baseHref & internationalised errors */
   fetch (endpoint) {
     return window.fetch(this.baseHref + endpoint).then((resp) => {
       if (!resp.ok) {
@@ -121,6 +126,7 @@ export default class MetadataApi {
     });
   }
 
+  /** Simple templating language */
   tmpl (tmpl, ...values) {
     if (this._intlTemplates[this.lang]) {
       tmpl = this._intlTemplates[this.lang][tmpl] || tmpl;
@@ -132,6 +138,7 @@ export default class MetadataApi {
     return new Error(this.tmpl(errTmpl, ...values));
   }
 
+  /** Merge per-language objects (source) into (target) */
   intlExtend (target, source) {
     for (const lang of Object.keys(source)) {
       if (!(lang in target)) target[lang] = {};
