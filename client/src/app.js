@@ -8,9 +8,9 @@ import { init as initProjectForm } from './project_form';
 import { init as initViewer } from './viewer';
 import { init as initCroppedViewer } from './cropped_viewer';
 
-import BaseMetadataApi from './metadata_api/base';
+import StandaloneMetadataApi from './metadata_api/standalone';
 import HafroMetadataApi from './metadata_api/hafro';
-window.BaseMetadataApi = BaseMetadataApi;
+window.StandaloneMetadataApi = StandaloneMetadataApi;
 window.HafroMetadataApi = HafroMetadataApi;
 
 // Expose for admin interface to use

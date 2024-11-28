@@ -24,10 +24,16 @@ const metaLabels = {
   }
 };
 
+const fieldsFor = {
+};
+
 const labelHelp = {
   en: [
     'Full label'
   ]
+};
+
+const txHardcoded = {
 };
 
 export default class MetadataApi {
@@ -37,9 +43,9 @@ export default class MetadataApi {
     this.baseHref = baseHref || '';
     this._intlTemplates = intlTemplates;
     this._metaLabels = metaLabels;
-    this._fieldsFor = {};
+    this._fieldsFor = fieldsFor;
     this._labelHelp = labelHelp;
-    this._txHardcoded = {};
+    this._txHardcoded = txHardcoded;
   }
 
   /** Return a list of strings to display as instructions for what to put as a slide label */
