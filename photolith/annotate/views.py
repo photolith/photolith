@@ -150,7 +150,7 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
                     context["ind_data"]
                 )
             else:
-                auth_level = Annotation.AuthorityLevel.NON_EXPERT
+                auth_level = UserSpeciesAuthority.AuthorityLevel.NON_EXPERT
             context["form"].initial["authority"] = auth_level
             context["form"].fields["authority"].choices = [
                 (v, n)

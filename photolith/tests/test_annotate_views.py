@@ -7,7 +7,7 @@ from django.core.exceptions import BadRequest, PermissionDenied
 from django.test import Client, RequestFactory, TestCase
 
 from ..annotate.views import AnnotateView, AnnotateStartView, DeleteView
-from ..models import Annotation, Individual, Image, Project
+from ..models import Annotation, Individual, Image, Project, UserSpeciesAuthority
 
 from .requires_utils import RequiresUtils
 
@@ -20,7 +20,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             age=kwargs.get("age", 10),
             axis_poly=kwargs.get("axis_poly", [[0, 0], [1, 1], [2, 2]]),
             comment=kwargs.get("comment", "UT comment %f" % random.uniform(100, 1000)),
-            authority=str(0),
+            authority=str(user.userprofile.base_authority_level),
             rating=kwargs.get("rating", Annotation.Rating.GOOD),
         )
         qs = ""
@@ -520,13 +520,11 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             v.setup(request, **(request.GET.dict()))
             context = v.get_context_data()
 
-            choices = [
-                Annotation.AuthorityLevel(x[0])
-                for x in context["form"].fields["authority"].choices
-            ]
             # initial choice always smallest value
-            self.assertEqual(context["form"].initial["authority"], min(choices))
-            return choices
+            min_choice = min(x[0] for x in context["form"].fields["authority"].choices)
+            self.assertEqual(context["form"].initial["authority"], min_choice)
+
+            return context["form"].fields["authority"].choices
 
         ind_nospecies = self.create_individual()
         ind_fish = self.create_individual(
@@ -541,84 +539,93 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
             ],
         )
 
         # Add profile, only authority for relevant species
         user = self.create_user(
-            groups=["General Annotation Editor"], species_expert=["Fish"]
+            groups=["General Annotation Editor"],
+            species_authority=[("Fish", UserSpeciesAuthority.AuthorityLevel.EXPERT)],
         )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
-                Annotation.AuthorityLevel.EXPERT,
-                Annotation.AuthorityLevel.EXPERT_ORIG,
+                (100, "Expert, from image"),
+                (105, "Expert, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
             ],
         )
 
         user = self.create_user(
-            groups=["General Annotation Editor"], species_expert=["Rock"]
+            groups=["General Annotation Editor"],
+            species_authority=[
+                ("Fish", UserSpeciesAuthority.AuthorityLevel.JUNIOR),
+                ("Rock", UserSpeciesAuthority.AuthorityLevel.SENIOR_EXPERT),
+            ],
         )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
-                Annotation.AuthorityLevel.EXPERT,
-                Annotation.AuthorityLevel.EXPERT_ORIG,
+                (120, "Senior expert, from image"),
+                (125, "Senior expert, with original otoliths or slides"),
             ],
         )
 
         user = self.create_user(
-            groups=["General Annotation Editor"], species_expert=["Fish", "Rock"]
+            groups=["General Annotation Editor"],
+            base_authority_level=UserSpeciesAuthority.AuthorityLevel.JUNIOR,
+            species_authority=[
+                ("Rock", UserSpeciesAuthority.AuthorityLevel.SENIOR_EXPERT),
+            ],
         )
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
-                Annotation.AuthorityLevel.NON_EXPERT,
-                Annotation.AuthorityLevel.NON_EXPERT_ORIG,
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
-                Annotation.AuthorityLevel.EXPERT,
-                Annotation.AuthorityLevel.EXPERT_ORIG,
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
             ],
         )
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
-                Annotation.AuthorityLevel.EXPERT,
-                Annotation.AuthorityLevel.EXPERT_ORIG,
+                (120, "Senior expert, from image"),
+                (125, "Senior expert, with original otoliths or slides"),
             ],
         )
 

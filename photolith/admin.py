@@ -39,7 +39,11 @@ class TeamInline(admin.TabularInline):
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
-    filter_horizontal = ("species_expert",)
+    can_delete = False
+
+
+class UserAuthorityInline(admin.StackedInline):
+    model = UserSpeciesAuthority
     can_delete = False
 
 
@@ -67,7 +71,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ("username", "email", "first_name", "last_name", "is_active")
     actions = [user_activate]
 
-    inlines = [UserProfileInline, TeamInline]
+    inlines = [UserProfileInline, UserAuthorityInline, TeamInline]
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),

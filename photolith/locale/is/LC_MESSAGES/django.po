@@ -102,6 +102,30 @@ msgid "Show individuals"
 msgstr "Sýna einstaklinga"
 
 #: photolith/models.py
+msgid "Automated reader"
+msgstr "Sjálfvirkur aldurslesari"
+
+#: photolith/models.py
+msgid "Inexperienced"
+msgstr "Óreyndur"
+
+#: photolith/models.py
+msgid "Junior"
+msgstr "Yngri"
+
+#: photolith/models.py
+msgid "Expert"
+msgstr "Sérfræðingur"
+
+#: photolith/models.py
+msgid "Senior expert"
+msgstr "Eldri sérfræðingur"
+
+#: photolith/models.py photolith/models.py photolith/models.py
+msgid "Reader authority"
+msgstr "Staða lesara"
+
+#: photolith/models.py
 msgid "Image"
 msgstr "Mynd"
 
@@ -166,6 +190,14 @@ msgid "Taxonomies"
 msgstr "Flokkunarfræði"
 
 #: photolith/models.py
+msgid "from image"
+msgstr "með mynd"
+
+#: photolith/models.py
+msgid "with original otoliths or slides"
+msgstr "með upprunalegu kvarnirnar eða glerin"
+
+#: photolith/models.py
 msgid "Unreadable"
 msgstr "Ólæsileg"
 
@@ -178,30 +210,6 @@ msgid "Easy to read"
 msgstr "Auðveld"
 
 #: photolith/models.py
-msgid "Unknown"
-msgstr "Óvíst"
-
-#: photolith/models.py
-msgid "Automated reader"
-msgstr "Sjálfvirkur aldurslesari"
-
-#: photolith/models.py
-msgid "Non expert, from image"
-msgstr "Óreyndur, með mynd"
-
-#: photolith/models.py
-msgid "Non expert, with original otoliths or slides"
-msgstr "Óreyndur, með upprunalegu kvarnirnar eða glerin"
-
-#: photolith/models.py
-msgid "Expert, from image"
-msgstr "Sérfræðingur, með mynd"
-
-#: photolith/models.py
-msgid "Expert, with original otoliths or slides"
-msgstr "Sérfræðingur, með upprunalegu kvarnirnar eða glerin"
-
-#: photolith/models.py
 msgid "Part of project"
 msgstr "Hluti af verkefni"
 
@@ -212,10 +220,6 @@ msgstr "Síðast breytt"
 #: photolith/models.py
 msgid "Image rating"
 msgstr "Einkunn"
-
-#: photolith/models.py
-msgid "Reader authority"
-msgstr "Staða lesara"
 
 #: photolith/models.py photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"

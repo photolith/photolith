@@ -25,21 +25,55 @@ def isisoformat(v):
         return False
 
 
+class UserSpeciesAuthority(models.Model):
+    class AuthorityLevel(models.IntegerChoices):
+        AUTOMATED = 20, _("Automated reader")
+        INEXPERIENCED = 50, _("Inexperienced")
+        JUNIOR = 80, _("Junior")
+        EXPERT = 100, _("Expert")
+        SENIOR_EXPERT = 120, _("Senior expert")
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    species = models.ForeignKey(
+        "Taxonomy",
+        on_delete=models.CASCADE,
+        null=False,
+        limit_choices_to=dict(key="species"),
+    )
+    level = models.PositiveSmallIntegerField(
+        _("Reader authority"),
+        null=False,
+        default=AuthorityLevel.INEXPERIENCED,
+        choices=AuthorityLevel.choices,
+    )
+
+    class Meta:
+        unique_together = (
+            "user",
+            "species",
+        )
+
+
 class UserProfile(models.Model):
     # https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#extending-the-existing-user-model
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    species_expert = models.ManyToManyField(
-        "Taxonomy",
-        limit_choices_to=dict(key="species"),
+
+    base_authority_level = models.PositiveSmallIntegerField(
+        _("Reader authority"),
+        null=False,
+        default=UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED,
+        choices=UserSpeciesAuthority.AuthorityLevel.choices,
     )
 
     def authority_level(self, ind_data):
         if "id" in ind_data.get("tx_species", dict()):
-            if self.species_expert.filter(
-                identifier=ind_data["tx_species"]["id"]
-            ).exists():
-                return Annotation.AuthorityLevel.EXPERT
-        return Annotation.AuthorityLevel.NON_EXPERT
+            sa = UserSpeciesAuthority.objects.filter(
+                user=self.user,
+                species__identifier=ind_data["tx_species"]["id"],
+            ).first()
+            if sa:
+                return sa.level
+        return self.base_authority_level
 
 
 class Image(models.Model):
@@ -343,6 +377,14 @@ class Taxonomy(models.Model):
         )
 
 
+def annotation_authority_choices():
+    out = []
+    for a in UserSpeciesAuthority.AuthorityLevel.choices:
+        out.append((a[0], a[1] + ", " + _("from image")))
+        out.append((a[0] + 5, a[1] + ", " + _("with original otoliths or slides")))
+    return out
+
+
 class Annotation(models.Model):
     """
     A user's annotations and verdict of an individual
@@ -352,14 +394,6 @@ class Annotation(models.Model):
         UNREADABLE = 0, _("Unreadable")
         DIFFICULT = 50, _("+/- 1 year")
         GOOD = 100, _("Easy to read")
-
-    class AuthorityLevel(models.IntegerChoices):
-        UNKNOWN = 0, _("Unknown")
-        AUTOMATED = 20, _("Automated reader")
-        NON_EXPERT = 50, _("Non expert, from image")
-        NON_EXPERT_ORIG = 55, _("Non expert, with original otoliths or slides")
-        EXPERT = 100, _("Expert, from image")
-        EXPERT_ORIG = 105, _("Expert, with original otoliths or slides")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
@@ -387,8 +421,8 @@ class Annotation(models.Model):
     authority = models.PositiveSmallIntegerField(
         _("Reader authority"),
         null=False,
-        default=AuthorityLevel.UNKNOWN,
-        choices=AuthorityLevel.choices,
+        default=UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED,
+        choices=annotation_authority_choices(),
     )
     age = models.IntegerField(_("Age reading"), null=True)
     comment = models.TextField(_("Comments"), null=False, default="")

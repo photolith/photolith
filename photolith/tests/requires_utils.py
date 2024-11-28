@@ -6,7 +6,16 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from ..models import Annotation, Image, Individual, Project, UserProfile, Taxonomy, Team
+from ..models import (
+    Annotation,
+    Image,
+    Individual,
+    Project,
+    UserProfile,
+    UserSpeciesAuthority,
+    Taxonomy,
+    Team,
+)
 
 from .binaries import JPEG_VALID
 
@@ -36,7 +45,14 @@ class RequiresUtils:
         self._ru_objects.append(o)
         return o
 
-    def create_user(self, username=None, groups=[], species_expert=[], is_active=True):
+    def create_user(
+        self,
+        username=None,
+        groups=[],
+        base_authority_level=None,
+        species_authority=[],
+        is_active=True,
+    ):
         if not username:
             username = "ut_user%d" % (get_user_model().objects.count() + 1)
         out = get_user_model().objects.create(
@@ -49,9 +65,14 @@ class RequiresUtils:
         self.assertEqual(out.groups.count(), len(groups))
 
         up = UserProfile.objects.create(user=out)
-        if len(species_expert) > 0:
-            up.species_expert.set(
-                Taxonomy.objects.filter(str_en__in=species_expert).all()
+        if base_authority_level is not None:
+            up.base_authority_level = base_authority_level
+
+        for species_name, level in species_authority:
+            UserSpeciesAuthority.objects.create(
+                user=out,
+                species=Taxonomy.objects.get(key="species", str_en=species_name),
+                level=level,
             )
 
         return self._ru_append(out)
