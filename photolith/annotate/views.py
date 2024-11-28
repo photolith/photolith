@@ -155,7 +155,7 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
             context["form"].fields["authority"].choices = [
                 (v, n)
                 for v, n in context["form"].fields["authority"].choices
-                if (v >= auth_level and v < auth_level + 10)
+                if (v < auth_level + 10)
             ]
 
             if self.object and self.object.id:

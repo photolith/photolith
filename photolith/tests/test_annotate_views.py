@@ -520,9 +520,12 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             v.setup(request, **(request.GET.dict()))
             context = v.get_context_data()
 
-            # initial choice always smallest value
-            min_choice = min(x[0] for x in context["form"].fields["authority"].choices)
-            self.assertEqual(context["form"].initial["authority"], min_choice)
+            # initial choice always user's default
+            if hasattr(user, "userprofile"):
+                auth_level = user.userprofile.authority_level(individual.data)
+            else:
+                auth_level = UserSpeciesAuthority.AuthorityLevel.NON_EXPERT
+            self.assertEqual(context["form"].initial["authority"], auth_level)
 
             return context["form"].fields["authority"].choices
 
@@ -539,6 +542,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
                 (50, "Inexperienced, from image"),
                 (55, "Inexperienced, with original otoliths or slides"),
             ],
@@ -552,6 +557,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
                 (50, "Inexperienced, from image"),
                 (55, "Inexperienced, with original otoliths or slides"),
             ],
@@ -559,6 +566,12 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
                 (100, "Expert, from image"),
                 (105, "Expert, with original otoliths or slides"),
             ],
@@ -566,6 +579,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
                 (50, "Inexperienced, from image"),
                 (55, "Inexperienced, with original otoliths or slides"),
             ],
@@ -581,6 +596,8 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
                 (50, "Inexperienced, from image"),
                 (55, "Inexperienced, with original otoliths or slides"),
             ],
@@ -588,6 +605,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
                 (80, "Junior, from image"),
                 (85, "Junior, with original otoliths or slides"),
             ],
@@ -595,6 +616,14 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
+                (100, "Expert, from image"),
+                (105, "Expert, with original otoliths or slides"),
                 (120, "Senior expert, from image"),
                 (125, "Senior expert, with original otoliths or slides"),
             ],
@@ -610,6 +639,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_nospecies),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
                 (80, "Junior, from image"),
                 (85, "Junior, with original otoliths or slides"),
             ],
@@ -617,6 +650,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_fish),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
                 (80, "Junior, from image"),
                 (85, "Junior, with original otoliths or slides"),
             ],
@@ -624,6 +661,14 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             auth_choices(user, ind_rock),
             [
+                (20, "Automated reader, from image"),
+                (25, "Automated reader, with original otoliths or slides"),
+                (50, "Inexperienced, from image"),
+                (55, "Inexperienced, with original otoliths or slides"),
+                (80, "Junior, from image"),
+                (85, "Junior, with original otoliths or slides"),
+                (100, "Expert, from image"),
+                (105, "Expert, with original otoliths or slides"),
                 (120, "Senior expert, from image"),
                 (125, "Senior expert, with original otoliths or slides"),
             ],
