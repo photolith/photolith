@@ -52,16 +52,19 @@ export class PhFilteringViewer extends PhViewer {
     }
 
     if (phFilters.saturation && phFilters.saturation !== '0') {
-      img.filters.push(new fabric.Image.filters.Saturation({
-        saturation: parseFloat(phFilters.saturation)
-      }));
-    }
-
-    if (phFilters.huesubtract && phFilters.huesubtract !== '0') {
-      img.filters.push(new fabric.Image.filters.BlendColor({
-        color: 'hsl(' + Math.floor(parseFloat(phFilters.huesubtract) * 360) + ',100%,50%)',
-        mode: 'subtract'
-      }));
+      if (phFilters.saturationhue && phFilters.saturationhue !== '0') {
+        // https://fabricjs.com/api/namespaces/filters/classes/blendcolor/
+        img.filters.push(new fabric.Image.filters.BlendColor({
+          color: 'hsl(' + Math.floor(parseFloat(phFilters.saturationhue) * 360) + ',100%,50%)',
+          alpha: Math.abs(phFilters.saturation),
+          mode: phFilters.saturation > 1 ? 'add' : 'subtract'
+        }));
+      } else {
+        // Saturate / desaturate all colours
+        img.filters.push(new fabric.Image.filters.Saturation({
+          saturation: parseFloat(phFilters.saturation)
+        }));
+      }
     }
 
     if (phFilters.vibrance && phFilters.vibrance !== '0') {
