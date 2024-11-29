@@ -121,9 +121,33 @@ msgstr "Sérfræðingur"
 msgid "Senior expert"
 msgstr "Eldri sérfræðingur"
 
-#: photolith/models.py photolith/models.py photolith/models.py
-msgid "Reader authority"
-msgstr "Staða lesara"
+#: photolith/models.py
+msgid "The species for which the user is more expert in"
+msgstr ""
+
+#: photolith/models.py photolith/models.py
+msgid "Reader annotation authority"
+msgstr ""
+
+#: photolith/models.py
+msgid ""
+"The authority level (annotations from more expert readers will be considered "
+"before others)"
+msgstr ""
+
+#: photolith/models.py
+msgid "User species authority"
+msgstr ""
+
+#: photolith/models.py
+msgid "User species authorities"
+msgstr ""
+
+#: photolith/models.py
+msgid ""
+"The reader's authority level (annotations from more expert readers will be "
+"considered before others). Used when a species authority doesn't apply"
+msgstr ""
 
 #: photolith/models.py
 msgid "Image"
@@ -220,6 +244,10 @@ msgstr "Síðast breytt"
 #: photolith/models.py
 msgid "Image rating"
 msgstr "Einkunn"
+
+#: photolith/models.py
+msgid "Reader authority"
+msgstr "Staða lesara"
 
 #: photolith/models.py photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"

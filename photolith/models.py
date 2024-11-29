@@ -39,15 +39,21 @@ class UserSpeciesAuthority(models.Model):
         on_delete=models.CASCADE,
         null=False,
         limit_choices_to=dict(key="species"),
+        help_text=_("The species for which the user is more expert in"),
     )
     level = models.PositiveSmallIntegerField(
-        _("Reader authority"),
+        _("Reader annotation authority"),
         null=False,
         default=AuthorityLevel.INEXPERIENCED,
         choices=AuthorityLevel.choices,
+        help_text=_(
+            "The authority level (annotations from more expert readers will be considered before others)"
+        ),
     )
 
     class Meta:
+        verbose_name = _("User species authority")
+        verbose_name_plural = _("User species authorities")
         unique_together = (
             "user",
             "species",
@@ -59,10 +65,13 @@ class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     base_authority_level = models.PositiveSmallIntegerField(
-        _("Reader authority"),
+        _("Reader annotation authority"),
         null=False,
         default=UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED,
         choices=UserSpeciesAuthority.AuthorityLevel.choices,
+        help_text=_(
+            "The reader's authority level (annotations from more expert readers will be considered before others). Used when a species authority doesn't apply"
+        ),
     )
 
     def authority_level(self, ind_data):
