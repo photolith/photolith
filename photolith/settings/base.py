@@ -209,6 +209,10 @@ for k in os.environ.keys():
         # Email host set, so also update backend
         EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
         EMAIL_HOST = os.environ[k]
+    elif k == "APP_SERVER_EMAIL":
+        # Set both SERVER_EMAIL & ADMINS, so errors are from/to the same address
+        SERVER_EMAIL = os.environ[k]
+        ADMINS = [("Photolith admin", os.environ[k])]
     elif k == "APP_LOG_DB":
         LOGGING["loggers"]["django.db.backends"] = {
             "level": "DEBUG",

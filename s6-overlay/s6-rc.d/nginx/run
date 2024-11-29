@@ -6,11 +6,13 @@ DEFAULT_HOST="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f1)"
 EXTRA_HOSTS="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f2-)"
 CERT_DIR="/var/lib/dehydrated/certs"
 DOMAINS_TXT="/etc/dehydrated/domains.txt"
+CONTACT_CONFIG="/etc/dehydrated/conf.d/contact"
 DHPARAM="${CERT_DIR}/dhparam.pem"
 DNS_SERVERS="$(awk '/nameserver/ { print $2 }' /etc/resolv.conf)"
 
-# Add hosts to dehydrated config
+# Dehydrated config
 echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_TXT}"
+[ -n "${APP_SERVER_EMAIL-}" ] && echo "CONTACT_EMAIL=${APP_SERVER_EMAIL}" > "${CONTACT_CONFIG}"
 
 # Self-signed bootstrap-cert
 mkdir -p "${CERT_DIR}/${DEFAULT_HOST}"
