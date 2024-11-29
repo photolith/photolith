@@ -16,3 +16,7 @@ apt-get $* --no-install-recommends install \
 # Client dependencies
 apt-get $* --no-install-recommends install \
     nodejs npm
+
+# Client web server dependencies
+apt-get $* --no-install-recommends install \
+    nginx-light dehydrated openssl

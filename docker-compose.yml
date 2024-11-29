@@ -1,0 +1,25 @@
+services:
+  photolith:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ssl:/var/lib/dehydrated
+      - db:/srv/app/db
+      - media:/srv/app/media
+      - ingest:/srv/app/ingest_root
+    ports:
+      - 8443:443
+      - 8080:80
+    env_file:
+      - .env
+
+volumes:
+  # Stores (letsencrypt) SSL certs for use by ftpd & nginx.
+  ssl:
+  # The default SQLite database, if used.
+  db:
+  # Storage area for uploaded assets. See photolith/media/views.py
+  media:
+  # Temporary holding area for FTP-uploaded images, regularly emptied. See docker/ftpd/entrypoint.sh
+  ingest:

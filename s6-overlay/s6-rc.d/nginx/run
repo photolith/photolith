@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/command/with-contenv /bin/bash
 set -eu
+
 PROJECT_NAME="app"
 DEFAULT_HOST="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f1)"
 EXTRA_HOSTS="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f2-)"
@@ -41,7 +42,7 @@ EOF
 # Create NGINX config
 cat <<EOF > /etc/nginx/sites-available/${PROJECT_NAME}
 upstream gunicorn {
-    server wsgi:8000 fail_timeout=0;
+    server localhost:8000 fail_timeout=0;
 }
 
 server {
@@ -129,4 +130,5 @@ server {
 }
 EOF
 ln -rsf /etc/nginx/sites-available/${PROJECT_NAME} /etc/nginx/sites-enabled/${PROJECT_NAME}
+
 exec nginx -g 'daemon off; error_log /dev/stdout;'

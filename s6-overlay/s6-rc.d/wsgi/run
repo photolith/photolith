@@ -1,0 +1,11 @@
+#!/command/with-contenv /bin/sh
+set -eu
+
+cd /srv/app
+export HOME=/home/app  # https://github.com/just-containers/s6-overlay/issues/207
+
+exec s6-setuidgid "app" ./bin/gunicorn \
+  --workers 4 \
+  --bind="localhost:8000" \
+  --log-level=warn \
+  photolith.wsgi:application
