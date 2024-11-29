@@ -21,21 +21,6 @@ Once configured, ou can then use docker-compose to perform a full local installa
 
 Volumes are created as part of ``docker/compose.yml``, see there for more details on their purpose.
 
-Bare metal installation
------------------------
-
-Currently unsupported, but can be achieved with::
-
-    git clone https://github.com/photolith/photolith.git /srv/photolith
-    sudo ./preinstall.sh
-    make
-    # Configure gunicorn server
-    sudo ./install-wsgi.sh
-    # Configure NGINX w/dehydrated to act as a proxy
-    sudo ./install-nginx.sh
-    # Install FTP server (optional)
-    sudo ./install-ftpd.sh
-
 Configuration
 -------------
 
@@ -55,3 +40,18 @@ dehydrated is configured to generate SSL certs, before use you need to accept th
 And then on a ~weekly basis the following needs to run::
 
     docker compose exec photolith dehydrated -c
+
+Bare metal installation
+-----------------------
+
+Currently unsupported, but can be achieved with::
+
+    git clone https://github.com/photolith/photolith.git /srv/photolith
+    sudo ./preinstall.sh
+    make
+    # Configure gunicorn server
+    sudo ./install-wsgi.sh
+    # Configure NGINX w/dehydrated to act as a proxy
+    sudo ./install-nginx.sh
+    # Install FTP server (optional)
+    sudo ./install-ftpd.sh
