@@ -5,13 +5,12 @@ PROJECT_NAME="app"
 DEFAULT_HOST="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f1)"
 EXTRA_HOSTS="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f2-)"
 CERT_DIR="/var/lib/dehydrated/certs"
-DOMAINS_DIR="/etc/dehydrated/domains.txt.d"
+DOMAINS_TXT="/etc/dehydrated/domains.txt"
 DHPARAM="${CERT_DIR}/dhparam.pem"
 DNS_SERVERS="$(awk '/nameserver/ { print $2 }' /etc/resolv.conf)"
 
 # Add hosts to dehydrated config
-mkdir -p "${DOMAINS_DIR}"
-echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_DIR}/${PROJECT_NAME}.txt"
+echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_TXT}"
 
 # Self-signed bootstrap-cert
 mkdir -p "${CERT_DIR}/${DEFAULT_HOST}"
