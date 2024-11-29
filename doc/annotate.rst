@@ -73,7 +73,7 @@ Age reading
 Image rating
     A rating for how easy the age reading was.
 Reader authority
-    How highly regarded your reading will be. This mostly depends on if you are one of the :ref:`administration/users:Species Experts` for the current species. Here we also take into account if you have only access to the image or if you have the otolith and/or slide at hand to clarify the age readings.
+    How highly regarded your reading will be, an expert's opinion is more highly regarded than an inexperienced reader. You can also state you have access to the physical slide, giving your reading greater prominence. See :ref:`administration/users:User annotation authority / species experts` for how these values are chosen.
 Comments
     Any other comments you may have.
 

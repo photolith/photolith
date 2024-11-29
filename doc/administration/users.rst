@@ -62,12 +62,16 @@ To participate in a project, a user needs to be part of a project team.
 
 In the "Teams" section, select "Add another Team" and select the team from the dropdown.
 
-Species experts
-^^^^^^^^^^^^^^^
+User annotation authority / species experts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A user can be marked as a species expert, enabling higher *Authority* values, making their annotations win over non-experts.
+When considering multiple annotations, readers that are more expert will be considered before other readers (e.g. inexperienced or atuomated readers).
 
-In the "User Profile" section, add any relevant species by clicking the arrow that moves it to "Chosen groups".
+The user's default reader authority can be set in the "User Profile" section.
+An account for an automated age reader should be "Automated reader", a student "Inexperienced", etc.
+
+A user can have a different authority for a particular species, by adding an entry under "User species authorities".
+Click "Add another User species authority", select the Species in question and then select "Expert", e.g.
 
 Project administrators
 ^^^^^^^^^^^^^^^^^^^^^^
