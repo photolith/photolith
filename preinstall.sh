@@ -20,3 +20,7 @@ apt-get $* --no-install-recommends install \
 # Client web server dependencies
 apt-get $* --no-install-recommends install \
     nginx-light dehydrated openssl
+
+# FTP server dependencies
+apt-get $* --no-install-recommends install \
+    vsftpd db-util

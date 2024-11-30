@@ -63,6 +63,11 @@ And then on a ~weekly basis the following needs to run::
 
     docker compose exec photolith dehydrated -c
 
+User accounts for the FTP server can be added with::
+
+    docker compose exec -uroot photolith /srv/app/photolith/ftp-add-user.sh \
+        user password
+
 Bare metal installation
 -----------------------
 
