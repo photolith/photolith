@@ -14,7 +14,7 @@ Firstly, choose an image source using the drop-down next to *Choose an image sou
 * **Upload files from computer**: Select images stored on your computer. Multiple images can be selected in one go by holding Ctrl
 * **Take Photo**: Take photo using a webcam or USB microscope attached to your computer. You will see a live view, which you can then click to take a photo
 
-    * If you have more than one camera attached, you will be able to select which camera from the drop-down, but only after first selecting to take a photo with the default camera
+    * If you have more than one camera attached, you will be able to select which camera from the drop-down, but only after first selecting to take a photo with the default camera.
 
 The photolith image viewer allows you to pan by dragging the image with either left or right mouse button,
 and zoom in & out with the scrollwheel or pinching.
@@ -30,7 +30,7 @@ Drag the handles on each end so that they sit over the scale marker in the image
 .. _figure-scale-bar:
 .. figure:: images/scale-bar.jpg
 
-If the image has no scale, then set the *Scale length* box blank.
+If the image has no scale, then set the *Scale length* box blank or drag the scale line out of the image.
 
 Marking up individuals
 ----------------------

@@ -29,7 +29,7 @@ This can be useful if you want to have every age reader follow the same axis lin
 Participating in projects
 ---------------------------------------------
 
-Once you are a part of a project, you will see all active projects in both the Home and Project tabs. In the Project tab you see both active and inactive projects that your team/teams is part of.
+Once you are a part of a project, you will see all active projects in both the :kbd: 'Home' and :kbd: 'Project' tabs. In the :kbd: 'Project' tab you see both active and inactive projects that your team/teams is part of.
 
 .. _figure-project-view:
 .. figure:: images/project-view.jpg
@@ -47,7 +47,7 @@ If you want to delete a previous annotation made by you within the project, you 
 Exporting annotations out of a closed project
 ---------------------------------------------
 
-Once a project is closed, annotations can be copied out of a project.
+Once a project is closed, annotations can be copied out of a project. You can also use chosen annotations from the project to add to general annotations:
 
 * Go to the projects list page
 * Press :kbd:`View results` on the relevant project

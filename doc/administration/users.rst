@@ -65,7 +65,7 @@ In the "Teams" section, select "Add another Team" and select the team from the d
 User annotation authority / species experts
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When considering multiple annotations, readers that are more expert will be considered before other readers (e.g. inexperienced or atuomated readers).
+When considering multiple annotations, readers that are more expert will be considered before other readers (e.g. inexperienced or automated readers).
 
 The user's default reader authority can be set in the "User Profile" section.
 An account for an automated age reader should be "Automated reader", a student "Inexperienced", etc.
