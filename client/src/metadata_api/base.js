@@ -93,10 +93,12 @@ export default class MetadataApi {
     * Optionally ensuring that the (txCurrent) taxonomy item is included
     */
   txFor (txName, txCurrent) {
+    // Convert (ar) array of objects to object, keyed by v.id
     function toObj (ar) {
       return !ar ? {} : ar.reduce((a, v) => ({ ...a, [v.id]: v }), {});
     }
 
+    // Combine txEl.textContent & this._txHardcoded into one big this._fullTx, for all species
     // NB: Assumes that {{ full_taxonomy|json_script:"full_taxonomy" }} has happened in template
     if (!this._fullTx) {
       const txEl = document.getElementById('full_taxonomy');
@@ -104,6 +106,7 @@ export default class MetadataApi {
 
       this._fullTx = {};
       for (const txName of new Set([].concat(Object.keys(this._txHardcoded), Object.keys(txServer)))) {
+        // Combine both based on tx id
         this._fullTx[txName] = Object.assign(
           {},
           toObj(this._txHardcoded[txName]),
