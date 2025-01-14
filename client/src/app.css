@@ -18,3 +18,16 @@
   margin-bottom: 2px;
   width: 2rem;
 }
+
+.form-switch label .unchecked,
+.form-switch label .checked {
+  display: none;
+}
+
+.form-switch input:checked + label .checked {
+  display: block;
+}
+
+.form-switch input:not(:checked) + label .unchecked {
+  display: block;
+}
