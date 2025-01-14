@@ -687,15 +687,6 @@ msgstr ""
 
 #: photolith/templates/ingest/index.html
 msgid ""
-"Select many boxes with <kbd>Ctrl</kbd>-drag, they then can be resized as a "
-"group"
-msgstr ""
-"Veldu mörg box með því að halda inni <kbd>Ctrl</kbd> og draga yfir þau box "
-"sem þú vilt velja saman. Boxin geta þá verið færð eða stærðin á þeim breytt "
-"á sama tíma."
-
-#: photolith/templates/ingest/index.html
-msgid ""
 "Discard an individual by dragging it outside the image, which will stop it "
 "being uploaded"
 msgstr ""
