@@ -679,11 +679,16 @@ msgstr ""
 
 #: photolith/templates/ingest/index.html
 msgid ""
-"Drag individual boxes or resize them by clicking on one and dragging it's "
-"corners."
+"Drag individual boxes, which will be resized to fit the individual "
+"underneath."
 msgstr ""
-"Dragðu hvert box yfir viðeigandi kvörn með því að smella á það og færa það "
-"með músinni. Einnig er hægt að minnka og stækka boxin eftir þörfum."
+"Dragðu einstaka reiti sem verða breyttir til að passa einstaklinginn undir."
+
+#: photolith/templates/ingest/index.html
+msgid ""
+"Manually adjust boxes by clicking an individual and dragging it's corners."
+msgstr ""
+"Stilltu reiti handvirkt með því að smella á einstakling og draga horn hans."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -705,6 +710,30 @@ msgstr "Lengd kvarða (mm)"
 #: photolith/templates/ingest/index.html
 msgid "Label species_no : Individual_no"
 msgstr "Raðnúmer tegund_nr : Einstakingur_nr"
+
+#: photolith/templates/ingest/index.html
+msgid ""
+"No cropping of individual boxes performed by default. Use the handles at the "
+"edge to crop, or crop by double-clicking on an individual."
+msgstr ""
+"Engin klipping einstakra kassa framkvæmt sjálfgefið. Notaðu handföngin á "
+"brúninni til að klippa eða klippa með því að tvísmella á einstakling."
+
+#: photolith/templates/ingest/index.html
+msgid "Manual crop"
+msgstr "Handvirk uppskera"
+
+#: photolith/templates/ingest/index.html
+msgid ""
+"When moving individual boxes, they will be automatically cropped to the "
+"individual underneath the mouse cursor."
+msgstr ""
+"Þegar einstakir kassar eru færðir verða þeir sjálfkrafa klipptir fyrir "
+"einstaklinginn undir músarbendlinum."
+
+#: photolith/templates/ingest/index.html
+msgid "Auto crop"
+msgstr "Sjálfvirk uppskera"
 
 #: photolith/templates/ingest/index.html
 msgid "Add"
