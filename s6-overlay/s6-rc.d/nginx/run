@@ -1,16 +1,18 @@
-#!/bin/bash
+#!/command/with-contenv /bin/bash
 set -eu
+
 PROJECT_NAME="app"
 DEFAULT_HOST="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f1)"
 EXTRA_HOSTS="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f2-)"
 CERT_DIR="/var/lib/dehydrated/certs"
-DOMAINS_DIR="/etc/dehydrated/domains.txt.d"
+DOMAINS_TXT="/etc/dehydrated/domains.txt"
+CONTACT_CONFIG="/etc/dehydrated/conf.d/contact"
 DHPARAM="${CERT_DIR}/dhparam.pem"
 DNS_SERVERS="$(awk '/nameserver/ { print $2 }' /etc/resolv.conf)"
 
-# Add hosts to dehydrated config
-mkdir -p "${DOMAINS_DIR}"
-echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_DIR}/${PROJECT_NAME}.txt"
+# Dehydrated config
+echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_TXT}"
+[ -n "${APP_SERVER_EMAIL-}" ] && echo "CONTACT_EMAIL=${APP_SERVER_EMAIL}" > "${CONTACT_CONFIG}"
 
 # Self-signed bootstrap-cert
 mkdir -p "${CERT_DIR}/${DEFAULT_HOST}"
@@ -41,7 +43,7 @@ EOF
 # Create NGINX config
 cat <<EOF > /etc/nginx/sites-available/${PROJECT_NAME}
 upstream gunicorn {
-    server wsgi:8000 fail_timeout=0;
+    server localhost:8000 fail_timeout=0;
 }
 
 server {
@@ -129,4 +131,5 @@ server {
 }
 EOF
 ln -rsf /etc/nginx/sites-available/${PROJECT_NAME} /etc/nginx/sites-enabled/${PROJECT_NAME}
+
 exec nginx -g 'daemon off; error_log /dev/stdout;'

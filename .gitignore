@@ -25,7 +25,7 @@
 /ingest_root/
 
 # Docker
-/docker/.env
+.env
 
 # Coverage
 /.coverage

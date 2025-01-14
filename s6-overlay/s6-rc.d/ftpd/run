@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/command/with-contenv /bin/sh
 set -eu
 DEFAULT_HOST="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f1)"
 EXTRA_HOSTS="$(printf ${APP_ALLOWED_HOSTS} | cut -d" " -f2-)"
 CERT_DIR="/var/lib/dehydrated/certs"
 INGEST_ROOT="/srv/app/ingest_root"
 # NB: Without .db because pam_userdb.so magically adds it on the end
-INGEST_USERDB="${INGEST_ROOT}/vsftpd"
+INGEST_USERDB="/srv/app/db/vsftpd"
 
 # References:
 # * https://www.cyberciti.biz/tips/centos-redhat-vsftpd-ftp-with-virtual-users.html
@@ -104,5 +104,5 @@ while [ -n "${PID_DAEMON}" ]; do
     sleep 60 &
     wait $!
 
-    find "${INGEST_ROOT}"/* -type f -ctime +1 -exec rm -- {} \;
+    find "${INGEST_ROOT}" -type f -ctime +1 -exec rm -- {} \;
 done
