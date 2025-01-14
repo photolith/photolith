@@ -45,8 +45,9 @@ These should be positioned on top of each individual.
 .. _figure-ingest-overview:
 .. figure:: images/ingest-overview.png
 
-* Click on a box to select it, and then use the handles around the edge to resize it
-* You can use Ctrl-drag to select multiple boxes, and drag/resize them as a group
+* Drag a box on top of an individual, it should be automatically resized to match.
+* You can manually adjust the size by using the handles at the edge of a box.
+* If auto-cropping is guessing poorly, you can also disable it by clicking the *Auto crop* toggle.
 
 The label may be used for multiple images, in which case not all the individuals will be part of the image.
 You can either:
