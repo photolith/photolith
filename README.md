@@ -4,8 +4,8 @@ An Otholith image capture, management and reading database.
 
 ## Installation 
 
-For production installations, see [doc/production.md](doc/production.md).
+For production installations, see [doc/advanced/production.md](doc/advanced/production.rst).
 
 ## Development
 
-For development notes, see [doc/development.md](doc/development.md).
+For development notes, see [doc/advanced/development.md](doc/advanced/development.rst).
