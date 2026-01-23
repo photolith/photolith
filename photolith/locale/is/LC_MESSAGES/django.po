@@ -111,7 +111,7 @@ msgstr "Óreyndur"
 
 #: photolith/models.py
 msgid "Junior"
-msgstr "Yngri"
+msgstr "Óreyndur"
 
 #: photolith/models.py
 msgid "Expert"
@@ -119,35 +119,38 @@ msgstr "Sérfræðingur"
 
 #: photolith/models.py
 msgid "Senior expert"
-msgstr "Eldri sérfræðingur"
+msgstr "Reyndari sérfræðingur"
 
 #: photolith/models.py
 msgid "The species for which the user is more expert in"
-msgstr ""
+msgstr "Tegundin sem notandinn er reyndastur í"
 
 #: photolith/models.py photolith/models.py
 msgid "Reader annotation authority"
-msgstr ""
+msgstr "Reynsla aldurslesara"
 
 #: photolith/models.py
 msgid ""
 "The authority level (annotations from more expert readers will be considered "
 "before others)"
 msgstr ""
+"Reynslustig (aldursmerkingar frá reyndari notanda hafa meira vægi)"
 
 #: photolith/models.py
 msgid "User species authority"
-msgstr ""
+msgstr "Reynsla notanda á tegund"
 
 #: photolith/models.py
 msgid "User species authorities"
-msgstr ""
+msgstr "Reynsla notanda á tegundir"
 
 #: photolith/models.py
 msgid ""
 "The reader's authority level (annotations from more expert readers will be "
 "considered before others). Used when a species authority doesn't apply"
 msgstr ""
+"Reynslustig aldurslesara (aldursmerkingar frá reyndari notendum hafa meira vægi). "
+"Notað þegar reynsla á vissri tegund á ekki við."
 
 #: photolith/models.py
 msgid "Image"
@@ -186,7 +189,7 @@ msgstr "Upplýsingar úr gagnagrunni"
 msgid ""
 "The taxonomy this entry is added to, a lower-case identifier, e.g. 'species'"
 msgstr ""
-"Flokkunin sem þessari færslu er bætt við, auðkenni með lágstöfum, t.d. "
+"Tegundaflokkunin sem þessari færslu er bætt við, auðkennd með lágstöfum, t.d. "
 "'tegund'"
 
 #: photolith/models.py
@@ -194,7 +197,7 @@ msgid ""
 "A numeric identifier. Should be unique for each key, can repeat 1 for "
 "'species' & 'sex', but cannot have 2 entries with both 1 & 'species'"
 msgstr ""
-"Tölulegt auðkenni. Ætti að vera einstakt fyrir hvern lykil, getur endurtekið "
+"Tölulegt auðkenni. Ætti að vera einstakt fyrir hvern flokk, getur endurtekið "
 "1 fyrir 'tegund' og 'kyn', en má ekki hafa 2 færslur með bæði 1 og 'tegund'"
 
 #: photolith/models.py
@@ -222,16 +225,16 @@ msgid "with original otoliths or slides"
 msgstr "með upprunalegu kvarnirnar eða glerin"
 
 #: photolith/models.py
-msgid "Unreadable"
-msgstr "Ólæsileg"
+msgid "3"
+msgstr "3"
 
 #: photolith/models.py
-msgid "+/- 1 year"
-msgstr "+/- 1 ár"
+msgid "2"
+msgstr "2"
 
 #: photolith/models.py
-msgid "Easy to read"
-msgstr "Auðveld"
+msgid "1"
+msgstr "1"
 
 #: photolith/models.py
 msgid "Part of project"
