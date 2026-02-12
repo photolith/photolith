@@ -5,9 +5,13 @@ export function clearFetchCache () {
 
 /** jsonFetch, but stash results in sessionStorage for use between pages */
 export function jsonFetchCached (baseResource, params, options) {
+  // https://stackoverflow.com/a/53307588
+  const isReload =
+    performance.getEntriesByType('navigation')[0]?.type === 'reload' ||
+      performance.navigation?.type === 1;
+
   // https://developer.mozilla.org/en-US/docs/Web/API/Storage
-  const cachedParams = window.sessionStorage.getItem(baseResource + '?query');
-  if (cachedParams === params) {
+  if (!isReload && params === window.sessionStorage.getItem(baseResource + '?query')) {
     return Promise.resolve(JSON.parse(window.sessionStorage.getItem(baseResource + '?data')));
   }
 
