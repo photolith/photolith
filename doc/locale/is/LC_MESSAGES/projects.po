@@ -105,7 +105,7 @@ msgstr ""
 "Þegar þú sérð myndina þá geturðu líka séð þínar eigin fyrri merkingar í "
 ":kbd: 'Fyrri merkingar' flipanum en þú sérð ekki merkingar annarra. Ef þú"
 " vilt eyða eigin merkingu þá er hægt að velja hana í :kbd: 'Fyrri "
-"merkingar' flipanum og ýta á :kbd: 'Eyða merkingu'"
+"merkingar' flipanum og ýta á :kbd:`Eyða merkingu`"
 
 msgid "Exporting annotations out of a closed project"
 msgstr "Að hala niður niðurstöðum verkefnis sem er lokið"
@@ -125,7 +125,7 @@ msgid "Press :kbd:`View results` on the relevant project"
 msgstr "Ýttu á :kbd:`Skoða niðurstöður` viðeigandi verkefnis"
 
 msgid "Open the first annotation, and press :kbd:`View/add annotation`"
-msgstr "Opnaðu fyrstu merkinguna og ýttu á :kbd: 'Skoða/breyta merkingu'"
+msgstr "Opnaðu fyrstu merkinguna og ýttu á :kbd:`Skoða/breyta merkingu`"
 
 msgid ""
 "Select the most representative annotation from existing annotations, and "
@@ -137,7 +137,7 @@ msgid "Make any changes if necessary, and press :kbd:`Save as general annotation
 msgstr "Breyttu ef þörf er á og ýttu á :kbd:'Vista sem almenna aldursmerkingu'"
 
 msgid "Press :kbd:`Next` to move on to the next individual."
-msgstr "Ýttu á :kbd:'Næsti' til að fara yfir á næsta einstakling."
+msgstr "Ýttu á :kbd:`Næsti` til að fara yfir á næsta einstakling."
 
 #~ msgid ""
 #~ "To create a project, go to the "
