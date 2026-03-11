@@ -74,7 +74,7 @@ msgstr "Taka mynd með tengdri myndavél"
 
 #: photolith/ingest/views.py
 msgid "No individual boxes on image! Nothing saved."
-msgstr "Engin einstaklingsbox á myndinni! Ekkert vistað."
+msgstr "Engir reitir á myndinni! Ekkert var vistað."
 
 #: photolith/ingest/views.py
 #, python-format
@@ -94,12 +94,12 @@ msgstr[1] "%(count)d einstaklingar uppfærðir."
 #, python-format
 msgid "Deleted %(count)d individual. "
 msgid_plural "Deleted %(count)d individuals. "
-msgstr[0] "%(count)d einstaklingur eytt."
+msgstr[0] "%(count)d einstakling eytt."
 msgstr[1] "%(count)d einstaklingar eytt."
 
 #: photolith/ingest/views.py
 msgid "Show individuals"
-msgstr "Sýna einstaklinga"
+msgstr "Sýna kvarnir"
 
 #: photolith/models.py
 msgid "Automated reader"
@@ -111,7 +111,7 @@ msgstr "Óreyndur"
 
 #: photolith/models.py
 msgid "Junior"
-msgstr "Yngri"
+msgstr "Í þjálfun"
 
 #: photolith/models.py
 msgid "Expert"
@@ -119,35 +119,38 @@ msgstr "Sérfræðingur"
 
 #: photolith/models.py
 msgid "Senior expert"
-msgstr "Eldri sérfræðingur"
+msgstr "Reyndari sérfræðingur"
 
 #: photolith/models.py
 msgid "The species for which the user is more expert in"
-msgstr ""
+msgstr "Tegundin sem notandinn er reyndastur í"
 
 #: photolith/models.py photolith/models.py
 msgid "Reader annotation authority"
-msgstr ""
+msgstr "Reynsla aldurslesara"
 
 #: photolith/models.py
 msgid ""
 "The authority level (annotations from more expert readers will be considered "
 "before others)"
 msgstr ""
+"Reynsla (aldursmerkingar frá reyndari notendum eru valdar framyfir aðra)"
 
 #: photolith/models.py
 msgid "User species authority"
-msgstr ""
+msgstr "Reynsla notanda á tegund"
 
 #: photolith/models.py
 msgid "User species authorities"
-msgstr ""
+msgstr "Reynsla notanda á tegundum"
 
 #: photolith/models.py
 msgid ""
 "The reader's authority level (annotations from more expert readers will be "
 "considered before others). Used when a species authority doesn't apply"
 msgstr ""
+"Reynsla (aldursmerkingar frá reyndari notendum eru valdar framyfir aðra). "
+"Notað þegar reynsla á vissri tegund á ekki við."
 
 #: photolith/models.py
 msgid "Image"
@@ -180,13 +183,13 @@ msgstr "Einstaklingar"
 
 #: photolith/models.py
 msgid "Metadata key"
-msgstr "Upplýsingar úr gagnagrunni"
+msgstr "Gögn úr gagnagrunni"
 
 #: photolith/models.py
 msgid ""
 "The taxonomy this entry is added to, a lower-case identifier, e.g. 'species'"
 msgstr ""
-"Flokkunin sem þessari færslu er bætt við, auðkenni með lágstöfum, t.d. "
+"Flokkunin sem þessari færslu er bætt við, auðkennd með lágstöfum, t.d. "
 "'tegund'"
 
 #: photolith/models.py
@@ -194,8 +197,9 @@ msgid ""
 "A numeric identifier. Should be unique for each key, can repeat 1 for "
 "'species' & 'sex', but cannot have 2 entries with both 1 & 'species'"
 msgstr ""
-"Tölulegt auðkenni. Ætti að vera einstakt fyrir hvern lykil, getur endurtekið "
-"1 fyrir 'tegund' og 'kyn', en má ekki hafa 2 færslur með bæði 1 og 'tegund'"
+"Tölulegt auðkenni. Ætti að vera einstakt fyrir hvern lykil, getur verið "
+"notað nokkrum sinnum, 1 fyrir 'tegund' og 'kyn', en má ekki hafa 2 færslur "
+"með bæði 1 og 'tegund'"
 
 #: photolith/models.py
 msgid "English"
@@ -222,16 +226,16 @@ msgid "with original otoliths or slides"
 msgstr "með upprunalegu kvarnirnar eða glerin"
 
 #: photolith/models.py
-msgid "Unreadable"
-msgstr "Ólæsileg"
+msgid "3"
+msgstr "3"
 
 #: photolith/models.py
-msgid "+/- 1 year"
-msgstr "+/- 1 ár"
+msgid "2"
+msgstr "2"
 
 #: photolith/models.py
-msgid "Easy to read"
-msgstr "Auðveld"
+msgid "1"
+msgstr "1"
 
 #: photolith/models.py
 msgid "Part of project"
@@ -247,7 +251,7 @@ msgstr "Einkunn"
 
 #: photolith/models.py
 msgid "Reader authority"
-msgstr "Staða lesara"
+msgstr "Reynsla lesara"
 
 #: photolith/models.py photolith/tests/test_templatetags_verbose_name.py
 msgid "Age reading"
@@ -271,7 +275,7 @@ msgstr "Nafn verkefnis"
 
 #: photolith/models.py
 msgid "The set of users that should be included in the project"
-msgstr "Notentur sem eiga að taka þátt í verkefninu"
+msgstr "Notendur sem eiga að taka þátt í verkefninu"
 
 #: photolith/models.py
 msgid "Project end date"
@@ -575,7 +579,7 @@ msgstr "Vefstjórn"
 msgid ""
 "Welcome to Photolith, the otolith image storage and annotation software."
 msgstr ""
-"Velkomin í Kvarnó, hugbúnaðinn sem heldur utan um kvarnamyndir og "
+"Velkomin í Photolith, hugbúnaðinn sem heldur utan um kvarnamyndir og "
 "aldursmerkingar."
 
 #: photolith/templates/home/index.html
@@ -633,8 +637,8 @@ msgstr "Næsta mynd"
 #: photolith/templates/ingest/index.html
 msgid "First, select an import option using the grey bar at the top."
 msgstr ""
-"Veldu viðeigandi innflutningsmöguleika í dálknum efst á síðunni til að hlaða "
-"inn mynd."
+"Veldu viðeigandi möguleika til að hlaða inn myndum í dálknum efst á " 
+"síðunni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -682,13 +686,14 @@ msgid ""
 "Drag individual boxes, which will be resized to fit the individual "
 "underneath."
 msgstr ""
-"Dragðu einstaka reiti sem verða breyttir til að passa einstaklinginn undir."
+"Dragðu hvern reit fyrir sig yfir kvörn og hann mun breyta um stærð "
+"til að passa utan um kvörnina." 
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Manually adjust boxes by clicking an individual and dragging it's corners."
 msgstr ""
-"Stilltu reiti handvirkt með því að smella á einstakling og draga horn hans."
+"Stilltu reiti handvirkt með því að smella á stakan reit og draga hornin til."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -716,24 +721,24 @@ msgid ""
 "No cropping of individual boxes performed by default. Use the handles at the "
 "edge to crop, or crop by double-clicking on an individual."
 msgstr ""
-"Engin klipping einstakra kassa framkvæmt sjálfgefið. Notaðu handföngin á "
-"brúninni til að klippa eða klippa með því að tvísmella á einstakling."
+"Reitirnir aðlagast ekki stærð á kvörn. Notaðu jaðrana á reinum til að aðlaga "
+"stærð eða tvísmelltu á einstaklinginn."
 
 #: photolith/templates/ingest/index.html
 msgid "Manual crop"
-msgstr "Handvirk uppskera"
+msgstr "Breyta stærð reita handvirkt"
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "When moving individual boxes, they will be automatically cropped to the "
-"individual underneath the mouse cursor."
+"individual underneath the mouse cursor when released."
 msgstr ""
-"Þegar einstakir kassar eru færðir verða þeir sjálfkrafa klipptir fyrir "
-"einstaklinginn undir músarbendlinum."
+"Þegar einstakir reitir eru færðir þá breytist stærðin á þeim sjálfkrafa "
+"til að passa utan um kvörnina undir músabendlinum þegar þeim er sleppt."
 
 #: photolith/templates/ingest/index.html
 msgid "Auto crop"
-msgstr "Sjálfvirk uppskera"
+msgstr "Sjálfvirk aðlögun stærðar"
 
 #: photolith/templates/ingest/index.html
 msgid "Add"
@@ -863,7 +868,7 @@ msgstr "Greining jaðars"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"
-msgstr "Ná í upprunalega mynd"
+msgstr "Hala niður upprunalega mynd"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Reset"
