@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.db.models import Count, Prefetch, Subquery, Min, Max, Q
+from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, Max, Q
 
 from ..errors import json_errors
 from ..models import (
@@ -128,24 +128,30 @@ class DataView(LoginRequiredMixin, View):
                         % (k, "&".join(vs))
                     )
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaNumeric.objects.filter(
+                            individual_id=OuterRef("id"),
                             key=k.replace("nm_", ""),
                             value__gte=float(vs[0]),
                             value__lte=float(vs[1]),
-                        ).values("individual_id")
+                        )
                     )
                 )
             elif k.startswith("ch_"):
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaChar.objects.filter(
-                            key=k.replace("ch_", ""), value__in=vs
-                        ).values("individual_id")
+                            individual_id=OuterRef("id"),
+                            key=k.replace("ch_", ""),
+                            value__in=vs,
+                        )
                     )
                 )
             elif k.startswith("dt_"):
-                sq = MetaDT.objects.filter(key=k.replace("nm_", ""))
+                sq = MetaDT.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("nm_", ""),
+                )
                 vs = sorted(x for x in vs if x)  # Sort & remove empty strings
                 if len(vs) > 0:
                     sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
@@ -155,11 +161,12 @@ class DataView(LoginRequiredMixin, View):
                         value__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
-                qs = qs.filter(id__in=Subquery(sq))
+                qs = qs.filter(Exists(sq))
             elif k.startswith("tx_"):
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaTx.objects.filter(
+                            individual_id=OuterRef("id"),
                             key=k.replace("tx_", ""),
                             value__in=Subquery(
                                 Taxonomy.objects.filter(
@@ -167,7 +174,7 @@ class DataView(LoginRequiredMixin, View):
                                     identifier__in=vs,
                                 ).values("id")
                             ),
-                        ).values("individual_id")
+                        )
                     )
                 )
 
