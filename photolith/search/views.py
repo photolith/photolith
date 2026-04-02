@@ -167,7 +167,7 @@ class DataView(LoginRequiredMixin, View):
                     Exists(
                         MetaTx.objects.filter(
                             individual_id=OuterRef("id"),
-                            key=k.replace("tx_", ""),
+                            # NB: Not checking the redundant key at this level
                             value__in=Subquery(
                                 Taxonomy.objects.filter(
                                     key=k.replace("tx_", ""),
