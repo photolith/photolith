@@ -40,7 +40,7 @@ class DataViewTest(RequiresUtils, TestCase):
         client = Client()
         client.force_login(user)
         resp = client.get("/search/data/", search)
-        out = json.loads(resp.content)
+        out = json.loads(b"".join(resp.streaming_content))
         return out
 
     def test_call__perms(self):

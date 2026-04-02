@@ -6,7 +6,7 @@ import re
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.views.generic import TemplateView
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.db.models import Count, Prefetch, Subquery, Min, Max, Q
@@ -21,6 +21,7 @@ from ..models import (
     Project,
     Taxonomy,
 )
+from ..response_json import StreamingJsonResponse
 from ..nullagg import NullAgg
 from ..perm_utils import check_annotate_access
 
@@ -229,11 +230,7 @@ class DataView(LoginRequiredMixin, View):
 
     @json_errors
     def get(self, *args, **kwargs):
-        context = {}
-
-        context["data"] = list(self.query())
-
-        return JsonResponse(context)
+        return StreamingJsonResponse(self.query())
 
 
 class ExportView(DataView):
