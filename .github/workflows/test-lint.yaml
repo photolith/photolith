@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+name: Test & Lint
+
+jobs:
+  test-lint:
+    runs-on: ubuntu-latest
+
+    name: Run tests / lint
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: sudo ./preinstall.sh -y
+
+      # https://github.com/actions/setup-python
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+ 
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+ 
+      - run: make test
+
+      - uses: nickcharlton/diff-check@9fa7ac2bd275b9ec60f13dbcef1b90cfaadc1872
+        with:
+          # NB: Ideally we'd just do "make precommit", but don't want to trigger on translation errors, yet
+          command: make makemigrations lint
