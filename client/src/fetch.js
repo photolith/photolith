@@ -37,7 +37,18 @@ export function jsonFetch (resource, options = {}) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/json';
   return window.fetch(resource, options).then((response) => {
-    if (response.ok) return response.json();
+    if (response.ok) {
+      return response.json().then((rv) => {
+        // NB: Streaming responses might have reported an error after starting
+        if (rv.error) {
+          throw new Error(`Failed to fetch ${resource} ${rv.error_class ? `[${rv.error_class}]` : ''}: ${rv.error}`);
+        }
+        return rv;
+      }).catch((e) => {
+        console.error('Failed to parse JSON response', e);
+        throw new Error(`Failed to fetch ${resource}`);
+      });
+    }
 
     return response.json().catch((e) => {
       console.error('Failed to parse error response', e);

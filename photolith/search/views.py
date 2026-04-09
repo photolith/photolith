@@ -4,12 +4,14 @@ import itertools
 import re
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
 from django.core.cache import cache
 from django.views.generic import TemplateView
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from django.views import View
-from django.db.models import Count, Prefetch, Subquery, Min, Max, Q
+from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, Max, Q
 
 from ..errors import json_errors
 from ..models import (
@@ -21,6 +23,7 @@ from ..models import (
     Project,
     Taxonomy,
 )
+from ..response_json import StreamingJsonResponse
 from ..nullagg import NullAgg
 from ..perm_utils import check_annotate_access
 
@@ -127,24 +130,30 @@ class DataView(LoginRequiredMixin, View):
                         % (k, "&".join(vs))
                     )
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaNumeric.objects.filter(
+                            individual_id=OuterRef("id"),
                             key=k.replace("nm_", ""),
                             value__gte=float(vs[0]),
                             value__lte=float(vs[1]),
-                        ).values("individual_id")
+                        )
                     )
                 )
             elif k.startswith("ch_"):
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaChar.objects.filter(
-                            key=k.replace("ch_", ""), value__in=vs
-                        ).values("individual_id")
+                            individual_id=OuterRef("id"),
+                            key=k.replace("ch_", ""),
+                            value__in=vs,
+                        )
                     )
                 )
             elif k.startswith("dt_"):
-                sq = MetaDT.objects.filter(key=k.replace("nm_", ""))
+                sq = MetaDT.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("nm_", ""),
+                )
                 vs = sorted(x for x in vs if x)  # Sort & remove empty strings
                 if len(vs) > 0:
                     sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
@@ -154,19 +163,20 @@ class DataView(LoginRequiredMixin, View):
                         value__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
-                qs = qs.filter(id__in=Subquery(sq))
+                qs = qs.filter(Exists(sq))
             elif k.startswith("tx_"):
                 qs = qs.filter(
-                    id__in=Subquery(
+                    Exists(
                         MetaTx.objects.filter(
-                            key=k.replace("tx_", ""),
+                            individual_id=OuterRef("id"),
+                            # NB: Not checking the redundant key at this level
                             value__in=Subquery(
                                 Taxonomy.objects.filter(
                                     key=k.replace("tx_", ""),
                                     identifier__in=vs,
                                 ).values("id")
                             ),
-                        ).values("individual_id")
+                        )
                     )
                 )
 
@@ -183,7 +193,16 @@ class DataView(LoginRequiredMixin, View):
                 )
             )
 
-        for ind in qs:
+        result_count = 0
+        for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
+            result_count += 1
+            if result_count > settings.SEARCH_RESULT_MAX_ROWS:
+                yield dict(
+                    truncated=_("Too many results, only first %d returned")
+                    % settings.SEARCH_RESULT_MAX_ROWS
+                )
+                break
+
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
             out["num_annotations"] = ind.num_annotations
@@ -229,11 +248,7 @@ class DataView(LoginRequiredMixin, View):
 
     @json_errors
     def get(self, *args, **kwargs):
-        context = {}
-
-        context["data"] = list(self.query())
-
-        return JsonResponse(context)
+        return StreamingJsonResponse(self.query())
 
 
 class ExportView(DataView):

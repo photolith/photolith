@@ -186,6 +186,12 @@ LOGGING = {
     "loggers": {},
 }
 
+# Photolith search
+# Maximum number of rows we will return before stopping
+SEARCH_RESULT_MAX_ROWS = 50_000
+# Number of prefetch_related() objects to fetch before iterating over row loop
+SEARCH_RESULT_CHUNK_SIZE = 100
+
 # Allow overrides via. environment (for docker)
 for k in os.environ.keys():
     if k.startswith("APP_DB_"):
