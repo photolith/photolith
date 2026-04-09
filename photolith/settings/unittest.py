@@ -11,3 +11,5 @@ DATABASES["default"]["NAME"] = "app_ut"
 STORAGES["default"]["BACKEND"] = "django.core.files.storage.InMemoryStorage"
 
 LOGGING = {}
+
+SEARCH_RESULT_MAX_ROWS = 100

@@ -2,6 +2,7 @@ import csv
 import datetime
 import json
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test import Client, TestCase, RequestFactory
 
@@ -36,11 +37,16 @@ class IndexViewTest(RequiresUtils, TestCase):
 class DataViewTest(RequiresUtils, TestCase):
     maxDiff = None
 
-    def data(self, user, search=dict()):
+    def data(self, user, search=dict(), expect_success=True):
         client = Client()
         client.force_login(user)
         resp = client.get("/search/data/", search)
         out = json.loads(b"".join(resp.streaming_content))
+        if expect_success:
+            if "error" in out.keys():
+                self.fail(out)
+            self.assertEqual(list(out.keys()), ["data"])
+            return out["data"]
         return out
 
     def test_call__perms(self):
@@ -48,7 +54,7 @@ class DataViewTest(RequiresUtils, TestCase):
         user = self.create_user(groups=[])
 
         self.assertEqual(
-            self.data(user),
+            self.data(user, expect_success=False),
             dict(
                 error_class="PermissionDenied",
                 error="Contact an administrator to be added to the general annotation group",
@@ -56,11 +62,48 @@ class DataViewTest(RequiresUtils, TestCase):
         )
         p = self.create_project()
         self.assertEqual(
-            self.data(user, dict(project=p.id)),
+            self.data(user, dict(project=p.id), expect_success=False),
             dict(
                 error_class="PermissionDenied",
                 error="Contact an administrator to be added to this project",
             ),
+        )
+
+    def test_truncated_results(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        img = self.create_image(
+            # Scale should multiply distances by 2
+            scale_line=[(0, 0), (1, 0)],
+            scale_mm=2,
+        )
+        for i in range(settings.SEARCH_RESULT_MAX_ROWS + 4):
+            self.create_individual(
+                image=img,
+                bounding_box=[(i, i), (i + 1, i + 1)],
+                data=dict(nm_category=i // 10),
+            )
+
+        # A filtered subset is fine
+        out = [
+            (r["id"] if "id" in r else r)
+            for r in self.data(userA, dict(nm_category=[4, 5]))
+        ]
+        self.assertEqual(out, list(range(41, 61)))
+
+        # Every possible result results in truncated response
+        out = [(r["id"] if "id" in r else r) for r in self.data(userA, dict())]
+        self.assertEqual(
+            out,
+            list(range(1, settings.SEARCH_RESULT_MAX_ROWS + 1))
+            + [
+                dict(
+                    truncated="Too many results, only first %d returned"
+                    % settings.SEARCH_RESULT_MAX_ROWS
+                )
+            ],
         )
 
 
