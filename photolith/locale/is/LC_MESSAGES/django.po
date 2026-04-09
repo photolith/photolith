@@ -496,10 +496,11 @@ msgstr "Eyða aldursmerkingu"
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"Annuli will be added/moved freeform. Pressing <kbd>Ctrl</kbd> will add/move along axis"
+"Annuli will be added/moved freeform. Pressing <kbd>Ctrl</kbd> will add/move "
+"along axis"
 msgstr ""
-"Aldursmerkingar munu ekki fylgja ekki lestrarás. Með því að ýta á <kbd>Ctrl</kbd> er "
-"hægt að láta merkingarnar fylgja lestrarásnum."
+"Aldursmerkingar munu ekki fylgja ekki lestrarás. Með því að ýta á <kbd>Ctrl</"
+"kbd> er hægt að láta merkingarnar fylgja lestrarásnum."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Free-form"
@@ -507,11 +508,12 @@ msgstr "Aldursmerkingar fylgja ekki lestarás"
 
 #: photolith/templates/annotate/annotate.html
 msgid ""
-"Annuli will be added/moved along axis. Pressing <kbd>Ctrl</kbd> will add/move freeform"
+"Annuli will be added/moved along axis. Pressing <kbd>Ctrl</kbd> will add/"
+"move freeform"
 msgstr ""
-"Aldursmerkingum er bætt á og fylgja lestrarás. Með því að ýta á <kbd>Ctrl</kbd> er "
-"hægt að færa þær frá ásnum með því að draga þær til eða tvíklikka fjarri ás til að "
-"búa til nýja merkingu."
+"Aldursmerkingum er bætt á og fylgja lestrarás. Með því að ýta á <kbd>Ctrl</"
+"kbd> er hægt að færa þær frá ásnum með því að draga þær til eða tvíklikka "
+"fjarri ás til að búa til nýja merkingu."
 
 #: photolith/templates/annotate/annotate.html
 msgid "Snap to axis"
@@ -638,8 +640,7 @@ msgstr "Næsta mynd"
 #: photolith/templates/ingest/index.html
 msgid "First, select an import option using the grey bar at the top."
 msgstr ""
-"Veldu viðeigandi möguleika til að hlaða inn myndum í dálknum efst á " 
-"síðunni."
+"Veldu viðeigandi möguleika til að hlaða inn myndum í dálknum efst á síðunni."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -647,8 +648,8 @@ msgid ""
 "species no. 1). Press <kbd>enter</kbd>."
 msgstr ""
 "Sláðu svo inn raðnúmer (id sýnis) og tegundanúmer (t.d. <kbd>542871 1</kbd> "
-"fyrir tegund nr. 1). Ýttu á <kbd>enter</kbd> eða ýttu með músabendlinum einhverstaðar "
-"út fyrir dálkinn."
+"fyrir tegund nr. 1). Ýttu á <kbd>enter</kbd> eða ýttu með músabendlinum "
+"einhverstaðar út fyrir dálkinn."
 
 #: photolith/templates/ingest/index.html
 msgid "After loading, a box for each individual will appear on the page grid."
@@ -664,19 +665,18 @@ msgid ""
 "no scale on the image then you can blank the scale field or write 0."
 msgstr ""
 "Færðu hvern reit yfir samsvarandi kvörn og stilltu kvarðann á skalanum sem "
-"birtist efst/neðst á hverri mynd. Ýttu á <kbd>Vista</kbd> þegar allt er tilbúið. "
-"Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á kvörnunum séu "
-"réttar. Ef enginn eða ónothæfur kvarði er á myndinni þá er hægt að slá inn 0 sem "
-"lengd á kvarða til að hann sé ekki notaður. "
+"birtist efst/neðst á hverri mynd. Ýttu á <kbd>Vista</kbd> þegar allt er "
+"tilbúið. Mikilvægt er að kvarðinn sé rétt settur inn svo mælingar á "
+"kvörnunum séu réttar. Ef enginn eða ónothæfur kvarði er á myndinni þá er "
+"hægt að slá inn 0 sem lengd á kvarða til að hann sé ekki notaður. "
 
 #: photolith/templates/ingest/index.html
 msgid ""
 "Adjust image contrast or download using the magic wand menu, increasing "
 "brightness to view slide notes, e.g."
 msgstr ""
-"Stilltu contrast, birtu, gamma o.fl. með töfrasprotanum sem birtist efst "
-"til hægri á myndinni. Einnig er hægt að hala niður myndinni til að breyta "
-"henni."
+"Stilltu contrast, birtu, gamma o.fl. með töfrasprotanum sem birtist efst til "
+"hægri á myndinni. Einnig er hægt að hala niður myndinni til að breyta henni."
 
 #: photolith/templates/ingest/index.html
 msgid "View individual details by clicking on the relevant box"
@@ -689,8 +689,8 @@ msgid ""
 "Drag individual boxes, which will be resized to fit the individual "
 "underneath."
 msgstr ""
-"Dragðu hvern reit fyrir sig yfir kvörn og hann mun breyta um stærð "
-"til að passa utan um kvörnina." 
+"Dragðu hvern reit fyrir sig yfir kvörn og hann mun breyta um stærð til að "
+"passa utan um kvörnina."
 
 #: photolith/templates/ingest/index.html
 msgid ""
@@ -736,8 +736,8 @@ msgid ""
 "When moving individual boxes, they will be automatically cropped to the "
 "individual underneath the mouse cursor when released."
 msgstr ""
-"Þegar einstakir reitir eru færðir þá breytist stærðin á þeim sjálfkrafa "
-"til að passa utan um kvörnina undir músabendlinum þegar þeim er sleppt."
+"Þegar einstakir reitir eru færðir þá breytist stærðin á þeim sjálfkrafa til "
+"að passa utan um kvörnina undir músabendlinum þegar þeim er sleppt."
 
 #: photolith/templates/ingest/index.html
 msgid "Auto crop"
@@ -800,8 +800,8 @@ msgstr "Búðu til verkefni með því að nota <kbd>leitina</kbd>."
 #: photolith/templates/project/list.html
 msgid "Then click <kbd>Save as project</kbd> in the top right corner."
 msgstr ""
-"Leitaðu með síunni að þeim eiginleikum sem þarf fyrir verkefnið og ýttu "
-"svo á <kbd>Vista sem verkefni</kbd>."
+"Leitaðu með síunni að þeim eiginleikum sem þarf fyrir verkefnið og ýttu svo "
+"á <kbd>Vista sem verkefni</kbd>."
 
 #: photolith/templates/project/update.html
 msgid "Cancel"
