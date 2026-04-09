@@ -63,7 +63,10 @@ makemessages: manage.py
 	sed -Ei '/^#: /{s/:[0-9]+//g}' photolith/locale/*/LC_MESSAGES/django.po
 	make -C doc makemessages
 
-precommit: lint makemessages
+makemigrations:
+	./manage.py makemigrations
+
+precommit: makemigrations lint makemessages
 
 outdated:
 	./bin/pip list --outdated
