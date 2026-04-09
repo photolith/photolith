@@ -214,6 +214,7 @@ for k in os.environ.keys():
         SERVER_EMAIL = os.environ[k]
         ADMINS = [("Photolith admin", os.environ[k])]
     elif k == "APP_LOG_DB":
+        DEBUG = True
         LOGGING["loggers"]["django.db.backends"] = {
             "level": "DEBUG",
             "handlers": ["console"],
