@@ -4,10 +4,12 @@ import itertools
 import re
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
 from django.core.cache import cache
 from django.views.generic import TemplateView
 from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from django.views import View
 from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, Max, Q
 
@@ -24,10 +26,6 @@ from ..models import (
 from ..response_json import StreamingJsonResponse
 from ..nullagg import NullAgg
 from ..perm_utils import check_annotate_access
-
-RESULT_CHUNK_SIZE = (
-    100  # Number of prefetch_related() objects to fetch before iterating over row loop
-)
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -195,7 +193,16 @@ class DataView(LoginRequiredMixin, View):
                 )
             )
 
-        for ind in qs.iterator(chunk_size=RESULT_CHUNK_SIZE):
+        result_count = 0
+        for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
+            result_count += 1
+            if result_count > settings.SEARCH_RESULT_MAX_ROWS:
+                yield dict(
+                    truncated=_("Too many results, only first %d returned")
+                    % settings.SEARCH_RESULT_MAX_ROWS
+                )
+                break
+
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
             out["num_annotations"] = ind.num_annotations
