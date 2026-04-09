@@ -25,6 +25,10 @@ from ..response_json import StreamingJsonResponse
 from ..nullagg import NullAgg
 from ..perm_utils import check_annotate_access
 
+RESULT_CHUNK_SIZE = (
+    100  # Number of prefetch_related() objects to fetch before iterating over row loop
+)
+
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "search/index.html"
@@ -191,7 +195,7 @@ class DataView(LoginRequiredMixin, View):
                 )
             )
 
-        for ind in qs:
+        for ind in qs.iterator(chunk_size=RESULT_CHUNK_SIZE):
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
             out["num_annotations"] = ind.num_annotations
