@@ -400,9 +400,9 @@ class Annotation(models.Model):
     """
 
     class Rating(models.IntegerChoices):
-        UNREADABLE = 0, _("Unreadable")
-        DIFFICULT = 50, _("+/- 1 year")
-        GOOD = 100, _("Easy to read")
+        UNREADABLE = 0, _("3")
+        DIFFICULT = 50, _("2")
+        GOOD = 100, _("1")
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
@@ -481,7 +481,7 @@ class Project(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name=_("Base axis on user"),
         help_text=_(
-            "If a user is selected, then their most recent annotation for each individual will be used as a starting point for annotations"
+            "If a user is selected, then their most recent annotation for each individual will be used as an axis starting point for annotations"
         ),
         related_name="projects_based_on_set",
         on_delete=models.SET_NULL,
