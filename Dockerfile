@@ -6,6 +6,7 @@ FROM debian:stable-slim
 ARG S6_OVERLAY_VERSION=3.2.0.2
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
+RUN apt update && apt install --no-install-recommends -y adduser
 RUN adduser --system --group --home /home/build build
 RUN adduser --system --group --home /home/app app
 
