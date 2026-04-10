@@ -322,6 +322,11 @@ msgstr "Teymi"
 msgid "No base axis"
 msgstr "Ekki fastur lestrarás"
 
+#: photolith/search/views.py
+#, python-format
+msgid "Too many results, only first %d returned"
+msgstr "Of margar niðurstöður, aðeins fyrstu %d skiluðu sér"
+
 #: photolith/templates/403.html photolith/templates/403.html
 #: photolith/templates/429.html photolith/templates/429.html
 msgid "Access denied"
