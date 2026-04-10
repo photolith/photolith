@@ -72,4 +72,10 @@ outdated:
 	./bin/pip list --outdated
 	npm outdated
 
-.PHONY: all compile test lint start makemessages ./photolith/settings/version.py outdated
+clean:
+	rm -rf -- bin include lib lib64 share pyvenv.cfg
+	rm -rf -- manage.py $(PROJECT)/settings/version.py $(PROJECT)/locale/*/LC_MESSAGES/*.mo
+	rm -rf -- node_modules client/dist .coverage
+	rm -rf -- doc/_build
+
+.PHONY: all compile test lint start makemessages ./photolith/settings/version.py outdated clean
