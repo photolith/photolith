@@ -159,7 +159,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(get_object(individual_id=ind.id, annotation_id=ann.id), ann)
 
         # individual mismatch reported
-        with self.assertRaisesRegexp(BadRequest, r"individual"):
+        with self.assertRaisesRegex(BadRequest, r"individual"):
             get_object(individual_id=ind.id + 1, annotation_id=ann.id)
 
     def test_get_all_annotations(self):
