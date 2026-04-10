@@ -12,6 +12,7 @@ services:
       # Web server
       - ${DOCKER_PORT_PREFIX-8}443:443
       - ${DOCKER_PORT_PREFIX-8}080:80
+      - ${DOCKER_PORT_PREFIX-8}469:8469
       # FTP server
       - ${DOCKER_PORT_PREFIX-8}021:021
       - 21100-21110:21100-21110

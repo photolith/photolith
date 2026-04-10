@@ -73,6 +73,7 @@ ssl_session_timeout 1d;
 ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
 
 server {
+    listen 8469 default_server;
     listen 443 ssl default_server;
     http2 on;
 
