@@ -550,6 +550,10 @@ msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 
 #: photolith/templates/annotate/snippet.html
+msgid "Administration"
+msgstr "Stjórnun"
+
+#: photolith/templates/annotate/snippet.html
 msgid "View annotations"
 msgstr "Skoða aldursmerkingar"
 

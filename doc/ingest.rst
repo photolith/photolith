@@ -75,3 +75,16 @@ Saving
 ------
 
 Once all individuals have been marked up on the image & have metadata, press *Save*. You can then advance to the next available image with *Next Image >*.
+
+Removing unintentional uploads
+------------------------------
+
+If you mistakenly upload a set of individuals, how to remove depends on where the error is noticed.
+If you are still on the ingest page for the individuals, you can drag all individuals outside the image and they will turn red.
+On pressing save, they will be removed from the database.
+
+If you find an individual that should be removed in the search pane, then the administrator can remove it.
+To the right of the image will be an "Administration" link.
+From there you can remove the individual entirely by pressing "Delete",
+or every individual associated to the image by selecting "Image Object" and pressing "Delete" there.
+Note that this will not only remove the individual, but any annotations associated with it.
