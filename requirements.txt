@@ -1,6 +1,6 @@
 # https://docs.djangoproject.com/en/4.1/releases/#id2
 django==4.2
-psycopg2-binary==2.9.7
+psycopg2-binary==2.9.11
 
 django-settings-export==1.2.1
 
@@ -10,7 +10,7 @@ crispy-bootstrap5==0.7
 django-storages==1.14.1
 django-storages[s3]==1.14.1
 
-pillow==10.0.0
+pillow==10.4.0
 
 gunicorn==21.2.0
 
