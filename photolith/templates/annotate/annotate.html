@@ -153,7 +153,9 @@
         </div>
         <div class="row">
           <div class="col-sm-3"></div>
-          <div class="col">
+          <div class="col"><div class="row">
+
+            <div class="col">
             <span class="form-check form-switch btn btn-link ms-4" style="color: var(--bs-body-color)">
               <input type="checkbox" class="form-check-input" role="switch" id="ph-viewer-snap-to-axis" autocomplete="off" checked>
               <label for="ph-viewer-snap-to-axis">
@@ -161,19 +163,29 @@
                 <span class="checked" title="{% translate 'Annuli will be added/moved along axis. Pressing <kbd>Ctrl</kbd> will add/move freeform' %}">{% translate "Snap to axis" %}</span>
               </label>
             </span>
+            </div>
 
-            <input type="submit"
-                   name="save"
-                   value="{% if project_closed %}{% translate 'Save as general annotation' %}{% else %}{% translate 'Save' %}{% endif %}"
-                   class="btn btn-success float-end" />
-          </div>
+            <div class="col">
+              <input type="reset"
+                     value="Reset changes"
+                     class="btn btn-outline-danger mr-5" />
+            </div>
+
+            <div class="col-auto">
+              <input type="submit"
+                     name="save"
+                     value="{% if project_closed %}{% translate 'Save as general annotation' %}{% else %}{% translate 'Save' %}{% endif %}"
+                     class="btn btn-success" />
+            </div>
+          </div></div>
         </div>
 
       </div>
       <div class="col ph-scroll-container">
 
         <div>
-          {{ form.axis_poly|as_crispy_field }}
+          <!-- NB: We can't use a hidden field for axis_poly, as they have no defaultValue, hide a text field instead -->
+          <span style="display:none">{{ form.axis_poly|as_crispy_field }}</span>
           <table id="axis_poly_table" class="table table-striped point-data" style="">
             <thead><tr>
               <th>{% translate "Annuli" %}</th>

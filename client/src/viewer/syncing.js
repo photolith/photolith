@@ -54,6 +54,17 @@ export class PhSyncingViewer extends PhFilteringViewer {
 
       this.reverseSyncForm({ target: this.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
     });
+
+    this.elSyncForm.addEventListener('reset', (event) => {
+      // Find all form elements with a matching fabCanvas object, and update with defaultValue
+      Array.from(event.target.elements).forEach((el) => {
+        const obj = this.fabCanvas.getObjects().find((obj) => obj.id === el.name);
+
+        if (obj) {
+          this.reverseSyncForm({ formReset: true, target: obj });
+        }
+      });
+    });
   }
 
   syncForm (opt) {
@@ -130,7 +141,9 @@ export class PhSyncingViewer extends PhFilteringViewer {
     if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
     const formEl = this.elSyncForm.elements[obj.id];
 
-    const val = formEl.value ? JSON.parse(formEl.value) : undefined;
+    // NB: A form reset event fires before value is updated, so look at defaultValue
+    const rawVal = opt.formReset ? formEl.defaultValue : formEl.value;
+    const val = rawVal ? JSON.parse(rawVal) : undefined;
 
     if (val === undefined) {
       // Empty value --> form hasn't been populated yet. Do opposite
