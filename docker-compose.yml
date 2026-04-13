@@ -18,6 +18,9 @@ services:
       - 21100-21110:21100-21110
     env_file:
       - .env
+    # https://docs.docker.com/reference/compose-file/services/#extra_hosts
+    extra_hosts:
+      - "host.docker.internal=host-gateway"
 
 volumes:
   # Stores (letsencrypt) SSL certs for use by ftpd & nginx.

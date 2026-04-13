@@ -39,7 +39,7 @@ EOF
 # Create NGINX config
 cat <<EOF > /etc/nginx/sites-available/${PROJECT_NAME}
 upstream gunicorn {
-    server localhost:8000 fail_timeout=0;
+    server ${DOCKER_WSGI_PORT-localhost:8000} fail_timeout=0;
 }
 
 server {
