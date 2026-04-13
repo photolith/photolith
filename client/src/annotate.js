@@ -76,7 +76,7 @@ function allAnnotationsClick (elForm, event) {
       // Copy other metadata to form, leave axis poly intact
       // NB: Wait until after the change event has auto-updated the age
       window.setTimeout((newVal) => {
-        elForm.elements.age.value = newVal;
+        elForm.elements.age.value = elForm.elements.age.defaultValue = newVal;
       }, 100, elSelected.querySelector('.val-age').textContent);
       elForm.elements.rating.value = elSelected.querySelector('.val-rating').getAttribute('data-value');
       elForm.elements.authority.value = elSelected.querySelector('.val-authority').getAttribute('data-value');
@@ -89,11 +89,20 @@ function allAnnotationsClick (elForm, event) {
       elForm.elements.comment.value = elSelected.querySelector('.val-comment').textContent;
       if (elForm.elements.comment.value) elForm.elements.comment.value += '\n';
       elForm.elements.comment.value += elSelected.querySelector('.val-created_by').getAttribute('data-locale-created_by') + ' ' + elSelected.querySelector('.val-created_by').textContent;
+
+      // Set default values, so a reset grabs these instead
+      Array.from(elForm.elements.rating.options).forEach((o, i) => {
+        o.defaultSelected = (i === elForm.elements.rating.selectedIndex);
+      });
+      Array.from(elForm.elements.authority.options).forEach((o, i) => {
+        o.defaultSelected = (i === elForm.elements.authority.selectedIndex);
+      });
+      elForm.elements.comment.defaultValue = elForm.elements.comment.value;
     } else {
       throw new Error('Unknown button ' + event.target.className);
     }
 
-    elForm.axis_poly.value = JSON.stringify(axisPoly);
+    elForm.axis_poly.defaultValue = elForm.axis_poly.value = JSON.stringify(axisPoly);
     elForm.axis_poly.dispatchEvent(changeEvent());
     document.querySelector('button#editor-tab').dispatchEvent(new window.MouseEvent('click', {
       view: window,
