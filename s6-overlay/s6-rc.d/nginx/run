@@ -8,6 +8,14 @@ CERT_DIR="/var/lib/dehydrated/certs"
 DOMAINS_TXT="/etc/dehydrated/domains.txt"
 CONTACT_CONFIG="/etc/dehydrated/conf.d/contact"
 DNS_SERVERS="$(awk '/nameserver/ { print $2 }' /etc/resolv.conf)"
+DOCKER_WSGI_PORT="${DOCKER_WSGI_PORT-localhost:8000}"
+
+if [ "${DOCKER_WSGI_PORT}" != "localhost:8000" ]; then
+  # NB: If using an external WSGI, our static resources won't be up-to-date
+  STATIC_HOSTING_DISABLE="DISABLED"
+else
+  STATIC_HOSTING_DISABLE=""
+fi
 
 # Dehydrated config
 echo "${DEFAULT_HOST} ${EXTRA_HOSTS}" > "${DOMAINS_TXT}"
@@ -39,7 +47,7 @@ EOF
 # Create NGINX config
 cat <<EOF > /etc/nginx/sites-available/${PROJECT_NAME}
 upstream gunicorn {
-    server ${DOCKER_WSGI_PORT-localhost:8000} fail_timeout=0;
+    server ${DOCKER_WSGI_PORT} fail_timeout=0;
 }
 
 server {
@@ -100,11 +108,11 @@ server {
         return 200 'User-agent: *\nDisallow: /';
     }
 
-    location /static/ {
+    location /${STATIC_HOSTING_DISABLE}static/ {
         alias /srv/app/staticfiles/;
     }
 
-    location /media/ {
+    location /${STATIC_HOSTING_DISABLE}media/ {
         alias /srv/app/media/;
     }
 
