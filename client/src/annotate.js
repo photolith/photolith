@@ -71,6 +71,10 @@ function allAnnotationsClick (elForm, event) {
     }
 
     if (event.target.classList.contains('ph-copy-line')) {
+      // Clear any previous age/comment
+      setDefaultValue(elForm.elements.age, 0);
+      setDefaultValue(elForm.elements.comment, '');
+
       // Strip out everything in the middle
       setDefaultValue(elForm.elements.axis_poly, JSON.stringify([axisPoly[0], axisPoly[axisPoly.length - 1]]));
     } else if (event.target.classList.contains('ph-copy-full')) {
