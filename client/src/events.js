@@ -26,3 +26,15 @@ export function toggleUnloadWarning (state) {
     window.phBeforeUnloadListener.registered = false;
   }
 }
+
+/** Turn on/off beforeunload depending on dirty state of (elForm) */
+export function formUnloadWarning (elForm) {
+  elForm.addEventListener('change', (event) => {
+    // Changing selected item shouldn't count an edit, everything else does
+    if (event.target.name !== 'selection') {
+      toggleUnloadWarning(true);
+    }
+  });
+  elForm.addEventListener('submit', toggleUnloadWarning.bind(undefined, false));
+  elForm.addEventListener('reset', toggleUnloadWarning.bind(undefined, false));
+}

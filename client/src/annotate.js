@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 
 import { displayAlert } from './alert';
+import { formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
@@ -154,6 +155,8 @@ export function init (parent) {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
     elForm.addEventListener('change', formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm'))));
+
+    formUnloadWarning(elForm);
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
