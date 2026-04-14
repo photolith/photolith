@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 
 import { displayAlert } from './alert';
-import { changeEvent } from './events';
+import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
 import { populateIndividualData } from './meta';
 
@@ -50,7 +50,7 @@ function formRefresh (pxMmRatio, event) {
 function allAnnotationsClick (elForm, event) {
   if (event.target.tagName === 'BUTTON') {
     const elSelected = this.querySelector('tbody > tr.table-info');
-    let axisPoly = elSelected ? JSON.parse(elSelected.querySelector(':scope .ph-line-legend').getAttribute('data-axis-poly')) : undefined;
+    const axisPoly = elSelected ? JSON.parse(elSelected.querySelector(':scope .ph-line-legend').getAttribute('data-axis-poly')) : undefined;
 
     if (!axisPoly) {
       displayAlert('warning', this.getAttribute('data-locale-select-annotation-first'), 2000);
@@ -71,39 +71,29 @@ function allAnnotationsClick (elForm, event) {
 
     if (event.target.classList.contains('ph-copy-line')) {
       // Strip out everything in the middle
-      axisPoly = [axisPoly[0], axisPoly[axisPoly.length - 1]];
+      setDefaultValue(elForm.elements.axis_poly, JSON.stringify([axisPoly[0], axisPoly[axisPoly.length - 1]]));
     } else if (event.target.classList.contains('ph-copy-full')) {
       // Copy other metadata to form, leave axis poly intact
       // NB: Wait until after the change event has auto-updated the age
       window.setTimeout((newVal) => {
-        elForm.elements.age.value = elForm.elements.age.defaultValue = newVal;
+        setDefaultValue(elForm.elements.age, newVal);
       }, 100, elSelected.querySelector('.val-age').textContent);
-      elForm.elements.rating.value = elSelected.querySelector('.val-rating').getAttribute('data-value');
-      elForm.elements.authority.value = elSelected.querySelector('.val-authority').getAttribute('data-value');
-      if (elForm.elements.authority.selectedIndex === -1) {
-        // Doesn't already exist, so create a new option with this authority level
-        elForm.elements.authority.add(new window.Option(
-          elSelected.querySelector('.val-authority').getAttribute('data-value')));
-        elForm.elements.authority.selectedIndex = elForm.elements.authority.options.length - 1;
-      }
-      elForm.elements.comment.value = elSelected.querySelector('.val-comment').textContent;
-      if (elForm.elements.comment.value) elForm.elements.comment.value += '\n';
-      elForm.elements.comment.value += elSelected.querySelector('.val-created_by').getAttribute('data-locale-created_by') + ' ' + elSelected.querySelector('.val-created_by').textContent;
 
-      // Set default values, so a reset grabs these instead
-      Array.from(elForm.elements.rating.options).forEach((o, i) => {
-        o.defaultSelected = (i === elForm.elements.rating.selectedIndex);
-      });
-      Array.from(elForm.elements.authority.options).forEach((o, i) => {
-        o.defaultSelected = (i === elForm.elements.authority.selectedIndex);
-      });
-      elForm.elements.comment.defaultValue = elForm.elements.comment.value;
+      setDefaultValue(elForm.elements.rating, elSelected.querySelector('.val-rating').getAttribute('data-value'));
+      setDefaultValue(elForm.elements.authority, elSelected.querySelector('.val-authority').getAttribute('data-value'));
+
+      setDefaultValue(elForm.elements.comment,
+        (elSelected.querySelector('.val-comment').textContent ? elSelected.querySelector('.val-comment').textContent + '\n' : '') +
+        elSelected.querySelector('.val-created_by').getAttribute('data-locale-created_by') + ' ' + elSelected.querySelector('.val-created_by').textContent
+      );
+
+      setDefaultValue(elForm.elements.axis_poly, JSON.stringify(axisPoly));
     } else {
       throw new Error('Unknown button ' + event.target.className);
     }
 
-    elForm.axis_poly.defaultValue = elForm.axis_poly.value = JSON.stringify(axisPoly);
-    elForm.axis_poly.dispatchEvent(changeEvent());
+    // NB: We reset rather than change so we don't trigger onbeforeunload
+    elForm.reset();
     document.querySelector('button#editor-tab').dispatchEvent(new window.MouseEvent('click', {
       view: window,
       bubbles: true,
