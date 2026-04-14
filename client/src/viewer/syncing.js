@@ -29,7 +29,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
 
     if (this.elSyncForm.selection.value !== newVal) {
       this.elSyncForm.selection.value = newVal;
-      this.elSyncForm.selection.dispatchEvent(changeEvent(999));
+      this.elSyncForm.selection.dispatchEvent(changeEvent());
     }
   }
 
@@ -42,7 +42,6 @@ export class PhSyncingViewer extends PhFilteringViewer {
     });
 
     this.elSyncForm.addEventListener('change', (event) => {
-      if (event.detail === 999) return; // Break loops
       if (event.target.name === 'image_file') {
         this.load(event.target.phBlob, null).then(() => {
           if (!this.imgBlob) return;
@@ -130,7 +129,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
     newVal = newVal === undefined ? '' : JSON.stringify(newVal);
     if (formEl.value !== newVal) {
       formEl.value = newVal;
-      formEl.dispatchEvent(changeEvent(999));
+      if (!opt.phSuppressChange) formEl.dispatchEvent(changeEvent());
     }
   }
 
@@ -149,7 +148,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
       // Empty value --> form hasn't been populated yet. Do opposite
       this.syncForm({ target: obj });
     } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
-      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])));
+      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])), true);
     } else {
       obj.left = val[0][0];
       obj.top = val[0][1];

@@ -49,7 +49,7 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   // Array to store "sub-objects" acting as control handles
   poly.phNodes = [];
 
-  poly.phSetPoints = function (newPoints) {
+  poly.phSetPoints = function (newPoints, suppressChange) {
     // Add any missing phNodes
     while (this.phNodes.length < newPoints.length) {
       const idx = this.phNodes.length;
@@ -114,7 +114,7 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
 
     if (this.canvas) {
-      this.canvas.fire('object:modified', { target: this });
+      this.canvas.fire('object:modified', { target: this, phSuppressChange: suppressChange });
       this.canvas.requestRenderAll();
     }
   };
@@ -188,7 +188,7 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   poly.on('phCanvasZoom', (event) => {
     // Refresh points to correct for any zoom error
     const points = poly.phNodes.map((n) => new fabric.Point(n.left, n.top));
-    return poly.phSetPoints(points);
+    return poly.phSetPoints(points, true);
   });
 
   // Wait for a bit, zoom to init canvas
