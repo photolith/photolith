@@ -2,7 +2,7 @@
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
 # https://testdriven.io/blog/django-docker-https-aws/
 # https://testdriven.io/blog/django-lets-encrypt/
-FROM debian:stable-slim
+FROM debian:13-slim
 ARG S6_OVERLAY_VERSION=3.2.0.2
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
