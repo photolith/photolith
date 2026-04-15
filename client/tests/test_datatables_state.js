@@ -38,6 +38,11 @@ function setupMApi (searchCols) {
       search_columns: searchColDict
     }[x];
   };
+  global.window.mApi.searchDefaults = () => {
+    return {
+      order: [[99, 'asc']]
+    };
+  };
 }
 
 test('setDTState', function (test) {
@@ -54,10 +59,11 @@ test('setDTState', function (test) {
 
 test('getDTState', function (test) {
   setupState(test);
+  setupMApi(['a', 'b', 'c']);
 
   function doLoopback (state, startUrl) {
     setDTState(startUrl || '', state);
-    return getDTState(global.window._url, { order: [[99, 'asc']] });
+    return getDTState(global.window._url);
   }
 
   test.deepEqual(doLoopback({}), { order: [[99, 'asc']] }, 'No order in state, return default');
@@ -88,13 +94,14 @@ test('removeDTState', function (test) {
 
 test('applyDTState', function (test) {
   setupDom(test);
+  setupMApi(['a', 'b', 'c']);
 
   function doApply (data, order, searchCols) {
     setupMApi(searchCols || Object.keys(data[1]));
     setDTState('', { order: order });
 
     out = JSON.parse(JSON.stringify(data));
-    applyDTState(out, global.window.location.search, []);
+    applyDTState(out, global.window.location.search);
     return out;
   }
   let out;

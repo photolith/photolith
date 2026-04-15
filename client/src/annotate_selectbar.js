@@ -4,7 +4,7 @@ import { applyDTState, removeDTState } from './datatables_state';
 
 function selectPopulate (elSelect) {
   return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then((data) => {
-    applyDTState(data.data, window.document.location.search, { order: [[0, 'asc'], [1, 'asc']] }).forEach((row) => {
+    applyDTState(data.data, window.document.location.search).forEach((row) => {
       const opt = new window.Option(row.__str__);
 
       opt.value = `/annotate/${row.id}/${window.document.location.search}`;

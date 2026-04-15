@@ -98,9 +98,6 @@ export function init (parent) {
   parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels('search_columns');
-    const defaultState = {
-      order: [[0, 'asc'], [1, 'asc']]
-    };
 
     // https://datatables.net/reference/option/%24.fn.dataTable.ext.errMode
     DataTable.ext.errMode = 'throw';
@@ -137,7 +134,7 @@ export function init (parent) {
         // Get bootstrap to add a hand cursor
         row.setAttribute('role', 'button');
       },
-      order: getDTState(window.location.search, defaultState).order,
+      order: getDTState(window.location.search).order,
       stateSave: true,
       stateSaveCallback: function (settings, data) {
         setDTState(window.location.search, data);
@@ -150,7 +147,7 @@ export function init (parent) {
         });
       },
       stateLoadCallback: function (settings, callback) {
-        callback(getDTState(window.location.search, defaultState));
+        callback(getDTState(window.location.search));
       },
       searching: false
     });

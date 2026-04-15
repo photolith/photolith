@@ -6,8 +6,9 @@ const SEP_INNER = '.';
 const SEP_OUTER = '-';
 
 /** Pull DT state from querystring */
-export function getDTState (searchString, defaultState) {
+export function getDTState (searchString) {
   const searchParams = new URLSearchParams(searchString);
+  const defaultState = window.mApi.searchDefaults();
 
   function getOrder () {
     if (!searchParams.has('order')) {
@@ -48,8 +49,8 @@ export function removeDTState (searchString) {
 }
 
 /** Perform ordering as DT would have done */
-export function applyDTState (data, searchString, defaultState) {
-  const dtState = getDTState(searchString, defaultState);
+export function applyDTState (data, searchString) {
+  const dtState = getDTState(searchString);
 
   // Under the browswer DataTable is pre-initalised, in tests we need to feed JSDOM into it
   const dtExt = DataTable.ext || DataTable(global.window, global.window.$).ext;

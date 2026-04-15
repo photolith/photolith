@@ -41,6 +41,10 @@ const fieldsFor = {
     'tx_sex',
     'tx_species'
   ],
+  search_ordering: [ // NB: These fields have to be present in search_columns
+    'ch_slideLabel',
+    'ch_individualLabel'
+  ],
   table_form: [ // i.e. ingest metadata table
     'ch_slideLabel',
     'ch_individualLabel',
