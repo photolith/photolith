@@ -4,7 +4,8 @@ LOCALE_FILES=$(wildcard $(PROJECT)/locale/*/LC_MESSAGES/django.po)
 all: compile
 
 bin/pip:
-	python3 -m venv .
+	# 3.13+ adds "--without-scm-ignore-files", without which we blat .gitignore
+	if python3 -m venv --help | grep -q -- "--without-scm-ignore-files"; then python3 -m venv --without-scm-ignore-files . ; else python3 -m venv .; fi
 
 lib/.%.txt: %.txt bin/pip
 	./bin/pip install -r $<
@@ -72,4 +73,10 @@ outdated:
 	./bin/pip list --outdated
 	npm outdated
 
-.PHONY: all compile test lint start makemessages ./photolith/settings/version.py outdated
+clean:
+	rm -rf -- bin include lib lib64 share pyvenv.cfg
+	rm -rf -- manage.py $(PROJECT)/settings/version.py $(PROJECT)/locale/*/LC_MESSAGES/*.mo
+	rm -rf -- node_modules client/dist .coverage
+	rm -rf -- doc/_build
+
+.PHONY: all compile test lint start makemessages ./photolith/settings/version.py outdated clean

@@ -26,6 +26,13 @@ Other commands are as with any other Django project, e.g::
 * ``./manage.py makemigrations``: Make any migrations required by database changes
 * ``./manage.py migrate``: Apply database changes
 
+Using docker container as a front-end
+-------------------------------------
+
+You can use the production configuration of docker as a front-end to your development server by setting the ``DOCKER_WSGI_PORT`` variable.
+This will disable the docker container's gunicorn process, and Nginx will connect to your development server.
+See ``env.example`` for more details.
+
 Precommit checks
 ----------------
 

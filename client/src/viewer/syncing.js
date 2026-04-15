@@ -29,7 +29,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
 
     if (this.elSyncForm.selection.value !== newVal) {
       this.elSyncForm.selection.value = newVal;
-      this.elSyncForm.selection.dispatchEvent(changeEvent(999));
+      this.elSyncForm.selection.dispatchEvent(changeEvent());
     }
   }
 
@@ -42,7 +42,6 @@ export class PhSyncingViewer extends PhFilteringViewer {
     });
 
     this.elSyncForm.addEventListener('change', (event) => {
-      if (event.detail === 999) return; // Break loops
       if (event.target.name === 'image_file') {
         this.load(event.target.phBlob, null).then(() => {
           if (!this.imgBlob) return;
@@ -53,6 +52,17 @@ export class PhSyncingViewer extends PhFilteringViewer {
       }
 
       this.reverseSyncForm({ target: this.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
+    });
+
+    this.elSyncForm.addEventListener('reset', (event) => {
+      // Find all form elements with a matching fabCanvas object, and update with defaultValue
+      Array.from(event.target.elements).forEach((el) => {
+        const obj = this.fabCanvas.getObjects().find((obj) => obj.id === el.name);
+
+        if (obj) {
+          this.reverseSyncForm({ formReset: true, target: obj });
+        }
+      });
     });
   }
 
@@ -119,7 +129,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
     newVal = newVal === undefined ? '' : JSON.stringify(newVal);
     if (formEl.value !== newVal) {
       formEl.value = newVal;
-      formEl.dispatchEvent(changeEvent(999));
+      if (!opt.phSuppressChange) formEl.dispatchEvent(changeEvent());
     }
   }
 
@@ -130,13 +140,15 @@ export class PhSyncingViewer extends PhFilteringViewer {
     if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
     const formEl = this.elSyncForm.elements[obj.id];
 
-    const val = formEl.value ? JSON.parse(formEl.value) : undefined;
+    // NB: A form reset event fires before value is updated, so look at defaultValue
+    const rawVal = opt.formReset ? formEl.defaultValue : formEl.value;
+    const val = rawVal ? JSON.parse(rawVal) : undefined;
 
     if (val === undefined) {
       // Empty value --> form hasn't been populated yet. Do opposite
       this.syncForm({ target: obj });
     } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
-      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])));
+      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])), true);
     } else {
       obj.left = val[0][0];
       obj.top = val[0][1];

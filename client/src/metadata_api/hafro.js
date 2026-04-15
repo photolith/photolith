@@ -100,6 +100,11 @@ const fieldsFor = {
     'tx_sampleType',
     'tx_maturity'
   ],
+  search_ordering: [ // NB: These fields have to be present in search_columns
+    'nm_stationYear',
+    'ch_cruise',
+    'nm_stationMonth'
+  ],
   table_form: [ // i.e. ingest metadata table
     'ch_sampleId',
     'ch_slideLabel',

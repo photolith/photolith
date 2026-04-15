@@ -1,8 +1,15 @@
 #!/command/with-contenv /bin/sh
 set -eu
 
+DOCKER_WSGI_PORT=${DOCKER_WSGI_PORT-localhost:8000}
+
 cd /srv/app
 export HOME=/home/app  # https://github.com/just-containers/s6-overlay/issues/207
+
+if [ "${DOCKER_WSGI_PORT}" != "localhost:8000" ]; then
+  # Using an external WSGI server (i.e. runserver external to the container), disable gunicorn
+  exec /bin/bash
+fi
 
 exec s6-setuidgid "app" ./bin/gunicorn \
   --workers 4 \

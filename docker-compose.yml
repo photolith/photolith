@@ -10,13 +10,17 @@ services:
       - ingest:/srv/app/ingest_root
     ports:
       # Web server
-      - 8443:443
-      - 8080:80
+      - ${DOCKER_PORT_PREFIX-8}443:443
+      - ${DOCKER_PORT_PREFIX-8}080:80
+      - ${DOCKER_PORT_PREFIX-8}469:8469
       # FTP server
-      - 8021:021
+      - ${DOCKER_PORT_PREFIX-8}021:021
       - 21100-21110:21100-21110
     env_file:
       - .env
+    # https://docs.docker.com/reference/compose-file/services/#extra_hosts
+    extra_hosts:
+      - "host.docker.internal=host-gateway"
 
 volumes:
   # Stores (letsencrypt) SSL certs for use by ftpd & nginx.

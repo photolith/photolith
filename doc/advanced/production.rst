@@ -67,18 +67,3 @@ User accounts for the FTP server can be added with::
 
     docker compose exec -uroot photolith /srv/app/photolith/ftp-add-user.sh \
         user password
-
-Bare metal installation
------------------------
-
-Currently unsupported, but can be achieved with::
-
-    git clone https://github.com/photolith/photolith.git /srv/photolith
-    sudo ./preinstall.sh
-    make
-    # Configure gunicorn server
-    sudo ./install-wsgi.sh
-    # Configure NGINX w/dehydrated to act as a proxy
-    sudo ./install-nginx.sh
-    # Install FTP server (optional)
-    sudo ./install-ftpd.sh
