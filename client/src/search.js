@@ -2,10 +2,11 @@
 import DataTable from 'datatables.net-bs5';
 import TomSelect from 'tom-select';
 
-import { displayAlert } from './alert';
-import { init as initCroppedViewer } from './cropped_viewer';
-import { htmlFetch, jsonFetch } from './fetch';
-import { renderMetaLabel, renderMetaCell } from './meta';
+import { displayAlert } from './alert.js';
+import { init as initCroppedViewer } from './cropped_viewer.js';
+import { htmlFetch, jsonFetch } from './fetch.js';
+import { renderMetaLabel, renderMetaCell } from './meta.js';
+import { getDTState, setDTState, removeDTState } from './datatables_state.js';
 
 function populateFilter (elForm) {
   const metaLabels = window.mApi.metaLabels('search_filter');
@@ -77,6 +78,16 @@ function filterChange (elForm, elTarget) {
   }
 }
 
+export function updateAnnotateUrl (containerEl) {
+  containerEl.querySelectorAll('a[href*="/annotate/"]').forEach((el) => {
+    // Add/update current search querystring to any annotate links
+    // NB: Django doesn't have this when generating the snippet, and it changes on header-clicks
+    const url = new URL(el.href);
+    url.search = window.location.search;
+    el.href = url.toString();
+  });
+}
+
 export function init (parent) {
   parent.querySelectorAll('form.filter-form').forEach((elForm) => {
     populateFilter(elForm);
@@ -97,7 +108,7 @@ export function init (parent) {
       autoWidth: false,
       ajax: function (data, callback) {
         // https://datatables.net/reference/option/ajax#Types
-        return jsonFetch('/search/data/' + window.document.location.search, {}).then((data) => {
+        return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then((data) => {
           if (data.data[data.data.length - 1].truncated) {
             const truncRow = data.data.pop();
             displayAlert('warning', truncRow.truncated, 0);
@@ -123,6 +134,21 @@ export function init (parent) {
         // Get bootstrap to add a hand cursor
         row.setAttribute('role', 'button');
       },
+      order: getDTState(window.location.search).order,
+      stateSave: true,
+      stateSaveCallback: function (settings, data) {
+        setDTState(window.location.search, data);
+        // Update visible children with new querystring
+        table.rows({ page: 'current' }).every(function () {
+          if (this.child.isShown()) {
+            updateAnnotateUrl(this.child()[0]);
+          }
+          return undefined;
+        });
+      },
+      stateLoadCallback: function (settings, callback) {
+        callback(getDTState(window.location.search));
+      },
       searching: false
     });
 
@@ -138,11 +164,7 @@ export function init (parent) {
         row.child('<div><div class="rendering" style="width: 10rem; height: 10rem; margin: auto;"></div></div>');
         htmlFetch('/annotate/' + row.data().id + '/snippet/' + window.document.location.search).then((html) => {
           row.child(html);
-          row.child()[0].querySelectorAll('a[href^="/annotate/"]').forEach((el) => {
-            // Add current search querystring to any annotate links
-            // NB: Django doesn't have this when generating the snippet
-            el.href += document.location.search;
-          });
+          updateAnnotateUrl(row.child()[0]);
           initCroppedViewer(row.child()[0]);
         });
       }
@@ -153,6 +175,7 @@ export function init (parent) {
         row.child.hide();
       } else {
         row.selector.rows.classList.add('table-info');
+        updateAnnotateUrl(row.child()[0]);
         row.child.show();
       }
     });

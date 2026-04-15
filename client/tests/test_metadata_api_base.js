@@ -172,3 +172,55 @@ test('MetadataApi:metaLabels', function (test) {
 
   test.end();
 });
+
+test('MetadataApi:searchDefaults', function (test) {
+  const mApiOpts = {
+    metaLabels: {
+      en: {
+        ch_eyes: 'Eyes',
+        ch_nose: 'Nose',
+        ch_mouth: 'Mouth',
+        ch_elbow: 'Elbow',
+        ch_toe: 'Toe'
+      },
+      es: {
+        ch_eyes: 'Ojos',
+        ch_nose: 'Nariz',
+        ch_mouth: 'Boca',
+        ch_elbow: 'Codo',
+        ch_toe: 'Dedo del pie'
+      }
+    },
+    fieldsFor: {},
+    lang: 'en-gb'
+  };
+
+  function doSearchDefaults (fieldsForExtra) {
+    const opts = JSON.parse(JSON.stringify(mApiOpts));
+    Object.assign(opts.fieldsFor, fieldsForExtra);
+    return createMetadataApi(test, opts).searchDefaults();
+  }
+
+  test.deepEqual(doSearchDefaults({
+    search_columns: ['ch_eyes', 'ch_nose', 'ch_mouth'],
+    search_ordering: ['ch_nose', 'ch_mouth']
+  }), {
+    order: [[1, 'asc'], [2, 'asc']]
+  }, 'Column numbers based on search_columns');
+
+  test.deepEqual(doSearchDefaults({
+    search_columns: ['ch_mouth', 'ch_eyes', 'ch_nose'],
+    search_ordering: ['ch_nose', 'ch_mouth']
+  }), {
+    order: [[2, 'asc'], [0, 'asc']]
+  }, 'Column numbers based on search_columns');
+
+  test.throws(() => {
+    doSearchDefaults({
+      search_columns: ['ch_eyes', 'ch_nose', 'ch_mouth'],
+      search_ordering: ['ch_brain']
+    });
+  }, 'Unknown names not allowed');
+
+  test.end();
+});

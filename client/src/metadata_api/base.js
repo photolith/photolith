@@ -60,6 +60,22 @@ export default class MetadataApi {
     return out;
   }
 
+  /** Return defaults to use for search DataTables state */
+  searchDefaults () {
+    const searchCols = Object.keys(this.metaLabels('search_columns'));
+
+    return {
+      order: (this._fieldsFor.search_ordering || []).map((colName) => {
+        const fieldPos = searchCols.indexOf(colName);
+        if (fieldPos === -1) {
+          throw new Error(`Column ${colName} not present in search_ordering`);
+        }
+
+        return [fieldPos, 'asc'];
+      })
+    };
+  }
+
   /** Given a single individual from sampleDetail(), return a short identifier to label a bounding box */
   individualLabel (ind) {
     return ind.ch_individualLabel;
