@@ -1,13 +1,9 @@
-import csv
 import datetime
-import itertools
-import re
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.core.cache import cache
 from django.views.generic import TemplateView
-from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.views import View
@@ -23,6 +19,7 @@ from ..models import (
     Project,
     Taxonomy,
 )
+from ..response_csv import StreamingCsvResponse
 from ..response_json import StreamingJsonResponse
 from ..nullagg import NullAgg
 from ..perm_utils import check_annotate_access
@@ -253,47 +250,11 @@ class DataView(LoginRequiredMixin, View):
 
 class ExportView(DataView):
     def get(self, *args, **kwargs):
-        # https://docs.djangoproject.com/en/4.2/howto/outputting-csv/#streaming-large-csv-files
-        def csv_rowgen(rows):
-            class Echo:
-                def write(self, value):
-                    return value
-
-            # Extract fieldnames by reading first row early
-            try:
-                first_row = next(rows)
-                # NB: Cheat and assume fish are at most 20 years old, we don't know at this point
-                fieldnames = [
-                    k for k in first_row.keys() if k not in ("id", "__str__")
-                ] + ["growth_%d" % i for i in range(1, 21)]
-                # Put first row back again
-                rows = itertools.chain([first_row], rows)
-            except StopIteration:
-                # Nothing in search, return empty CSV
-                return
-
-            writer = csv.writer(Echo())
-            yield writer.writerow(re.sub(r"^\w{2}_", "", f) for f in fieldnames)
-            for row in rows:
-                row_out = []
-                for n in fieldnames:
-                    if isinstance(row.get(n), dict):  # Taxonomy
-                        row_out.append(row[n]["id"])
-                    elif isinstance(row.get(n), datetime.date):
-                        row_out.append(row[n].isoformat())
-                    else:
-                        row_out.append(row.get(n))
-                yield writer.writerow(row_out)
-
-        return StreamingHttpResponse(
-            csv_rowgen(
-                self.query(
-                    with_annotations=self.kwargs["with_annotations"],
-                    with_image_url=True,
-                )
+        return StreamingCsvResponse(
+            self.query(
+                with_annotations=self.kwargs["with_annotations"],
+                with_image_url=True,
             ),
-            content_type="text/csv",
-            headers={
-                "Content-Disposition": 'attachment; filename="photolith-export.csv"'
-            },
+            # NB: Cheat and assume fish are at most 20 years old, we don't know at this point
+            force_cols=["growth_%d" % i for i in range(1, 21)],
         )
