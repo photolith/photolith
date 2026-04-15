@@ -1,6 +1,8 @@
 import test from 'tape';
 
-import { getDTState, setDTState, removeDTState } from '../src/datatables_state.js';
+import { setupDom } from './util_dom.js';
+
+import { getDTState, setDTState, removeDTState, applyDTState } from '../src/datatables_state.js';
 
 function setupState (test) {
   if (!global.window) {
@@ -80,6 +82,62 @@ test('removeDTState', function (test) {
     '?a=1&b=2',
     'Order arg removed'
   );
+
+  test.end();
+});
+
+test('applyDTState', function (test) {
+  setupDom(test);
+
+  function doApply (data, order, searchCols) {
+    setupMApi(searchCols || Object.keys(data[1]));
+    setDTState('', { order: order });
+
+    out = JSON.parse(JSON.stringify(data));
+    applyDTState(out, global.window.location.search, []);
+    return out;
+  }
+  let out;
+
+  test.deepEqual(doApply([
+    { a: 1, b: 2 },
+    { a: 10, b: 3 },
+    { a: 3, b: 2 }
+  ], [[0, 'desc']]), [
+    { a: 10, b: 3, __rowpos: 1 },
+    { a: 3, b: 2, __rowpos: 2 },
+    { a: 1, b: 2, __rowpos: 0 }
+  ], 'Sorted by first column, descending');
+
+  test.deepEqual(doApply([
+    { a: '1', b: 2 },
+    { a: '10', b: 3 },
+    { a: '3', b: 2 }
+  ], [[0, 'desc']]), [
+    { a: '3', b: 2, __rowpos: 2 },
+    { a: '10', b: 3, __rowpos: 1 },
+    { a: '1', b: 2, __rowpos: 0 }
+  ], 'Sorted by first column, string order');
+
+  test.deepEqual(doApply([
+    { a: 1, b: 2 },
+    { a: 10, b: 3 },
+    { a: 3, b: 2 }
+  ], [[1, 'asc']]), [
+    { a: 1, b: 2, __rowpos: 0 },
+    { a: 3, b: 2, __rowpos: 2 },
+    { a: 10, b: 3, __rowpos: 1 }
+  ], 'Sorted by second column, then preserving original order');
+
+  test.deepEqual(doApply([
+    { a: 1, b: 2 },
+    { a: 10, b: 3 },
+    { a: 3, b: 2 }
+  ], [[1, 'asc'], [0, 'desc']]), [
+    { a: 3, b: 2, __rowpos: 2 },
+    { a: 1, b: 2, __rowpos: 0 },
+    { a: 10, b: 3, __rowpos: 1 }
+  ], 'Sorted by second column, then first');
 
   test.end();
 });
