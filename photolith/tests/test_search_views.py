@@ -115,6 +115,11 @@ class ExportViewTest(RequiresUtils, TestCase):
         client.force_login(user)
         resp = client.get("/search/export/%s/" % (with_annotations,), search)
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers["Content-Type"], "text/csv")
+        self.assertEqual(
+            resp.headers["Content-Disposition"],
+            'attachment; filename="photolith-export.csv"',
+        )
 
         reader = csv.DictReader(l.decode("utf-8") for l in resp.streaming_content)
         for r in reader:
