@@ -6,6 +6,7 @@ import { displayAlert } from './alert';
 import { init as initCroppedViewer } from './cropped_viewer';
 import { htmlFetch, jsonFetch } from './fetch';
 import { renderMetaLabel, renderMetaCell } from './meta';
+import { getDTState, setDTState, removeDTState } from './datatables_state';
 
 function populateFilter (elForm) {
   const metaLabels = window.mApi.metaLabels('search_filter');
@@ -87,6 +88,9 @@ export function init (parent) {
   parent.querySelectorAll('.ph-search-table').forEach((elSearchTable) => {
     const lang = document.documentElement.lang || 'en';
     const metaLabels = window.mApi.metaLabels('search_columns');
+    const defaultState = {
+      order: [[0, 'asc'], [1, 'asc']]
+    };
 
     // https://datatables.net/reference/option/%24.fn.dataTable.ext.errMode
     DataTable.ext.errMode = 'throw';
@@ -97,7 +101,7 @@ export function init (parent) {
       autoWidth: false,
       ajax: function (data, callback) {
         // https://datatables.net/reference/option/ajax#Types
-        return jsonFetch('/search/data/' + window.document.location.search, {}).then((data) => {
+        return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then((data) => {
           if (data.data[data.data.length - 1].truncated) {
             const truncRow = data.data.pop();
             displayAlert('warning', truncRow.truncated, 0);
@@ -122,6 +126,14 @@ export function init (parent) {
       createdRow: function (row, data, dataIndex) {
         // Get bootstrap to add a hand cursor
         row.setAttribute('role', 'button');
+      },
+      order: getDTState(window.location.search, defaultState).order,
+      stateSave: true,
+      stateSaveCallback: function (settings, data) {
+        setDTState(window.location.search, data);
+      },
+      stateLoadCallback: function (settings, callback) {
+        callback(getDTState(window.location.search, defaultState));
       },
       searching: false
     });
