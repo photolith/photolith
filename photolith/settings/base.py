@@ -196,6 +196,7 @@ SEARCH_RESULT_CHUNK_SIZE = 100
 for k in os.environ.keys():
     if k.startswith("APP_DB_"):
         DATABASES["default"][k.replace("APP_DB_", "")] = os.environ[k]
+
     elif k == "APP_STORAGE_BACKEND":
         STORAGES["default"]["BACKEND"] = os.environ[k]
     elif k.startswith("APP_STORAGE_"):
@@ -204,6 +205,7 @@ for k in os.environ.keys():
         AWS_S3_OBJECT_PARAMETERS[
             k.replace("AWS_S3_OBJECT_PARAMETERS_", "")
         ] = os.environ[k]
+
     elif k == "APP_ALLOWED_HOSTS":
         ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")
     elif k == "APP_AUTH_PASSWORD_VALIDATORS":
@@ -211,6 +213,13 @@ for k in os.environ.keys():
             os.environ[k].split(" ") if len(os.environ[k]) > 0 else []
         )
         AUTH_PASSWORD_VALIDATORS = [dict(name=x) for x in AUTH_PASSWORD_VALIDATORS]
+
+    elif k == "AWS_SES_REGION_NAME":
+        # Enable AWS SES if region set
+        EMAIL_BACKEND = "django_ses.SESBackend"
+        USE_SES_V2 = True
+        AWS_SES_REGION_NAME = os.environ[k]
+
     elif k == "APP_EMAIL_HOST":
         # Email host set, so also update backend
         EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -219,11 +228,16 @@ for k in os.environ.keys():
         # Set both SERVER_EMAIL & ADMINS, so errors are from/to the same address
         SERVER_EMAIL = os.environ[k]
         ADMINS = [("Photolith admin", os.environ[k])]
+
     elif k == "APP_LOG_DB":
         DEBUG = True
         LOGGING["loggers"]["django.db.backends"] = {
             "level": "DEBUG",
             "handlers": ["console"],
         }
+
+    elif k.startswith("AWS_"):
+        # NB: Whilst S3 support will read the environment, django-ses needs these locally
+        globals()[k] = os.environ[k]
     elif k.startswith("APP_"):
         globals()[k.replace("APP_", "")] = os.environ[k]
