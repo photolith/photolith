@@ -1,3 +1,4 @@
+import codecs
 import csv
 import datetime
 import itertools
@@ -37,6 +38,7 @@ class StreamingCsvResponse(StreamingHttpResponse):
                 return
 
             writer = csv.writer(Echo())
+            yield codecs.BOM_UTF8  # BOM triggers Excel to decode as UTF8
             yield writer.writerow(re.sub(r"^\w{2}_", "", f) for f in fieldnames)
             for row in rows:
                 row_out = []

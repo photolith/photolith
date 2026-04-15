@@ -1,3 +1,4 @@
+import codecs
 import csv
 import datetime
 import json
@@ -121,7 +122,11 @@ class ExportViewTest(RequiresUtils, TestCase):
             'attachment; filename="photolith-export.csv"',
         )
 
-        reader = csv.DictReader(l.decode("utf-8") for l in resp.streaming_content)
+        body = b"".join(resp.streaming_content)
+        # Got a BOM, so Excel will think the content is unicode
+        self.assertTrue(body.startswith(codecs.BOM_UTF8))
+
+        reader = csv.DictReader(body.decode("utf-8-sig").split("\r\n"))
         for r in reader:
             # Make sure all dates are ISO formats
             if r["age"]:
@@ -174,7 +179,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             ind1,
             age=3,
             axis_poly=[(0, 0), (1, 0), (3, 0)],
-            comment="The not-very-good annotation",
+            comment="Ekki mjög góð skýring",
             authority=20,
         )
         ann12 = self.create_annotation(
@@ -215,7 +220,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "annotated_by": "annotator",
                     "authority": "20",
                     "bounding_box": "[[0, 0], [1, 1]]",
-                    "comment": "The not-very-good annotation",
+                    "comment": "Ekki mjög góð skýring",
                     "growth_1": "2.0",
                     "growth_2": "4.0",
                     "image__content__url": img.content.url,
@@ -251,7 +256,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "rating": "100",
                     "num_annotations": "2",
                 },
-                # NB: The not-very-good annotation isn't here
+                # NB: Ekki mjög góð skýring isn't here
                 {
                     "bounding_box": "[[1, 1], [2, 2]]",
                     "image__content__url": img.content.url,
