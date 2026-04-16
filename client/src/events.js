@@ -30,8 +30,8 @@ export function toggleUnloadWarning (state) {
 /** Turn on/off beforeunload depending on dirty state of (elForm) */
 export function formUnloadWarning (elForm) {
   elForm.addEventListener('change', (event) => {
-    // Changing selected item shouldn't count an edit, everything else does
-    if (event.target.name !== 'selection') {
+    // Changing selected item / preferences shouldn't count an edit, everything else does
+    if (event.target.name !== 'selection' && !event.target.classList.contains('pref')) {
       toggleUnloadWarning(true);
     }
   });

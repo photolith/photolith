@@ -45,6 +45,8 @@ export class PhViewer {
     //    set to absolute so it's ignored
     this.fabCanvas.upperCanvasEl.parentNode.style.position = 'absolute';
 
+    this.fabCanvas.phPrefs = {};
+
     this.fabCanvas.phFitBoundingBox = function (boundingBox) {
       const zoom = Math.min(
         this.height / (boundingBox[1][1] - boundingBox[0][1]),

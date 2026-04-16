@@ -123,8 +123,8 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   poly.phAddNode = function (newPoint, opt) {
     let i;
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
-    // snap when this.canvas.phSnapToAxis or ctrl
-    const snapToAxis = (this.canvas.phSnapToAxis && !opt.e.ctrlKey) || (!this.canvas.phSnapToAxis && opt.e.ctrlKey);
+    // snap when this.canvas.phPrefs["ph-pref-snap-to-axis"] or ctrl
+    const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
     // Find first point that is further than the origin than our point, splice in new point here.
     for (i = 0; i < points.length; i++) {
@@ -148,8 +148,8 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
     const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
-    // snap when both this.canvas.phSnapToAxis opt.e.ctrlKey on or off
-    const snapToAxis = (this.canvas.phSnapToAxis && !opt.e.ctrlKey) || (!this.canvas.phSnapToAxis && opt.e.ctrlKey);
+    // snap when both this.canvas.phPrefs["ph-pref-snap-to-axis"] opt.e.ctrlKey on or off
+    const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
     if (!snapToAxis) {
       // no snapping to point

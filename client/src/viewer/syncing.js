@@ -37,6 +37,10 @@ export class PhSyncingViewer extends PhFilteringViewer {
     this.elSyncForm = el;
     if (!el) return;
 
+    document.querySelectorAll('input[type=checkbox].pref').forEach((elPref) => {
+      this.fabCanvas.phPrefs[elPref.id] = elPref.checked;
+    });
+
     this.elSyncForm.addEventListener('element_addremove', (event) => {
       this.elementAddRemove();
     });
@@ -48,6 +52,12 @@ export class PhSyncingViewer extends PhFilteringViewer {
           // Update form with new imgBlob, which may have actually been e.g. a video stream
           event.target.phBlob = this.imgBlob;
         });
+        return;
+      }
+
+      // Update phPrefs with any checkbox information
+      if (event.target.classList.contains('pref')) {
+        this.fabCanvas.phPrefs[event.target.id] = event.target.checked;
         return;
       }
 
