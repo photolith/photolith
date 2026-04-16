@@ -44,6 +44,8 @@ export class PhAnnotate extends PhSyncingViewer {
       if ((o.id || '').match(/^axis_poly|^view_poly/)) this.fabCanvas.remove(o);
     });
     const els = Array.from((this.elSyncForm || { elements: [] }).elements);
+    // NB: Not using phPrefs, element isn't part of form so syncing doesn't happen, and it won't trigger addremove anyway.
+    const showAxis = (document.getElementById('ph-view-poly-show-axis') || { checked: true }).checked;
     els.reverse(); // NB: Reverse so we draw the polys in table order
     els.forEach((el) => {
       const m = el.name.match(/^(axis_poly|view_poly):?(\d*)$/);
@@ -53,7 +55,7 @@ export class PhAnnotate extends PhSyncingViewer {
       const i = parseInt(m[2] || 0, 10);
       const obj = new EditableLine({
         id: el.name,
-        stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 0.6)`
+        stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, ${el.name.startsWith('axis_poly') || showAxis ? 0.6 : 0})`
       }, {
         stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 1)`,
         radius: 5 + (i % 5),

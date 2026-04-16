@@ -496,6 +496,19 @@ msgid "Copy axis line only"
 msgstr "Afrita lestrarás"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Axis line hidden, click here to show axis lines"
+msgstr "Lestrarás falinn. Smelltu hér til að sýna lestrarás"
+
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/annotate/annotate.html
+msgid "Show/Hide axis line"
+msgstr "Sýna/fela lestrarás"
+
+#: photolith/templates/annotate/annotate.html
+msgid "Axis lines visible, click here to hide axis lines"
+msgstr "Lestrarás sýnilegur. Smelltu hér til að fela lestrarás"
+
+#: photolith/templates/annotate/annotate.html
 msgid "Delete annotation"
 msgstr "Eyða aldursmerkingu"
 

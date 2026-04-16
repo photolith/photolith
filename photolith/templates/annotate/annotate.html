@@ -118,6 +118,13 @@
       {% if object.id is None %}
         <button class="btn btn-info btn-block ph-copy-full">{% translate 'Copy full annotation' %}</button>
         <button class="btn btn-info btn-block ph-copy-line">{% translate 'Copy axis line only' %}</button>
+            <span class="form-check form-switch btn btn-link ms-5" style="color: var(--bs-body-color)">
+              <input type="checkbox" class="form-check-input pref-session" role="switch" id="ph-view-poly-show-axis" autocomplete="off" checked>
+              <label for="ph-view-poly-show-axis">
+                <span class="unchecked" title="{% translate 'Axis line hidden, click here to show axis lines' %}">{% translate "Show/Hide axis line" %}</span>
+                <span class="checked" title="{% translate 'Axis lines visible, click here to hide axis lines' %}">{% translate "Show/Hide axis line" %}</span>
+              </label>
+            </span>
         <button class="btn btn-danger btn-block float-end ph-delete d-none">{% translate 'Delete annotation' %}</button>
       {% endif %}
     </div>
