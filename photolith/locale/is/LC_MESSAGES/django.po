@@ -156,7 +156,7 @@ msgstr ""
 msgid "Image"
 msgstr "Mynd"
 
-#: photolith/models.py
+#: photolith/models.py photolith/templates/home/index.html
 msgid "Images"
 msgstr "Myndir"
 
@@ -177,7 +177,7 @@ msgstr "Breytt"
 msgid "Individual"
 msgstr "Einstakingur"
 
-#: photolith/models.py
+#: photolith/models.py photolith/templates/home/index.html
 msgid "Individuals"
 msgstr "Einstaklingar"
 
@@ -266,6 +266,7 @@ msgid "Annotation"
 msgstr "Aldursmerking"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
+#: photolith/templates/home/index.html
 msgid "Annotations"
 msgstr "Aldursmerkingar"
 
@@ -606,6 +607,10 @@ msgid ""
 msgstr ""
 "Velkomin í Photolith, hugbúnaðinn sem heldur utan um kvarnamyndir og "
 "aldursmerkingar."
+
+#: photolith/templates/home/index.html
+msgid "We currently hold"
+msgstr "Við höldum nú"
 
 #: photolith/templates/home/index.html
 msgid "Log in"

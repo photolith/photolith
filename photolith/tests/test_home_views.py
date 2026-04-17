@@ -8,7 +8,7 @@ from .requires_utils import RequiresUtils
 
 
 class IndexViewTest(RequiresUtils, TestCase):
-    def ctx(self, user):
+    def ctx(self, user=None):
         request = RequestFactory().get("/", {})
         request.user = user if user else AnonymousUser()
         v = IndexView()
@@ -41,3 +41,90 @@ class IndexViewTest(RequiresUtils, TestCase):
         # Can see projects
         self.assertEqual(self.ctx(user1)["projects"], ["p1.1"])
         self.assertEqual(self.ctx(user2)["projects"], [])
+
+    def test_get_headline_numbers(self):
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=0,
+                images=0,
+                ind_by_species=dict(),
+                individuals=0,
+            ),
+        )
+
+        # Images in images count
+        imgs = [self.create_image() for _ in range(3)]
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=0,
+                images=3,
+                ind_by_species=dict(),
+                individuals=0,
+            ),
+        )
+
+        # Major number of species appears in breakdown
+        inds = [
+            self.create_individual(
+                data=dict(
+                    tx_species={"id": 100, "en": "Fish [FSH]", "is": "Fiskur [FSH]"}
+                )
+            )
+            for _ in range(20)
+        ]
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=0,
+                images=3 + 20,
+                ind_by_species=dict(Fish=20),
+                individuals=20,
+            ),
+        )
+
+        # Minor species not included in breakdown
+        inds = [
+            self.create_individual(
+                data=dict(
+                    tx_species={"id": 101, "en": "Cat [CAT]", "is": "Köttur [CAT]"}
+                )
+            )
+            for _ in range(5)
+        ]
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=0,
+                images=3 + 20 + 5,
+                ind_by_species=dict(Fish=20),
+                individuals=20 + 5,
+            ),
+        )
+
+        # Missing species doesn't get a breakdown either
+        inds = [self.create_individual() for _ in range(30)]
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=0,
+                images=3 + 20 + 5 + 30,
+                ind_by_species=dict(Fish=20),
+                individuals=20 + 5 + 30,
+            ),
+        )
+
+        user1 = self.create_user("user1")
+        ann = self.create_annotation(inds[0], user1, created_delta=dict(days=-5))
+        ann = self.create_annotation(inds[0], user1, created_delta=dict(days=-4))
+        ann = self.create_annotation(inds[0], user1, created_delta=dict(days=-3))
+        self.assertEqual(
+            self.ctx()["headline_numbers"],
+            dict(
+                annotations=3,
+                images=3 + 20 + 5 + 30,
+                ind_by_species=dict(Fish=20),
+                individuals=20 + 5 + 30,
+            ),
+        )

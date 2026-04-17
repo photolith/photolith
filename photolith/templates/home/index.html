@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load headline_number %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block content %}
@@ -7,7 +8,17 @@
 
 
 <div class="col-lg my-3">
-  <p>{% translate 'Welcome to Photolith, the otolith image storage and annotation software.' %}</p>
+  <p>
+    {% translate 'Welcome to Photolith, the otolith image storage and annotation software.' %}
+  </p>
+
+  <p>
+    {% translate 'We currently hold' %}:
+    {{ headline_numbers.images | headline_number }}{% translate 'Images' %},
+    {{ headline_numbers.individuals | headline_number }}{% translate 'Individuals' %}
+    ({% for name, count in headline_numbers.ind_by_species.items %}{{ count | headline_number }}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}),
+    {{ headline_numbers.annotations | headline_number }}{% translate 'Annotations' %}
+  </p>
 
   {% if not user.is_authenticated %}
     <div class="m-4 text-center">
