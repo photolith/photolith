@@ -166,6 +166,11 @@ export function init (parent) {
 
     populateIndividualData(indData);
 
+    document.querySelector('#ph-view-poly-show-axis').addEventListener('change', (event) => {
+      // Trigger addRemove so we update axis state
+      elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
+    });
+
     parent.querySelectorAll('button#existing-tab').forEach((elExistingBtn) => {
       // Find matching editor button
       const elEditorBtn = elExistingBtn.closest('ul').querySelector(':scope button#editor-tab');
