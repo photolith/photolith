@@ -111,7 +111,6 @@ from django.utils.translation import get_language_info
 LANGUAGE_CODE = "en"
 TIME_ZONE = "UTC"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
     (lang, get_language_info(lang)["name_translated"])

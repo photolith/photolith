@@ -1,5 +1,5 @@
-# https://docs.djangoproject.com/en/4.1/releases/#id2
-django==4.2
+# https://docs.djangoproject.com/en/5.2/releases/5.2.13/
+django==5.2.13
 psycopg2-binary==2.9.11
 
 django-settings-export==1.2.1
