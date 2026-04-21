@@ -7,7 +7,6 @@ import re
 
 from django.http import StreamingHttpResponse
 
-
 logger = logging.getLogger(__name__)
 
 

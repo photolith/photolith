@@ -300,9 +300,11 @@ class ProjectUpdateViewTest(RequiresUtils, TestCase):
         resp = client.post("/project/update/%d/" % (project.id,), updates)
         return (
             resp.status_code,
-            json.loads(resp.content)
-            if resp.headers["Content-Type"] == "application/json"
-            else resp.content,
+            (
+                json.loads(resp.content)
+                if resp.headers["Content-Type"] == "application/json"
+                else resp.content
+            ),
         )
 
     def test_call(self):
@@ -336,9 +338,11 @@ class ProjectDeleteViewTest(RequiresUtils, TestCase):
         resp = client.post("/project/delete/%d/" % (project.id,), {})
         return (
             resp.status_code,
-            json.loads(resp.content)
-            if resp.headers["Content-Type"] == "application/json"
-            else resp.content,
+            (
+                json.loads(resp.content)
+                if resp.headers["Content-Type"] == "application/json"
+                else resp.content
+            ),
         )
 
     def test_call(self):

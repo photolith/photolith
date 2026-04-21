@@ -4,7 +4,6 @@ import logging
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import StreamingHttpResponse
 
-
 logger = logging.getLogger(__name__)
 
 
