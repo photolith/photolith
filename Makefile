@@ -31,7 +31,7 @@ compile: lib/.requirements.txt ./manage.py ./photolith/settings/version.py $(LOC
 	npm run build
 
 test: compile lib/.requirements-dev.txt node_modules/.package-dev.json
-	./manage.py test --settings $(PROJECT).settings.unittest
+	./bin/python -Wa ./manage.py test --settings $(PROJECT).settings.unittest
 	npm run test
 
 coverage: compile lib/.requirements-dev.txt node_modules/.package-dev.json
