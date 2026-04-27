@@ -1,8 +1,8 @@
-table.table-bordered > thead > tr > th {
+/* stylelint-disable selector-class-pattern */
+table.dataTable.table-bordered > thead > tr > th {
   background-color: #b6dbe2;
 }
 
-/* stylelint-disable selector-class-pattern */
 .dataTables_wrapper {
   clear: both;
 }
