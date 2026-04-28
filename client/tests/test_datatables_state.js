@@ -98,7 +98,7 @@ test('applyDTState', function (test) {
 
   function doApply (data, order, searchCols) {
     setupMApi(searchCols || Object.keys(data[1]));
-    setDTState('', { order: order });
+    setDTState('', { order });
 
     out = JSON.parse(JSON.stringify(data));
     applyDTState(out, global.window.location.search);

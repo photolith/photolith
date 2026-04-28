@@ -10,8 +10,7 @@ from .models import *
 
 
 def image_preview_html(href, bounding_box):
-    return mark_safe(
-        """<script>
+    return mark_safe("""<script>
         window.addEventListener('DOMContentLoaded', function (event) {
             const elViewer = document.createElement('DIV');
             elViewer.className = 'ph-cropped-viewer';
@@ -22,9 +21,7 @@ def image_preview_html(href, bounding_box):
             window.initCroppedViewer(this);
         }.bind(document.currentScript.parentElement))
         </script>
-        """
-        % (href.replace("'", "\\'"), bounding_box.replace("'", "\\'"))
-    )
+        """ % (href.replace("'", "\\'"), bounding_box.replace("'", "\\'")))
 
 
 class IndividualInline(admin.StackedInline):

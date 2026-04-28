@@ -109,7 +109,7 @@ export function init (parent) {
       ajax: function (data, callback) {
         // https://datatables.net/reference/option/ajax#Types
         return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then((data) => {
-          if (data.data[data.data.length - 1].truncated) {
+          if (data.data.length > 0 && data.data[data.data.length - 1].truncated) {
             const truncRow = data.data.pop();
             displayAlert('warning', truncRow.truncated, 0);
           }

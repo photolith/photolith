@@ -1,20 +1,20 @@
-# https://docs.djangoproject.com/en/4.1/releases/#id2
-django==4.2
-psycopg2-binary==2.9.11
+# https://docs.djangoproject.com/en/5.2/releases/5.2.13/
+django==5.2.13
+psycopg2-binary==2.9.12
 
 django-settings-export==1.2.1
 
-django-crispy-forms==2.0
-crispy-bootstrap5==0.7
+django-crispy-forms==2.6
+crispy-bootstrap5==2026.3
 
-django-storages==1.14.1
-django-storages[s3]==1.14.1
+django-storages==1.14.6
+django-storages[s3]==1.14.6
 
 django-ses==4.7.2
 
-pillow==10.4.0
+pillow==12.2.0
 
-gunicorn==21.2.0
+gunicorn==25.3.0
 
-sphinx==7.2.6
-sphinx-intl==2.1.0
+sphinx==9.1.0
+sphinx-intl==2.3.2

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-
 try:
     from .version import GIT_REVISION
 except ImportError:
@@ -111,7 +110,6 @@ from django.utils.translation import get_language_info
 LANGUAGE_CODE = "en"
 TIME_ZONE = "UTC"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
     (lang, get_language_info(lang)["name_translated"])
@@ -202,9 +200,9 @@ for k in os.environ.keys():
     elif k.startswith("APP_STORAGE_"):
         STORAGES["default"]["OPTIONS"][k.replace("APP_STORAGE_", "")] = os.environ[k]
     elif k.startswith("AWS_S3_OBJECT_PARAMETERS_"):
-        AWS_S3_OBJECT_PARAMETERS[
-            k.replace("AWS_S3_OBJECT_PARAMETERS_", "")
-        ] = os.environ[k]
+        AWS_S3_OBJECT_PARAMETERS[k.replace("AWS_S3_OBJECT_PARAMETERS_", "")] = (
+            os.environ[k]
+        )
 
     elif k == "APP_ALLOWED_HOSTS":
         ALLOWED_HOSTS = os.environ["APP_ALLOWED_HOSTS"].split(" ")

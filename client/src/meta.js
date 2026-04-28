@@ -68,8 +68,9 @@ export function renderMetaCell (k, data, type, row, meta) {
 
     } else if (typeof out === 'number') {
       // https://datatables.net/manual/data/renderers#Number-helper
-      // NB: Under nodeJS, we need to do DataTable(). In-browser, DataTable.render is fine
-      renderNumber = renderNumber || (DataTable.render || DataTable().render).number(
+      // NB: Under nodeJS, DataTable is a function that needs to be fed a window
+      //     See https://github.com/DataTables/Dist-DataTables-Bootstrap5/blob/7d09afc9038aaea5d8d045e18116d4d089203c9b/js/dataTables.bootstrap5.js#L21-L40
+      renderNumber = renderNumber || (DataTable.render || DataTable(global.window).render).number(
         document.documentElement.getAttribute('data-thousand-separator') || ',',
         document.documentElement.getAttribute('data-decimal-separator') || '.',
         2

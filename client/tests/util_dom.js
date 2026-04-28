@@ -1,9 +1,9 @@
 import { createRequire } from 'module';
+import DataTable from 'datatables.net-bs5';
 const require = createRequire(import.meta.url);
 
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
-const jQueryFactory = require('jquery');
 
 export function setupDom (test, html) {
   const dom = new JSDOM(html || '<!DOCTYPE html><html><body></body></html>', {
@@ -15,9 +15,10 @@ export function setupDom (test, html) {
     global.window = undefined;
     global.document = undefined;
   });
+  // NB: Attach a DT now to ensure it require()s in headless mode: https://github.com/DataTables/DataTablesSrc/issues/385
+  DataTable(dom.window);
   global.window = dom.window;
   global.document = dom.window.document;
-  global.window.$ = jQueryFactory(window);
 
   return dom;
 }

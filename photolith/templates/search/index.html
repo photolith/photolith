@@ -31,6 +31,7 @@
 </h2>{% endif %}
 
 {% if qs %}
+  <br/>{# Indent table so floating buttons don't foul table layout #}
   <table class="table table-bordered w-auto mx-auto ph-search-table">
   </table>
 {% else %}
@@ -41,13 +42,13 @@
 
 <form action="" method="get" class="filter-form offcanvas {% if not qs %}show{% endif %} offcanvas-end" tabindex="-1" id="filter-offcanvas" aria-labelledby="filter-label">
   {{ meta_fields|json_script:"meta_fields" }}
-  <div class="offcanvas-header">
+  <div class="offcanvas-header justify-content-between">
     <h5 class="offcanvas-title" id="filter-label">{% translate "Filter results" %}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
   </div>
-  <div class="offcanvas-header">
+  <div class="offcanvas-header justify-content-between">
       <button type="submit" class="btn btn-info">{% translate "Apply" %}</button>
       <a href="?{% if request.GET.project %}project={{ request.GET.project }}{% endif %}" class="btn btn-outline-secondary">{% translate "Clear filters" %}</a>
   </div>
