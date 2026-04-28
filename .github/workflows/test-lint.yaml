@@ -24,7 +24,7 @@ jobs:
       # https://github.com/actions/setup-python
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.13'  # NB: Should be in-sync with Dockerfile
           cache: 'pip'
  
       # https://github.com/actions/setup-node
