@@ -23,9 +23,9 @@
   "type": "module",
   "devDependencies": {
     "c8": "^11.0.0",
-    "jsdom": "^29.0.2",
+    "jsdom": "^29.1.0",
     "semistandard": "^17.0.0",
-    "stylelint": "^17.8.0",
+    "stylelint": "^17.9.1",
     "stylelint-config-standard": "^40.0.0",
     "tape": "^5.9.0"
   }
