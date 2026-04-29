@@ -2,7 +2,7 @@ import test from 'tape';
 
 import { setupDom } from './util_dom.js';
 
-import { renderMetaCell, populateIndividualData, updateDataObject } from '../src/meta.js';
+import { renderMetaCell, populateIndividualData, updateDataObject, renderSearchFilters } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
 
 test('renderMetaCell:undefined', function (test) {
@@ -207,6 +207,64 @@ test('updateDataObject', function (test) {
     'tx_t',
     ''
   ), {});
+
+  test.end();
+});
+
+test('renderSearchFilter', function (test) {
+  class UTMetadataApi extends MetadataApi {
+    constructor (lang) {
+      super(lang);
+      this.intlExtend(this._metaLabels, {
+        en: {
+          ch_slideLabel: 'Slide Label',
+          ch_individualLabel: 'Individual No.',
+          tx_sampleType: 'Sample Type',
+          nm_length: 'Length',
+          nm_weight: 'Weight',
+          dt_caught: 'Caught',
+          in_fingers: 'Fingers',
+          tx_sex: 'Sex'
+        }
+      });
+      this._txHardcoded = {
+        sex: [
+          { id: 1, en: 'M.', is: 'Ka.' },
+          { id: 2, en: 'F.', is: 'Kv.' }
+        ]
+      };
+    }
+  }
+
+  const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
+  dom.window.mApi = new UTMetadataApi('en-gb');
+
+  function rsf (metaFields, search) {
+    return renderSearchFilters(metaFields, new URLSearchParams(search || '')).split(/\s*\n+\s*/).filter((x) => !!x);
+  }
+
+  // Numeric
+  test.deepEqual(rsf({ nm_length: { min: 50, max: 200 } }), [
+    '<div class="mb-3">',
+    '<label for="filter-nm_length-control" class="form-label">Length</label>',
+    '<div class="input-group">',
+    '<input type="number" name="nm_length" value="" min="50" max="200" class="form-control range-start" id="filter-nm_length-control">',
+    '<span class="input-group-text">..</span>',
+    '<input type="number" name="nm_length" value="" min="50" max="200" class="form-control range-end" id="filter-nm_length-control-2">',
+    '</div>',
+    '</div>'
+  ]);
+
+  // Character
+  test.deepEqual(rsf({ ch_slideLabel: { char: true } }, 'ch_slideLabel=moo'), [
+    '<div class="mb-3">',
+    '<label for="filter-ch_slideLabel-control" class="form-label">Slide Label</label>',
+    '<div class="input-group">',
+    '<input type="text" name="ch_slideLabel" value="moo" class="form-control">',
+    '<button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>',
+    '</div>',
+    '</div>'
+  ]);
 
   test.end();
 });
