@@ -24,6 +24,13 @@ class IndexViewTest(RequiresUtils, TestCase):
         out = v.get_context_data()
         return out
 
+    def do_get_meta_fields(self):
+        request = RequestFactory().get("/", dict())
+        v = IndexView()
+        v.setup(request, **(request.GET.dict()))
+        out = v.get_meta_fields()
+        return out
+
     def test_call__perms(self):
         """Not allowed access without general annotation / project"""
         user = self.create_user(groups=[])
@@ -33,6 +40,78 @@ class IndexViewTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(PermissionDenied, "project"):
             p = self.create_project()
             out = self.ctx_data(user, dict(project=p.id))
+
+    def test_get_meta_fields(self):
+        self.assertEqual(
+            self.do_get_meta_fields(),
+            dict(
+                dt_created_at={},
+            ),
+        )
+
+    def test_get_meta_fields_numeric(self):
+        self.create_individual(
+            data=dict(
+                nm_length=100,
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["nm_length"],
+            dict(
+                min=100.0,
+                max=100.0,
+            ),
+        )
+        self.create_individual(
+            data=dict(
+                nm_length=200,
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["nm_length"],
+            dict(
+                min=100.0,
+                max=200.0,
+            ),
+        )
+
+    def test_get_meta_fields_string(self):
+        self.create_individual(
+            data=dict(
+                ch_name="Barry",
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["ch_name"],
+            dict(
+                char=True,
+            ),
+        )
+
+    def test_get_meta_fields_taxonomy(self):
+        self.create_individual(
+            data=dict(
+                tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["tx_species"],
+            dict(choices=[{"en": "Fish", "id": 100, "is": "Fiskur"}]),
+        )
+        self.create_individual(
+            data=dict(
+                tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["tx_species"],
+            dict(
+                choices=[
+                    {"id": 100, "en": "Fish", "is": "Fiskur"},
+                    {"id": 200, "en": "Cat", "is": "Köttur"},
+                ]
+            ),
+        )
 
 
 class DataViewTest(RequiresUtils, TestCase):
