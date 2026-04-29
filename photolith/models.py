@@ -152,6 +152,8 @@ class Individual(models.Model):
         out = {}
         for m in self.metanumeric_set.all():
             out["nm_" + m.key] = m.value
+        for m in self.metainteger_set.all():
+            out["in_" + m.key] = m.value
         for m in self.metachar_set.all():
             out["ch_" + m.key] = m.value
         for m in self.metadt_set.all():
@@ -174,6 +176,9 @@ class Individual(models.Model):
                 )
             elif t == "nm":
                 metaset = self.metanumeric_set
+                v = float(v)
+            elif t == "in":
+                metaset = self.metainteger_set
                 v = float(v)
             elif t == "dt":
                 metaset = self.metadt_set
@@ -234,12 +239,27 @@ class Individual(models.Model):
 class MetaNumeric(models.Model):
     """
     Numeric Metadata about an individual, e.g. length
-    NB: This is only for floats. Serials such as individualId have to be stringified
+    NB: This is only for floats. Serials such as individualId have to be integer
     """
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["key"]),
+        ]
+
+
+class MetaInteger(models.Model):
+    """
+    Integer Metadata about an individual, e.g. station
+    """
+
+    individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
+    key = models.CharField(max_length=255, blank=False, null=False)
+    value = models.IntegerField(blank=True, null=True)
 
     class Meta:
         indexes = [

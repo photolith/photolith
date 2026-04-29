@@ -153,6 +153,16 @@ class IndividualTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(ValueError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])
 
+    def test_data_int(self):
+        ind1 = self.create_individual()
+
+        # Data initially empty
+        self.assertEqual(ind1.data, dict())
+
+        # Set station
+        ind1.data = dict(in_station=135, nm_length=42.5)
+        self.assertEqual(ind1.data, dict(in_station=135, nm_length=42.5))
+
     def test_str(self):
         self.assertEqual(str(self.create_individual()), "Individual 1")
         self.assertEqual(str(self.create_individual()), "Individual 2")
