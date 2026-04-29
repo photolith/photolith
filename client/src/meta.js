@@ -30,6 +30,9 @@ export function renderMetaCell (k, data, type, row, meta) {
     if (k.startsWith('nm_')) {
       return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data)}" step="any">`;
     }
+    if (k.startsWith('in_')) {
+      return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : parseInt(data, 10)}" step="1">`;
+    }
     if (k.startsWith('dt_')) {
       return `<input type="date" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data.replace(/T.*/, ''))}">`;
     }
@@ -134,7 +137,7 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
       // Fill in reserved spot for "Add..." prompt
       if (!k) return elAddSelect.options[0].outerHTML;
       // Ignore values without type prefix
-      if (!k.match(/^(ch|nm|tx|dt)_/)) return '';
+      if (!k.match(/^(ch|nm|in|tx|dt)_/)) return '';
       return new window.Option(metaLabels[k], k).outerHTML;
     }).join('\n');
 
@@ -167,6 +170,8 @@ export function updateDataObject (data, elInput) {
     delete data[key];
   } else if (key.startsWith('nm_')) {
     data[key] = parseFloat(newValue);
+  } else if (key.startsWith('in_')) {
+    data[key] = parseInt(newValue, 10);
   } else if (key.startsWith('tx_')) {
     data[key] = JSON.parse(newValue);
     if (data[key].id === undefined) {
@@ -216,6 +221,12 @@ export function renderSearchFilters (metaFields, searchParams) {
           <input type="number" name="${k}" value="${searchParams.getAll(k)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
           <span class="input-group-text">..</span>
           <input type="number" name="${k}" value="${searchParams.getAll(k)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
+        </div>`;
+    } else if (k.startsWith('in')) {
+      controlHtml = `<div class="input-group">
+          <input type="number" name="${k}" value="${searchParams.getAll(k)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}" step="1">
+          <span class="input-group-text">..</span>
+          <input type="number" name="${k}" value="${searchParams.getAll(k)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2" step="1">
         </div>`;
     } else if (k.startsWith('tx')) {
       controlHtml = `<select multiple name="${k}" class="form-select" id="${controlId}">

@@ -77,6 +77,9 @@ test('renderMetaCell:form', function (test) {
   // Numbers get a number field
   test.deepEqual(renderMetaCell('nm_n', 1234567.4562, 'form'), '<input type="number" class="form-control ph-meta" data-key="nm_n" name="" value="1234567.4562" step="any">');
 
+  // Integers get an integer field
+  test.deepEqual(renderMetaCell('in_i', 1234567.8, 'form'), '<input type="number" class="form-control ph-meta" data-key="in_i" name="" value="1234567" step="1">');
+
   // Dates get a date field, time ignored
   test.deepEqual(renderMetaCell('dt_dDate', '2023-11-22T16:38:28.817Z', 'form'), '<input type="date" class="form-control ph-meta" data-key="dt_dDate" name="" value="2023-11-22">');
 
@@ -106,6 +109,7 @@ test('populateIndividualData', function (test) {
           nm_length: 'Length',
           nm_weight: 'Weight',
           dt_caught: 'Caught',
+          in_fingers: 'Fingers',
           tx_sex: 'Sex'
         }
       });
@@ -141,35 +145,41 @@ test('populateIndividualData', function (test) {
 
   // No data
   test.deepEqual(pid({}, 'display'), [
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
 
   // No prefix --> ignored
   test.deepEqual(pid({ moo: 'no' }, 'display'), [
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
 
   // Character
   test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'display'), [
     ['Slide Label', '<code>moo</code>'],
-    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
   test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'form'), [
     ['<label class="col-form-label">Slide Label</label>', '<input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="moo">'],
-    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
 
   // Numeric
   test.deepEqual(pid({ nm_length: 12345 }, 'display'), [
     ['Length', '<code>12345</code>'],
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
 
   // Date
   test.deepEqual(pid({ dt_caught: '2001-03-01', nm_length: 1080 }, 'display'), [
     ['Length', '<code>1080</code>'],
     ['Caught', '<code>2001-03-01</code>'],
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'tx_sex'], '<button type="button">Copy</button>']
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+
+  // Integer
+  test.deepEqual(pid({ in_fingers: 5 }, 'display'), [
+    ['Fingers', '<code>5</code>'],
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
   ]);
 
   test.end();
@@ -194,6 +204,7 @@ test('updateDataObject', function (test) {
 
   // Value formatting preserved
   test.deepEqual(udo({}, 'nm_n', 12345.67), { nm_n: 12345.67 });
+  test.deepEqual(udo({}, 'in_i', 12345.67), { in_i: 12345 });
   test.deepEqual(udo({}, 'ch_a', 'parp'), { ch_a: 'parp' });
   test.deepEqual(udo({}, 'dt_d', '2023-11-22T16:38:28.817Z'), { dt_d: '2023-11-22' }); // NB: Time truncated by renderDataCell()
   test.deepEqual(udo({}, 'tx_t', { id: 1, en: 'M', ge: 'მ' }), { tx_t: { id: 1, en: 'M', ge: 'მ' } });
@@ -262,6 +273,18 @@ test('renderSearchFilter', function (test) {
     '<div class="input-group">',
     '<input type="text" name="ch_slideLabel" value="moo" class="form-control">',
     '<button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>',
+    '</div>',
+    '</div>'
+  ]);
+
+  // Integer
+  test.deepEqual(rsf({ in_fingers: { min: 0, max: 5 } }), [
+    '<div class="mb-3">',
+    '<label for="filter-in_fingers-control" class="form-label">Fingers</label>',
+    '<div class="input-group">',
+    '<input type="number" name="in_fingers" value="" min="0" max="5" class="form-control range-start" id="filter-in_fingers-control" step="1">',
+    '<span class="input-group-text">..</span>',
+    '<input type="number" name="in_fingers" value="" min="0" max="5" class="form-control range-end" id="filter-in_fingers-control-2" step="1">',
     '</div>',
     '</div>'
   ]);
