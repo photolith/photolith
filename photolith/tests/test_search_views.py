@@ -240,6 +240,36 @@ class DataViewTest(RequiresUtils, TestCase):
             [x.id for x in inds[0:2]],  # NB: 0 indexed
         )
 
+    def test_query_filter_integer(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        # Create individuals with station=0..9
+        inds = [
+            self.create_individual(
+                data=dict(
+                    in_station=s,
+                )
+            )
+            for s in range(10)
+        ]
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(in_station=(5)))],
+            [x.id for x in [inds[5]]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(in_station=(0, 3)))],
+            [x.id for x in inds[0:4]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(in_station=(2, 5)))],
+            [x.id for x in inds[2:6]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(in_station=(2, 99)))],
+            [x.id for x in inds[2:10]],
+        )
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]

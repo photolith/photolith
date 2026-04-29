@@ -142,6 +142,18 @@ class DataView(LoginRequiredMixin, View):
                 if vs[1] != "":
                     sq = sq.filter(value__lte=float(vs[1]))
                 qs = qs.filter(Exists(sq))
+            elif k.startswith("in_"):
+                sq = MetaInteger.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("in_", ""),
+                )
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__gte=int(vs[0]))
+                if vs[1] != "":
+                    sq = sq.filter(value__lte=int(vs[1]))
+                qs = qs.filter(Exists(sq))
             elif k.startswith("ch_"):
                 qs = qs.filter(
                     Exists(
