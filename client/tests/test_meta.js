@@ -2,7 +2,7 @@ import test from 'tape';
 
 import { setupDom } from './util_dom.js';
 
-import { renderMetaCell } from '../src/meta.js';
+import { renderMetaCell, updateDataObject } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
 
 test('renderMetaCell:undefined', function (test) {
@@ -75,7 +75,7 @@ test('renderMetaCell:form', function (test) {
   test.deepEqual(renderMetaCell('ch_chchanges', '<hello>"world"</hello>', 'form'), '<input type="text" class="form-control ph-meta" data-key="ch_chchanges" name="" value="<hello>&quot;world&quot;</hello>">');
 
   // Numbers get a number field
-  test.deepEqual(renderMetaCell('nm_n', 1234567.4562, 'form'), '<input type="number" class="form-control ph-meta" data-key="nm_n" name="" value="1234567.4562">');
+  test.deepEqual(renderMetaCell('nm_n', 1234567.4562, 'form'), '<input type="number" class="form-control ph-meta" data-key="nm_n" name="" value="1234567.4562" step="any">');
 
   // Dates get a date field, time ignored
   test.deepEqual(renderMetaCell('dt_dDate', '2023-11-22T16:38:28.817Z', 'form'), '<input type="date" class="form-control ph-meta" data-key="dt_dDate" name="" value="2023-11-22">');
@@ -88,6 +88,42 @@ test('renderMetaCell:form', function (test) {
     '<option value="{&quot;id&quot;:2,&quot;en&quot;:&quot;F.&quot;,&quot;is&quot;:&quot;Kv.&quot;}">2: F.</option>',
     '</select>'
   ].join(''));
+
+  test.end();
+});
+
+test('updateDataObject', function (test) {
+  const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
+  dom.window.mApi = new MetadataApi('en-gb');
+  dom.window.mApi._txHardcoded = {
+    sex: [
+      { id: 1, en: 'M.', is: 'Ka.' },
+      { id: 2, en: 'F.', is: 'Kv.' }
+    ]
+  };
+
+  function udo (inData, inKey, inVal) {
+    const formEl = dom.window.document.createElement('form');
+    formEl.innerHTML = renderMetaCell(inKey, inVal, 'form');
+
+    return updateDataObject(inData, formEl.elements[0]);
+  }
+
+  // Value formatting preserved
+  test.deepEqual(udo({}, 'nm_n', 12345.67), { nm_n: 12345.67 });
+  test.deepEqual(udo({}, 'ch_a', 'parp'), { ch_a: 'parp' });
+  test.deepEqual(udo({}, 'dt_d', '2023-11-22T16:38:28.817Z'), { dt_d: '2023-11-22' }); // NB: Time truncated by renderDataCell()
+  test.deepEqual(udo({}, 'tx_t', { id: 1, en: 'M', ge: 'მ' }), { tx_t: { id: 1, en: 'M', ge: 'მ' } });
+
+  // Existing values kept unless overriden
+  test.deepEqual(udo({ ch_a: 'hello', nm_n: 4 }, 'nm_n', 12345.67), { ch_a: 'hello', nm_n: 12345.67 });
+
+  // Deleting tx values
+  test.deepEqual(udo(
+    { tx_t: { id: 1, en: 'M', ge: 'მ' } },
+    'tx_t',
+    ''
+  ), {});
 
   test.end();
 });
