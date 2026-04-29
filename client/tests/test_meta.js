@@ -2,7 +2,7 @@ import test from 'tape';
 
 import { setupDom } from './util_dom.js';
 
-import { renderMetaCell, updateDataObject } from '../src/meta.js';
+import { renderMetaCell, populateIndividualData, updateDataObject } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
 
 test('renderMetaCell:undefined', function (test) {
@@ -88,6 +88,89 @@ test('renderMetaCell:form', function (test) {
     '<option value="{&quot;id&quot;:2,&quot;en&quot;:&quot;F.&quot;,&quot;is&quot;:&quot;Kv.&quot;}">2: F.</option>',
     '</select>'
   ].join(''));
+
+  test.end();
+});
+
+test('populateIndividualData', function (test) {
+  const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
+
+  class UTMetadataApi extends MetadataApi {
+    constructor (lang) {
+      super(lang);
+      this.intlExtend(this._metaLabels, {
+        en: {
+          ch_slideLabel: 'Slide Label',
+          ch_individualLabel: 'Individual No.',
+          tx_sampleType: 'Sample Type',
+          nm_length: 'Length',
+          nm_weight: 'Weight',
+          dt_caught: 'Caught',
+          tx_sex: 'Sex'
+        }
+      });
+      this._txHardcoded = {
+        sex: [
+          { id: 1, en: 'M.', is: 'Ka.' },
+          { id: 2, en: 'F.', is: 'Kv.' }
+        ]
+      };
+    }
+  }
+  dom.window.mApi = new UTMetadataApi('en-gb');
+
+  function pid (indData, tableMode) {
+    const elForm = dom.window.document.createElement('form');
+    const includeNewHtml = `<tfoot><tr><td colspan="1"><select class="form-select add-new-metadata">
+        <option value="" selected="selected">Add...</option>
+    </select>
+    </td><td><button type="button">Copy</button></td></tr></tfoot>`;
+
+    elForm.innerHTML = `<table><tbody></tbody>${includeNewHtml}</table>`;
+
+    populateIndividualData(indData, elForm.querySelector('tbody'), tableMode);
+    return Array.from(elForm.querySelectorAll('tr')).map((elRow) => {
+      return Array.from(elRow.querySelectorAll('td')).map((elCell) => {
+        if (elCell.firstElementChild && elCell.firstElementChild.classList.contains('add-new-metadata')) {
+          return Array.from(elCell.firstElementChild.options).map((o) => o.value);
+        }
+        return elCell.innerHTML.trim();
+      });
+    });
+  }
+
+  // No data
+  test.deepEqual(pid({}, 'display'), [
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+
+  // No prefix --> ignored
+  test.deepEqual(pid({ moo: 'no' }, 'display'), [
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+
+  // Character
+  test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'display'), [
+    ['Slide Label', '<code>moo</code>'],
+    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+  test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'form'), [
+    ['<label class="col-form-label">Slide Label</label>', '<input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="moo">'],
+    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+
+  // Numeric
+  test.deepEqual(pid({ nm_length: 12345 }, 'display'), [
+    ['Length', '<code>12345</code>'],
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
+
+  // Date
+  test.deepEqual(pid({ dt_caught: '2001-03-01', nm_length: 1080 }, 'display'), [
+    ['Length', '<code>1080</code>'],
+    ['Caught', '<code>2001-03-01</code>'],
+    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'tx_sex'], '<button type="button">Copy</button>']
+  ]);
 
   test.end();
 });

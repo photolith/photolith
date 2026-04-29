@@ -41,11 +41,12 @@ export default class MetadataApi {
     // Strip -gb from en-gb
     this.lang = lang.replace(/\W.*/, '');
     this.baseHref = baseHref || '';
-    this._intlTemplates = intlTemplates;
-    this._metaLabels = metaLabels;
-    this._fieldsFor = fieldsFor;
-    this._labelHelp = labelHelp;
-    this._txHardcoded = txHardcoded;
+    // NB: deep clone so downstream classes can modify without altering base
+    this._intlTemplates = JSON.parse(JSON.stringify(intlTemplates));
+    this._metaLabels = JSON.parse(JSON.stringify(metaLabels));
+    this._fieldsFor = JSON.parse(JSON.stringify(fieldsFor));
+    this._labelHelp = JSON.parse(JSON.stringify(labelHelp));
+    this._txHardcoded = JSON.parse(JSON.stringify(txHardcoded));
   }
 
   /** Return a list of strings to display as instructions for what to put as a slide label */
