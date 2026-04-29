@@ -40,6 +40,17 @@ class IndividualTest(RequiresUtils, TestCase):
         ind2.data = dict(nm_length="40", ch_name=22)
         self.assertEqual(ind2.data, dict(nm_length=40, ch_name="22"))
 
+        # Only one length entry for all individuals, old ones tidied up
+        self.assertEqual(
+            set((x.individual_id, x.key, x.value) for x in MetaNumeric.objects.all()),
+            set(
+                (
+                    (ind1.id, "length", 39.0),
+                    (ind2.id, "length", 40.0),
+                )
+            ),
+        )
+
         # ISO dates get translated
         ind1.data = dict(nm_length=39, ch_name="5", dt_time="20230912T082738Z")
         self.assertTrue(isinstance(MetaDT.objects.all()[0].value, datetime.datetime))

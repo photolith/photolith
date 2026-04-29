@@ -162,66 +162,44 @@ class Individual(models.Model):
 
     @data.setter
     def data(self, new_value):
-        # TODO: Not removing old values
         for k, v in new_value.items():
             if "_" not in k:
                 raise ValueError("'%s' has no type prefix" % k)
             t, k = k.split("_", 2)
+
             if v is None:
                 # We don't allow nulls in, means an empty required field in UI
                 raise ValidationError(
                     "'%s' is missing for %s" % (k, str(self)), code=400
                 )
-            if t == "nm":
-                self.metanumeric_set.add(
-                    MetaNumeric(
-                        individual=self,
-                        key=k,
-                        value=float(v),
-                    ),
-                    bulk=False,
-                )
-
+            elif t == "nm":
+                metaset = self.metanumeric_set
+                v = float(v)
             elif t == "dt":
-                self.metadt_set.add(
-                    MetaDT(
-                        individual=self,
-                        key=k,
-                        value=str(v),
-                    ),
-                    bulk=False,
-                )
-
+                metaset = self.metadt_set
+                v = str(v)
             elif t == "ch":
-                self.metachar_set.add(
-                    MetaChar(
-                        individual=self,
-                        key=k,
-                        value=str(v),
-                    ),
-                    bulk=False,
-                )
-
+                metaset = self.metachar_set
+                v = str(v)
             elif t == "tx":
                 if "id" not in v:
                     # Empty dict() passed in, possibly not filled-in form fields. Ignore.
                     continue
+                # Upsert taxonomy object first
                 tx, created = Taxonomy.objects.get_or_create(key=k, identifier=v["id"])
                 v["key"] = k
                 tx.dict = v
                 tx.save()
-                # upsert many-to-many
-                mtx, created = self.metatx_set.get_or_create(
-                    individual=self,
-                    key=k,
-                    defaults=dict(value=tx),
-                )
-                if not created:
-                    mtx.value = tx
-                    mtx.save()
 
+                metaset = self.metatx_set
+                v = tx
             else:  # pragma: no cover
                 raise ValueError("Unknown type of %s: %s" % (k, str(v)))
+
+            m, created = metaset.get_or_create(key=k, defaults=dict(value=v))
+            if not created:
+                m.value = v
+                m.save()
 
     def save(self, *args, **kwargs):
         """Save any associated meta objects as well as ourselves"""
