@@ -75,6 +75,32 @@ class IndexViewTest(RequiresUtils, TestCase):
             ),
         )
 
+    def test_get_meta_fields_integer(self):
+        self.create_individual(
+            data=dict(
+                in_length=100,
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["in_length"],
+            dict(
+                min=100.0,
+                max=100.0,
+            ),
+        )
+        self.create_individual(
+            data=dict(
+                in_length=200,
+            )
+        )
+        self.assertEqual(
+            self.do_get_meta_fields()["in_length"],
+            dict(
+                min=100.0,
+                max=200.0,
+            ),
+        )
+
     def test_get_meta_fields_string(self):
         self.create_individual(
             data=dict(

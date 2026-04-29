@@ -14,6 +14,7 @@ from ..models import (
     Annotation,
     Individual,
     MetaNumeric,
+    MetaInteger,
     MetaChar,
     MetaTx,
     MetaDT,
@@ -37,6 +38,11 @@ class IndexView(LoginRequiredMixin, TemplateView):
             min=Min("value"), max=Max("value")
         ):
             out["nm_" + m["key"]] = dict(min=m["min"], max=m["max"])
+
+        for m in MetaInteger.objects.values("key").annotate(
+            min=Min("value"), max=Max("value")
+        ):
+            out["in_" + m["key"]] = dict(min=m["min"], max=m["max"])
 
         for m in MetaChar.objects.values("key").annotate(x=NullAgg()):
             out["ch_" + m["key"]] = dict(char=True)
