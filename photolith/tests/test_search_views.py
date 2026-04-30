@@ -149,6 +149,44 @@ class DataViewTest(RequiresUtils, TestCase):
             ),
         )
 
+    def test_query_filter_date(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        inds = [
+            self.create_individual(
+                data=dict(dt_sampled="2010-04-%02dT00:00:00+00:00" % (i + 1)),
+            )
+            for i in range(10)
+        ]
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(dt_sampled="2010-04-05"))],
+            [x.id for x in [inds[4]]],  # NB: 0 indexed
+        )
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA, search=dict(dt_sampled=("2010-04-06", "2010-04-08"))
+                )
+            ],
+            [x.id for x in inds[5:8]],  # NB: 0 indexed
+        )
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(userA, search=dict(dt_sampled=("2010-04-03", "")))
+            ],
+            [x.id for x in inds[2:10]],  # NB: 0 indexed
+        )
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(userA, search=dict(dt_sampled=("", "2010-04-02")))
+            ],
+            [x.id for x in inds[0:2]],  # NB: 0 indexed
+        )
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]

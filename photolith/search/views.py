@@ -16,6 +16,7 @@ from ..models import (
     MetaNumeric,
     MetaChar,
     MetaTx,
+    MetaDT,
     Project,
     Taxonomy,
 )
@@ -111,12 +112,16 @@ class DataView(LoginRequiredMixin, View):
                 # Ignore all-blank entries, didn't fill in the form
                 pass
             elif k == "dt_created_at":
-                if len(vs) > 0 and vs[0]:
-                    qs = qs.filter(created_at__gte=datetime.date.fromisoformat(vs[0]))
-                if len(vs) > 1 and vs[1]:
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    qs = qs.filter(
+                        created_at__date__gte=datetime.date.fromisoformat(vs[0])
+                    )
+                if vs[1] != "":
                     # Date ls less than midinight the day after (i.e. filter is inclusive)
                     qs = qs.filter(
-                        created_at__lt=datetime.date.fromisoformat(vs[1])
+                        created_at__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
             elif k.startswith("nm_"):
@@ -149,15 +154,16 @@ class DataView(LoginRequiredMixin, View):
             elif k.startswith("dt_"):
                 sq = MetaDT.objects.filter(
                     individual_id=OuterRef("id"),
-                    key=k.replace("nm_", ""),
+                    key=k.replace("dt_", ""),
                 )
-                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
-                if len(vs) > 0:
-                    sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
-                if len(vs) > 1:
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__date__gte=datetime.date.fromisoformat(vs[0]))
+                if vs[1] != "":
                     # Date ls less than midinight the day after (i.e. filter is inclusive)
                     sq = sq.filter(
-                        value__lt=datetime.date.fromisoformat(vs[1])
+                        value__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
                 qs = qs.filter(Exists(sq))
