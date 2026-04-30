@@ -125,22 +125,17 @@ class DataView(LoginRequiredMixin, View):
                         + datetime.timedelta(days=1)
                     )
             elif k.startswith("nm_"):
-                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
-                if len(vs) != 2:
-                    raise ValueError(
-                        "Numeric searches should have 2 values: %s=%s"
-                        % (k, "&".join(vs))
-                    )
-                qs = qs.filter(
-                    Exists(
-                        MetaNumeric.objects.filter(
-                            individual_id=OuterRef("id"),
-                            key=k.replace("nm_", ""),
-                            value__gte=float(vs[0]),
-                            value__lte=float(vs[1]),
-                        )
-                    )
+                sq = MetaNumeric.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("nm_", ""),
                 )
+                while len(vs) < 2:  # Range filter, should always have a pair of values
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__gte=float(vs[0]))
+                if vs[1] != "":
+                    sq = sq.filter(value__lte=float(vs[1]))
+                qs = qs.filter(Exists(sq))
             elif k.startswith("ch_"):
                 qs = qs.filter(
                     Exists(

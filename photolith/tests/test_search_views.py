@@ -149,6 +149,33 @@ class DataViewTest(RequiresUtils, TestCase):
             ),
         )
 
+    def test_query_filter_numeric(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        inds = [
+            self.create_individual(
+                data=dict(nm_length=i / 10),
+            )
+            for i in range(60)
+        ]
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(nm_length="5"))],
+            [x.id for x in [inds[50]]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(nm_length=("2.4", "3.5")))],
+            [x.id for x in inds[24:36]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(nm_length=("", "3.2")))],
+            [x.id for x in inds[0:33]],
+        )
+        self.assertEqual(
+            [x["id"] for x in self.data(userA, search=dict(nm_length=("7.6", "")))],
+            [x.id for x in inds[76:60]],
+        )
+
     def test_query_filter_date(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]
