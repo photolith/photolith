@@ -70,11 +70,15 @@ function populateFilter (elForm) {
 }
 
 function filterChange (elForm, elTarget) {
-  if (!elTarget.name) {
-    // Do nothing for unnamed elements
-  } else if (elTarget.classList.contains('range-start')) {
-    const elRangeEnd = elTarget.nextElementSibling.nextElementSibling;
-    if (!elRangeEnd.value) elRangeEnd.value = elTarget.value;
+  if (elTarget.classList.contains('range-start') || elTarget.classList.contains('range-end')) {
+    const elOpposing = elTarget.classList.contains('range-start') ? elTarget.nextElementSibling.nextElementSibling : elTarget.previousElementSibling.previousElementSibling;
+
+    // If input boxes matched before this event, they should stay matched
+    if (elOpposing.value === elTarget.defaultValue) {
+      elOpposing.value = elTarget.value;
+    }
+    // Use defaultValue to store old value for the next change event (reset reloads page, so not used otherwise)
+    elTarget.defaultValue = elTarget.value;
   }
 }
 
