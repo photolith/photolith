@@ -14,8 +14,10 @@ from ..models import (
     Annotation,
     Individual,
     MetaNumeric,
+    MetaInteger,
     MetaChar,
     MetaTx,
+    MetaDT,
     Project,
     Taxonomy,
 )
@@ -36,6 +38,11 @@ class IndexView(LoginRequiredMixin, TemplateView):
             min=Min("value"), max=Max("value")
         ):
             out["nm_" + m["key"]] = dict(min=m["min"], max=m["max"])
+
+        for m in MetaInteger.objects.values("key").annotate(
+            min=Min("value"), max=Max("value")
+        ):
+            out["in_" + m["key"]] = dict(min=m["min"], max=m["max"])
 
         for m in MetaChar.objects.values("key").annotate(x=NullAgg()):
             out["ch_" + m["key"]] = dict(char=True)
@@ -111,31 +118,42 @@ class DataView(LoginRequiredMixin, View):
                 # Ignore all-blank entries, didn't fill in the form
                 pass
             elif k == "dt_created_at":
-                if len(vs) > 0 and vs[0]:
-                    qs = qs.filter(created_at__gte=datetime.date.fromisoformat(vs[0]))
-                if len(vs) > 1 and vs[1]:
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    qs = qs.filter(
+                        created_at__date__gte=datetime.date.fromisoformat(vs[0])
+                    )
+                if vs[1] != "":
                     # Date ls less than midinight the day after (i.e. filter is inclusive)
                     qs = qs.filter(
-                        created_at__lt=datetime.date.fromisoformat(vs[1])
+                        created_at__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
             elif k.startswith("nm_"):
-                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
-                if len(vs) != 2:
-                    raise ValueError(
-                        "Numeric searches should have 2 values: %s=%s"
-                        % (k, "&".join(vs))
-                    )
-                qs = qs.filter(
-                    Exists(
-                        MetaNumeric.objects.filter(
-                            individual_id=OuterRef("id"),
-                            key=k.replace("nm_", ""),
-                            value__gte=float(vs[0]),
-                            value__lte=float(vs[1]),
-                        )
-                    )
+                sq = MetaNumeric.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("nm_", ""),
                 )
+                while len(vs) < 2:  # Range filter, should always have a pair of values
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__gte=float(vs[0]))
+                if vs[1] != "":
+                    sq = sq.filter(value__lte=float(vs[1]))
+                qs = qs.filter(Exists(sq))
+            elif k.startswith("in_"):
+                sq = MetaInteger.objects.filter(
+                    individual_id=OuterRef("id"),
+                    key=k.replace("in_", ""),
+                )
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__gte=int(vs[0]))
+                if vs[1] != "":
+                    sq = sq.filter(value__lte=int(vs[1]))
+                qs = qs.filter(Exists(sq))
             elif k.startswith("ch_"):
                 qs = qs.filter(
                     Exists(
@@ -149,15 +167,16 @@ class DataView(LoginRequiredMixin, View):
             elif k.startswith("dt_"):
                 sq = MetaDT.objects.filter(
                     individual_id=OuterRef("id"),
-                    key=k.replace("nm_", ""),
+                    key=k.replace("dt_", ""),
                 )
-                vs = sorted(x for x in vs if x)  # Sort & remove empty strings
-                if len(vs) > 0:
-                    sq = sq.filter(value__gte=datetime.date.fromisoformat(vs[0]))
-                if len(vs) > 1:
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    sq = sq.filter(value__date__gte=datetime.date.fromisoformat(vs[0]))
+                if vs[1] != "":
                     # Date ls less than midinight the day after (i.e. filter is inclusive)
                     sq = sq.filter(
-                        value__lt=datetime.date.fromisoformat(vs[1])
+                        value__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
                 qs = qs.filter(Exists(sq))

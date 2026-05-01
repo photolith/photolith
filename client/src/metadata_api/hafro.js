@@ -31,7 +31,7 @@ const intlTemplates = {
 
 const metaLabels = {
   en: {
-    ch_sampleId: 'Sample Id',
+    in_sampleId: 'Sample Id',
     ch_slideLabel: 'Slide Label',
     ch_individualLabel: 'Individual No.',
     tx_sampleType: 'Sample Type',
@@ -41,9 +41,9 @@ const metaLabels = {
     tx_maturity: 'Maturity',
     tx_species: 'Species',
     ch_cruise: 'Cruise',
-    ch_station: 'Station',
-    nm_stationYear: 'Year',
-    nm_stationMonth: 'Month',
+    in_station: 'Station',
+    in_year: 'Year',
+    in_month: 'Month',
     dt_stationDate: 'Date',
     ch_gear: 'Gear',
     nm_meshSize: 'Mesh Size',
@@ -51,7 +51,7 @@ const metaLabels = {
     dt_created_at: 'Uploaded'
   },
   is: {
-    ch_sampleId: 'Raðnúmer (id)',
+    in_sampleId: 'Raðnúmer (id)',
     ch_slideLabel: 'Merking á gleri',
     ch_individualLabel: 'Einstaklingur nr.',
     tx_sampleType: 'Tegund sýnis',
@@ -61,9 +61,9 @@ const metaLabels = {
     tx_maturity: 'Kynþroski',
     tx_species: 'Tegund',
     ch_cruise: 'Leiðangur',
-    ch_station: 'Stöð',
-    nm_stationYear: 'Ár',
-    nm_stationMonth: 'Mánuður',
+    in_station: 'Stöð',
+    in_year: 'Ár',
+    in_month: 'Mánuður',
     dt_stationDate: 'Dagsetning leiðangurs',
     ch_gear: 'Veiðarfæri',
     nm_meshSize: 'Möskvastærð',
@@ -74,11 +74,11 @@ const metaLabels = {
 
 const fieldsFor = {
   search_columns: [
-    'ch_sampleId',
+    'in_sampleId',
     'ch_cruise',
-    'ch_station',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_station',
+    'in_year',
+    'in_month',
     'tx_species',
     'ch_individualLabel',
     'num_annotations',
@@ -90,23 +90,23 @@ const fieldsFor = {
   ],
   search_filter: [
     'ch_cruise',
-    'ch_station',
+    'in_station',
     'tx_species',
     'nm_length',
     'nm_weight',
     'tx_sex',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_year',
+    'in_month',
     'tx_sampleType',
     'tx_maturity'
   ],
   search_ordering: [ // NB: These fields have to be present in search_columns
-    'nm_stationYear',
+    'in_year',
     'ch_cruise',
-    'nm_stationMonth'
+    'in_month'
   ],
   table_form: [ // i.e. ingest metadata table
-    'ch_sampleId',
+    'in_sampleId',
     'ch_slideLabel',
     'ch_individualLabel',
     'tx_sampleType',
@@ -116,9 +116,9 @@ const fieldsFor = {
     'tx_maturity',
     'tx_species',
     'ch_cruise',
-    'ch_station',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_station',
+    'in_year',
+    'in_month',
     'ch_gear',
     'nm_meshSize'
   ]
@@ -265,15 +265,15 @@ export default class MetadataApi extends BaseMetadataApi {
         }
         if (od.sampleResponse && od.sampleResponse.station) {
           out.ch_cruise = od.sampleResponse.station.cruise.name;
-          out.ch_station = od.sampleResponse.station.number.toString();
+          out.in_station = parseInt(od.sampleResponse.station.number.toString(), 10);
           out.dt_stationDate = od.sampleResponse.station.stationDate;
-          out.nm_stationYear = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
-          out.nm_stationMonth = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
+          out.in_year = (new Date(od.sampleResponse.station.stationDate)).getFullYear();
+          out.in_month = (new Date(od.sampleResponse.station.stationDate)).getMonth() + 1;
         } else {
           if (lbl.cruise) out.ch_cruise = lbl.cruise;
-          if (lbl.station) out.ch_station = lbl.station.toString();
-          if (lbl.year) out.nm_stationYear = lbl.year;
-          if (lbl.month) out.nm_stationMonth = lbl.month;
+          if (lbl.station) out.in_station = parseInt(lbl.station.toString(), 10);
+          if (lbl.year) out.in_year = lbl.year;
+          if (lbl.month) out.in_month = lbl.month;
         }
         if (od.sampleResponse) {
           out.ch_gear = od.sampleResponse.gear.isscfgNo;
@@ -281,22 +281,22 @@ export default class MetadataApi extends BaseMetadataApi {
         }
 
         out.tx_sampleType = txHardcoded.sampleType[0];
-        out.ch_sampleId = od.sampleId.toString();
-        out.ch_measureId = od.measureId.toString();
+        out.in_sampleId = parseInt(od.sampleId.toString(), 10);
+        out.in_measureId = parseInt(od.measureId.toString(), 10);
         out.ch_individualLabel = od.serialNo.toString();
 
         // re-build slideLabel based on what we now know
-        if (!out.ch_sampleId || !out.ch_cruise || !out.ch_station || !out.tx_species || !out.nm_stationMonth) {
+        if (!out.in_sampleId || !out.ch_cruise || !out.in_station || !out.tx_species || !out.in_month) {
           console.warn('label', lbl);
           console.warn('API', od);
           console.warn('Combined', out);
           throw this.intlError('Not enough information from API to reconstruct slide label: Contact IT or enter entire slide label');
         }
         out.ch_slideLabel = [
-          out.ch_sampleId,
-          [out.ch_cruise, out.ch_station].join('/'),
+          out.in_sampleId,
+          [out.ch_cruise, out.in_station].join('/'),
           out.tx_species.id,
-          (out.nm_stationMonth < 10 ? '0' : '') + out.nm_stationMonth
+          (out.in_month < 10 ? '0' : '') + out.nm_stationMonth
         ].join(' ');
 
         if (!suppressWarnings && out.ch_slideLabel !== slideLabel) {

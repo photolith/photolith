@@ -40,6 +40,17 @@ class IndividualTest(RequiresUtils, TestCase):
         ind2.data = dict(nm_length="40", ch_name=22)
         self.assertEqual(ind2.data, dict(nm_length=40, ch_name="22"))
 
+        # Only one length entry for all individuals, old ones tidied up
+        self.assertEqual(
+            set((x.individual_id, x.key, x.value) for x in MetaNumeric.objects.all()),
+            set(
+                (
+                    (ind1.id, "length", 39.0),
+                    (ind2.id, "length", 40.0),
+                )
+            ),
+        )
+
         # ISO dates get translated
         ind1.data = dict(nm_length=39, ch_name="5", dt_time="20230912T082738Z")
         self.assertTrue(isinstance(MetaDT.objects.all()[0].value, datetime.datetime))
@@ -141,6 +152,16 @@ class IndividualTest(RequiresUtils, TestCase):
         # Unknown types are an error
         with self.assertRaisesRegex(ValueError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])
+
+    def test_data_int(self):
+        ind1 = self.create_individual()
+
+        # Data initially empty
+        self.assertEqual(ind1.data, dict())
+
+        # Set station
+        ind1.data = dict(in_station=135, nm_length=42.5)
+        self.assertEqual(ind1.data, dict(in_station=135, nm_length=42.5))
 
     def test_str(self):
         self.assertEqual(str(self.create_individual()), "Individual 1")

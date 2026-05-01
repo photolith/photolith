@@ -152,6 +152,8 @@ class Individual(models.Model):
         out = {}
         for m in self.metanumeric_set.all():
             out["nm_" + m.key] = m.value
+        for m in self.metainteger_set.all():
+            out["in_" + m.key] = m.value
         for m in self.metachar_set.all():
             out["ch_" + m.key] = m.value
         for m in self.metadt_set.all():
@@ -162,66 +164,47 @@ class Individual(models.Model):
 
     @data.setter
     def data(self, new_value):
-        # TODO: Not removing old values
         for k, v in new_value.items():
             if "_" not in k:
                 raise ValueError("'%s' has no type prefix" % k)
             t, k = k.split("_", 2)
+
             if v is None:
                 # We don't allow nulls in, means an empty required field in UI
                 raise ValidationError(
                     "'%s' is missing for %s" % (k, str(self)), code=400
                 )
-            if t == "nm":
-                self.metanumeric_set.add(
-                    MetaNumeric(
-                        individual=self,
-                        key=k,
-                        value=float(v),
-                    ),
-                    bulk=False,
-                )
-
+            elif t == "nm":
+                metaset = self.metanumeric_set
+                v = float(v)
+            elif t == "in":
+                metaset = self.metainteger_set
+                v = float(v)
             elif t == "dt":
-                self.metadt_set.add(
-                    MetaDT(
-                        individual=self,
-                        key=k,
-                        value=str(v),
-                    ),
-                    bulk=False,
-                )
-
+                metaset = self.metadt_set
+                v = str(v)
             elif t == "ch":
-                self.metachar_set.add(
-                    MetaChar(
-                        individual=self,
-                        key=k,
-                        value=str(v),
-                    ),
-                    bulk=False,
-                )
-
+                metaset = self.metachar_set
+                v = str(v)
             elif t == "tx":
                 if "id" not in v:
                     # Empty dict() passed in, possibly not filled-in form fields. Ignore.
                     continue
+                # Upsert taxonomy object first
                 tx, created = Taxonomy.objects.get_or_create(key=k, identifier=v["id"])
                 v["key"] = k
                 tx.dict = v
                 tx.save()
-                # upsert many-to-many
-                mtx, created = self.metatx_set.get_or_create(
-                    individual=self,
-                    key=k,
-                    defaults=dict(value=tx),
-                )
-                if not created:
-                    mtx.value = tx
-                    mtx.save()
 
+                metaset = self.metatx_set
+                v = tx
             else:  # pragma: no cover
                 raise ValueError("Unknown type of %s: %s" % (k, str(v)))
+
+            m, created = metaset.get_or_create(key=k, defaults=dict(value=v))
+            if not created:
+                m.value = v
+                m.save()
 
     def save(self, *args, **kwargs):
         """Save any associated meta objects as well as ourselves"""
@@ -256,12 +239,27 @@ class Individual(models.Model):
 class MetaNumeric(models.Model):
     """
     Numeric Metadata about an individual, e.g. length
-    NB: This is only for floats. Serials such as individualId have to be stringified
+    NB: This is only for floats. Serials such as individualId have to be integer
     """
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["key"]),
+        ]
+
+
+class MetaInteger(models.Model):
+    """
+    Integer Metadata about an individual, e.g. station
+    """
+
+    individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
+    key = models.CharField(max_length=255, blank=False, null=False)
+    value = models.IntegerField(blank=True, null=True)
 
     class Meta:
         indexes = [
