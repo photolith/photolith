@@ -31,8 +31,8 @@ const metaLabels = {
     tx_species: 'Species',
     ch_cruise: 'Cruise',
     in_station: 'Station',
-    nm_stationYear: 'Year',
-    nm_stationMonth: 'Month',
+    in_year: 'Year',
+    in_month: 'Month',
     dt_stationDate: 'Date',
     ch_gear: 'Gear',
     nm_meshSize: 'Mesh Size',
@@ -50,8 +50,8 @@ const metaLabels = {
     tx_species: 'Tegund',
     ch_cruise: 'Leiðangur',
     in_station: 'Stöð',
-    nm_stationYear: 'Ár',
-    nm_stationMonth: 'Mánuður',
+    in_year: 'Ár',
+    in_month: 'Mánuður',
     dt_stationDate: 'Dagsetning leiðangurs',
     ch_gear: 'Veiðarfæri',
     nm_meshSize: 'Möskvastærð',
@@ -64,8 +64,8 @@ const fieldsFor = {
   search_columns: [
     'ch_cruise',
     'in_station',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_year',
+    'in_month',
     'tx_species',
     'ch_individualLabel',
     'num_annotations',
@@ -82,15 +82,15 @@ const fieldsFor = {
     'nm_length',
     'nm_weight',
     'tx_sex',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_year',
+    'in_month',
     'tx_sampleType',
     'tx_maturity'
   ],
   search_ordering: [ // NB: These fields have to be present in search_columns
-    'nm_stationYear',
+    'in_year',
     'ch_cruise',
-    'nm_stationMonth'
+    'in_month'
   ],
   table_form: [ // i.e. ingest metadata table
     'ch_slideLabel',
@@ -103,8 +103,8 @@ const fieldsFor = {
     'tx_species',
     'ch_cruise',
     'in_station',
-    'nm_stationYear',
-    'nm_stationMonth',
+    'in_year',
+    'in_month',
     'ch_gear',
     'nm_meshSize'
   ]
