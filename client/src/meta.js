@@ -25,6 +25,45 @@ export function renderMetaCell (k, data, type, row, meta) {
 
   if (type === undefined) return data;
 
+  if (type === 'search-form') {
+    if (k.startsWith('ch')) {
+      let vs = data.val.filter((v) => !!v);
+      if (vs.length === 0) vs = ['']; // Should be at least one box, so we have something to copy
+
+      return `<div class="input-group">
+          ${vs.map((v) => `<input type="text" name="${k}" value="${v}" class="form-control">`).join('\n')}
+          <button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>
+      </div>`;
+    }
+    if (k.startsWith('nm')) {
+      return `<div class="input-group">
+          <input type="number" name="${k}" value="${data.val[0] || ''}" min="${data.min}" max="${data.max}" class="form-control range-start" id="${meta.control_id}">
+          <span class="input-group-text">..</span>
+          <input type="number" name="${k}" value="${data.val[1] || ''}" min="${data.min}" max="${data.max}" class="form-control range-end" id="${meta.control_id}-2">
+        </div>`;
+    }
+    if (k.startsWith('in')) {
+      return `<div class="input-group">
+          <input type="number" name="${k}" value="${data.val[0] || ''}" min="${data.min}" max="${data.max}" class="form-control range-start" id="${meta.control_id}" step="1">
+          <span class="input-group-text">..</span>
+          <input type="number" name="${k}" value="${data.val[1] || ''}" min="${data.min}" max="${data.max}" class="form-control range-end" id="${meta.control_id}-2" step="1">
+        </div>`;
+    }
+    if (k.startsWith('tx')) {
+      return `<select multiple name="${k}" class="form-select" id="${meta.control_id}">
+          ${data.choices.map((tx) => `<option value="${tx.id}" ${data.val.indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
+        </select>`;
+    }
+    if (k.startsWith('dt')) {
+      return `<div class="input-group">
+          <input type="date" name="${k}" value="${data.val[0] || ''}" class="form-control range-start" id="${meta.control_id}">
+          <span class="input-group-text">..</span>
+          <input type="date" name="${k}" value="${data.val[1] || ''}" class="form-control range-end" id="${meta.control_id}-2">
+        </div>`;
+    }
+    throw new Error('Cannot generate search filter for ' + k);
+  }
+
   if (type === 'form') {
     // NB: We use data-key so these values don't get submitted themselves, we sync JSON blob separately
     if (k.startsWith('nm_')) {
@@ -98,54 +137,71 @@ export function renderMetaCell (k, data, type, row, meta) {
   throw new Error(`Unknown display type ${type}`);
 }
 
-export function renderMetaLabel (k, type) {
+export function renderMetaLabel (k, type, row, meta) {
   const metaLabels = window.mApi.metaLabels();
 
   if (type === 'form') {
     return `<label class="col-form-label">${htmlEscape(metaLabels[k])}</label>`;
   }
+  if (type === 'search-form') {
+    return `<label for="${meta.control_id}" class="form-label">${metaLabels[k]}</label>`;
+  }
+
   return htmlEscape(metaLabels[k]);
 }
 
-export function renderMetaRow (k, indData, tableMode) {
-  // NB: Individual values missing means no row, but no data at all is allowed
-  if (indData && indData[k] === undefined) return '';
+export function renderMetaRow (k, data, tableMode) {
+  const meta = {
+    control_id: 'filter-' + k + '-control'
+  };
+  const htmlLabel = renderMetaLabel(k, tableMode, {}, meta);
+  const htmlRow = renderMetaCell(k, data === undefined ? null : data, tableMode, {}, meta);
+
+  if (tableMode === 'search-form') {
+    return `<div class="mb-3">
+      ${htmlLabel}
+      ${htmlRow}
+    </div>`;
+  }
 
   return `<tr>
-    <td>${renderMetaLabel(k, tableMode)}</td>
-    <td>${renderMetaCell(k, indData ? indData[k] : null, tableMode, indData || {}, undefined)}</td>
+    <td>${htmlLabel}</td>
+    <td>${htmlRow}</td>
   </tr>`;
 }
 
 export function populateIndividualData (indData, elTableBody, tableMode = 'display') {
-  const metaLabels = window.mApi.metaLabels('table_' + tableMode);
-  const missingMeta = [null];
+  const optionalFields = new Set();
+  const initFields = new Set();
+
+  Object.keys(window.mApi.metaLabels('table_' + tableMode)).forEach((k) => {
+    // Sort into optional/init, depending on if a value is already set
+    if (indData[k] === undefined) {
+      optionalFields.add(k);
+    } else {
+      initFields.add(k);
+    }
+  });
 
   if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
 
-  // NB: Don't list values when undefined (i.e. in ingest when created_at is nonsensical)
-  elTableBody.innerHTML = Object.keys(metaLabels).map((k) => {
-    const out = renderMetaRow(k, indData, tableMode);
-    if (!out) missingMeta.push(k);
-    return out;
+  elTableBody.innerHTML = Array.from(initFields).map((k) => {
+    return renderMetaRow(k, indData[k], tableMode);
   }).join('\n');
 
   // Populate add-new-metadata if present
   const elAddSelect = elTableBody.parentElement.querySelector(':scope>tfoot select.add-new-metadata');
   if (elAddSelect) {
-    elAddSelect.innerHTML = missingMeta.map((k) => {
-      // Fill in reserved spot for "Add..." prompt
-      if (!k) return elAddSelect.options[0].outerHTML;
-      // Ignore values without type prefix
-      if (!k.match(/^(ch|nm|in|tx|dt)_/)) return '';
-      return new window.Option(metaLabels[k], k).outerHTML;
+    const allMetaLabels = window.mApi.metaLabels();
+    elAddSelect.innerHTML = [elAddSelect.options[0].outerHTML] + Array.from(optionalFields).map((k) => {
+      return new window.Option(allMetaLabels[k], k).outerHTML;
     }).join('\n');
 
     // Wire up add select to append extra items
     if (!elAddSelect.classList.contains('meta-listening')) {
       elAddSelect.addEventListener('change', (event) => {
         const elContainer = document.createElement('TBODY');
-        elContainer.innerHTML = renderMetaRow(event.target.value, undefined, 'form');
+        elContainer.innerHTML = renderMetaRow(event.target.value, indData[event.target.value], tableMode);
 
         // Append & Fire a change event for form control
         elTableBody.appendChild(elContainer.firstElementChild).querySelectorAll(':scope .ph-meta').forEach((el) => {
@@ -158,6 +214,36 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
       elAddSelect.classList.add('meta-listening');
     }
   }
+}
+
+/** Render the search filter fields to sit in search page offscreen  */
+export function renderSearchFilters (metaFields, searchParams) {
+  const initFields = new Set(Object.keys(window.mApi.metaLabels('search_filter')));
+  const optionalFields = new Set(Object.keys(metaFields));
+
+  // Append any search terms on querystring that aren't included in filter list by default
+  for (const k of searchParams.keys()) {
+    if (!initFields.has(k)) {
+      initFields.add(k);
+    }
+  }
+
+  // Generate indData as a combination of server-reported bounds & querystring selections
+  const indData = {};
+  initFields.forEach((k) => {
+    indData[k] = Object.assign(
+      { val: searchParams.getAll(k) },
+      metaFields[k] || {}
+    );
+    // Field shouldn't be in both init & optional lists
+    if (optionalFields.has(k)) {
+      optionalFields.delete(k);
+    }
+  });
+
+  return Array.from(initFields).map((k) => {
+    return renderMetaRow(k, indData[k], 'search-form');
+  }).join('\n');
 }
 
 /** For an input element generated by renderMetaCell, slot it's value back into a full data structure */
@@ -183,66 +269,4 @@ export function updateDataObject (data, elInput) {
   }
 
   return data;
-}
-
-/** Render the search filter fields to sit in search page offscreen  */
-export function renderSearchFilters (metaFields, searchParams) {
-  const metaLabels = window.mApi.metaLabels('search_filter');
-
-  // Append any search terms on querystring that aren't included in filter list
-  for (const k of searchParams.keys()) {
-    if (!metaLabels[k]) {
-      metaLabels[k] = window.mApi.metaLabels()[k] || k;
-    }
-  }
-
-  return ['project'].map((k) => {
-    // If not set, don't pollute querystring with hidden field
-    if (!searchParams.get(k)) return '';
-    return `<input type="hidden" name="${k}" value="${searchParams.get(k)}">`;
-  }).join('\n\n') + Object.keys(metaLabels).map((k) => {
-    const controlId = 'filter-' + k + '-control';
-    const mf = metaFields[k];
-    let controlHtml;
-
-    // If no metaFields, then we can't filter this
-    if (!mf) return '';
-
-    if (k.startsWith('ch')) {
-      let vs = searchParams.getAll(k).filter((v) => !!v);
-      if (vs.length === 0) vs = ['']; // Should be at least one box, so we have something to copy
-
-      controlHtml = `<div class="input-group">
-          ${vs.map((v) => `<input type="text" name="${k}" value="${v}" class="form-control">`).join('\n')}
-          <button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>
-      </div>`;
-    } else if (k.startsWith('nm')) {
-      controlHtml = `<div class="input-group">
-          <input type="number" name="${k}" value="${searchParams.getAll(k)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}">
-          <span class="input-group-text">..</span>
-          <input type="number" name="${k}" value="${searchParams.getAll(k)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2">
-        </div>`;
-    } else if (k.startsWith('in')) {
-      controlHtml = `<div class="input-group">
-          <input type="number" name="${k}" value="${searchParams.getAll(k)[0] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-start" id="${controlId}" step="1">
-          <span class="input-group-text">..</span>
-          <input type="number" name="${k}" value="${searchParams.getAll(k)[1] || ''}" min="${mf.min}" max="${mf.max}" class="form-control range-end" id="${controlId}-2" step="1">
-        </div>`;
-    } else if (k.startsWith('tx')) {
-      controlHtml = `<select multiple name="${k}" class="form-select" id="${controlId}">
-          ${mf.choices.map((tx) => `<option value="${tx.id}" ${searchParams.getAll(k).indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
-        </select>`;
-    } else if (k.startsWith('dt')) {
-      controlHtml = `<div class="input-group">
-          <input type="date" name="${k}" value="${searchParams.getAll(k)[0] || ''}" class="form-control range-start" id="${controlId}">
-          <span class="input-group-text">..</span>
-          <input type="date" name="${k}" value="${searchParams.getAll(k)[1] || ''}" class="form-control range-end" id="${controlId}-2">
-        </div>`;
-    }
-
-    return `<div class="mb-3">
-        <label for="${controlId}" class="form-label">${metaLabels[k]}</label>
-        ${controlHtml}
-      </div>`;
-  }).join('\n\n');
 }
