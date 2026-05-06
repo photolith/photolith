@@ -312,16 +312,55 @@ test('renderSearchFilter', function (test) {
       };
     }
   }
+  const defMetaFields = {
+    nm_length: { min: 50, max: 200 },
+    nm_weight: { min: 100, max: 200 },
+    ch_slideLabel: { char: true },
+    in_fingers: { min: 0, max: 5 }
+  };
 
   const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
   dom.window.mApi = new UTMetadataApi('en-gb');
 
-  function rsf (metaFields, search) {
-    return renderSearchFilters(metaFields, new URLSearchParams(search || '')).split(/\s*\n+\s*/).filter((x) => !!x);
+  function rsf (fieldsForSearchFilter, search) {
+    dom.window.mApi._fieldsFor.search_filter = fieldsForSearchFilter;
+    return renderSearchFilters(defMetaFields, new URLSearchParams(search || '')).split(/\s*\n+\s*/).filter((x) => !!x);
+  }
+  function rsfNames (fieldsForSearchFilter, search) {
+    const elForm = dom.window.document.createElement('FORM');
+    elForm.innerHTML = rsf(fieldsForSearchFilter, search);
+
+    // Only return names of form fields
+    const out = [];
+    for (let i = 0; i < elForm.elements.length; i++) {
+      if (elForm.elements[i].name) out.push(elForm.elements[i].name);
+    }
+    return out;
   }
 
+  // Only includes fields in fieldsFor
+  test.deepEqual(rsfNames(['nm_length']), [
+    'nm_length',
+    'nm_length'
+  ]);
+  test.deepEqual(rsfNames(['nm_length', 'nm_weight']), [
+    'nm_length',
+    'nm_length',
+    'nm_weight',
+    'nm_weight'
+  ]);
+
+  // Search query appends fields regardless
+  test.deepEqual(rsfNames(['nm_length', 'nm_weight'], 'ch_slideLabel=bertie'), [
+    'nm_length',
+    'nm_length',
+    'nm_weight',
+    'nm_weight',
+    'ch_slideLabel'
+  ]);
+
   // Numeric
-  test.deepEqual(rsf({ nm_length: { min: 50, max: 200 } }), [
+  test.deepEqual(rsf(['nm_length']), [
     '<div class="mb-3">',
     '<label for="filter-nm_length-control" class="form-label">Length</label>',
     '<div class="input-group">',
@@ -333,7 +372,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Character
-  test.deepEqual(rsf({ ch_slideLabel: { char: true } }, 'ch_slideLabel=moo'), [
+  test.deepEqual(rsf(['ch_slideLabel'], 'ch_slideLabel=moo'), [
     '<div class="mb-3">',
     '<label for="filter-ch_slideLabel-control" class="form-label">Slide Label</label>',
     '<div class="input-group">',
@@ -344,7 +383,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Integer
-  test.deepEqual(rsf({ in_fingers: { min: 0, max: 5 } }), [
+  test.deepEqual(rsf(['in_fingers']), [
     '<div class="mb-3">',
     '<label for="filter-in_fingers-control" class="form-label">Fingers</label>',
     '<div class="input-group">',
