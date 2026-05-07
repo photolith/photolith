@@ -61,7 +61,8 @@ export function renderMetaCell (k, data, type, row, meta) {
           <input type="date" name="${k}" value="${data.val[1] || ''}" class="form-control range-end" id="${meta.control_id}-2">
         </div>`;
     }
-    throw new Error('Cannot generate search filter for ' + k);
+    // e.g. project entries, ordering
+    return data.val.map((v) => `<input type="hidden" name="${k}" value="${v}">`).join('');
   }
 
   if (type === 'form') {
@@ -139,6 +140,10 @@ export function renderMetaCell (k, data, type, row, meta) {
 
 export function renderMetaLabel (k, type, row, meta) {
   const metaLabels = window.mApi.metaLabels();
+
+  if (metaLabels[k] === undefined) {
+    return '';
+  }
 
   if (type === 'form') {
     return `<label class="col-form-label">${htmlEscape(metaLabels[k])}</label>`;

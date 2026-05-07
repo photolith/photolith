@@ -359,6 +359,16 @@ test('renderSearchFilter', function (test) {
     'ch_slideLabel'
   ]);
 
+  // Project/order etc are passed through as hidden fields without headers (NB: Splitting order fields isn't something we actually do)
+  test.deepEqual(rsf([], 'project=1&order=1.desc&order=2.asc'), [
+    '<div class="mb-3">',
+    '<input type="hidden" name="project" value="1">',
+    '</div>',
+    '<div class="mb-3">',
+    '<input type="hidden" name="order" value="1.desc"><input type="hidden" name="order" value="2.asc">',
+    '</div>'
+  ]);
+
   // Numeric
   test.deepEqual(rsf(['nm_length']), [
     '<div class="mb-3">',
