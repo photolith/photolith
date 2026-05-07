@@ -3,7 +3,7 @@ import test from 'tape';
 import { setupDom } from './util_dom.js';
 
 import { changeEvent } from '../src/events.js';
-import { renderMetaCell, populateIndividualData, updateDataObject, renderSearchFilters } from '../src/meta.js';
+import { renderMetaCell, populateIndividualData, updateDataObject, populateSearchFilters } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
 
 test('renderMetaCell:undefined', function (test) {
@@ -288,7 +288,7 @@ test('updateDataObject', function (test) {
   test.end();
 });
 
-test('renderSearchFilter', function (test) {
+test('populateSearchFilter', function (test) {
   class UTMetadataApi extends MetadataApi {
     constructor (lang) {
       super(lang);
@@ -322,13 +322,20 @@ test('renderSearchFilter', function (test) {
   const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
   dom.window.mApi = new UTMetadataApi('en-gb');
 
-  function rsf (fieldsForSearchFilter, search) {
-    dom.window.mApi._fieldsFor.search_filter = fieldsForSearchFilter;
-    return renderSearchFilters(defMetaFields, new URLSearchParams(search || '')).split(/\s*\n+\s*/).filter((x) => !!x);
-  }
-  function rsfNames (fieldsForSearchFilter, search) {
+  function psf (fieldsForSearchFilter, search) {
     const elForm = dom.window.document.createElement('FORM');
-    elForm.innerHTML = rsf(fieldsForSearchFilter, search);
+    document.body.append(elForm);
+    dom.window.mApi._fieldsFor.search_filter = fieldsForSearchFilter;
+    populateSearchFilters(elForm, defMetaFields, new URLSearchParams(search || ''));
+    return elForm;
+  }
+  function psfHtml (fieldsForSearchFilter, search) {
+    const elForm = psf(fieldsForSearchFilter, search);
+
+    return elForm.innerHTML.split(/\s*\n+\s*/).filter((x) => !!x);
+  }
+  function psfNames (fieldsForSearchFilter, search) {
+    const elForm = psf(fieldsForSearchFilter, search);
 
     // Only return names of form fields
     const out = [];
@@ -339,11 +346,11 @@ test('renderSearchFilter', function (test) {
   }
 
   // Only includes fields in fieldsFor
-  test.deepEqual(rsfNames(['nm_length']), [
+  test.deepEqual(psfNames(['nm_length']), [
     'nm_length',
     'nm_length'
   ]);
-  test.deepEqual(rsfNames(['nm_length', 'nm_weight']), [
+  test.deepEqual(psfNames(['nm_length', 'nm_weight']), [
     'nm_length',
     'nm_length',
     'nm_weight',
@@ -351,7 +358,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Search query appends fields regardless
-  test.deepEqual(rsfNames(['nm_length', 'nm_weight'], 'ch_slideLabel=bertie'), [
+  test.deepEqual(psfNames(['nm_length', 'nm_weight'], 'ch_slideLabel=bertie'), [
     'nm_length',
     'nm_length',
     'nm_weight',
@@ -360,7 +367,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Project/order etc are passed through as hidden fields without headers (NB: Splitting order fields isn't something we actually do)
-  test.deepEqual(rsf([], 'project=1&order=1.desc&order=2.asc'), [
+  test.deepEqual(psfHtml([], 'project=1&order=1.desc&order=2.asc'), [
     '<div class="mb-3">',
     '<input type="hidden" name="project" value="1">',
     '</div>',
@@ -370,7 +377,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Numeric
-  test.deepEqual(rsf(['nm_length']), [
+  test.deepEqual(psfHtml(['nm_length']), [
     '<div class="mb-3">',
     '<label for="filter-nm_length-control" class="form-label">Length</label>',
     '<div class="input-group">',
@@ -382,7 +389,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Character
-  test.deepEqual(rsf(['ch_slideLabel'], 'ch_slideLabel=moo'), [
+  test.deepEqual(psfHtml(['ch_slideLabel'], 'ch_slideLabel=moo'), [
     '<div class="mb-3">',
     '<label for="filter-ch_slideLabel-control" class="form-label">Slide Label</label>',
     '<div class="input-group">',
@@ -393,7 +400,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Integer
-  test.deepEqual(rsf(['in_fingers']), [
+  test.deepEqual(psfHtml(['in_fingers']), [
     '<div class="mb-3">',
     '<label for="filter-in_fingers-control" class="form-label">Fingers</label>',
     '<div class="input-group">',
