@@ -44,8 +44,16 @@ class IndexView(TemplateView):
             annotations=Annotation.objects.count(),
         )
 
+    def get_verbose_names(self):
+        return dict(
+            images=Image._meta.verbose_name_plural,
+            individuals=Individual._meta.verbose_name_plural,
+            annotations=Annotation._meta.verbose_name_plural,
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["projects"] = self.get_project_queryset()
         context["headline_numbers"] = self.get_headline_numbers()
+        context["verbose_names"] = self.get_verbose_names()
         return context
