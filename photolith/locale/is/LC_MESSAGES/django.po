@@ -608,7 +608,7 @@ msgstr ""
 
 #: photolith/templates/home/index.html
 msgid "We currently hold"
-msgstr "Við höldum nú"
+msgstr "Í gagnagrunninum eru núna"
 
 #: photolith/templates/home/index.html
 msgid "Log in"
