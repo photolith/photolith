@@ -48,6 +48,7 @@ const metaLabels = {
     ch_gear: 'Gear',
     nm_meshSize: 'Mesh Size',
     num_annotations: '# Annotations',
+    in_measureId: 'Measurement Id',
     dt_created_at: 'Uploaded'
   },
   is: {
@@ -68,6 +69,7 @@ const metaLabels = {
     ch_gear: 'Veiðarfæri',
     nm_meshSize: 'Möskvastærð',
     num_annotations: 'Fjöldi aldursmerkinga',
+    in_measureId: 'Maeling Id',
     dt_created_at: 'Fært inn'
   }
 };
