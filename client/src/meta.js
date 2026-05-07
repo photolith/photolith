@@ -188,8 +188,6 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
     }
   });
 
-  if (!elTableBody) elTableBody = window.document.querySelector('.individual-data tbody');
-
   elTableBody.innerHTML = Array.from(initFields).map((k) => {
     return renderMetaRow(k, indData[k], tableMode);
   }).join('\n');

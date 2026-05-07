@@ -164,7 +164,7 @@ export function init (parent) {
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
-    populateIndividualData(indData);
+    populateIndividualData(indData, window.document.querySelector('.individual-data tbody'));
 
     document.querySelector('#ph-view-poly-show-axis').addEventListener('change', (event) => {
       // Trigger addRemove so we update axis state
