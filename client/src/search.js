@@ -37,7 +37,7 @@ export function init (parent) {
     const searchParams = new URLSearchParams(window.location.search);
 
     populateSearchFilters(elForm.querySelector('.offcanvas-body'), metaFields, searchParams);
-    elForm.querySelectorAll(':scope .offcanvas-body select').forEach((el) => new TomSelect(el, {
+    elForm.querySelectorAll(':scope .offcanvas-body select:not(.add-new-metadata)').forEach((el) => new TomSelect(el, {
     }));
     elForm.addEventListener('change', (event) => {
       filterChange(elForm, event.target);

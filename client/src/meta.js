@@ -181,18 +181,25 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
     initFields = new Set(Array.from(allFields).filter((k) => (indData[k] !== undefined)));
   }
 
+  // If elTableBody already has something in it, nest our stuff at the top
+  if (elTableBody.children.length > 0) {
+    const el = elTableBody.ownerDocument.createElement('DIV');
+    elTableBody.prepend(el);
+    elTableBody = el;
+  }
+
   elTableBody.innerHTML = Array.from(initFields).map((k) => {
     return renderMetaRow(k, indData[k], tableMode);
   }).join('\n');
 
   // Populate add-new-metadata if present
-  const elAddSelect = elTableBody.parentElement.querySelector(':scope>tfoot select.add-new-metadata');
+  const elAddSelect = elTableBody.parentElement.querySelector(':scope select.add-new-metadata');
   if (elAddSelect) {
     const allMetaLabels = window.mApi.metaLabels();
     elAddSelect.innerHTML = [elAddSelect.options[0].outerHTML] + Array.from(allFields).map((k) => {
       // Items shouldn't exist in both lists
       if (initFields.has(k)) return '';
-      return new window.Option(allMetaLabels[k], k).outerHTML;
+      return new window.Option(allMetaLabels[k] || k, k).outerHTML;
     }).join('\n');
 
     // Wire up add select to append extra items
@@ -216,19 +223,21 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
 
 /** Render the search filter fields to sit in search page offscreen  */
 export function populateSearchFilters (elContainer, metaFields, searchParams) {
+  // initFields is hardcoded fields + any search terms already on querystring
   const initFields = new Set(Object.keys(window.mApi.metaLabels('search_filter')));
-  const allFields = new Set(Object.keys(metaFields));
-
-  // Append any search terms on querystring that aren't included in filter list by default
   for (const k of searchParams.keys()) {
     if (!initFields.has(k)) {
       initFields.add(k);
     }
   }
 
+  // allFields is anything with bounds + anything additional in initFields
+  const allFields = new Set(Object.keys(metaFields));
+  initFields.forEach((k) => allFields.add(k));
+
   // Generate indData as a combination of server-reported bounds & querystring selections
   const indData = {};
-  initFields.forEach((k) => {
+  allFields.forEach((k) => {
     indData[k] = Object.assign(
       { val: searchParams.getAll(k) },
       metaFields[k] || {}

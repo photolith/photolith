@@ -324,15 +324,20 @@ test('populateSearchFilter', function (test) {
 
   function psf (fieldsForSearchFilter, search) {
     const elForm = dom.window.document.createElement('FORM');
+    elForm.innerHTML = `<div class="body-thing"><select class="form-select add-new-metadata">
+        <option value="" selected="selected">Add...</option>
+    </select>
+    </div>`;
     document.body.append(elForm);
+
     dom.window.mApi._fieldsFor.search_filter = fieldsForSearchFilter;
-    populateSearchFilters(elForm, defMetaFields, new URLSearchParams(search || ''));
+    populateSearchFilters(elForm.children[0], defMetaFields, new URLSearchParams(search || ''));
     return elForm;
   }
   function psfHtml (fieldsForSearchFilter, search) {
     const elForm = psf(fieldsForSearchFilter, search);
 
-    return elForm.innerHTML.split(/\s*\n+\s*/).filter((x) => !!x);
+    return elForm.querySelector('.body-thing>div').innerHTML.split(/\s*\n+\s*/).filter((x) => !!x);
   }
   function psfNames (fieldsForSearchFilter, search) {
     const elForm = psf(fieldsForSearchFilter, search);
@@ -342,19 +347,22 @@ test('populateSearchFilter', function (test) {
     for (let i = 0; i < elForm.elements.length; i++) {
       if (elForm.elements[i].name) out.push(elForm.elements[i].name);
     }
+    out.push(Array.from(elForm.querySelector('.add-new-metadata').options).map((o) => o.value));
     return out;
   }
 
   // Only includes fields in fieldsFor
   test.deepEqual(psfNames(['nm_length']), [
     'nm_length',
-    'nm_length'
+    'nm_length',
+    ['', 'nm_weight', 'ch_slideLabel', 'in_fingers']
   ]);
   test.deepEqual(psfNames(['nm_length', 'nm_weight']), [
     'nm_length',
     'nm_length',
     'nm_weight',
-    'nm_weight'
+    'nm_weight',
+    ['', 'ch_slideLabel', 'in_fingers']
   ]);
 
   // Search query appends fields regardless
@@ -363,7 +371,8 @@ test('populateSearchFilter', function (test) {
     'nm_length',
     'nm_weight',
     'nm_weight',
-    'ch_slideLabel'
+    'ch_slideLabel',
+    ['', 'in_fingers']
   ]);
 
   // Project/order etc are passed through as hidden fields without headers (NB: Splitting order fields isn't something we actually do)
