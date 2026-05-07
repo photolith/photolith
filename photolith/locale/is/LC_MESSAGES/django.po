@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
-#: photolith/admin.py
+#: photolith/admin.py photolith/models.py
 msgid "team"
 msgstr "teymi"
 
@@ -137,12 +137,12 @@ msgstr ""
 "Reynsla (aldursmerkingar frá reyndari notendum eru valdar framyfir aðra)"
 
 #: photolith/models.py
-msgid "User species authority"
-msgstr "Reynsla notanda á tegund"
+msgid "user species authority"
+msgstr "reynsla notanda á tegund"
 
 #: photolith/models.py
-msgid "User species authorities"
-msgstr "Reynsla notanda á tegundum"
+msgid "user species authorities"
+msgstr "reynsla notanda á tegundum"
 
 #: photolith/models.py
 msgid ""
@@ -153,17 +153,17 @@ msgstr ""
 "Notað þegar reynsla á vissri tegund á ekki við."
 
 #: photolith/models.py
-msgid "Image"
-msgstr "Mynd"
+msgid "image"
+msgstr "mynd"
 
 #: photolith/models.py
-msgid "Images"
-msgstr "Myndir"
+msgid "images"
+msgstr "myndir"
 
 #: photolith/models.py photolith/models.py photolith/models.py
 #: photolith/templates/annotate/annotate.html
-msgid "Created by"
-msgstr "Notandi"
+msgid "created by"
+msgstr "notandi"
 
 #: photolith/models.py photolith/models.py photolith/models.py
 msgid "Created at"
@@ -174,16 +174,16 @@ msgid "Modified at"
 msgstr "Breytt"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
-msgid "Individual"
-msgstr "Einstakingur"
+msgid "individual"
+msgstr "einstakingur"
 
 #: photolith/models.py
-msgid "Individuals"
-msgstr "Einstaklingar"
+msgid "individuals"
+msgstr "einstaklingar"
 
 #: photolith/models.py
-msgid "Metadata key"
-msgstr "Gögn úr gagnagrunni"
+msgid "metadata key"
+msgstr "gögn úr gagnagrunni"
 
 #: photolith/models.py
 msgid ""
@@ -202,20 +202,20 @@ msgstr ""
 "með bæði 1 og 'tegund'"
 
 #: photolith/models.py
-msgid "English"
-msgstr "Enska"
+msgid "english"
+msgstr "enska"
 
 #: photolith/models.py
-msgid "Icelandic"
-msgstr "Íslenska"
+msgid "icelandic"
+msgstr "íslenska"
 
 #: photolith/models.py
-msgid "Taxonomy"
-msgstr "Flokk"
+msgid "taxonomy"
+msgstr "flokk"
 
 #: photolith/models.py
-msgid "Taxonomies"
-msgstr "Flokkar"
+msgid "taxonomies"
+msgstr "flokkar"
 
 #: photolith/models.py
 msgid "from image"
@@ -238,8 +238,8 @@ msgid "1"
 msgstr "1"
 
 #: photolith/models.py
-msgid "Part of project"
-msgstr "Hluti af verkefni"
+msgid "part of project"
+msgstr "hluti af verkefni"
 
 #: photolith/models.py photolith/models.py
 msgid "Last modified"
@@ -262,28 +262,28 @@ msgid "Comments"
 msgstr "Athugasemdir"
 
 #: photolith/models.py
-msgid "Annotation"
-msgstr "Aldursmerking"
+msgid "annotation"
+msgstr "aldursmerking"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
-msgid "Annotations"
-msgstr "Aldursmerkingar"
+msgid "annotations"
+msgstr "aldursmerkingar"
 
 #: photolith/models.py
-msgid "Project name"
-msgstr "Heiti verkefnis"
+msgid "project name"
+msgstr "heiti verkefnis"
 
 #: photolith/models.py
 msgid "The set of users that should be included in the project"
 msgstr "Notendur sem eiga að taka þátt í verkefninu"
 
 #: photolith/models.py
-msgid "Project end date"
-msgstr "Lokadagsetning verkefnis"
+msgid "project end date"
+msgstr "lokadagsetning verkefnis"
 
 #: photolith/models.py
-msgid "Base axis on user"
-msgstr "Staðsetja lestrarás út frá notanda"
+msgid "base axis on user"
+msgstr "staðsetja lestrarás út frá notanda"
 
 #: photolith/models.py
 msgid ""
@@ -294,29 +294,24 @@ msgstr ""
 "einstakling vera notuð sem lestrarás fyrir aldursmerkingar"
 
 #: photolith/models.py photolith/templates/project/update.html
-msgid "Project"
-msgstr "Verkefni"
-
-#: photolith/models.py photolith/templates/base.html
-#: photolith/templates/home/index.html
-msgid "Projects"
-msgstr "Verkefni"
+msgid "project"
+msgstr "verkefni"
 
 #: photolith/models.py
-msgid "Team name"
-msgstr "Nafn teymis"
+msgid "projects"
+msgstr "verkefni"
 
 #: photolith/models.py
-msgid "Team members"
-msgstr "Aðilar í teymi"
+msgid "team name"
+msgstr "nafn teymis"
 
 #: photolith/models.py
-msgid "Team"
-msgstr "Teymi"
+msgid "team members"
+msgstr "aðilar í teymi"
 
 #: photolith/models.py
-msgid "Teams"
-msgstr "Teymi"
+msgid "teams"
+msgstr "teymi"
 
 #: photolith/project/forms.py
 msgid "No base axis"
@@ -587,6 +582,10 @@ msgstr "Hlaða inn myndum"
 #: photolith/templates/base.html
 msgid "Search"
 msgstr "Leita"
+
+#: photolith/templates/base.html photolith/templates/home/index.html
+msgid "Projects"
+msgstr "Verkefni"
 
 #: photolith/templates/base.html
 msgid "Documentation"

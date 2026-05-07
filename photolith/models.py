@@ -52,8 +52,8 @@ class UserSpeciesAuthority(models.Model):
     )
 
     class Meta:
-        verbose_name = _("User species authority")
-        verbose_name_plural = _("User species authorities")
+        verbose_name = _("user species authority")
+        verbose_name_plural = _("user species authorities")
         unique_together = (
             "user",
             "species",
@@ -105,8 +105,8 @@ class Image(models.Model):
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        verbose_name = _("Image")
-        verbose_name_plural = _("Images")
+        verbose_name = _("image")
+        verbose_name_plural = _("images")
 
     def px_to_mm(self):
         if not self.scale_mm:
@@ -123,7 +123,7 @@ class Individual(models.Model):
     bounding_box = models.JSONField(null=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Created by"),
+        verbose_name=_("created by"),
         on_delete=models.SET_NULL,
         null=True,
     )
@@ -133,8 +133,8 @@ class Individual(models.Model):
     modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
 
     class Meta:
-        verbose_name = _("Individual")
-        verbose_name_plural = _("Individuals")
+        verbose_name = _("individual")
+        verbose_name_plural = _("individuals")
 
     def full_data(self):
         """Dict of data, including values outside the meta table"""
@@ -320,7 +320,7 @@ class Taxonomy(models.Model):
     # NB: key isn't generally needed, but key/identifier is our business-logic key, and
     #     we compare this when upserting
     key = models.CharField(
-        verbose_name=_("Metadata key"),
+        verbose_name=_("metadata key"),
         max_length=255,
         blank=False,
         null=False,
@@ -335,21 +335,21 @@ class Taxonomy(models.Model):
         ),
     )
     str_en = models.CharField(
-        verbose_name=_("English"),
+        verbose_name=_("english"),
         max_length=255,
         blank=False,
         null=False,
     )
     str_is = models.CharField(
-        verbose_name=_("Icelandic"),
+        verbose_name=_("icelandic"),
         max_length=255,
         blank=False,
         null=False,
     )
 
     class Meta:
-        verbose_name = _("Taxonomy")
-        verbose_name_plural = _("Taxonomies")
+        verbose_name = _("taxonomy")
+        verbose_name_plural = _("taxonomies")
         constraints = (
             models.UniqueConstraint(
                 name="taxonomy_key_identifier",
@@ -359,7 +359,7 @@ class Taxonomy(models.Model):
         indexes = [
             models.Index(fields=["key", "identifier"]),
         ]
-        verbose_name_plural = "Taxonomies"
+        verbose_name_plural = "taxonomies"
 
     @property
     def dict(self):
@@ -405,13 +405,13 @@ class Annotation(models.Model):
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Created by"),
+        verbose_name=_("created by"),
         on_delete=models.SET_NULL,
         null=True,
     )
     project = models.ForeignKey(
         "Project",
-        verbose_name=_("Part of project"),
+        verbose_name=_("part of project"),
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -436,8 +436,8 @@ class Annotation(models.Model):
     axis_poly = models.JSONField(null=True)
 
     class Meta:
-        verbose_name = _("Annotation")
-        verbose_name_plural = _("Annotations")
+        verbose_name = _("annotation")
+        verbose_name_plural = _("annotations")
         indexes = [
             models.Index(fields=["individual"]),
             models.Index(fields=["created_by", "individual"]),
@@ -455,7 +455,7 @@ def in_4_weeks():
 
 class Project(models.Model):
     name = models.CharField(
-        verbose_name=_("Project name"),
+        verbose_name=_("project name"),
         max_length=4096,
         blank=False,
         null=False,
@@ -470,14 +470,14 @@ class Project(models.Model):
         Individual,
     )
     date_end = models.DateField(
-        verbose_name=_("Project end date"),
+        verbose_name=_("project end date"),
         # Default 4 weeks from now
         default=in_4_weeks,
         null=False,
     )
     base_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Base axis on user"),
+        verbose_name=_("base axis on user"),
         help_text=_(
             "If a user is selected, then their most recent annotation for each individual will be used as an axis starting point for annotations"
         ),
@@ -487,7 +487,7 @@ class Project(models.Model):
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Created by"),
+        verbose_name=_("created by"),
         on_delete=models.SET_NULL,
         null=True,
     )
@@ -546,8 +546,8 @@ class Project(models.Model):
         return out
 
     class Meta:
-        verbose_name = _("Project")
-        verbose_name_plural = _("Projects")
+        verbose_name = _("project")
+        verbose_name_plural = _("projects")
 
     def __str__(self):
         return self.name
@@ -555,14 +555,14 @@ class Project(models.Model):
 
 class Team(models.Model):
     name = models.CharField(
-        verbose_name=_("Team name"),
+        verbose_name=_("team name"),
         max_length=4096,
         blank=False,
         null=False,
     )
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Team members"),
+        verbose_name=_("team members"),
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -574,8 +574,8 @@ class Team(models.Model):
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        verbose_name = _("Team")
-        verbose_name_plural = _("Teams")
+        verbose_name = _("team")
+        verbose_name_plural = _("teams")
 
     def __str__(self):
         return self.name

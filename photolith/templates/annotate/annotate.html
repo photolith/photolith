@@ -107,7 +107,7 @@
               <span class="ph-line-legend" data-axis-poly="{{ a.axis_poly }}"></span>
             </td>
             <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|time:'H:i' }}</code></td>
-            <td class="text-nowrap"><code class="val-created_by" data-locale-created_by="{% translate "Created by" %}">{{ a.created_by }}</code></td>
+            <td class="text-nowrap"><code class="val-created_by" data-locale-created_by="{% translate "created by"|capfirst %}">{{ a.created_by }}</code></td>
             <td class="text-nowrap"><code class="val-authority" data-value="{{ a.authority }}">{{ a.get_authority_display }}</code></td>
             <td class="text-nowrap text-end"><code class="val-age">{{ a.age }}</code></td>
             <td class="text-nowrap text-end"><code class="val-rating" data-value="{{ a.rating }}">{{ a.get_rating_display }}</code></td>
@@ -215,8 +215,8 @@
 
   <table class="table w-auto mx-auto">
     <thead><tr>
-      <th>{% translate "Individual" %}</th>
-      <th>{% translate "Annotations" %}</th>
+      <th>{% translate "individual"|capfirst %}</th>
+      <th>{% translate "annotations"|capfirst %}</th>
     </tr></thead>
     <tbody>
       {% for ind in project_progress %}<tr class="{% if ind.num_annotations > 0 %}table-success{% endif %}">
