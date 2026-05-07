@@ -769,6 +769,7 @@ msgid "Auto crop"
 msgstr "Sjálfvirk aðlögun stærðar"
 
 #: photolith/templates/ingest/index.html
+#: photolith/templates/search/index.html
 msgid "Add"
 msgstr "Bæta við"
 

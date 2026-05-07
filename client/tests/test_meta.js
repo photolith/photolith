@@ -2,7 +2,8 @@ import test from 'tape';
 
 import { setupDom } from './util_dom.js';
 
-import { renderMetaCell, populateIndividualData, updateDataObject, renderSearchFilters } from '../src/meta.js';
+import { changeEvent } from '../src/events.js';
+import { renderMetaCell, populateIndividualData, updateDataObject, populateSearchFilters } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
 
 test('renderMetaCell:undefined', function (test) {
@@ -123,7 +124,7 @@ test('populateIndividualData', function (test) {
   }
   dom.window.mApi = new UTMetadataApi('en-gb');
 
-  function pid (indData, tableMode) {
+  function pid (indData, tableMode, changeTo) {
     const elForm = dom.window.document.createElement('form');
     const includeNewHtml = `<tfoot><tr><td colspan="1"><select class="form-select add-new-metadata">
         <option value="" selected="selected">Add...</option>
@@ -131,58 +132,123 @@ test('populateIndividualData', function (test) {
     </td><td><button type="button">Copy</button></td></tr></tfoot>`;
 
     elForm.innerHTML = `<table><tbody></tbody>${includeNewHtml}</table>`;
-
     populateIndividualData(indData, elForm.querySelector('tbody'), tableMode);
-    return Array.from(elForm.querySelectorAll('tr')).map((elRow) => {
-      return Array.from(elRow.querySelectorAll('td')).map((elCell) => {
-        if (elCell.firstElementChild && elCell.firstElementChild.classList.contains('add-new-metadata')) {
-          return Array.from(elCell.firstElementChild.options).map((o) => o.value);
-        }
-        return elCell.innerHTML.trim();
+
+    return Promise.resolve().then(() => {
+      if (changeTo) {
+        const elAddSelect = elForm.querySelector('select.add-new-metadata');
+        elAddSelect.value = changeTo;
+        elAddSelect.dispatchEvent(changeEvent());
+        return new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      return Promise.resolve();
+    }).then(() => {
+      return Array.from(elForm.querySelectorAll('tr')).map((elRow) => {
+        return Array.from(elRow.querySelectorAll('td')).map((elCell) => {
+          if (elCell.firstElementChild && elCell.firstElementChild.classList.contains('add-new-metadata')) {
+            return Array.from(elCell.firstElementChild.options).map((o) => o.value);
+          }
+          return elCell.innerHTML.trim();
+        });
       });
     });
   }
 
+  let p = Promise.resolve();
+
   // No data
-  test.deepEqual(pid({}, 'display'), [
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({}, 'display').then((out) => {
+      test.deepEqual(out, [
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
   // No prefix --> ignored
-  test.deepEqual(pid({ moo: 'no' }, 'display'), [
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({ moo: 'no' }, 'display').then((out) => {
+      test.deepEqual(out, [
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
   // Character
-  test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'display'), [
-    ['Slide Label', '<code>moo</code>'],
-    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
-  test.deepEqual(pid({ ch_slideLabel: 'moo' }, 'form'), [
-    ['<label class="col-form-label">Slide Label</label>', '<input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="moo">'],
-    [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({ ch_slideLabel: 'moo' }, 'display').then((out) => {
+      test.deepEqual(out, [
+        ['Slide Label', '<code>moo</code>'],
+        [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
+  p = p.then(() => {
+    return pid({ nm_length: 12345 }, 'display').then((out) => {
+      test.deepEqual(out, [
+        ['Length', '<code>12345</code>'],
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
+  p = p.then(() => {
+    return pid({ ch_slideLabel: 'moo' }, 'form').then((out) => {
+      test.deepEqual(out, [
+        ['<label class="col-form-label">Slide Label</label>', '<input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="moo">'],
+        [['', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
   // Numeric
-  test.deepEqual(pid({ nm_length: 12345 }, 'display'), [
-    ['Length', '<code>12345</code>'],
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({ nm_length: 12345 }, 'display').then((out) => {
+      test.deepEqual(out, [
+        ['Length', '<code>12345</code>'],
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
   // Date
-  test.deepEqual(pid({ dt_caught: '2001-03-01', nm_length: 1080 }, 'display'), [
-    ['Length', '<code>1080</code>'],
-    ['Caught', '<code>2001-03-01</code>'],
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({ dt_caught: '2001-03-01', nm_length: 1080 }, 'display').then((out) => {
+      test.deepEqual(out, [
+        ['Length', '<code>1080</code>'],
+        ['Caught', '<code>2001-03-01</code>'],
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
   // Integer
-  test.deepEqual(pid({ in_fingers: 5 }, 'display'), [
-    ['Fingers', '<code>5</code>'],
-    [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
-  ]);
+  p = p.then(() => {
+    return pid({ in_fingers: 5 }, 'display').then((out) => {
+      test.deepEqual(out, [
+        ['Fingers', '<code>5</code>'],
+        [['', 'ch_slideLabel', 'ch_individualLabel', 'tx_sampleType', 'nm_length', 'nm_weight', 'dt_caught', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
 
-  test.end();
+  // Triggering additional row
+  p = p.then(() => {
+    return pid({ ch_slideLabel: 'moo' }, 'form', 'nm_length').then((out) => {
+      test.deepEqual(out, [
+        [
+          '<label class="col-form-label">Slide Label</label>',
+          '<input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="moo">'
+        ],
+        [
+          '<label class="col-form-label">Length</label>',
+          '<input type="number" class="form-control ph-meta" data-key="nm_length" name="" value="" step="any">'
+        ],
+        [['', 'ch_individualLabel', 'tx_sampleType', 'nm_weight', 'dt_caught', 'in_fingers', 'tx_sex'], '<button type="button">Copy</button>']
+      ]);
+    });
+  });
+
+  return p;
 });
 
 test('updateDataObject', function (test) {
@@ -222,7 +288,7 @@ test('updateDataObject', function (test) {
   test.end();
 });
 
-test('renderSearchFilter', function (test) {
+test('populateSearchFilter', function (test) {
   class UTMetadataApi extends MetadataApi {
     constructor (lang) {
       super(lang);
@@ -246,16 +312,81 @@ test('renderSearchFilter', function (test) {
       };
     }
   }
+  const defMetaFields = {
+    nm_length: { min: 50, max: 200 },
+    nm_weight: { min: 100, max: 200 },
+    ch_slideLabel: { char: true },
+    in_fingers: { min: 0, max: 5 }
+  };
 
   const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
   dom.window.mApi = new UTMetadataApi('en-gb');
 
-  function rsf (metaFields, search) {
-    return renderSearchFilters(metaFields, new URLSearchParams(search || '')).split(/\s*\n+\s*/).filter((x) => !!x);
+  function psf (fieldsForSearchFilter, search) {
+    const elForm = dom.window.document.createElement('FORM');
+    elForm.innerHTML = `<div class="body-thing"><select class="form-select add-new-metadata">
+        <option value="" selected="selected">Add...</option>
+    </select>
+    </div>`;
+    document.body.append(elForm);
+
+    dom.window.mApi._fieldsFor.search_filter = fieldsForSearchFilter;
+    populateSearchFilters(elForm.children[0], defMetaFields, new URLSearchParams(search || ''));
+    return elForm;
+  }
+  function psfHtml (fieldsForSearchFilter, search) {
+    const elForm = psf(fieldsForSearchFilter, search);
+
+    return elForm.querySelector('.body-thing>div').innerHTML.split(/\s*\n+\s*/).filter((x) => !!x);
+  }
+  function psfNames (fieldsForSearchFilter, search) {
+    const elForm = psf(fieldsForSearchFilter, search);
+
+    // Only return names of form fields
+    const out = [];
+    for (let i = 0; i < elForm.elements.length; i++) {
+      if (elForm.elements[i].name) out.push(elForm.elements[i].name);
+    }
+    out.push(Array.from(elForm.querySelector('.add-new-metadata').options).map((o) => o.value));
+    return out;
   }
 
+  // Only includes fields in fieldsFor
+  test.deepEqual(psfNames(['nm_length']), [
+    'nm_length',
+    'nm_length',
+    ['', 'nm_weight', 'ch_slideLabel', 'in_fingers']
+  ]);
+  test.deepEqual(psfNames(['nm_length', 'nm_weight']), [
+    'nm_length',
+    'nm_length',
+    'nm_weight',
+    'nm_weight',
+    ['', 'ch_slideLabel', 'in_fingers']
+  ]);
+
+  // Search query appends fields regardless
+  test.deepEqual(psfNames(['nm_length', 'nm_weight'], 'ch_slideLabel=bertie'), [
+    'nm_length',
+    'nm_length',
+    'nm_weight',
+    'nm_weight',
+    'ch_slideLabel',
+    ['', 'in_fingers']
+  ]);
+
+  // Project/order etc are passed through as hidden fields without headers (NB: Splitting order fields isn't something we actually do)
+  test.deepEqual(psfHtml([], 'project=1&order=1.desc&order=2.asc'), [
+    '<div class="mb-3">',
+    '<input type="hidden" name="project" value="1">',
+    '</div>',
+    '<div class="mb-3">',
+    '<input type="hidden" name="order" value="1.desc"><input type="hidden" name="order" value="2.asc">',
+    '</div>'
+  ]);
+
   // Numeric
-  test.deepEqual(rsf({ nm_length: { min: 50, max: 200 } }), [
+  test.deepEqual(psfHtml(['nm_length']), [
     '<div class="mb-3">',
     '<label for="filter-nm_length-control" class="form-label">Length</label>',
     '<div class="input-group">',
@@ -267,7 +398,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Character
-  test.deepEqual(rsf({ ch_slideLabel: { char: true } }, 'ch_slideLabel=moo'), [
+  test.deepEqual(psfHtml(['ch_slideLabel'], 'ch_slideLabel=moo'), [
     '<div class="mb-3">',
     '<label for="filter-ch_slideLabel-control" class="form-label">Slide Label</label>',
     '<div class="input-group">',
@@ -278,7 +409,7 @@ test('renderSearchFilter', function (test) {
   ]);
 
   // Integer
-  test.deepEqual(rsf({ in_fingers: { min: 0, max: 5 } }), [
+  test.deepEqual(psfHtml(['in_fingers']), [
     '<div class="mb-3">',
     '<label for="filter-in_fingers-control" class="form-label">Fingers</label>',
     '<div class="input-group">',

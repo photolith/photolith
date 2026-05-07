@@ -5,7 +5,7 @@ import TomSelect from 'tom-select';
 import { displayAlert } from './alert.js';
 import { init as initCroppedViewer } from './cropped_viewer.js';
 import { htmlFetch, jsonFetch } from './fetch.js';
-import { renderMetaLabel, renderMetaCell, renderSearchFilters } from './meta.js';
+import { renderMetaLabel, renderMetaCell, populateSearchFilters } from './meta.js';
 import { getDTState, setDTState, removeDTState } from './datatables_state.js';
 
 function filterChange (elForm, elTarget) {
@@ -36,8 +36,8 @@ export function init (parent) {
     const metaFields = JSON.parse(document.getElementById('meta_fields').textContent);
     const searchParams = new URLSearchParams(window.location.search);
 
-    elForm.querySelector('.offcanvas-body').innerHTML = renderSearchFilters(metaFields, searchParams);
-    elForm.querySelectorAll(':scope .offcanvas-body select').forEach((el) => new TomSelect(el, {
+    populateSearchFilters(elForm.querySelector('.offcanvas-body'), metaFields, searchParams);
+    elForm.querySelectorAll(':scope .offcanvas-body select:not(.add-new-metadata)').forEach((el) => new TomSelect(el, {
     }));
     elForm.addEventListener('change', (event) => {
       filterChange(elForm, event.target);
