@@ -45,3 +45,37 @@ test('init', function (test) {
 
   test.end();
 });
+
+test('init select', function (test) {
+  setupDom(test, `<html lang="en"><body>
+    <form>
+      <select id="pref-view-mode" class="pref pref-session" multiple>
+        <option value="grid" selected>Grid</option>
+        <option value="list">List</option>
+        <option value="detail">Detail</option>
+      </select>
+    </form>
+  </body></html>`);
+  const elForm = global.window.document.getElementsByTagName('FORM')[0];
+  const elSelect = global.window.document.getElementById('pref-view-mode');
+  init(global.window.document);
+
+  test.deepEqual(dumpSessionStorage(global.window), {}, 'No session storage entry before any change');
+
+  elSelect.options[1].selected = true;
+  elSelect.dispatchEvent(changeEvent());
+  test.deepEqual(dumpSessionStorage(global.window), {
+    'pref-view-mode': '["grid","list"]'
+  }, 'Recorded selected options on change');
+
+  elForm.reset();
+  test.deepEqual(elSelect.options[1].selected, true, 'list still selected after form reset');
+  test.deepEqual(elSelect.options[0].selected, true, 'grid still selected after form reset');
+
+  init(global.window.document);
+  test.deepEqual(elSelect.options[0].selected, true, 'grid still selected after re-init');
+  test.deepEqual(elSelect.options[1].selected, true, 'list still selected after re-init');
+  test.deepEqual(elSelect.options[2].selected, false, 'detail not selected after re-init');
+
+  test.end();
+});
