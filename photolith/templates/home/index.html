@@ -13,11 +13,11 @@
   </p>
 
   <p>
-    {% translate 'We currently hold' %}:
-    {{ headline_numbers.images | headline_number }}{% translate 'Images' %},
-    {{ headline_numbers.individuals | headline_number }}{% translate 'Individuals' %}
+    {% translate 'We currently hold' %}
+    {{ headline_numbers.images | headline_number }}{{ verbose_names.images }},
+    {{ headline_numbers.individuals | headline_number }}{{ verbose_names.individuals }},
     ({% for name, count in headline_numbers.ind_by_species.items %}{{ count | headline_number }}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}),
-    {{ headline_numbers.annotations | headline_number }}{% translate 'Annotations' %}
+    {{ headline_numbers.annotations | headline_number }}{{ verbose_names.annotations }}
   </p>
 
   {% if not user.is_authenticated %}

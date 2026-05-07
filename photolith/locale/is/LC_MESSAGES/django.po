@@ -156,7 +156,7 @@ msgstr ""
 msgid "Image"
 msgstr "Mynd"
 
-#: photolith/models.py photolith/templates/home/index.html
+#: photolith/models.py
 msgid "Images"
 msgstr "Myndir"
 
@@ -177,7 +177,7 @@ msgstr "Breytt"
 msgid "Individual"
 msgstr "Einstakingur"
 
-#: photolith/models.py photolith/templates/home/index.html
+#: photolith/models.py
 msgid "Individuals"
 msgstr "Einstaklingar"
 
@@ -266,7 +266,6 @@ msgid "Annotation"
 msgstr "Aldursmerking"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
-#: photolith/templates/home/index.html
 msgid "Annotations"
 msgstr "Aldursmerkingar"
 
