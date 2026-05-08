@@ -36,6 +36,18 @@ msgstr "Mikilvægar dagsetningar"
 msgid "Groups"
 msgstr "Hópar"
 
+#: photolith/admin.py
+msgid "state"
+msgstr "ástand"
+
+#: photolith/admin.py
+msgid "Finished"
+msgstr "Lokið"
+
+#: photolith/admin.py
+msgid "Active"
+msgstr "Virk"
+
 #: photolith/annotate/views.py
 msgid "Successfully deleted annotation"
 msgstr "Aldursmerkingu var eytt"
