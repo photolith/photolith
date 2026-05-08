@@ -1,5 +1,6 @@
 import json
 
+from django.utils import timezone
 from django.utils.html import escape, mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
@@ -111,6 +112,7 @@ class ImageAdmin(admin.ModelAdmin):
     list_display = ["content", "orig_filename", "created_by", "created_at"]
     fields = ["preview", "content", "orig_filename", "created_by", "created_at"]
     readonly_fields = ["preview", "created_by", "created_at"]
+    search_fields = ["orig_filename", "content"]
     inlines = [IndividualInline]
 
     def preview(self, obj):
@@ -145,6 +147,7 @@ class IndividualAdmin(admin.ModelAdmin):
         "created_at",
         "data",
     ]
+    search_fields = ["image__orig_filename", "metachar__value"]
 
     def image_content(self, obj):
         return obj.image.orig_filename
@@ -199,6 +202,7 @@ class TaxonomyAdmin(admin.ModelAdmin):
         "str_en",
         "str_is",
     ]
+    search_fields = ["identifier", "str_en", "str_is"]
 
 
 @admin.register(Annotation)
@@ -223,6 +227,8 @@ class AnnotationAdmin(admin.ModelAdmin):
         "created_at",
     ]
     readonly_fields = ["individual", "image_preview", "created_by", "created_at"]
+    list_filter = ["project", "rating", "created_by"]
+    search_fields = ["individual__metachar__value"]
 
     def image_preview(self, obj):
         return image_preview_html(
@@ -244,9 +250,28 @@ class AnnotationAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+class ProjectExpiredFilter(admin.SimpleListFilter):
+    title = _("state")
+    parameter_name = "expired"
+
+    def lookups(self, request, model_admin):
+        return [("yes", _("Finished")), ("no", _("Active"))]
+
+    def queryset(self, request, queryset):
+        now = timezone.now().date()
+        if self.value() == "yes":
+            return queryset.filter(date_end__lt=now)
+        if self.value() == "no":
+            return queryset.filter(date_end__gte=now) | queryset.filter(
+                date_end__isnull=True
+            )
+        return queryset
+
+
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ["name", "date_end", "created_by", "created_at"]
+    list_filter = [ProjectExpiredFilter]
     fields = [
         "name",
         "team",
@@ -283,6 +308,7 @@ class TeamAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ["created_at", "created_by", "modified_at"]
     filter_horizontal = ("users",)
+    search_fields = ["name"]
 
     def save_model(
         self,
