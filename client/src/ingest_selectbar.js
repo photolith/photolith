@@ -35,12 +35,14 @@ function nextSelection (elSelect, elSyncForm) {
 
     elSyncForm.image_file.value = elSelect.fs.name;
     elSyncForm.image_file.phBlob = f;
+    elSyncForm.image_id.value = '';
     elSyncForm.image_file.dispatchEvent(changeEvent());
     toggleUnloadWarning(true);
   }).catch((err) => {
     // Clear the loading spinner, if still going
     elSyncForm.image_file.value = '';
     elSyncForm.image_file.phBlob = null;
+    elSyncForm.image_id.value = '';
     elSyncForm.image_file.dispatchEvent(changeEvent());
 
     if (err instanceof Cancelled || (err instanceof DOMException && err.code === err.ABORT_ERR)) {
