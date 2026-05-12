@@ -130,6 +130,13 @@ class DataView(LoginRequiredMixin, View):
                         created_at__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
+            elif k == "nm_image_id":
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    qs = qs.filter(image_id__gte=int(vs[0]))
+                if vs[1] != "":
+                    qs = qs.filter(image_id__lte=int(vs[1]))
             elif k.startswith("nm_"):
                 sq = MetaNumeric.objects.filter(
                     individual_id=OuterRef("id"),

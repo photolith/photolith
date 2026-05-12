@@ -270,6 +270,54 @@ class DataViewTest(RequiresUtils, TestCase):
             [x.id for x in inds[2:10]],
         )
 
+    def test_query_filter_image_id(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        # Each create_individual() call creates a fresh image, giving each ind a distinct image_id
+        inds = [self.create_individual() for _ in range(5)]
+        image_ids = [ind.image_id for ind in inds]
+
+        # Single value: used as both bounds, so matches exactly one image_id
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(userA, search=dict(nm_image_id=str(image_ids[2])))
+            ],
+            [inds[2].id],
+        )
+        # Range: inclusive on both ends
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(nm_image_id=(str(image_ids[1]), str(image_ids[3]))),
+                )
+            ],
+            [ind.id for ind in inds[1:4]],
+        )
+        # Lower bound only
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA, search=dict(nm_image_id=(str(image_ids[3]), ""))
+                )
+            ],
+            [ind.id for ind in inds[3:]],
+        )
+        # Upper bound only
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA, search=dict(nm_image_id=("", str(image_ids[1])))
+                )
+            ],
+            [ind.id for ind in inds[:2]],
+        )
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]
