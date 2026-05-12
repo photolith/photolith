@@ -112,7 +112,9 @@ function formRefresh (event) {
 
     if (selIndividual !== null) {
       const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
-      populateIndividualData(ids, elForm.querySelector(':scope .individual-data tbody'), 'form');
+      const elTBody = elForm.querySelector(':scope .individual-data tbody');
+      elTBody.innerHTML = ''; // Remove any previous selections
+      populateIndividualData(ids, elTBody, 'form');
     }
   }
 
