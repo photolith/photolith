@@ -318,6 +318,74 @@ class DataViewTest(RequiresUtils, TestCase):
             [ind.id for ind in inds[:2]],
         )
 
+    def test_with_associated_images(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        img1 = self.create_image(
+            orig_filename="first.jpg",
+            scale_line=[(0, 0), (1, 0)],
+            scale_mm=2,
+        )
+        img2 = self.create_image(
+            orig_filename="second.jpg",
+            scale_line=[(0, 0), (4, 0)],
+            scale_mm=8,
+        )
+        # Two individuals share img1, one is on img2
+        ind1a = self.create_individual(image=img1, bounding_box=[(0, 0), (1, 1)])
+        ind1b = self.create_individual(image=img1, bounding_box=[(1, 1), (2, 2)])
+        ind2 = self.create_individual(image=img2, bounding_box=[(2, 2), (3, 3)])
+
+        # By default, no `images` extra returned, and no `image_id` on rows
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual([r["id"] for r in out["data"]], [ind1a.id, ind1b.id, ind2.id])
+        self.assertNotIn("image_id", out["data"][0])
+
+        # Empty value for the parameter is treated as falsy (no extra returned)
+        out = self.data(userA, dict(with_associated_images=""), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertNotIn("image_id", out["data"][0])
+
+        # With `with_associated_images` set, every row gets `image_id` and we get
+        # a top-level `images` dict, denormalised by image_id
+        out = self.data(userA, dict(with_associated_images="1"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "images"]))
+        self.assertEqual(
+            [r["image_id"] for r in out["data"]], [img1.id, img1.id, img2.id]
+        )
+        # JSON dict keys are strings, so img ids come back stringified
+        self.assertEqual(set(out["images"].keys()), {str(img1.id), str(img2.id)})
+        self.assertEqual(
+            out["images"][str(img1.id)],
+            dict(
+                url=img1.content.url,
+                scale_line=[[0, 0], [1, 0]],
+                scale_mm=2,
+                orig_filename="first.jpg",
+            ),
+        )
+        self.assertEqual(
+            out["images"][str(img2.id)],
+            dict(
+                url=img2.content.url,
+                scale_line=[[0, 0], [4, 0]],
+                scale_mm=8,
+                orig_filename="second.jpg",
+            ),
+        )
+
+    def test_with_associated_images__no_results(self):
+        """No `images` extra returned when no individuals match"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        out = self.data(userA, dict(with_associated_images="1"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(out["data"], [])
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]

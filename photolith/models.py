@@ -169,6 +169,7 @@ class Individual(models.Model):
                 (
                     "__str__",
                     "id",
+                    "image_id",
                     "dt_created_at",
                     "dt_modified_at",
                     "bounding_box",

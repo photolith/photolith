@@ -162,6 +162,7 @@ class IndividualTest(RequiresUtils, TestCase):
         internal_keys = [
             ("__str__", "Individual 1"),
             ("id", 999),
+            ("image_id", 3),
             ("dt_created_at", "2023-01-01"),
             ("dt_modified_at", "2023-01-02"),
             ("bounding_box", [[0, 0], [50, 50]]),
