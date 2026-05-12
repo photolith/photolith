@@ -35,7 +35,6 @@ function formRefresh (event) {
 
     // Clear out old individuals first
     elForm.querySelector(':scope .individuals').innerHTML = '';
-    elForm.querySelector(':scope .individual-ids').innerHTML = '';
     elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
     elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     elForm.classList.add('rendering');
@@ -64,7 +63,6 @@ function formRefresh (event) {
       elForm.elements.individual.dispatchEvent(changeEvent());
     }).catch((err) => {
       elForm.querySelector(':scope .individuals').innerHTML = '';
-      elForm.querySelector(':scope .individual-ids').innerHTML = '';
       elForm.selection.value = '';
       throw err;
     }).finally(() => {
@@ -76,7 +74,7 @@ function formRefresh (event) {
     const selIndividual = event.target.options[event.target.selectedIndex].value;
 
     // Twiddle disabled on all inputs to match individual dropdown
-    elForm.querySelectorAll(':scope .individuals input,:scope .individual-ids input').forEach((el) => {
+    elForm.querySelectorAll(':scope .individuals input').forEach((el) => {
       if (selIndividual) {
         el.disabled = !el.name.endsWith(':' + selIndividual);
       } else {
@@ -172,14 +170,14 @@ function formSubmit (elForm) {
       body: new FormData(elForm)
     });
   }).then((data) => {
-    displayAlert(data.alert_status, data.alert);
-    elForm.querySelector(':scope .individual-ids').innerHTML = Object.keys(data.created_individuals).map((k) => {
-      return `<input type="hidden" name="individual_id:${k}" value="${data.created_individuals[k]}">`;
-    }).join('\n') + Object.keys(data.updated_individuals).map((k) => {
-      return `<input type="hidden" name="individual_id:${k}" value="${data.updated_individuals[k]}">`;
-    }).join('\n');
+    Object.keys(data).forEach((k) => {
+      if (elForm[k]) {
+        elForm[k].value = JSON.stringify(data[k]);
+      }
+    });
   }).finally(() => {
     elForm.classList.remove('rendering');
+    elForm.selection.dispatchEvent(changeEvent()); // To update data view
   });
 }
 

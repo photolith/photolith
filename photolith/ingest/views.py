@@ -2,7 +2,6 @@ import hashlib
 import io
 import json
 import os.path
-import urllib.parse
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -115,37 +114,37 @@ class UploadView(PermissionRequiredMixin, View):
         )
         image.save()
 
+        out = {}
         created_inds = {}
         updated_inds = {}
         deleted_inds = {}
-        search_query = set()
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
                 continue
             ind_data = json.loads(self.request.POST[post_key])
+            ind_client_idx = post_key.replace("data:", "")
             ind_bounding_box = json.loads(
                 self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
 
             # If an ID is given, fetch any existant individual
-            ind_id = self.request.POST.get(
-                post_key.replace("data:", "individual_id:", 1)
-            )
             ind = (
                 Individual.objects.filter(
-                    pk=int(ind_id),
+                    pk=int(ind_data["id"]),
                     created_by=self.request.user,
                 ).first()
-                if ind_id
+                if ind_data.get("id")
                 else None
             )
 
             # No bounding box --> this individual shouldn't exist
             if not ind_bounding_box:
                 if ind:
-                    deleted_inds[post_key.replace("data:", "")] = ind.id
+                    deleted_inds[ind_client_idx] = ind.id
                     ind.delete()
+                    del ind_data["id"]
+                    out["data:%s" % ind_client_idx] = ind_data
                 continue
 
             # If no individual was found, create one at this point
@@ -157,15 +156,12 @@ class UploadView(PermissionRequiredMixin, View):
             ind.save()
             ind.data = ind_data
             ind.save()
-            if ind_id:
-                updated_inds[post_key.replace("data:", "")] = ind.id
+            out["data:%s" % ind_client_idx] = ind.full_data()
+            del out["data:%s" % ind_client_idx]["__str__"]
+            if ind_data.get("id"):
+                updated_inds[ind_client_idx] = ind.id
             else:
-                created_inds[post_key.replace("data:", "")] = ind.id
-            if ind_data.get("ch_slideLabel"):
-                # NB: search_query is a set, we don't repeat values
-                search_query.add(
-                    urllib.parse.urlencode({"ch_slideLabel": ind_data["ch_slideLabel"]})
-                )
+                created_inds[ind_client_idx] = ind.id
 
         if len(created_inds) > 0 or len(updated_inds) > 0:
             # Clear meta_fields cache created in search/views
@@ -194,20 +190,18 @@ class UploadView(PermissionRequiredMixin, View):
                 "Deleted %(count)d individuals. ",
                 len(deleted_inds),
             ) % dict(count=len(deleted_inds))
-        if len(search_query) > 0:
-            alert += '<br><a href="/search/?%s" target="_blank">%s</a>' % (
-                "&".join(search_query),
-                _("Show individuals"),
+        if len(created_inds) + len(updated_inds) > 0:
+            alert += (
+                '<br><a href="/search/?nm_image_id=%d&nm_image_id=%d" target="_blank">%s</a>'
+                % (
+                    image.id,
+                    image.id,
+                    _("Show individuals"),
+                )
             )
-        return JsonResponse(
-            dict(
-                alert=alert,
-                alert_status=alert_status,
-                created_individuals=created_inds,
-                updated_individuals=updated_inds,
-                deleted_individuals=deleted_inds,
-            )
-        )
+
+        out["alert"] = dict(level=alert_status, messageHTML=alert)
+        return JsonResponse(out)
 
 
 class UploadImageView(PermissionRequiredMixin, View):

@@ -1,7 +1,5 @@
 import itertools
 import json
-import urllib.parse
-import re
 
 from django.core.cache import cache
 from django.test import Client, TestCase, RequestFactory
@@ -77,10 +75,8 @@ class UploadViewTest(RequiresUtils, TestCase):
             if not data:
                 continue
             post_dict["bounding_box:%d" % i] = json.dumps(data["_bb"])
-            if "_id" in data:
-                post_dict["individual_id:%d" % i] = json.dumps(data["_id"])
             post_dict["data:%d" % i] = json.dumps(
-                {k: v for k, v in data.items() if k not in ("_bb", "_id")}
+                {k: v for k, v in data.items() if k not in ("_bb")}
             )
 
         client = Client()
@@ -92,18 +88,18 @@ class UploadViewTest(RequiresUtils, TestCase):
             except:
                 return resp.status_code
         out = json.loads(resp.content)
-        if "created_individuals" in out:
-            for k, id in itertools.chain(
-                out["created_individuals"].items(), out["updated_individuals"].items()
-            ):
-                data = ind_data[int(k)]
-                new = Individual.objects.get(pk=id)
-                if not data.get("_id"):
+        for k, v in out.items():
+            if k.startswith("data:") and out[k].get("id"):
+                data = ind_data[int(k.replace("data:", ""))]
+                new = Individual.objects.get(pk=int(out[k]["id"]))
+                if not data.get("id"):
                     self.assertEqual(new.created_by, user)
                 self.assertEqual(new.image, image)
                 self.assertEqual(new.bounding_box, data["_bb"])
-            return out
-        raise ValueError(str(out))
+                # No tests for times in output, yet.
+                del out[k]["dt_created_at"]
+                del out[k]["dt_modified_at"]
+        return out
 
     def test_post(self):
         # You need to be part of the ingest group to post
@@ -112,44 +108,60 @@ class UploadViewTest(RequiresUtils, TestCase):
 
         # Can create nothing, but user gets a warning
         user = self.create_user(groups=["Ingest"])
+        out = self.form_post(user)
         self.assertEqual(
-            self.form_post(user),
+            out,
             dict(
-                alert_status="warning",
-                alert="No individual boxes on image! Nothing saved.",
-                created_individuals={},
-                updated_individuals={},
-                deleted_individuals={},
+                dict(
+                    alert=dict(
+                        level="warning",
+                        messageHTML="No individual boxes on image! Nothing saved.",
+                    )
+                ),
             ),
         )
 
         # Create 2 individuals
         user = self.create_user(groups=["Ingest"])
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [100, 100]],
+                ),
+                dict(
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [200, 200]],
+                ),
+                dict(
+                    # NB: Will be ignored since there's no bounding box
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=300,
+                    _bb=None,
+                ),
+            ],
+        )
         self.assertEqual(
-            len(
-                self.form_post(
-                    user,
-                    [
-                        dict(
-                            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                            nm_length=100,
-                            _bb=[[0, 0], [100, 100]],
-                        ),
-                        dict(
-                            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
-                            nm_length=100,
-                            _bb=[[0, 0], [200, 200]],
-                        ),
-                        dict(
-                            # NB: Will be ignored since there's no bounding box
-                            tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
-                            nm_length=300,
-                            _bb=None,
-                        ),
-                    ],
-                )["created_individuals"]
-            ),
-            2,
+            out,
+            {
+                "alert": dict(
+                    level="success",
+                    messageHTML='Created 2 individuals. <br><a href="/search/?nm_image_id=3&nm_image_id=3" target="_blank">Show individuals</a>',
+                ),
+                "data:0": dict(
+                    id=1,
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100.0,
+                ),
+                "data:1": dict(
+                    id=2,
+                    tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
+                    nm_length=100.0,
+                ),
+            },
         )
 
         # We can find them in the database
@@ -174,24 +186,36 @@ class UploadViewTest(RequiresUtils, TestCase):
         )
 
         # Create 1 individual, with keys that don't start at 1
+        out = self.form_post(
+            user,
+            [
+                None,
+                None,
+                None,
+                None,
+                dict(
+                    tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+                    nm_length=100,
+                    _bb=[[0, 0], [920, 100]],
+                ),
+            ],
+        )
         self.assertEqual(
-            len(
-                self.form_post(
-                    user,
-                    [
-                        None,
-                        None,
-                        None,
-                        None,
-                        dict(
-                            tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
-                            nm_length=100,
-                            _bb=[[0, 0], [920, 100]],
-                        ),
-                    ],
-                )["created_individuals"]
-            ),
-            1,
+            out,
+            {
+                "alert": dict(
+                    level="success",
+                    messageHTML="Created 1 individual. <br><a "
+                    'href="/search/?nm_image_id=4&nm_image_id=4" '
+                    'target="_blank">Show individuals</a>',
+                ),
+                # NB: data:* index corresponds to the above, not DB index
+                "data:4": {
+                    "id": 3,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+            },
         )
 
         # We can find them in the database
@@ -209,7 +233,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
                     nm_length=100,
                     _bb=[[0, 0], [925, 100]],
-                    _id=inds[2].id,
+                    id=inds[2].id,
                 ),
                 dict(
                     tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
@@ -220,20 +244,36 @@ class UploadViewTest(RequiresUtils, TestCase):
                     tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
                     nm_length=100,
                     _bb=[[0, 0], [205, 200]],
-                    _id=inds[1].id,
+                    id=inds[1].id,
                 ),
             ],
         )
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(
             out,
-            dict(
-                alert_status="success",
-                alert="Created 1 individual. Updated 2 individuals. ",
-                created_individuals={"1": inds[3].id},
-                updated_individuals={"0": inds[2].id, "2": inds[1].id},
-                deleted_individuals={},
-            ),
+            {
+                "alert": dict(
+                    level="success",
+                    messageHTML="Created 1 individual. Updated 2 individuals. <br><a "
+                    'href="/search/?nm_image_id=5&nm_image_id=5" '
+                    'target="_blank">Show individuals</a>',
+                ),
+                "data:0": {
+                    "id": inds[2].id,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+                "data:1": {
+                    "id": inds[3].id,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+                "data:2": {
+                    "id": inds[1].id,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Cat", "id": 200, "is": "Köttur"},
+                },
+            },
         )
 
         # Ignore any empty taxonomy fields
@@ -250,8 +290,16 @@ class UploadViewTest(RequiresUtils, TestCase):
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(len(inds), 5)
         self.assertEqual(
-            out["created_individuals"],
-            {"0": inds[4].id},
+            out,
+            {
+                "alert": dict(
+                    level="success",
+                    messageHTML="Created 1 individual. <br><a "
+                    'href="/search/?nm_image_id=6&nm_image_id=6" '
+                    'target="_blank">Show individuals</a>',
+                ),
+                "data:0": {"id": inds[4].id, "nm_length": 100.0},
+            },
         )
         self.assertEqual(
             inds[4].data,
@@ -268,25 +316,35 @@ class UploadViewTest(RequiresUtils, TestCase):
                     tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
                     nm_length=100,
                     _bb=None,
-                    _id=inds[1].id,
+                    id=inds[1].id,
                 ),
                 dict(
                     tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
                     nm_length=100,
                     _bb=[[0, 0], [925, 100]],
-                    _id=inds[2].id,
+                    id=inds[2].id,
                 ),
             ],
         )
         self.assertEqual(
             out,
-            dict(
-                alert_status="success",
-                alert="Updated 1 individual. Deleted 1 individual. ",
-                created_individuals={},
-                updated_individuals={"1": 3},
-                deleted_individuals={"0": 2},
-            ),
+            {
+                "alert": {
+                    "level": "success",
+                    "messageHTML": "Updated 1 individual. Deleted 1 individual. <br><a "
+                    'href="/search/?nm_image_id=7&nm_image_id=7" '
+                    'target="_blank">Show individuals</a>',
+                },
+                "data:0": {
+                    "nm_length": 100,
+                    "tx_species": {"en": "Cat", "id": 200, "is": "Köttur"},
+                },
+                "data:1": {
+                    "id": 3,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+            },
         )
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(
@@ -302,25 +360,36 @@ class UploadViewTest(RequiresUtils, TestCase):
                     tx_species={"id": 200, "en": "Cat", "is": "Köttur"},
                     nm_length=100,
                     _bb=[[0, 0], [101010, 123]],
-                    _id=2,
+                    id=2,
                 ),
                 dict(
                     tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
                     nm_length=100,
                     _bb=[[0, 0], [925, 100]],
-                    _id=3,
+                    id=3,
                 ),
             ],
         )
         self.assertEqual(
             out,
-            dict(
-                alert_status="success",
-                alert="Updated 2 individuals. ",
-                created_individuals={},
-                updated_individuals={"0": 6, "1": 3},
-                deleted_individuals={},
-            ),
+            {
+                "alert": {
+                    "level": "success",
+                    "messageHTML": "Updated 2 individuals. <br><a "
+                    'href="/search/?nm_image_id=8&nm_image_id=8" '
+                    'target="_blank">Show individuals</a>',
+                },
+                "data:0": {
+                    "id": 6,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Cat", "id": 200, "is": "Köttur"},
+                },
+                "data:1": {
+                    "id": 3,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+            },
         )
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(
@@ -338,20 +407,26 @@ class UploadViewTest(RequiresUtils, TestCase):
                     tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
                     nm_length=100,
                     _bb=[[0, 0], [1025, 100]],
-                    _id=3,
+                    id=3,
                 ),
             ],
         )
         self.assertEqual(
             out,
-            dict(
-                alert_status="success",
-                alert="Updated 1 individual. ",
-                created_individuals={},
+            {
+                "alert": {
+                    "level": "success",
+                    "messageHTML": "Updated 1 individual. <br><a "
+                    'href="/search/?nm_image_id=9&nm_image_id=9" '
+                    'target="_blank">Show individuals</a>',
+                },
                 # NB: ID has changed
-                updated_individuals={"0": 7},
-                deleted_individuals={},
-            ),
+                "data:0": {
+                    "id": 7,
+                    "nm_length": 100.0,
+                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
+                },
+            },
         )
 
     def test_post__searchquerystring(self):
@@ -376,12 +451,18 @@ class UploadViewTest(RequiresUtils, TestCase):
                 ),
             ],
         )
-        m = re.search(
-            r'<a href="/search/\?([^"]+)".*>Show individuals</a>', out["alert"]
+        self.assertEqual(
+            out,
+            {
+                "alert": {
+                    "level": "success",
+                    "messageHTML": 'Created 3 individuals. <br><a href="/search/?nm_image_id=2&nm_image_id=2" target="_blank">Show individuals</a>',
+                },
+                "data:0": {"ch_slideLabel": "AB-01", "id": 1},
+                "data:1": {"ch_slideLabel": "AB-01", "id": 2},
+                "data:2": {"ch_slideLabel": "AB-02", "id": 3},
+            },
         )
-        qs = urllib.parse.parse_qs(m.group(1))
-        self.assertEqual(list(qs.keys()), ["ch_slideLabel"])
-        self.assertEqual(set(qs["ch_slideLabel"]), set(("AB-02", "AB-01")))
 
     def test_post__image_update(self):
         """Creating individuals updates the scale"""
