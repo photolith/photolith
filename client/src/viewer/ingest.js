@@ -25,6 +25,7 @@ function setInitBBs (bbEls, width, height) {
     : { w: box.w * 0.1, h: box.h * 0.2 };
 
   bbEls.forEach((el, i) => {
+    if (el.value) return; // Ignore bounding boxes with a value already set
     const left = margin.w + (i % grid.w) * box.w;
     const top = margin.h + Math.min(Math.floor(i / grid.w), grid.h) * box.h;
 
