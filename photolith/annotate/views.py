@@ -14,7 +14,7 @@ from ..errors import json_errors
 from ..models import Individual, Annotation, Project, UserSpeciesAuthority
 
 from .forms import AnnotationForm
-from ..perm_utils import check_annotate_access
+from ..perm_utils import check_annotate_access, check_individual_edit_access
 
 
 class AnnotateView(LoginRequiredMixin, UpdateView):
@@ -114,15 +114,22 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
             .prefetch_related("metatx_set")
             .prefetch_related("metatx_set__value")
         )
+        qs = qs.annotate(num_annotations=Count("annotation"))
         ind = get_object_or_404(qs)
 
         out = ind.full_data()
         out["bounding_box"] = ind.bounding_box
+        out["image__id"] = ind.image.id
         out["image__content__url"] = ind.image.content.url
         out["image__px_to_mm"] = ind.image.px_to_mm()
         out["image__mm_to_px"] = (
             1 / out["image__px_to_mm"] if out["image__px_to_mm"] is not None else None
         )
+        try:
+            check_individual_edit_access(ind, self.request.user)
+            out["can_edit"] = True
+        except PermissionDenied:
+            out["can_edit"] = False
         return out
 
     def get_context_data(self, **kwargs):

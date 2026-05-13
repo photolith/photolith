@@ -575,6 +575,12 @@ msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 
 #: photolith/templates/annotate/snippet.html
+#: photolith/templates/project/list.html
+#: photolith/templates/project/list.html
+msgid "Edit"
+msgstr "Breyta"
+
+#: photolith/templates/annotate/snippet.html
 msgid "Administration"
 msgstr "Stjórnun"
 
@@ -825,11 +831,6 @@ msgstr "Aldursmerkja í verkefni"
 #: photolith/templates/project/list.html
 msgid "View results"
 msgstr "Sjá niðurstöður"
-
-#: photolith/templates/project/list.html
-#: photolith/templates/project/list.html
-msgid "Edit"
-msgstr "Breyta"
 
 #: photolith/templates/project/list.html
 msgid "Closed projects"
