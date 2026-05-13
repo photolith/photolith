@@ -10,7 +10,7 @@
     <select id="image-source-select" class="form-select" data-sync-form="form.ingest-form">
       <option value="" selected>{% translate "Choose..." %}</option>
       {% for s in image_sources %}
-        <option value="{{ s.name }}">{{ s.description }}</option>
+        <option value="{{ s.name }}" {% if s.selected %}selected{% endif %}>{{ s.description }}</option>
       {% endfor %}
     </select>
   </div>

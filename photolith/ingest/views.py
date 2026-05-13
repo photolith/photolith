@@ -30,6 +30,15 @@ class IndexView(PermissionRequiredMixin, TemplateView):
                 count=count,
             )
 
+        # If given image_ids to edit, set-up a photolith: fileset for those image id(s)
+        image_ids = self.request.GET.getlist("image_id", [])
+        if len(image_ids) > 0:
+            yield dict(
+                name="photolith:%s" % ",".join(image_ids),
+                description=_("Edit selected images"),
+                selected=True,
+            )
+
         for d in list_photo_dirs(settings.INGEST_ROOT):
             yield dict(
                 name="server:%s" % d,

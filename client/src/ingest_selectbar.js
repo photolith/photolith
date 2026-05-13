@@ -69,6 +69,10 @@ export function init (parent) {
       toggleUnloadWarning(false);
       nextSelection(elSelect, elSyncForm);
     });
+    // If there's an initial item selected, trigger select now
+    if (elSelect.selectedIndex > 0) {
+      elSelect.dispatchEvent(changeEvent());
+    }
 
     elSelectBar.querySelector(':scope *[data-action=next]').addEventListener('click', (event) => {
       event.preventDefault();

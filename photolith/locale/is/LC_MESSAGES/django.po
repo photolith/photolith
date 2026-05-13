@@ -68,6 +68,10 @@ msgstr[0] "(%(count)d mynd)"
 msgstr[1] "(%(count)d myndir)"
 
 #: photolith/ingest/views.py
+msgid "Edit selected images"
+msgstr "Breyta völdum myndum"
+
+#: photolith/ingest/views.py
 #, python-format
 msgid "Uploaded by %(photo_dir)s"
 msgstr "Hlaðið upp af %(photo_dir)s"

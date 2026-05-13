@@ -1,8 +1,11 @@
 import itertools
 import json
+import os
+import tempfile
 
 from django.core.cache import cache
 from django.test import Client, TestCase, RequestFactory
+from django.test.testcases import override_settings
 
 from ..ingest.views import *
 from ..models import Individual, Image, Taxonomy
@@ -14,13 +17,116 @@ from .requires_utils import RequiresUtils
 class IndexViewTest(RequiresUtils, TestCase):
     maxDiff = None
 
-    def ctx_data(self, user=None):
-        request = RequestFactory().get("/ingest", dict())
+    def ctx_data(self, user=None, get_data=None):
+        request = RequestFactory().get("/ingest", get_data or dict())
         request.user = user
         v = IndexView()
         v.setup(request, **(request.GET.dict()))
         out = v.get_context_data()
         return out
+
+    def test_context_data__image_sources(self):
+        user = self.create_user(groups=["Ingest"])
+
+        def img_src(get_data=None):
+            return list(self.ctx_data(user, get_data=get_data)["image_sources"])
+
+        with tempfile.TemporaryDirectory() as ingest_root:
+            with override_settings(INGEST_ROOT=ingest_root):
+                # With an empty INGEST_ROOT and no image_id, only the
+                # client-side upload sources are returned
+                self.assertEqual(
+                    img_src(),
+                    [
+                        dict(
+                            name="localdirselect:",
+                            description="Upload directory from computer",
+                        ),
+                        dict(
+                            name="fileselect:",
+                            description="Upload selected files from computer",
+                        ),
+                        dict(
+                            name="webcam:",
+                            description="Take photo (default camera)",
+                        ),
+                    ],
+                )
+
+                # Subdirectories of INGEST_ROOT appear as server: sources,
+                # sorted alphabetically. Loose files are ignored.
+                os.makedirs(os.path.join(ingest_root, "z_cuthbert"))
+                os.makedirs(os.path.join(ingest_root, "a_dibble"))
+                with open(os.path.join(ingest_root, "loose_file"), "w") as f:
+                    f.write("not a dir")
+                self.assertEqual(
+                    img_src(),
+                    [
+                        dict(
+                            name="server:a_dibble",
+                            description="Uploaded by a_dibble",
+                        ),
+                        dict(
+                            name="server:z_cuthbert",
+                            description="Uploaded by z_cuthbert",
+                        ),
+                        dict(
+                            name="localdirselect:",
+                            description="Upload directory from computer",
+                        ),
+                        dict(
+                            name="fileselect:",
+                            description="Upload selected files from computer",
+                        ),
+                        dict(
+                            name="webcam:",
+                            description="Take photo (default camera)",
+                        ),
+                    ],
+                )
+
+                # When image_id is present, a selected photolith: source is
+                # prepended to feed the chosen image(s) back in for editing
+                self.assertEqual(
+                    img_src(get_data=dict(image_id="42")),
+                    [
+                        dict(
+                            name="photolith:42",
+                            description="Edit selected images",
+                            selected=True,
+                        ),
+                        dict(
+                            name="server:a_dibble",
+                            description="Uploaded by a_dibble",
+                        ),
+                        dict(
+                            name="server:z_cuthbert",
+                            description="Uploaded by z_cuthbert",
+                        ),
+                        dict(
+                            name="localdirselect:",
+                            description="Upload directory from computer",
+                        ),
+                        dict(
+                            name="fileselect:",
+                            description="Upload selected files from computer",
+                        ),
+                        dict(
+                            name="webcam:",
+                            description="Take photo (default camera)",
+                        ),
+                    ],
+                )
+
+                # Multiple image_id values are joined into a single source
+                self.assertEqual(
+                    img_src(get_data=dict(image_id=["42", "43"]))[0],
+                    dict(
+                        name="photolith:42,43",
+                        description="Edit selected images",
+                        selected=True,
+                    ),
+                )
 
     def test_context_data__full_taxonomy(self):
         user = self.create_user(groups=["Ingest"])
