@@ -79,9 +79,11 @@ Once all individuals have been marked up on the image & have metadata, press *Sa
 Removing unintentional uploads
 ------------------------------
 
-If you mistakenly upload a set of individuals, how to remove depends on where the error is noticed.
-If you are still on the ingest page for the individuals, you can drag all individuals outside the image and they will turn red.
+If you mistakenly upload a set of individuals, you can drag individuals outside the image and they will turn red.
 On pressing save, they will be removed from the database.
+If you want to remove all individuals and re-label the image from scratch, press "Remove & reset".
+
+If no annotations have been added to your image yet, you can return to the ingest screen by finding them using the search page and pressing "Edit".
 
 If you find an individual that should be removed in the search pane, then the administrator can remove it.
 To the right of the image will be an "Administration" link.
