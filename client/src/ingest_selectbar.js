@@ -5,6 +5,7 @@ import { LocalDirectoryFileSet } from './fileset/local_directory';
 import { NullFileSet } from './fileset/null';
 import { ServerFileSet } from './fileset/server';
 import { WebcamFileSet } from './fileset/webcam';
+import { PhotolithFileSet } from './fileset/photolith';
 
 function newFileSet (val) {
   val = val.split(':');
@@ -14,6 +15,7 @@ function newFileSet (val) {
   if (val[0] === 'localdirselect') return new LocalDirectoryFileSet();
   if (val[0] === 'server') return new ServerFileSet(val[1]);
   if (val[0] === 'webcam') return new WebcamFileSet(val[1]);
+  if (val[0] === 'photolith') return new PhotolithFileSet(val[1]);
   throw new Error('Unknown fileset type ' + val.join(':'));
 }
 
