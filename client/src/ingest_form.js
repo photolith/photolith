@@ -37,7 +37,7 @@ function formRefresh (event) {
   const elForm = event.target.form;
 
   // Can progress iff there's at least one individual bounding_box to upload
-  elForm.save.disabled = !Array.from(elForm.elements).find((el) => {
+  elForm.clear_all.disabled = elForm.save.disabled = !Array.from(elForm.elements).find((el) => {
     return el.name.startsWith('bounding_box:') && el.value;
   });
 
@@ -157,9 +157,26 @@ function formRefresh (event) {
   }
 }
 
-function formSubmit (elForm) {
+function formSubmit (event) {
+  const elForm = event.submitter.form;
+
+  if (event.submitter.name === 'clear_all' && !window.confirm(elForm.getAttribute('data-locale-warnclear'))) {
+    return false;
+  }
+
   return Promise.resolve().then(() => {
     elForm.classList.add('rendering');
+
+    // Clear all bounding boxes first, triggering mass deletion
+    if (event.submitter.name === 'clear_all') {
+      Array.from(elForm.elements).forEach((el) => {
+        if (el.name.startsWith('bounding_box:')) {
+          el.value = '';
+        }
+      });
+    }
+
+    // If we already have an image_id, skip upload-image step
     if (elForm.image_id.value) return;
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
 
@@ -181,11 +198,21 @@ function formSubmit (elForm) {
       body: new FormData(elForm)
     });
   }).then((data) => {
-    Object.keys(data).forEach((k) => {
-      if (elForm[k]) {
-        elForm[k].value = JSON.stringify(data[k]);
-      }
-    });
+    if (event.submitter.name === 'clear_all') {
+      // Clear out evidence of previous individuals
+      elForm.elements['slide-label'].value = '';
+      elForm.elements.individual.selectedIndex = 0;
+      elForm.elements.selection.value = '';
+      elForm.querySelector(':scope .individuals').innerHTML = '';
+      elForm.image_file.phIndividuals = undefined;
+      elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
+    } else {
+      Object.keys(data).forEach((k) => {
+        if (elForm[k]) {
+          elForm[k].value = JSON.stringify(data[k]);
+        }
+      });
+    }
   }).finally(() => {
     elForm.classList.remove('rendering');
     elForm.selection.dispatchEvent(changeEvent()); // To update data view
@@ -201,7 +228,7 @@ export function init (parent) {
     });
     elForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      formSubmit(elForm);
+      formSubmit(event);
     });
     elForm.querySelector(':scope .label_help>ul').innerHTML = window.mApi.labelHelp().map((x) => '<li>' + x + '</li>').join('\n');
   });

@@ -60,7 +60,7 @@
 
   <div class="tab-pane show active" id="ingest-tab-pane" role="tabpanel" aria-labelledby="ingest-tab" tabindex="0">
 
-  <form class="ingest-form mt-2" data-locale-warnexisting="{% translate 'There are already %d individuals uploaded with this label' %}">
+  <form class="ingest-form mt-2" data-locale-warnclear="{% translate 'This will remove all individuals associated with this image. Are you sure?' %}" data-locale-warnexisting="{% translate 'There are already %d individuals uploaded with this label' %}">
     {% csrf_token %}
     {{ full_taxonomy|json_script:"full_taxonomy" }}
     <input type="hidden" name="selection" value="" />
@@ -97,6 +97,7 @@
             </span>
 
             <input type="submit" name="save" value="{% translate 'Save' %}" class="btn btn-success float-end" disabled="disabled">
+            <input type="submit" name="clear_all" value="{% translate 'Remove & reset' %}" class="btn btn-outline-danger float-end me-2" disabled="disabled">
           </div>
         </div>
       </fieldset>

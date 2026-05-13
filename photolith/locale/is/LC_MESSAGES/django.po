@@ -754,6 +754,12 @@ msgstr ""
 "myndinni, sem kemur í veg fyrir að sá einstaklingur er færður inn."
 
 #: photolith/templates/ingest/index.html
+msgid ""
+"This will remove all individuals associated with this image. Are you sure?"
+msgstr ""
+"Þetta mun fjarlægja alla einstaklinga sem tengjast þessari mynd. Ertu viss?"
+
+#: photolith/templates/ingest/index.html
 #, python-format
 msgid "There are already %%d individuals uploaded with this label"
 msgstr "Það eru nú þegar %%d einstaklingar með þessi einkenni í kerfinu"
@@ -789,6 +795,10 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 msgid "Auto crop"
 msgstr "Sjálfvirk aðlögun stærðar"
+
+#: photolith/templates/ingest/index.html
+msgid "Remove & reset"
+msgstr "Fjarlægja og endurstilla"
 
 #: photolith/templates/ingest/index.html
 #: photolith/templates/search/index.html
