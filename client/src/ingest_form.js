@@ -153,9 +153,9 @@ function formRefresh (event) {
 
 function formSubmit (elForm) {
   return Promise.resolve().then(() => {
+    elForm.classList.add('rendering');
     if (elForm.image_id.value) return;
     if (!elForm.image_file.phBlob) throw new Error('Missing file, nothing to upload');
-    elForm.classList.add('rendering');
 
     // Image not already uploaded, so upload it
     return jsonFetch('/ingest/upload-image/', {
