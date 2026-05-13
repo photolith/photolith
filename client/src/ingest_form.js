@@ -20,6 +20,19 @@ function checkExisting (labels, warnMsg) {
   });
 }
 
+/** Return data element for currently selected individual */
+function getSelectedIndividualData (elForm) {
+  if (elForm.individual.selectedIndex > 0) {
+    // Single individual mode, ensure it's always selected
+    return elForm['data:' + elForm.individual.options[elForm.individual.selectedIndex].value];
+  }
+  if (elForm.elements.selection.value.startsWith('bounding_box:')) {
+    // Bounding box is selected, select corresponding individual
+    return elForm['data:' + elForm.elements.selection.value.replace(/^bounding_box:/, '')];
+  }
+  return null;
+}
+
 function formRefresh (event) {
   const elForm = event.target.form;
 
@@ -98,32 +111,23 @@ function formRefresh (event) {
   }
 
   if (event.target.name === 'selection') {
-    let selIndividual = null;
-
-    if (elForm.individual.selectedIndex > 0) {
-      // Single individual is selected, show it's metadata regardless
-      selIndividual = elForm.individual.options[elForm.individual.selectedIndex].value;
-    } else if (event.target.value.startsWith('bounding_box:')) {
-      // Bounding box is selected, show it's metadata
-      selIndividual = event.target.value.replace(/^bounding_box:/, '');
-    }
+    const elData = getSelectedIndividualData(elForm);
 
     // Hide form if nothing selected
-    elForm.querySelector(':scope .label_help').classList.toggle('d-none', selIndividual !== null);
-    elForm.querySelector(':scope .individual-data').classList.toggle('d-none', selIndividual === null);
+    elForm.querySelector(':scope .label_help').classList.toggle('d-none', elData !== null);
+    elForm.querySelector(':scope .individual-data').classList.toggle('d-none', elData === null);
 
-    if (selIndividual !== null) {
-      const ids = JSON.parse((elForm[`data:${selIndividual}`] || {}).value || '{}');
+    if (elData !== null) {
       const elTBody = elForm.querySelector(':scope .individual-data tbody');
       elTBody.innerHTML = ''; // Remove any previous selections
-      populateIndividualData(ids, elTBody, 'form');
+      populateIndividualData(JSON.parse(elData.value || '{}'), elTBody, 'form');
     }
   }
 
   if (event.target.classList.contains('ph-meta')) {
     // Sync ph-meta elements up with JSON, which gets submitted server-side
     // NB: Sending ph-meta elements directly server-side may be more sensible long-term
-    const dataEl = elForm[elForm.elements.selection.value.replace(/^bounding_box:/, 'data:')];
+    const dataEl = getSelectedIndividualData(elForm);
     if (!dataEl) return;
 
     dataEl.value = JSON.stringify(updateDataObject(JSON.parse(dataEl.value || '{}'), event.target));
@@ -131,7 +135,7 @@ function formRefresh (event) {
 
   if (event.target.classList.contains('ph-meta-copy')) {
     // Sync current data up with any other
-    const sourceDataEl = elForm[elForm.elements.selection.value.replace(/^bounding_box:/, 'data:')];
+    const sourceDataEl = getSelectedIndividualData(elForm);
     if (!sourceDataEl) return;
     const sourceData = JSON.parse(sourceDataEl.value || '{}');
 
