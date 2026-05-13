@@ -288,23 +288,26 @@ class DataViewTest(RequiresUtils, TestCase):
             )
 
         # A filtered subset is fine
-        out = [
-            (r["id"] if "id" in r else r)
-            for r in self.data(userA, dict(nm_category=[4, 5]))
-        ]
-        self.assertEqual(out, list(range(41, 61)))
+        out = self.data(userA, dict(nm_category=[4, 5]), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"] if "id" in r else r) for r in out["data"]], list(range(41, 61))
+        )
 
         # Every possible result results in truncated response
-        out = [(r["id"] if "id" in r else r) for r in self.data(userA, dict())]
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "alert"]))
         self.assertEqual(
-            out,
-            list(range(1, settings.SEARCH_RESULT_MAX_ROWS + 1))
-            + [
-                dict(
-                    truncated="Too many results, only first %d returned"
-                    % settings.SEARCH_RESULT_MAX_ROWS
-                )
-            ],
+            [(r["id"] if "id" in r else r) for r in out["data"]],
+            list(range(1, settings.SEARCH_RESULT_MAX_ROWS + 1)),
+        )
+        self.assertEqual(
+            out["alert"],
+            {
+                "level": "warning",
+                "messageHTML": "Too many results, only first 100 returned",
+                "timeout": 0,
+            },
         )
 
 

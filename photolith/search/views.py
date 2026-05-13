@@ -213,11 +213,14 @@ class DataView(LoginRequiredMixin, View):
         for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
             result_count += 1
             if result_count > settings.SEARCH_RESULT_MAX_ROWS:
-                yield dict(
-                    truncated=_("Too many results, only first %d returned")
-                    % settings.SEARCH_RESULT_MAX_ROWS
+                return dict(
+                    alert=dict(
+                        level="warning",
+                        messageHTML=_("Too many results, only first %d returned")
+                        % settings.SEARCH_RESULT_MAX_ROWS,
+                        timeout=0,
+                    )
                 )
-                break
 
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
