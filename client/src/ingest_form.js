@@ -38,12 +38,18 @@ function formRefresh (event) {
     elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
     elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     elForm.classList.add('rendering');
-    // Update rest of form to match new sample
-    return (event.target.value ? window.mApi.sampleDetail(event.target.value) : Promise.resolve([])).then((individuals) => {
+    // Update rest of form to match new sample, getting data from fileset or mApi if none provided
+    return Promise.resolve().then(() => {
+      if (elForm.image_file.phIndividuals) return elForm.image_file.phIndividuals;
+      if (event.target.value) return window.mApi.sampleDetail(event.target.value);
+      return [];
+    }).then((individuals) => {
       if (!individuals) individuals = []; // Do nothing if no individuals returned
 
       // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
-      checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
+      if (!elForm.image_file.phIndividuals) {
+        checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
+      }
 
       elForm.querySelector(':scope .individuals').innerHTML = individuals.map((ind, indIdx) => {
         return `
@@ -54,6 +60,7 @@ function formRefresh (event) {
       individuals.forEach((ind, indIdx) => {
         elForm.elements.individual.append(new window.Option(window.mApi.individualLabel(ind), indIdx));
         elForm[`data:${indIdx}`].value = JSON.stringify(ind);
+        elForm[`bounding_box:${indIdx}`].value = ind.bounding_box ? JSON.stringify(ind.bounding_box) : '';
         elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';

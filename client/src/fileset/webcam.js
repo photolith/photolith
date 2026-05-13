@@ -47,7 +47,7 @@ export class WebcamFileSet {
       // Open a new video stream
       return navigator.mediaDevices.getUserMedia({ video: { deviceId: this.deviceId, facingMode: 'environment' } }).then((stream) => {
         this.video = document.createElement('VIDEO');
-        this.video.name = stream.getVideoTracks()[0].label; // NB: So we can later extract a filename from the element
+        this.streamLabel = stream.getVideoTracks()[0].label; // NB: So we can later extract a filename from the element
         this.video.setAttribute('style', this.elViewer.querySelector(':scope>.canvas-container').getAttribute('style'));
         this.video.style.display = 'none';
         this.video.srcObject = stream;
@@ -66,7 +66,7 @@ export class WebcamFileSet {
     }).then(() => {
       this.video.pause();
       // NB: Can be anything createImageBitmap supports: https://developer.mozilla.org/en-US/docs/Web/API/CreateImageBitmap
-      return this.video;
+      return { blob: this.video, name: this.streamLabel };
     }).finally(() => {
       // Hide video object, view canvas underneath
       if (this.video) { // NB: close() might have destroyed it already
