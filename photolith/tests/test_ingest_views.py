@@ -56,6 +56,8 @@ class IndexViewTest(RequiresUtils, TestCase):
 
 
 class UploadViewTest(RequiresUtils, TestCase):
+    maxDiff = None
+
     def form_post(
         self,
         user,
@@ -122,6 +124,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         )
 
         # Create 2 individuals
+        image = self.create_image()
         user = self.create_user(groups=["Ingest"])
         out = self.form_post(
             user,
@@ -143,6 +146,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     _bb=None,
                 ),
             ],
+            image=image,
         )
         self.assertEqual(
             out,
@@ -199,6 +203,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     _bb=[[0, 0], [920, 100]],
                 ),
             ],
+            image=image,
         )
         self.assertEqual(
             out,
@@ -206,7 +211,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 "alert": dict(
                     level="success",
                     messageHTML="Created 1 individual. <br><a "
-                    'href="/search/?nm_image_id=4&nm_image_id=4" '
+                    'href="/search/?nm_image_id=3&nm_image_id=3" '
                     'target="_blank">Show individuals</a>',
                 ),
                 # NB: data:* index corresponds to the above, not DB index
@@ -247,6 +252,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     id=inds[1].id,
                 ),
             ],
+            image=image,
         )
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(
@@ -255,7 +261,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 "alert": dict(
                     level="success",
                     messageHTML="Created 1 individual. Updated 2 individuals. <br><a "
-                    'href="/search/?nm_image_id=5&nm_image_id=5" '
+                    'href="/search/?nm_image_id=3&nm_image_id=3" '
                     'target="_blank">Show individuals</a>',
                 ),
                 "data:0": {
@@ -286,6 +292,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     nm_length=100,
                 )
             ],
+            image=image,
         )
         inds = Individual.objects.all().order_by("pk")
         self.assertEqual(len(inds), 5)
@@ -295,7 +302,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 "alert": dict(
                     level="success",
                     messageHTML="Created 1 individual. <br><a "
-                    'href="/search/?nm_image_id=6&nm_image_id=6" '
+                    'href="/search/?nm_image_id=3&nm_image_id=3" '
                     'target="_blank">Show individuals</a>',
                 ),
                 "data:0": {"id": inds[4].id, "nm_length": 100.0},
@@ -325,6 +332,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     id=inds[2].id,
                 ),
             ],
+            image=image,
         )
         self.assertEqual(
             out,
@@ -332,7 +340,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 "alert": {
                     "level": "success",
                     "messageHTML": "Updated 1 individual. Deleted 1 individual. <br><a "
-                    'href="/search/?nm_image_id=7&nm_image_id=7" '
+                    'href="/search/?nm_image_id=3&nm_image_id=3" '
                     'target="_blank">Show individuals</a>',
                 },
                 "data:0": {
@@ -369,6 +377,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                     id=3,
                 ),
             ],
+            image=image,
         )
         self.assertEqual(
             out,
@@ -376,7 +385,7 @@ class UploadViewTest(RequiresUtils, TestCase):
                 "alert": {
                     "level": "success",
                     "messageHTML": "Updated 2 individuals. <br><a "
-                    'href="/search/?nm_image_id=8&nm_image_id=8" '
+                    'href="/search/?nm_image_id=3&nm_image_id=3" '
                     'target="_blank">Show individuals</a>',
                 },
                 "data:0": {
@@ -410,23 +419,263 @@ class UploadViewTest(RequiresUtils, TestCase):
                     id=3,
                 ),
             ],
+            image=image,
         )
         self.assertEqual(
             out,
-            {
-                "alert": {
-                    "level": "success",
-                    "messageHTML": "Updated 1 individual. <br><a "
-                    'href="/search/?nm_image_id=9&nm_image_id=9" '
-                    'target="_blank">Show individuals</a>',
+            (
+                500,
+                {
+                    "error_class": "PermissionDenied",
+                    "error": "Cannot edit Individual %d, was created by %s not you"
+                    % (3, inds[3].created_by.username),
                 },
-                # NB: ID has changed
-                "data:0": {
-                    "id": 7,
-                    "nm_length": 100.0,
-                    "tx_species": {"en": "Fish", "id": 100, "is": "Fiskur"},
-                },
-            },
+            ),
+        )
+
+    def test_post__annotated_individual(self):
+        """Cannot edit or delete an individual once it has annotations"""
+        user = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+
+        # Without annotations, updates go through normally
+        ind = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=user,
+            data=dict(nm_length=100),
+        )
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    nm_length=150,
+                    _bb=[[0, 0], [110, 110]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, [[0, 0], [110, 110]])
+        self.assertEqual(ind.data["nm_length"], 150.0)
+
+        # Once it has an annotation, updates are blocked
+        self.create_annotation(individual=ind)
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, has already been annotated %d times"
+                    % (str(ind), 1),
+                ),
+            ),
+        )
+        # The individual is unchanged
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, [[0, 0], [110, 110]])
+        self.assertEqual(ind.data["nm_length"], 150.0)
+
+        # ...and deletes (clearing the bounding box) are blocked too
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    nm_length=150,
+                    _bb=None,
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, has already been annotated %d times"
+                    % (str(ind), 1),
+                ),
+            ),
+        )
+        self.assertTrue(Individual.objects.filter(pk=ind.id).exists())
+
+        # The count of annotations is reflected in the error message
+        self.create_annotation(individual=ind)
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, has already been annotated %d times"
+                    % (str(ind), 2),
+                ),
+            ),
+        )
+
+        # Submitting an annotated individual stops the rest of the batch
+        # from being processed
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [300, 300]],
+                    id=ind.id,
+                ),
+                dict(
+                    nm_length=300,
+                    _bb=[[0, 0], [50, 50]],
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, has already been annotated %d times"
+                    % (str(ind), 2),
+                ),
+            ),
+        )
+        self.assertEqual(
+            list(Individual.objects.filter(image=image).values_list("pk", flat=True)),
+            [ind.id],
+        )
+
+    def test_post__superuser_edits_any(self):
+        """Superusers can edit individuals regardless of ownership"""
+        owner = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        ind = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+
+        # A non-superuser, non-owner can't edit it
+        other = self.create_user(groups=["Ingest"])
+        out = self.form_post(
+            other,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, was created by %s not you"
+                    % (str(ind), owner.username),
+                ),
+            ),
+        )
+
+        # A superuser can update it
+        superuser = self.create_user(groups=[])
+        superuser.is_superuser = True
+        superuser.save()
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, [[0, 0], [200, 200]])
+        self.assertEqual(ind.data["nm_length"], 200.0)
+        # Ownership is preserved across a superuser edit
+        self.assertEqual(ind.created_by, owner)
+
+        # A superuser can also delete it
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=None,
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        self.assertIn("Deleted 1 individual", out["alert"]["messageHTML"])
+        self.assertFalse(Individual.objects.filter(pk=ind.id).exists())
+
+        # Annotation rules still apply: superusers can't edit annotated individuals
+        ind2 = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+        self.create_annotation(individual=ind2)
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind2.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(
+            out,
+            (
+                500,
+                dict(
+                    error_class="PermissionDenied",
+                    error="Cannot edit %s, has already been annotated %d times"
+                    % (str(ind2), 1),
+                ),
+            ),
         )
 
     def test_post__searchquerystring(self):

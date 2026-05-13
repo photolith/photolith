@@ -20,3 +20,22 @@ def check_annotate_access(project, user, rw=False):
             raise PermissionDenied(
                 "Contact an administrator to be added to the general annotation group"
             )
+
+
+def check_individual_edit_access(ind, user):
+    if ind.num_annotations > 0:
+        raise PermissionDenied(
+            "Cannot edit %s, has already been annotated %d times"
+            % (
+                ind,
+                ind.num_annotations,
+            )
+        )
+    if not user.is_superuser and ind.created_by != user:
+        raise PermissionDenied(
+            "Cannot edit %s, was created by %s not you"
+            % (
+                ind,
+                ind.created_by,
+            )
+        )

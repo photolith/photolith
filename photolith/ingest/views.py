@@ -12,10 +12,12 @@ from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
+from django.db.models import Count
 
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
 from ..models import Image, Individual, Taxonomy
+from ..perm_utils import check_individual_edit_access
 
 
 class IndexView(PermissionRequiredMixin, TemplateView):
@@ -114,6 +116,16 @@ class UploadView(PermissionRequiredMixin, View):
         )
         image.save()
 
+        # Prefetch all existing individuals for images
+        existing_inds = {
+            i.id: i
+            for i in (
+                Individual.objects.filter(image=image).annotate(
+                    num_annotations=Count("annotation")
+                )
+            )
+        }
+
         out = {}
         created_inds = {}
         updated_inds = {}
@@ -129,14 +141,9 @@ class UploadView(PermissionRequiredMixin, View):
             )
 
             # If an ID is given, fetch any existant individual
-            ind = (
-                Individual.objects.filter(
-                    pk=int(ind_data["id"]),
-                    created_by=self.request.user,
-                ).first()
-                if ind_data.get("id")
-                else None
-            )
+            ind = existing_inds.get(ind_data["id"]) if "id" in ind_data else None
+            if ind:
+                check_individual_edit_access(ind, self.request.user)
 
             # No bounding box --> this individual shouldn't exist
             if not ind_bounding_box:
@@ -169,7 +176,7 @@ class UploadView(PermissionRequiredMixin, View):
 
         alert = ""
         alert_status = "success"
-        if len(created_inds) == 0 and len(updated_inds) == 0:
+        if len(created_inds) == 0 and len(updated_inds) == 0 and len(deleted_inds) == 0:
             alert += _("No individual boxes on image! Nothing saved.")
             alert_status = "warning"
         if len(created_inds) > 0:
