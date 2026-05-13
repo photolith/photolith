@@ -2,6 +2,7 @@ import codecs
 import csv
 import datetime
 import itertools
+import json
 import logging
 import re
 
@@ -25,30 +26,35 @@ class StreamingCsvResponse(StreamingHttpResponse):
                 def write(self, value):
                     return value
 
-            # Extract fieldnames by reading first row early
-            try:
-                first_row = next(rows)
-                fieldnames = [
-                    k for k in first_row.keys() if k not in ("id", "__str__")
-                ] + (force_cols or [])
-                rows = itertools.chain([first_row], rows)
-            except StopIteration:
-                # Nothing in search, return empty CSV
-                return
-
             writer = csv.writer(Echo())
             yield codecs.BOM_UTF8  # BOM triggers Excel to decode as UTF8
-            yield writer.writerow(re.sub(r"^\w{2}_", "", f) for f in fieldnames)
-            for row in rows:
-                row_out = []
-                for n in fieldnames:
-                    if isinstance(row.get(n), dict):  # Taxonomy
-                        row_out.append(row[n]["id"])
-                    elif isinstance(row.get(n), datetime.date):
-                        row_out.append(row[n].isoformat())
-                    else:
-                        row_out.append(row.get(n))
-                yield writer.writerow(row_out)
+
+            fieldnames = None
+            try:
+                while True:
+                    row = next(rows)
+
+                    # If header hasn't been sent, do that now
+                    if fieldnames is None:
+                        fieldnames = [
+                            k for k in row.keys() if k not in ("id", "__str__")
+                        ] + (force_cols or [])
+                        yield writer.writerow(
+                            re.sub(r"^\w{2}_", "", f) for f in fieldnames
+                        )
+
+                    row_out = []
+                    for n in fieldnames:
+                        if isinstance(row.get(n), dict):  # Taxonomy
+                            row_out.append(row[n]["id"])
+                        elif isinstance(row.get(n), datetime.date):
+                            row_out.append(row[n].isoformat())
+                        else:
+                            row_out.append(row.get(n))
+                    yield writer.writerow(row_out)
+            except StopIteration as e:
+                if e.value is not None:
+                    yield writer.writerow([json.dumps(e.value)])
 
         kwargs["streaming_content"] = csv_rowgen(streaming_content or [])
         kwargs["content_type"] = "text/csv"
