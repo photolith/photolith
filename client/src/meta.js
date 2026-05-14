@@ -51,7 +51,7 @@ export function renderMetaCell (k, data, type, row, meta) {
     }
     if (k.startsWith('tx')) {
       return `<select multiple name="${k}" class="form-select" id="${meta.control_id}">
-          ${data.choices.map((tx) => `<option value="${tx.id}" ${data.val.indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
+          ${(data.choices || []).map((tx) => `<option value="${tx.id}" ${data.val.indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
         </select>`;
     }
     if (k.startsWith('dt')) {

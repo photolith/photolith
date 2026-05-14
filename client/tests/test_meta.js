@@ -96,6 +96,29 @@ test('renderMetaCell:form', function (test) {
   test.end();
 });
 
+test('renderMetaCell:search-form', function (test) {
+  setupDom(test, '<html lang="en-gb"></html>');
+
+  const meta = { control_id: 'filter-tx_sex-control' };
+
+  // Taxonomy with choices renders an <option> for each, marking matches as selected
+  test.deepEqual(renderMetaCell('tx_sex', {
+    val: ['1'],
+    choices: [
+      { id: 1, en: 'M.', is: 'Ka.' },
+      { id: 2, en: 'F.', is: 'Kv.' }
+    ]
+  }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
+  '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> <option value="1" selected>1: M.</option>,<option value="2" >2: F.</option> </select>');
+
+  // Taxonomy without choices renders an empty <select> rather than throwing
+  // (happens when a tx_* field is added via search querystring with no metaFields entry)
+  test.deepEqual(renderMetaCell('tx_sex', { val: [] }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
+    '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> </select>');
+
+  test.end();
+});
+
 test('populateIndividualData', function (test) {
   const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
 
