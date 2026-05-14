@@ -18,6 +18,16 @@ class ImageTest(RequiresUtils, TestCase):
             0.2773500981126146,
         )
 
+        # No div/0 errors
+        self.assertEqual(
+            px_to_mm([(10, 20), (10, 20)], 10),
+            None,
+        )
+        self.assertEqual(
+            px_to_mm([(10, 20), (10, 30)], 0),
+            None,
+        )
+
         self.assertEqual(px_to_mm([(10, 20), (30, 50)], None), None)
 
 

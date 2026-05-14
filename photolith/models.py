@@ -111,7 +111,10 @@ class Image(models.Model):
     def px_to_mm(self):
         if not self.scale_mm:
             return None
-        return self.scale_mm / euclidean_dist(self.scale_line[0], self.scale_line[1])
+        px_length = euclidean_dist(self.scale_line[0], self.scale_line[1])
+        if px_length == 0:
+            return None
+        return self.scale_mm / px_length
 
 
 class Individual(models.Model):
