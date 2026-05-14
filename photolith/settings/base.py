@@ -173,8 +173,11 @@ MEDIA_URL = "/media/"
 AWS_S3_OBJECT_PARAMETERS = {}
 
 # Logging
+# https://docs.djangoproject.com/en/6.0/topics/logging/#configuring-logging
+# https://docs.djangoproject.com/en/6.0/ref/logging/#default-logging-configuration
 LOGGING = {
     "version": 1,
+    "disable_existing_loggers": False,
     "handlers": {
         "console": {
             "level": "DEBUG",
@@ -182,6 +185,10 @@ LOGGING = {
         },
     },
     "loggers": {},
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
 }
 
 # Photolith search
