@@ -1,5 +1,5 @@
 import { blobFetch } from './fetch.js';
-import { toImageBitmap } from './image.js';
+import { toImageBitmap } from './image/decode.js';
 
 export function init (parent) {
   parent.querySelectorAll('div.ph-cropped-viewer').forEach((elViewer) => {
