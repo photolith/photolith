@@ -2,6 +2,7 @@ import { fabric } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
+import { thresholdLocalOtsu, iterPixelsInRect } from '../image/threshold.js';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 const rgbInvalid = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-danger-rgb');
@@ -47,8 +48,6 @@ function validScale (l, bgWidth, bgHeight) {
 
 // Find bounding box of object at (startX, startY) in (bkgdImg)
 function autoCrop (bkgdImg, startX, startY) {
-  // All channels should be within tolerance to match
-  const tolerance = 0.4 * 255;
   // Reduce resolution of our working offscreen image, means:
   // * We take an average for the reference pixel
   // * We reduce the getImageData() calls, which are very slow on FireFox
@@ -56,15 +55,10 @@ function autoCrop (bkgdImg, startX, startY) {
   // Rougly scale image to 512 pixels wide
   const rescale = bkgdImg._originalElement.width > 512 ? 1 / Math.round(bkgdImg._originalElement.width / 512) : 1;
 
-  // Does at least one pixel in (data) match (reference)?
-  function withinObject (data, reference) {
-    for (let i = 0; i < data.length; i += 4) {
-      // Assume transparent actually means off the edge of the screen
-      if (data[i + 3] < 255) return false;
-      // If difference in all channels is less than tolerance, return true
-      if ((Math.abs(data[i + 0] - reference[0]) < tolerance) &&
-          (Math.abs(data[i + 1] - reference[1]) < tolerance) &&
-          (Math.abs(data[i + 2] - reference[2]) < tolerance)) return true;
+  // Does at least one pixel in (iterData) match (reference)?
+  function withinObject (iterData, reference) {
+    for (const d of iterData) {
+      if ((d & 0x1) === (reference & 0x1)) return true;
     }
   }
 
@@ -87,10 +81,15 @@ function autoCrop (bkgdImg, startX, startY) {
     context = bkgdImg.phOffScreen.getContext('2d', { willReadFrequently: true });
   }
 
-  // Find reference pixel color
-  const reference = context.getImageData(startX * rescale, startY * rescale, 1, 1, { colorSpace: 'srgb' }).data;
-  // Reference outside image, can't do anything
-  if (reference[3] < 255) return null;
+  // Generate monochrome thresholded vesion if not already present
+  if (!bkgdImg.phThresholded) {
+    bkgdImg.phThresholded = thresholdLocalOtsu(context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }));
+    // document.body.append(debugPreview(bkgdImg.phThresholded));
+  }
+  const thresholdedImage = bkgdImg.phThresholded;
+
+  // Find reference pixel state
+  const reference = thresholdedImage[Math.floor(startY * rescale) * thresholdedImage.phWidth + Math.floor(startX * rescale)];
 
   // Draw box around edge, fetch data & expand if within object, stop once nothing more to find
   let x1 = Math.floor(startX * rescale) - 1;
@@ -101,22 +100,22 @@ function autoCrop (bkgdImg, startX, startY) {
   while (updated) {
     updated = false;
     // top
-    if (withinObject(context.getImageData(x1, y1, x2 - x1, 1, { colorSpace: 'srgb' }).data, reference)) {
+    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y1, x2, y1), reference)) {
       updated = true;
       y1--;
     }
     // right
-    if (withinObject(context.getImageData(x2, y1, 1, y2 - y1, { colorSpace: 'srgb' }).data, reference)) {
+    if (withinObject(iterPixelsInRect(thresholdedImage, x2, y1, x2, y2), reference)) {
       updated = true;
       x2++;
     }
     // bottom
-    if (withinObject(context.getImageData(x1, y2, x2 - x1, 1, { colorSpace: 'srgb' }).data, reference)) {
+    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y2, x2, y2), reference)) {
       updated = true;
       y2++;
     }
     // left
-    if (withinObject(context.getImageData(x1, y1, 1, y2 - y1, { colorSpace: 'srgb' }).data, reference)) {
+    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y1, x1, y2), reference)) {
       updated = true;
       x1--;
     }
