@@ -192,6 +192,24 @@ export function thresholdLocalOtsu (imageData, blockSize) {
 }
 
 /**
+ * Ensure the binary threshold bit treats 0 as the majority class, so we can
+ * assume that the background is 0, and foreground is 1.
+ * If 1s outnumer 0s in mono, flip the LSB so the foreground is 1 again.
+ *
+ * @param {Uint8ClampedArray} mono - Output of `thresholdOtsu` /
+ *   `thresholdLocalOtsu`. Modified in place.
+ * @returns {Uint8ClampedArray} The same array, for chaining.
+ */
+export function normaliseSelection (mono) {
+  let ones = 0;
+  for (let i = 0; i < mono.length; i += 1) ones += mono[i] & 1;
+  if (ones * 2 > mono.length) {
+    for (let i = 0; i < mono.length; i += 1) mono[i] ^= 1;
+  }
+  return mono;
+}
+
+/**
  * Return a canvas displaying the thresholded image for debugging
  *
  * @param {Uint8ClampedArray} mono - Output of `thresholdOtsu`. Must carry

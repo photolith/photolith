@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { thresholdOtsu, thresholdLocalOtsu } from '../src/image/threshold.js';
+import { thresholdOtsu, thresholdLocalOtsu, normaliseSelection } from '../src/image/threshold.js';
 
 function makeImageData (width, height, pixels) {
   const data = new Uint8ClampedArray(width * height * 4);
@@ -170,6 +170,63 @@ test('thresholdLocalOtsu:isolated_bright_spike_is_above_local_mean', function (t
   test.equal(out[25 * W + 25] & 0xFE, 250, 'Spike luminance preserved');
   test.equal(out[0] & 1, 0, 'Corner far from spike stays at bit 0');
   test.equal(out[(W * H) - 1] & 1, 0, 'Opposite corner stays at bit 0');
+  test.end();
+});
+
+test('normaliseSelection:zeros_majority_unchanged', function (test) {
+  // Three 0s and one 1 in bit 0: 0 is already the majority, so the array
+  // should be returned untouched. Upper bits must be preserved either way.
+  const mono = new Uint8ClampedArray([100, 100, 100, 201]);
+  const out = normaliseSelection(mono);
+
+  test.equal(out, mono, 'Returns the same array (in place)');
+  test.deepEqual(Array.from(out), [100, 100, 100, 201], 'Bits untouched when 0 is majority');
+  test.end();
+});
+
+test('normaliseSelection:ones_majority_flipped', function (test) {
+  // Three 1s and one 0: flip bit 0 across the whole array so 1 becomes the
+  // minority. Upper 7 bits must survive the flip.
+  const mono = new Uint8ClampedArray([100, 201, 201, 201]);
+  normaliseSelection(mono);
+
+  test.deepEqual(Array.from(mono), [101, 200, 200, 200], 'Bit 0 flipped everywhere when 1 was majority');
+  test.end();
+});
+
+test('normaliseSelection:tie_unchanged', function (test) {
+  // Equal counts (2 zeros, 2 ones) — 1 is not *more* common than 0, so no flip.
+  const mono = new Uint8ClampedArray([100, 100, 201, 201]);
+  normaliseSelection(mono);
+
+  test.deepEqual(Array.from(mono), [100, 100, 201, 201], 'No flip when counts tie');
+  test.end();
+});
+
+test('normaliseSelection:preserves_threshold_metadata', function (test) {
+  // phWidth/phHeight set by thresholdOtsu must survive normalisation, since
+  // downstream iterators rely on them.
+  const out = thresholdOtsu(makeImageData(2, 2, [
+    [50, 50, 50], [50, 50, 50],
+    [200, 200, 200], [200, 200, 200]
+  ]));
+  normaliseSelection(out);
+
+  test.equal(out.phWidth, 2, 'phWidth preserved');
+  test.equal(out.phHeight, 2, 'phHeight preserved');
+  test.end();
+});
+
+test('normaliseSelection:bulk_flip_on_mostly_ones', function (test) {
+  // 100-pixel array with 70 ones and 30 zeros — well past the majority
+  // threshold, so the whole array should flip.
+  const mono = new Uint8ClampedArray(100);
+  for (let i = 0; i < 100; i += 1) mono[i] = i < 70 ? 1 : 0;
+  normaliseSelection(mono);
+
+  let ones = 0;
+  for (let i = 0; i < 100; i += 1) ones += mono[i] & 1;
+  test.equal(ones, 30, 'After normalisation, 1s are the minority');
   test.end();
 });
 

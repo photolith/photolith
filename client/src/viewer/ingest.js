@@ -2,7 +2,7 @@ import { fabric } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
-import { thresholdLocalOtsu, iterPixelsInRect } from '../image/threshold.js';
+import { thresholdLocalOtsu, iterPixelsInRect, normaliseSelection } from '../image/threshold.js';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 const rgbInvalid = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-danger-rgb');
@@ -83,7 +83,11 @@ function autoCrop (bkgdImg, startX, startY) {
 
   // Generate monochrome thresholded vesion if not already present
   if (!bkgdImg.phThresholded) {
-    bkgdImg.phThresholded = thresholdLocalOtsu(context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }));
+    bkgdImg.phThresholded = normaliseSelection(thresholdLocalOtsu(
+      context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }),
+      // i.e. ~55 pixels
+      Math.floor(context.canvas.width * 0.053)
+    ));
     // document.body.append(debugPreview(bkgdImg.phThresholded));
   }
   const thresholdedImage = bkgdImg.phThresholded;
