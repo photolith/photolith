@@ -2,7 +2,8 @@ import { fabric } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
-import { thresholdLocalOtsu, iterPixelsInRect, normaliseSelection } from '../image/threshold.js';
+import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
+import { floodFill } from '../image/fill.js';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 const rgbInvalid = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-danger-rgb');
@@ -53,14 +54,7 @@ function autoCrop (bkgdImg, startX, startY) {
   // * We reduce the getImageData() calls, which are very slow on FireFox
   // * We have a degree of margin on the result
   // Rougly scale image to 512 pixels wide
-  const rescale = bkgdImg._originalElement.width > 512 ? 1 / Math.round(bkgdImg._originalElement.width / 512) : 1;
-
-  // Does at least one pixel in (iterData) match (reference)?
-  function withinObject (iterData, reference) {
-    for (const d of iterData) {
-      if ((d & 0x1) === (reference & 0x1)) return true;
-    }
-  }
+  const rescale = bkgdImg._originalElement.width > 1000 ? 1 / Math.round(bkgdImg._originalElement.width / 1000) : 1;
 
   // Draw background image onto offscreen canvas, get 2d context to read
   let context = null;
@@ -90,46 +84,26 @@ function autoCrop (bkgdImg, startX, startY) {
     ));
     // document.body.append(debugPreview(bkgdImg.phThresholded));
   }
-  const thresholdedImage = bkgdImg.phThresholded;
 
-  // Find reference pixel state
-  const reference = thresholdedImage[Math.floor(startY * rescale) * thresholdedImage.phWidth + Math.floor(startX * rescale)];
+  let x1 = Math.floor(startX * rescale);
+  let y1 = Math.floor(startY * rescale);
+  let x2 = x1;
+  let y2 = y1;
+  floodFill(bkgdImg.phThresholded, x1, y1, function (newX, newY) {
+    if (newX < x1) x1 = newX;
+    if (newY < y1) y1 = newY;
+    if (newX > x2) x2 = newX;
+    if (newY > y2) y2 = newY;
+  });
 
-  // Draw box around edge, fetch data & expand if within object, stop once nothing more to find
-  let x1 = Math.floor(startX * rescale) - 1;
-  let y1 = Math.floor(startY * rescale) - 1;
-  let x2 = Math.floor(startX * rescale);
-  let y2 = Math.floor(startY * rescale);
-  let updated = true;
-  while (updated) {
-    updated = false;
-    // top
-    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y1, x2, y1), reference)) {
-      updated = true;
-      y1--;
-    }
-    // right
-    if (withinObject(iterPixelsInRect(thresholdedImage, x2, y1, x2, y2), reference)) {
-      updated = true;
-      x2++;
-    }
-    // bottom
-    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y2, x2, y2), reference)) {
-      updated = true;
-      y2++;
-    }
-    // left
-    if (withinObject(iterPixelsInRect(thresholdedImage, x1, y1, x1, y2), reference)) {
-      updated = true;
-      x1--;
-    }
-  }
+  // If bounding box is zero-sized, then don't set it
+  if (x1 === x2 || y1 === y2) return null;
 
-  // offscreen pixels will bias to the top-left, make the bounding box one bigger to have a more balanced margin
-  x1 = Math.max(0, x1);
-  y1 = Math.max(0, y1);
-  x2 = Math.min(bkgdImg.phOffScreen.width, x2 + 1);
-  y2 = Math.min(bkgdImg.phOffScreen.height, y2 + 1);
+  // Expand bounding box a notch to include edges
+  x1 = Math.max(0, x1 - 2);
+  y1 = Math.max(0, y1 - 2);
+  x2 = Math.min(bkgdImg.phOffScreen.width, x2 + 2);
+  y2 = Math.min(bkgdImg.phOffScreen.height, y2 + 2);
 
   return { x1: x1 / rescale, y1: y1 / rescale, x2: x2 / rescale, y2: y2 / rescale };
 }
