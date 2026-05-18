@@ -2,7 +2,6 @@ import { fabric } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
-import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 import { floodFillBounds } from '../image/fill.js';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
@@ -45,59 +44,6 @@ function validScale (l, bgWidth, bgHeight) {
   if (l[1][0] < 0 || l[1][0] > bgWidth) return false;
   if (l[1][1] < 0 || l[1][1] > bgHeight) return false;
   return true;
-}
-
-// Find bounding box of object at (startX, startY) in (bkgdImg)
-function autoCrop (bkgdImg, startX, startY) {
-  // Reduce resolution of our working offscreen image, means:
-  // * We take an average for the reference pixel
-  // * We reduce the getImageData() calls, which are very slow on FireFox
-  // * We have a degree of margin on the result
-  // Rougly scale image to 512 pixels wide
-  const rescale = bkgdImg._originalElement.width > 1000 ? 1 / Math.round(bkgdImg._originalElement.width / 1000) : 1;
-
-  // Draw background image onto offscreen canvas, get 2d context to read
-  let context = null;
-  if (!window.OffscreenCanvas) {
-    // Don't do any cropping without being able to add an offscreen canvas
-    console.warning("Browser doesn't support OffscreenCanvas");
-    return null;
-  } else if (!bkgdImg.phOffScreen) {
-    // Attach canvas to FabricImage, so it gets thrown away when background changes
-    bkgdImg.phOffScreen = new window.OffscreenCanvas(
-      bkgdImg._originalElement.width * rescale,
-      bkgdImg._originalElement.height * rescale
-    );
-    context = bkgdImg.phOffScreen.getContext('2d', { willReadFrequently: true });
-    context.drawImage(bkgdImg._originalElement, 0, 0, bkgdImg.phOffScreen.width, bkgdImg.phOffScreen.height);
-  } else {
-    // Already got one, just open context
-    context = bkgdImg.phOffScreen.getContext('2d', { willReadFrequently: true });
-  }
-
-  // Generate monochrome thresholded vesion if not already present
-  if (!bkgdImg.phThresholded) {
-    bkgdImg.phThresholded = normaliseSelection(thresholdLocalOtsu(
-      context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }),
-      // i.e. ~55 pixels
-      Math.floor(context.canvas.width * 0.053)
-    ));
-    // document.body.append(debugPreview(bkgdImg.phThresholded));
-  }
-
-  // Find bounds of selected area, scaling to/from actual image size
-  const crop = floodFillBounds(
-    bkgdImg.phThresholded,
-    Math.floor(startX * rescale),
-    Math.floor(startY * rescale),
-    2 // Border around cropped area
-  );
-  if (!crop) return null;
-  crop.x1 = crop.x1 / rescale;
-  crop.y1 = crop.y1 / rescale;
-  crop.x2 = crop.x2 / rescale;
-  crop.y2 = crop.y2 / rescale;
-  return crop;
 }
 
 export class PhCropper extends PhSyncingViewer {
@@ -187,8 +133,19 @@ export class PhCropper extends PhSyncingViewer {
     });
 
     obj.on('mousedblclick', (opt) => {
-      const crop = autoCrop(opt.target.canvas.backgroundImage, opt.absolutePointer.x, opt.absolutePointer.y);
+      // Find bounds of selected object in thresholded bitmap
+      const [image, rescale] = this.thresholdedImage();
+      const crop = floodFillBounds(
+        image,
+        Math.floor(opt.absolutePointer.x * rescale),
+        Math.floor(opt.absolutePointer.y * rescale),
+        2 // Border around cropped area
+      );
       if (!crop) return;
+      crop.x1 = crop.x1 / rescale;
+      crop.y1 = crop.y1 / rescale;
+      crop.x2 = crop.x2 / rescale;
+      crop.y2 = crop.y2 / rescale;
 
       obj.set({
         left: crop.x1,
