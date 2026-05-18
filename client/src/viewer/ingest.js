@@ -3,7 +3,7 @@ import { fabric } from 'fabric';
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
-import { floodFill } from '../image/fill.js';
+import { floodFillBounds } from '../image/fill.js';
 
 const rgbHighlight = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-info-rgb');
 const rgbInvalid = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-danger-rgb');
@@ -85,27 +85,19 @@ function autoCrop (bkgdImg, startX, startY) {
     // document.body.append(debugPreview(bkgdImg.phThresholded));
   }
 
-  let x1 = Math.floor(startX * rescale);
-  let y1 = Math.floor(startY * rescale);
-  let x2 = x1;
-  let y2 = y1;
-  floodFill(bkgdImg.phThresholded, x1, y1, function (newX, newY) {
-    if (newX < x1) x1 = newX;
-    if (newY < y1) y1 = newY;
-    if (newX > x2) x2 = newX;
-    if (newY > y2) y2 = newY;
-  });
-
-  // If bounding box is zero-sized, then don't set it
-  if (x1 === x2 || y1 === y2) return null;
-
-  // Expand bounding box a notch to include edges
-  x1 = Math.max(0, x1 - 2);
-  y1 = Math.max(0, y1 - 2);
-  x2 = Math.min(bkgdImg.phOffScreen.width, x2 + 2);
-  y2 = Math.min(bkgdImg.phOffScreen.height, y2 + 2);
-
-  return { x1: x1 / rescale, y1: y1 / rescale, x2: x2 / rescale, y2: y2 / rescale };
+  // Find bounds of selected area, scaling to/from actual image size
+  const crop = floodFillBounds(
+    bkgdImg.phThresholded,
+    Math.floor(startX * rescale),
+    Math.floor(startY * rescale),
+    2 // Border around cropped area
+  );
+  if (!crop) return null;
+  crop.x1 = crop.x1 / rescale;
+  crop.y1 = crop.y1 / rescale;
+  crop.x2 = crop.x2 / rescale;
+  crop.y2 = crop.y2 / rescale;
+  return crop;
 }
 
 export class PhCropper extends PhSyncingViewer {

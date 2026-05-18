@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { floodFill } from '../src/image/fill.js';
+import { floodFill, floodFillBounds } from '../src/image/fill.js';
 
 // Build a thresholdOtsu-shaped mono image from ASCII art. '#' marks pixels
 // whose threshold bit (bit 0) is set, '.' marks pixels that are not. A
@@ -188,6 +188,155 @@ test('floodFill:seed_on_zero_bit_then_set_pixel_still_noop', function (test) {
   const visited = collectFilled(image, 0, 1);
 
   test.equal(visited.length, 0, 'Seed bit determines termination, not neighbours');
+  test.end();
+});
+
+test('floodFillBounds:solid_rectangle_no_border', function (test) {
+  // A 3x3 '#' block inside a '.' frame. With border=0 the returned bounds
+  // are the half-open box around the visited cells (x2/y2 are the inclusive
+  // max coordinate, since no clamping is needed).
+  const image = makeMonoImage([
+    '.....',
+    '.###.',
+    '.###.',
+    '.###.',
+    '.....'
+  ]);
+
+  const bounds = floodFillBounds(image, 2, 2, 0);
+
+  test.deepEqual(bounds, { x1: 1, y1: 1, x2: 3, y2: 3 }, 'Bounds match the 3x3 block exactly');
+  test.end();
+});
+
+test('floodFillBounds:border_expands_in_all_directions', function (test) {
+  // Same 3x3 block with room around it. A border of 1 expands each side by
+  // one without hitting any image edge, so no clamping happens.
+  const image = makeMonoImage([
+    '.....',
+    '.###.',
+    '.###.',
+    '.###.',
+    '.....'
+  ]);
+
+  const bounds = floodFillBounds(image, 2, 2, 1);
+
+  test.deepEqual(bounds, { x1: 0, y1: 0, x2: 4, y2: 4 }, 'Each side grown by 1');
+  test.end();
+});
+
+test('floodFillBounds:border_clamped_to_image_edges', function (test) {
+  // Region touches every edge of the image. A border of 3 would push the
+  // bounds outside [0, phWidth] / [0, phHeight], so x1/y1 clamp to 0 and
+  // x2/y2 clamp to phWidth/phHeight (exclusive upper, matching the source).
+  const image = makeMonoImage([
+    '###',
+    '#.#',
+    '###'
+  ]);
+
+  const bounds = floodFillBounds(image, 0, 0, 3);
+
+  test.deepEqual(bounds, { x1: 0, y1: 0, x2: 3, y2: 3 }, 'Bounds clamped to image dimensions');
+  test.end();
+});
+
+test('floodFillBounds:concave_region_uses_extent_not_just_visited', function (test) {
+  // The donut shape's bounding box covers the entire 5x5 ring, including
+  // the hollow centre — the box is the extent of the visited pixels, not
+  // the set of them.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const bounds = floodFillBounds(image, 0, 0, 0);
+
+  test.deepEqual(bounds, { x1: 0, y1: 0, x2: 4, y2: 4 }, 'Bounding box spans the whole ring');
+  test.end();
+});
+
+test('floodFillBounds:single_pixel_region_returns_null', function (test) {
+  // A lone '#' fills exactly one cell, so x1===x2 and y1===y2 — the
+  // function treats a zero-area box as no region and returns null.
+  const image = makeMonoImage([
+    '...',
+    '.#.',
+    '...'
+  ]);
+
+  const bounds = floodFillBounds(image, 1, 1, 1);
+
+  test.equal(bounds, null, 'Single-pixel region yields null');
+  test.end();
+});
+
+test('floodFillBounds:seed_on_zero_bit_returns_null', function (test) {
+  // Seed on a '.' cell makes floodFill terminate immediately without any
+  // callbacks. x1/x2/y1/y2 stay at the seed coords, so x1===x2 — null.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const bounds = floodFillBounds(image, 2, 2, 1);
+
+  test.equal(bounds, null, 'No callbacks → zero-sized box → null');
+  test.end();
+});
+
+test('floodFillBounds:single_row_region_returns_null', function (test) {
+  // A region one pixel tall has y1===y2 even though it spans multiple
+  // columns — the early-return treats it as zero-sized.
+  const image = makeMonoImage([
+    '.....',
+    '.###.',
+    '.....'
+  ]);
+
+  const bounds = floodFillBounds(image, 2, 1, 0);
+
+  test.equal(bounds, null, 'Single-row region yields null');
+  test.end();
+});
+
+test('floodFillBounds:single_column_region_returns_null', function (test) {
+  // Mirror of the single-row case: a 1-wide vertical strip has x1===x2.
+  const image = makeMonoImage([
+    '...',
+    '.#.',
+    '.#.',
+    '.#.',
+    '...'
+  ]);
+
+  const bounds = floodFillBounds(image, 1, 2, 0);
+
+  test.equal(bounds, null, 'Single-column region yields null');
+  test.end();
+});
+
+test('floodFillBounds:asymmetric_border_clamp', function (test) {
+  // Region hugs the left/top edges but has room on the right/bottom. With
+  // border=2, x1/y1 clamp to 0 while x2/y2 expand freely.
+  const image = makeMonoImage([
+    '##....',
+    '##....',
+    '......',
+    '......',
+    '......'
+  ]);
+
+  const bounds = floodFillBounds(image, 0, 0, 2);
+
+  test.deepEqual(bounds, { x1: 0, y1: 0, x2: 3, y2: 3 }, 'Left/top clamped, right/bottom grown');
   test.end();
 });
 

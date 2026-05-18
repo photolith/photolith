@@ -79,3 +79,54 @@ export function floodFill (image, refX, refY, callback) {
     }
   }
 }
+
+/**
+ * Run `floodFill` from (refX, refY) and return the axis-aligned bounding
+ * box of every visited pixel, optionally grown by `border` pixels on each
+ * side. The returned box is half-open on the upper edges: `x2` and `y2`
+ * are clamped to `phWidth` / `phHeight` (not `phWidth - 1`), so the box
+ * can be used directly as a `[x1, x2) × [y1, y2)` slice.
+ *
+ * Returns `null` if the connected region has zero area along either axis
+ * — i.e. a single pixel, single row, or single column, or a seed pixel
+ * whose bit 0 is 0 (in which case `floodFill` terminates immediately and
+ * no pixels are visited). This lets callers distinguish "no usable
+ * region" from a valid one-pixel-thick box.
+ *
+ * @param {Uint8ClampedArray} image - Output of `thresholdOtsu`, carrying
+ *   `phWidth` / `phHeight`. Index layout is `y * phWidth + x`. Bit 0 of
+ *   each cell is the threshold result; bits 7..1 are the (quantised)
+ *   luminance.
+ * @param {number} refX - Column of the seed pixel (0-based).
+ * @param {number} refY - Row of the seed pixel (0-based).
+ * @param {number} border - Pixels to grow the bounding box by on each
+ *   side after the fill completes. Clamped to the image extents, so the
+ *   returned box never escapes `[0, phWidth] × [0, phHeight]`.
+ * @returns {{x1: number, y1: number, x2: number, y2: number} | null}
+ *   Bounding box of the filled region (`x1`/`y1` inclusive, `x2`/`y2`
+ *   exclusive when border-clamped to the image edge), or `null` if the
+ *   region is degenerate along either axis.
+ */
+export function floodFillBounds (image, refX, refY, border) {
+  let x1 = refX;
+  let y1 = refY;
+  let x2 = refX;
+  let y2 = refY;
+  floodFill(image, x1, y1, function (newX, newY) {
+    if (newX < x1) x1 = newX;
+    if (newY < y1) y1 = newY;
+    if (newX > x2) x2 = newX;
+    if (newY > y2) y2 = newY;
+  });
+
+  // If bounding box is zero-sized, then don't set it
+  if (x1 === x2 || y1 === y2) return null;
+
+  // Expand bounding box a notch to include edges
+  x1 = Math.max(0, x1 - border);
+  y1 = Math.max(0, y1 - border);
+  x2 = Math.min(image.phWidth, x2 + border);
+  y2 = Math.min(image.phHeight, y2 + border);
+
+  return { x1, y1, x2, y2 };
+}
