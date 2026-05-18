@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 
 import { PhViewer } from './base';
+import { changeEvent } from '../events';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 
 export class PhFilteringViewer extends PhViewer {
@@ -74,6 +75,23 @@ export class PhFilteringViewer extends PhViewer {
       }));
     }
 
+    if (phFilters.histogramExpansion && phFilters.histogramExpansion !== '0') {
+      const [image, rescale] = this.thresholdedImage();
+      // If no focal point, or focal point out of bounds, use full image histogram
+      const histogram = (this._focalPoint
+        ? floodFillHistogram(
+          image,
+          Math.floor(this._focalPoint.x * rescale),
+          Math.floor(this._focalPoint.y * rescale)
+        )
+        : null) || fullHistogram(image);
+
+      img.filters.push(new fabric.Image.filters.HistogramExpansion({
+        histogramExpansion: parseFloat(phFilters.histogramExpansion),
+        histogram
+      }));
+    }
+
     if (phFilters.laplace) {
       img.filters.push(new fabric.Image.filters.Convolute({
         matrix: [
@@ -96,6 +114,23 @@ export class PhFilteringViewer extends PhViewer {
       }
       this.fabCanvas.renderAll();
     }, 10);
+  }
+
+  load (blob, boundingBox) {
+    return super.load(blob, boundingBox).finally(() => {
+      // Clear focal point on new image load
+      this.setFocalPoint(null);
+    });
+  }
+
+  // Set focal pixels as used by filters (e.g. currently selected individual)
+  setFocalPoint (x, y) {
+    const oldFp = this._focalPoint || null;
+    this._focalPoint = x === null ? null : { x, y };
+    // Trigger filters to update based on new focal point
+    if (x === null ? oldFp !== null : (oldFp === null || oldFp.x !== x || oldFp.y !== y)) {
+      this.elForm.dispatchEvent(changeEvent());
+    }
   }
 
   lowresImage () {

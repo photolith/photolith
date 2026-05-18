@@ -60,6 +60,9 @@ export class PhAnnotate extends PhSyncingViewer {
         stroke: `rgba(${el.getAttribute('data-stroke') || rgbHighlight}, 1)`,
         radius: 5 + (i % 5),
         selectable: m[1] === 'axis_poly'
+      }, {
+        // All should update the focal point if origin changes
+        origin_is_focal_point: true
       });
       this.fabCanvas.add(obj);
     });

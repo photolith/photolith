@@ -39,6 +39,7 @@ export class PhViewer {
       fireRightClick: true,
       stopContextMenu: true
     });
+    this.fabCanvas.phViewer = this;
     this.fabCanvas.setWidth(this.elViewer.clientWidth);
     this.fabCanvas.setHeight(this.elViewer.clientHeight);
     // NB: Any previous height will grow the elViewer container when page is shrinking,
