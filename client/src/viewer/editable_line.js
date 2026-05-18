@@ -25,11 +25,11 @@ function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
   ));
 }
 
-export default function (props = {}, circleProps = {}, endcapRadius) {
+export default function (props = {}, circleProps = {}) {
   props.strokeWidth = props.strokeWidth || 3;
   circleProps.strokeWidth = circleProps.strokeWidth || props.strokeWidth;
   circleProps.radius = circleProps.radius || 10;
-  endcapRadius = endcapRadius || 3;
+  const endcapRadius = 3;
 
   const poly = new fabric.Polyline([], Object.assign({}, {
     left: 0,
