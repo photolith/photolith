@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.views import View
 from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, Max, Q
+from django.template.loader import render_to_string
 
 from ..errors import json_errors
 from ..models import (
@@ -116,6 +117,7 @@ class DataView(LoginRequiredMixin, View):
         )
 
         extra = {}
+        annotation_alert = {}
         for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
@@ -206,11 +208,15 @@ class DataView(LoginRequiredMixin, View):
                     )
                 )
 
-        if with_annotations:
-            if with_annotations == "all" or with_annotations == "best":
-                ann_qs = Annotation.objects.order_by("-authority", "-created_at")
-            else:
-                raise ValueError("Unknown annotations type '%s'" % with_annotations)
+        if not with_annotations:
+            pass
+        elif with_annotations == "alert":
+            if p is not None:
+                raise ValueError(
+                    "Setting both project=x and with_annotations=alert doesn't make sense"
+                )
+        elif with_annotations == "all" or with_annotations == "best":
+            ann_qs = Annotation.objects.order_by("-authority", "-created_at")
             qs = qs.prefetch_related(
                 Prefetch(
                     "annotation_set",
@@ -218,6 +224,8 @@ class DataView(LoginRequiredMixin, View):
                     to_attr="_annotations",
                 )
             )
+        else:
+            raise ValueError("Unknown annotations type '%s'" % with_annotations)
 
         result_count = 0
         for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
@@ -252,7 +260,11 @@ class DataView(LoginRequiredMixin, View):
                         orig_filename=ind.image.orig_filename,
                     )
 
-            if with_annotations and len(ind._annotations) > 0:
+            if with_annotations == "alert":
+                if ind.num_annotations > 0:
+                    annotation_alert[str(ind)] = ind
+                yield out
+            elif with_annotations and len(ind._annotations) > 0:
                 px_to_mm = ind.image.px_to_mm()
                 for a in ind._annotations:
                     a_out = dict(
@@ -285,6 +297,15 @@ class DataView(LoginRequiredMixin, View):
                 yield {**out, **a_out}
             else:
                 yield out
+        if len(annotation_alert) > 0:
+            extra["alert"] = dict(
+                level="warning",
+                messageHTML=render_to_string(
+                    "search/annotation_alert.html",
+                    dict(annotation_alert=annotation_alert),
+                ),
+                timeout=0,
+            )
         if len(extra.keys()) > 0:
             return extra
 
@@ -296,6 +317,7 @@ class DataView(LoginRequiredMixin, View):
                 with_associated_images=bool(
                     self.request.GET.get("with_associated_images")
                 ),
+                with_annotations=self.request.GET.get("with_annotations", ""),
             )
         )
 

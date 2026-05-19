@@ -282,6 +282,7 @@ msgid "annotation"
 msgstr "aldursmerking"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
+#: photolith/templates/search/annotation_alert.html
 msgid "annotations"
 msgstr "aldursmerkingar"
 
@@ -863,6 +864,14 @@ msgstr "Hætta við"
 #: photolith/templates/project/update.html
 msgid "Delete"
 msgstr "Eyða"
+
+#: photolith/templates/search/annotation_alert.html
+msgid "There are already annotations present for individuals in this image:"
+msgstr "Það eru þegar til staðar skýringar fyrir einstaklinga á þessari mynd"
+
+#: photolith/templates/search/annotation_alert.html
+msgid "Editing these will result in the annotations being removed."
+msgstr "Ef þessum skýringum er breytt verða skýringarnar fjarlægðar."
 
 #: photolith/templates/search/index.html
 msgid "Individual Search"

@@ -386,6 +386,80 @@ class DataViewTest(RequiresUtils, TestCase):
         self.assertEqual(set(out.keys()), set(["data"]))
         self.assertEqual(out["data"], [])
 
+    def test_with_annotations_alert(self):
+        """`with_annotations=alert` lists all individuals, alert lists pre-annotated ones"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind_clean = self.create_individual(data=dict(ch_slideLabel="clean"))
+        ind_annotated = self.create_individual(data=dict(ch_slideLabel="annotated"))
+        self.create_annotation(ind_annotated)
+        self.create_annotation(ind_annotated, authority=50)
+
+        # Without `with_annotations`, no alert is emitted regardless of pre-existing annotations
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind_clean.id, 0), (ind_annotated.id, 2)],
+        )
+
+        # `with_annotations=alert` yields every individual, plus an alert listing the annotated one
+        out = self.data(userA, dict(with_annotations="alert"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "alert"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind_clean.id, 0), (ind_annotated.id, 2)],
+        )
+        self.assertEqual(out["alert"]["level"], "warning")
+        self.assertEqual(out["alert"]["timeout"], 0)
+        msg = out["alert"]["messageHTML"]
+        self.assertIn("There are already annotations present", msg)
+        self.assertIn('href="/annotate/%d"' % ind_annotated.id, msg)
+        self.assertIn(">annotated</a>", msg)
+        self.assertIn("2 ", msg)  # num_annotations for the annotated individual
+        # The clean individual should not be referenced in the alert
+        self.assertNotIn('href="/annotate/%d"' % ind_clean.id, msg)
+        self.assertNotIn(">clean</a>", msg)
+
+    def test_with_annotations_alert__no_existing(self):
+        """`with_annotations=alert` with no pre-annotated individuals: no alert key"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind1 = self.create_individual(data=dict(ch_slideLabel="a"))
+        ind2 = self.create_individual(data=dict(ch_slideLabel="b"))
+
+        out = self.data(userA, dict(with_annotations="alert"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind1.id, 0), (ind2.id, 0)],
+        )
+
+    def test_with_annotations_alert__project_scope(self):
+        """`with_annotations=alert` in a project falls over"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind_in_this_project = self.create_individual(data=dict(ch_slideLabel="this"))
+        this_project = self.create_project(
+            individuals=[ind_in_this_project],
+            team=[userA],
+        )
+
+        # Searching within `this_project`: only the annotation on this_project counts
+        out = self.data(
+            userA,
+            dict(project=this_project.id, with_annotations="alert"),
+            expect_success=False,
+        )
+        self.assertIn("project=x", out["error"])
+        self.assertIn("with_annotations=alert", out["error"])
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]

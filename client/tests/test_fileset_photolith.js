@@ -37,7 +37,7 @@ test('PhotolithFileSet:next', async function (test) {
   const blob42 = { type: 'image/jpeg', tag: 'blob42' };
   const blob43 = { type: 'image/jpeg', tag: 'blob43' };
   global.window.fetch = mockFetch({
-    '/search/data?nm_image_id=42&with_associated_images=y': {
+    '/search/data?nm_image_id=42&with_associated_images=y&with_annotations=alert': {
       json: {
         data: [
           { ch_slideLabel: 'Slide-A', ch_individualLabel: '1' },
@@ -54,7 +54,7 @@ test('PhotolithFileSet:next', async function (test) {
       }
     },
     '/media/42.jpg': { blob: blob42 },
-    '/search/data?nm_image_id=43&with_associated_images=y': {
+    '/search/data?nm_image_id=43&with_associated_images=y&with_annotations=alert': {
       json: {
         data: [{ ch_slideLabel: 'Slide-B', ch_individualLabel: '1' }],
         images: {
@@ -99,7 +99,7 @@ test('PhotolithFileSet:next empty data', async function (test) {
   setupDom(test);
 
   global.window.fetch = mockFetch({
-    '/search/data?nm_image_id=7&with_associated_images=y': {
+    '/search/data?nm_image_id=7&with_associated_images=y&with_annotations=alert': {
       json: { data: [], images: {} }
     }
   });
@@ -115,7 +115,7 @@ test('PhotolithFileSet:next image fetch failure', async function (test) {
   setupDom(test);
 
   global.window.fetch = mockFetch({
-    '/search/data?nm_image_id=8&with_associated_images=y': {
+    '/search/data?nm_image_id=8&with_associated_images=y&with_annotations=alert': {
       json: {
         data: [{ ch_slideLabel: 'Slide-X' }],
         images: { 8: { url: '/media/8.jpg', orig_filename: '8.jpg' } }

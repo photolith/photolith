@@ -35,7 +35,7 @@ export class PhotolithFileSet {
 
     if (imageId === undefined) return Promise.resolve(null);
 
-    return this.cancellable(jsonFetch(`/search/data?nm_image_id=${imageId}&with_associated_images=y`).then((searchData) => {
+    return this.cancellable(jsonFetch(`/search/data?nm_image_id=${imageId}&with_associated_images=y&with_annotations=alert`).then((searchData) => {
       if ((searchData.data || []).length === 0) return null;
       const imageMeta = searchData.images[imageId];
 

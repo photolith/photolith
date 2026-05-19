@@ -1,0 +1,9 @@
+{% load l10n %}
+{% load i18n %}
+<p>{% translate "There are already annotations present for individuals in this image:" %}
+
+<dl>{% for k, ind in annotation_alert.items %}
+  <dt><a href="/annotate/{{ ind.id }}" target="_blank">{{ k }}</a></dt><dd>{{ ind.num_annotations }} {% translate 'annotations' %}</dd>
+{% endfor %}</dl>
+
+<div>{% translate "Editing these will result in the annotations being removed." %}</div>
