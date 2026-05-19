@@ -23,6 +23,9 @@ def check_annotate_access(project, user, rw=False):
 
 
 def check_individual_edit_access(ind, user):
+    if user.is_superuser:
+        # Superuser can edit regardless
+        return
     if ind.num_annotations > 0:
         raise PermissionDenied(
             "Cannot edit %s, has already been annotated %d times"
@@ -31,7 +34,7 @@ def check_individual_edit_access(ind, user):
                 ind.num_annotations,
             )
         )
-    if not user.is_superuser and ind.created_by != user:
+    if ind.created_by != user:
         raise PermissionDenied(
             "Cannot edit %s, was created by %s not you"
             % (

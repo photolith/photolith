@@ -393,10 +393,10 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(get_ind(ind_anon, user=owner)["can_edit"], False)
         self.assertEqual(get_ind(ind_anon, user=superuser)["can_edit"], True)
 
-        # Once annotated, even the owner & superuser lose edit access
+        # Once annotated, the owner loses edit access
         self.create_annotation(ind, created_by=owner)
         self.assertEqual(get_ind(ind, user=owner)["can_edit"], False)
-        self.assertEqual(get_ind(ind, user=superuser)["can_edit"], False)
+        self.assertEqual(get_ind(ind, user=superuser)["can_edit"], True)
         self.assertEqual(get_ind(ind, user=other)["can_edit"], False)
 
     def test_get_context_data(self):

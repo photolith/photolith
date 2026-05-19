@@ -753,37 +753,6 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertIn("Deleted 1 individual", out["alert"]["messageHTML"])
         self.assertFalse(Individual.objects.filter(pk=ind.id).exists())
 
-        # Annotation rules still apply: superusers can't edit annotated individuals
-        ind2 = self.create_individual(
-            image=image,
-            bounding_box=[[0, 0], [100, 100]],
-            created_by=owner,
-            data=dict(nm_length=100),
-        )
-        self.create_annotation(individual=ind2)
-        out = self.form_post(
-            superuser,
-            [
-                dict(
-                    nm_length=200,
-                    _bb=[[0, 0], [200, 200]],
-                    id=ind2.id,
-                ),
-            ],
-            image=image,
-        )
-        self.assertEqual(
-            out,
-            (
-                500,
-                dict(
-                    error_class="PermissionDenied",
-                    error="Cannot edit %s, has already been annotated %d times"
-                    % (str(ind2), 1),
-                ),
-            ),
-        )
-
     def test_post__searchquerystring(self):
         """Can add a search querystring to the output"""
         user = self.create_user(groups=["Ingest"])
