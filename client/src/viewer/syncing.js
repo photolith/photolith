@@ -160,6 +160,11 @@ export class PhSyncingViewer extends PhFilteringViewer {
     } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
       obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])), true);
     } else {
+      if (obj instanceof fabric.Textbox && obj.text !== formEl.getAttribute('data-label')) {
+        obj.text = formEl.getAttribute('data-label');
+        obj.dirty = true;
+        obj.canvas.requestRenderAll();
+      }
       obj.left = val[0][0];
       obj.top = val[0][1];
       obj.width = val[1][0] - val[0][0];

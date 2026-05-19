@@ -127,10 +127,26 @@ function formRefresh (event) {
   if (event.target.classList.contains('ph-meta')) {
     // Sync ph-meta elements up with JSON, which gets submitted server-side
     // NB: Sending ph-meta elements directly server-side may be more sensible long-term
-    const dataEl = getSelectedIndividualData(elForm);
-    if (!dataEl) return;
+    const elData = getSelectedIndividualData(elForm);
+    if (!elData) return;
 
-    dataEl.value = JSON.stringify(updateDataObject(JSON.parse(dataEl.value || '{}'), event.target));
+    const newData = updateDataObject(JSON.parse(elData.value || '{}'), event.target);
+    elData.value = JSON.stringify(newData);
+
+    if (Object.hasOwn(newData, 'ch_individualLabel')) {
+      // If label changed, copy value to bounding_box & trigger form (thus updating fabricjs)
+      const indIdx = elData.name.replace(/^data:/, ''); // NB: will still be string, but don't care
+      const elBB = elForm['bounding_box:' + indIdx];
+      if (newData.ch_individualLabel !== elBB.getAttribute('data-label')) {
+        elBB.setAttribute('data-label', newData.ch_individualLabel);
+        elBB.dispatchEvent(changeEvent());
+
+        // Copy to individual select box too
+        Array.from(elForm.elements.individual.options).forEach((o) => {
+          if (o.value === indIdx) o.text = newData.ch_individualLabel;
+        });
+      }
+    }
   }
 
   if (event.target.classList.contains('ph-meta-copy')) {
