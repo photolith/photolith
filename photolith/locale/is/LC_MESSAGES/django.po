@@ -114,6 +114,13 @@ msgstr[0] "%(count)d einstakling eytt."
 msgstr[1] "%(count)d einstaklingar eytt."
 
 #: photolith/ingest/views.py
+#, fuzzy, python-format
+msgid "Deleted %(count)d annotation. "
+msgid_plural "Deleted %(count)d annotations. "
+msgstr[0] "%(count)d aldursmerkingu eytt."
+msgstr[1] "%(count)d aldursmerkingar eytt."
+
+#: photolith/ingest/views.py
 msgid "Show individuals"
 msgstr "Sýna kvarnir"
 

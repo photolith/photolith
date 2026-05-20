@@ -139,6 +139,7 @@ class UploadView(PermissionRequiredMixin, View):
         created_inds = {}
         updated_inds = {}
         deleted_inds = {}
+        deleted_anns = {}
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
                 continue
@@ -158,10 +159,27 @@ class UploadView(PermissionRequiredMixin, View):
             if not ind_bounding_box:
                 if ind:
                     deleted_inds[ind_client_idx] = ind.id
+                    # NB: Will cascade-delete
+                    # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
+                    if ind.num_annotations > 0:
+                        deleted_anns[ind_client_idx] = [
+                            a.id for a in ind.annotation_set.all()
+                        ]
                     ind.delete()
                     del ind_data["id"]
                     out["data:%s" % ind_client_idx] = ind_data
                 continue
+
+            # Check if we should be invalidating existing annotations
+            if (
+                ind
+                and ind.num_annotations > 0
+                and ind.bounding_box
+                and ind.bounding_box != ind_bounding_box
+            ):
+                # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
+                deleted_anns[ind_client_idx] = [a.id for a in ind.annotation_set.all()]
+                ind.annotation_set.all().delete()
 
             # If no individual was found, create one at this point
             if not ind:
@@ -206,6 +224,12 @@ class UploadView(PermissionRequiredMixin, View):
                 "Deleted %(count)d individuals. ",
                 len(deleted_inds),
             ) % dict(count=len(deleted_inds))
+        if len(deleted_anns) > 0:
+            alert += ngettext(
+                "Deleted %(count)d annotation. ",
+                "Deleted %(count)d annotations. ",
+                sum(len(anns) for ind_id, anns in deleted_anns.items()),
+            ) % dict(count=sum(len(anns) for ind_id, anns in deleted_anns.items()))
         if len(created_inds) + len(updated_inds) > 0:
             alert += (
                 '<br><a href="/search/?nm_image_id=%d&nm_image_id=%d" target="_blank">%s</a>'

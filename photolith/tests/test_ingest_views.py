@@ -8,7 +8,7 @@ from django.test import Client, TestCase, RequestFactory
 from django.test.testcases import override_settings
 
 from ..ingest.views import *
-from ..models import Individual, Image, Taxonomy
+from ..models import Annotation, Individual, Image, Taxonomy
 
 from .binaries import JPEG_VALID, JPEG_TRUNCATED, GIF_VALID
 from .requires_utils import RequiresUtils
@@ -751,6 +751,181 @@ class UploadViewTest(RequiresUtils, TestCase):
         )
         self.assertEqual(out["alert"]["level"], "success")
         self.assertIn("Deleted 1 individual", out["alert"]["messageHTML"])
+        self.assertFalse(Individual.objects.filter(pk=ind.id).exists())
+
+    def test_post__superuser_bbox_change_drops_annotations(self):
+        """Superuser changing an annotated individual's bbox drops the annotations"""
+        owner = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        ind = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+        self.create_annotation(individual=ind, age=3)
+        self.create_annotation(individual=ind, age=4, authority=50)
+
+        # Unrelated annotated individual must remain untouched
+        other_ind = self.create_individual(
+            image=image,
+            bounding_box=[[5, 5], [55, 55]],
+            created_by=owner,
+            data=dict(nm_length=50),
+        )
+        other_ann = self.create_annotation(individual=other_ind, age=7)
+
+        superuser = self.create_user(groups=[])
+        superuser.is_superuser = True
+        superuser.save()
+
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=200,
+                    _bb=[[0, 0], [200, 200]],
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        # Alert mentions both the update and the dropped annotations (pluralised)
+        self.assertIn("Updated 1 individual", out["alert"]["messageHTML"])
+        self.assertIn("Deleted 2 annotations", out["alert"]["messageHTML"])
+
+        # Edit applied, ownership preserved
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, [[0, 0], [200, 200]])
+        self.assertEqual(ind.data["nm_length"], 200.0)
+        self.assertEqual(ind.created_by, owner)
+
+        # Annotations on the edited individual were dropped, others survive
+        self.assertEqual(Annotation.objects.filter(individual=ind).count(), 0)
+        self.assertEqual(
+            list(
+                Annotation.objects.filter(individual=other_ind).values_list(
+                    "id", flat=True
+                )
+            ),
+            [other_ann.id],
+        )
+
+    def test_post__superuser_same_bbox_preserves_annotations(self):
+        """Superuser editing data without changing the bbox keeps annotations"""
+        owner = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        bbox = [[0, 0], [100, 100]]
+        ind = self.create_individual(
+            image=image,
+            bounding_box=bbox,
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+        ann1 = self.create_annotation(individual=ind, age=3)
+        ann2 = self.create_annotation(individual=ind, age=4, authority=50)
+
+        superuser = self.create_user(groups=[])
+        superuser.is_superuser = True
+        superuser.save()
+
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=222,
+                    _bb=bbox,  # Identical bounding box
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        self.assertIn("Updated 1 individual", out["alert"]["messageHTML"])
+        # No annotations were dropped, so the alert should not mention any
+        self.assertNotIn("annotation", out["alert"]["messageHTML"])
+
+        # Data updated, bbox unchanged
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, bbox)
+        self.assertEqual(ind.data["nm_length"], 222.0)
+
+        # Annotations survive
+        self.assertEqual(
+            sorted(
+                Annotation.objects.filter(individual=ind).values_list("id", flat=True)
+            ),
+            sorted([ann1.id, ann2.id]),
+        )
+
+    def test_post__superuser_delete_annotated(self):
+        """Superuser deleting an annotated individual cascades to its annotations"""
+        owner = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        ind = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+        self.create_annotation(individual=ind, age=3)
+        self.create_annotation(individual=ind, age=4, authority=50)
+        self.create_annotation(individual=ind, age=5, authority=80)
+
+        superuser = self.create_user(groups=[])
+        superuser.is_superuser = True
+        superuser.save()
+
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=100,
+                    _bb=None,
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        self.assertIn("Deleted 1 individual", out["alert"]["messageHTML"])
+        # Pluralised count of cascade-deleted annotations
+        self.assertIn("Deleted 3 annotations", out["alert"]["messageHTML"])
+
+        # Individual + annotations all gone
+        self.assertFalse(Individual.objects.filter(pk=ind.id).exists())
+        self.assertEqual(Annotation.objects.filter(individual_id=ind.id).count(), 0)
+
+    def test_post__superuser_delete_unannotated(self):
+        """Deleting an individual with no annotations does not mention annotations"""
+        owner = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        ind = self.create_individual(
+            image=image,
+            bounding_box=[[0, 0], [100, 100]],
+            created_by=owner,
+            data=dict(nm_length=100),
+        )
+
+        superuser = self.create_user(groups=[])
+        superuser.is_superuser = True
+        superuser.save()
+
+        out = self.form_post(
+            superuser,
+            [
+                dict(
+                    nm_length=100,
+                    _bb=None,
+                    id=ind.id,
+                ),
+            ],
+            image=image,
+        )
+        self.assertEqual(out["alert"]["level"], "success")
+        self.assertIn("Deleted 1 individual", out["alert"]["messageHTML"])
+        self.assertNotIn("annotation", out["alert"]["messageHTML"])
         self.assertFalse(Individual.objects.filter(pk=ind.id).exists())
 
     def test_post__searchquerystring(self):
