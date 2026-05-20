@@ -317,6 +317,34 @@ class DataViewTest(RequiresUtils, TestCase):
             ],
             [ind.id for ind in inds[:2]],
         )
+        # Can equivalently query by image filename
+        image_filenames = [
+            ind.image.content.name.replace("image_content/", "") for ind in inds
+        ]
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(
+                        ch_image_content=image_filenames[1],
+                    ),
+                )
+            ],
+            [inds[1].id],
+        )
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(
+                        ch_image_content=[image_filenames[2], image_filenames[3]],
+                    ),
+                )
+            ],
+            [inds[2].id, inds[3].id],
+        )
 
     def test_with_associated_images(self):
         userA = self.create_user(

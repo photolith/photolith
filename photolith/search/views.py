@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from ..errors import json_errors
 from ..models import (
     Annotation,
+    Image,
     Individual,
     MetaNumeric,
     MetaInteger,
@@ -135,6 +136,12 @@ class DataView(LoginRequiredMixin, View):
                         created_at__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
+            elif k == "ch_image_content":
+                qs = qs.filter(
+                    image__content__in=set(
+                        Image.content.field.generate_filename(None, v) for v in vs
+                    )
+                )
             elif k == "nm_image_id":
                 while len(vs) < 2:
                     vs.append(vs[0])
