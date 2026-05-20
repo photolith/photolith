@@ -53,14 +53,18 @@ function formRefresh (event) {
     elForm.classList.add('rendering');
     // Update rest of form to match new sample, getting data from fileset or mApi if none provided
     return Promise.resolve().then(() => {
-      if (elForm.image_file.phIndividuals) return elForm.image_file.phIndividuals;
+      if (elForm.image_file.phIndividuals) {
+        const individuals = elForm.image_file.phIndividuals;
+        elForm.image_file.phIndividuals = undefined; // Only use it once, subsequent changes behave like new images
+        return individuals;
+      }
       if (event.target.value) return window.mApi.sampleDetail(event.target.value);
       return [];
     }).then((individuals) => {
       if (!individuals) individuals = []; // Do nothing if no individuals returned
 
-      // Trigger a check for existing individuals. Don't bother checking the response, let it display it's own messages
-      if (!elForm.image_file.phIndividuals) {
+      // If no DB id set, check for existing individuals. Don't bother checking the response, let it display it's own messages
+      if (Object.values(individuals).find((i) => i.id) === undefined) {
         checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
       }
 
