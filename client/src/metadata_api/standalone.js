@@ -95,6 +95,7 @@ const fieldsFor = {
     'in_month'
   ],
   table_form: [ // i.e. ingest metadata table
+    'num_annotations',
     'ch_slideLabel',
     'ch_individualLabel',
     'tx_sampleType',

@@ -66,6 +66,11 @@ export function renderMetaCell (k, data, type, row, meta) {
   }
 
   if (type === 'form') {
+    if (k === 'num_annotations') {
+      data = parseInt(data || 0, 10);
+      // If no annotations, hide this row
+      return data === 0 ? undefined : `<a href="/annotate/${row.id}" target="_blank"><code>${data}</code></a>`;
+    }
     // NB: We use data-key so these values don't get submitted themselves, we sync JSON blob separately
     if (k.startsWith('nm_')) {
       return `<input type="number" class="form-control ph-meta" data-key="${k}" name="" value="${data === null ? '' : attribEscape(data)}" step="any">`;
@@ -155,12 +160,15 @@ export function renderMetaLabel (k, type, row, meta) {
   return htmlEscape(metaLabels[k]);
 }
 
-export function renderMetaRow (k, data, tableMode) {
+export function renderMetaRow (k, data, tableMode, row) {
   const meta = {
     control_id: 'filter-' + k + '-control'
   };
-  const htmlLabel = renderMetaLabel(k, tableMode, {}, meta);
-  const htmlRow = renderMetaCell(k, data === undefined ? null : data, tableMode, {}, meta);
+  const htmlLabel = renderMetaLabel(k, tableMode, row, meta);
+  const htmlRow = renderMetaCell(k, data === undefined ? null : data, tableMode, row, meta);
+
+  // If either returned undefined, skip this row
+  if (htmlLabel === undefined || htmlRow === undefined) return '';
 
   if (tableMode === 'search-form') {
     return `<div class="mb-3">
@@ -170,8 +178,8 @@ export function renderMetaRow (k, data, tableMode) {
   }
 
   return `<tr>
-    <td>${htmlLabel}</td>
-    <td>${htmlRow}</td>
+    <td class="align-middle">${htmlLabel}</td>
+    <td class="align-middle">${htmlRow}</td>
   </tr>`;
 }
 
@@ -189,7 +197,7 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
   }
 
   elTableBody.innerHTML = Array.from(initFields).map((k) => {
-    return renderMetaRow(k, indData[k], tableMode);
+    return renderMetaRow(k, indData[k], tableMode, indData);
   }).join('\n');
 
   // Populate add-new-metadata if present
