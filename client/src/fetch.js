@@ -1,3 +1,5 @@
+import { displayAlert } from './alert.js';
+
 /** Remove any previously cached items  */
 export function clearFetchCache () {
   window.sessionStorage.clear();
@@ -59,6 +61,11 @@ export function jsonFetch (resource, options = {}) {
     }).then((errData) => {
       throw new Error(`Failed to fetch ${resource} ${errData.error_class ? `[${errData.error_class}]` : ''}: ${errData.error}`);
     });
+  }).then((rv) => {
+    if (rv.alert) {
+      displayAlert(rv.alert.level, rv.alert.messageHTML, rv.alert.timeout);
+    }
+    return rv;
   });
 }
 

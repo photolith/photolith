@@ -2,7 +2,6 @@ import hashlib
 import io
 import json
 import os.path
-import urllib.parse
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -13,10 +12,12 @@ from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
+from django.db.models import Count
 
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
 from ..models import Image, Individual, Taxonomy
+from ..perm_utils import check_individual_edit_access
 
 
 class IndexView(PermissionRequiredMixin, TemplateView):
@@ -27,6 +28,15 @@ class IndexView(PermissionRequiredMixin, TemplateView):
         def count_string(count):
             return ngettext("(%(count)d photo)", "(%(count)d photos)", count) % dict(
                 count=count,
+            )
+
+        # If given image_ids to edit, set-up a photolith: fileset for those image id(s)
+        image_ids = self.request.GET.getlist("image_id", [])
+        if len(image_ids) > 0:
+            yield dict(
+                name="photolith:%s" % ",".join(image_ids),
+                description=_("Edit selected images"),
+                selected=True,
             )
 
         for d in list_photo_dirs(settings.INGEST_ROOT):
@@ -115,38 +125,61 @@ class UploadView(PermissionRequiredMixin, View):
         )
         image.save()
 
+        # Prefetch all existing individuals for images
+        existing_inds = {
+            i.id: i
+            for i in (
+                Individual.objects.filter(image=image).annotate(
+                    num_annotations=Count("annotation")
+                )
+            )
+        }
+
+        out = {}
         created_inds = {}
         updated_inds = {}
         deleted_inds = {}
-        search_query = set()
+        deleted_anns = {}
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
                 continue
             ind_data = json.loads(self.request.POST[post_key])
+            ind_client_idx = post_key.replace("data:", "")
             ind_bounding_box = json.loads(
                 self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
 
             # If an ID is given, fetch any existant individual
-            ind_id = self.request.POST.get(
-                post_key.replace("data:", "individual_id:", 1)
-            )
-            ind = (
-                Individual.objects.filter(
-                    pk=int(ind_id),
-                    created_by=self.request.user,
-                ).first()
-                if ind_id
-                else None
-            )
+            ind = existing_inds.get(ind_data["id"]) if "id" in ind_data else None
+            if ind:
+                check_individual_edit_access(ind, self.request.user)
 
             # No bounding box --> this individual shouldn't exist
             if not ind_bounding_box:
                 if ind:
-                    deleted_inds[post_key.replace("data:", "")] = ind.id
+                    deleted_inds[ind_client_idx] = ind.id
+                    # NB: Will cascade-delete
+                    # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
+                    if ind.num_annotations > 0:
+                        deleted_anns[ind_client_idx] = [
+                            a.id for a in ind.annotation_set.all()
+                        ]
                     ind.delete()
+                    del ind_data["id"]
+                    out["data:%s" % ind_client_idx] = ind_data
                 continue
+
+            # Check if we should be invalidating existing annotations
+            if (
+                ind
+                and ind.num_annotations > 0
+                and ind.bounding_box
+                and ind.bounding_box != ind_bounding_box
+            ):
+                # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
+                deleted_anns[ind_client_idx] = [a.id for a in ind.annotation_set.all()]
+                ind.annotation_set.all().delete()
 
             # If no individual was found, create one at this point
             if not ind:
@@ -157,15 +190,12 @@ class UploadView(PermissionRequiredMixin, View):
             ind.save()
             ind.data = ind_data
             ind.save()
-            if ind_id:
-                updated_inds[post_key.replace("data:", "")] = ind.id
+            out["data:%s" % ind_client_idx] = ind.full_data()
+            del out["data:%s" % ind_client_idx]["__str__"]
+            if ind_data.get("id"):
+                updated_inds[ind_client_idx] = ind.id
             else:
-                created_inds[post_key.replace("data:", "")] = ind.id
-            if ind_data.get("ch_slideLabel"):
-                # NB: search_query is a set, we don't repeat values
-                search_query.add(
-                    urllib.parse.urlencode({"ch_slideLabel": ind_data["ch_slideLabel"]})
-                )
+                created_inds[ind_client_idx] = ind.id
 
         if len(created_inds) > 0 or len(updated_inds) > 0:
             # Clear meta_fields cache created in search/views
@@ -173,7 +203,7 @@ class UploadView(PermissionRequiredMixin, View):
 
         alert = ""
         alert_status = "success"
-        if len(created_inds) == 0 and len(updated_inds) == 0:
+        if len(created_inds) == 0 and len(updated_inds) == 0 and len(deleted_inds) == 0:
             alert += _("No individual boxes on image! Nothing saved.")
             alert_status = "warning"
         if len(created_inds) > 0:
@@ -194,20 +224,24 @@ class UploadView(PermissionRequiredMixin, View):
                 "Deleted %(count)d individuals. ",
                 len(deleted_inds),
             ) % dict(count=len(deleted_inds))
-        if len(search_query) > 0:
-            alert += '<br><a href="/search/?%s" target="_blank">%s</a>' % (
-                "&".join(search_query),
-                _("Show individuals"),
+        if len(deleted_anns) > 0:
+            alert += ngettext(
+                "Deleted %(count)d annotation. ",
+                "Deleted %(count)d annotations. ",
+                sum(len(anns) for ind_id, anns in deleted_anns.items()),
+            ) % dict(count=sum(len(anns) for ind_id, anns in deleted_anns.items()))
+        if len(created_inds) + len(updated_inds) > 0:
+            alert += (
+                '<br><a href="/search/?nm_image_id=%d&nm_image_id=%d" target="_blank">%s</a>'
+                % (
+                    image.id,
+                    image.id,
+                    _("Show individuals"),
+                )
             )
-        return JsonResponse(
-            dict(
-                alert=alert,
-                alert_status=alert_status,
-                created_individuals=created_inds,
-                updated_individuals=updated_inds,
-                deleted_individuals=deleted_inds,
-            )
-        )
+
+        out["alert"] = dict(level=alert_status, messageHTML=alert)
+        return JsonResponse(out)
 
 
 class UploadImageView(PermissionRequiredMixin, View):

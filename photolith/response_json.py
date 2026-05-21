@@ -12,11 +12,22 @@ class StreamingJsonResponse(StreamingHttpResponse):
         def stream_json(iter, root_key="data"):
             data_header_sent = False
             try:
-                for r in iter:
+                while True:
+                    r = next(iter)
                     yield (
                         ",\n" if data_header_sent else '{"%s":[\n' % root_key
                     ) + json.dumps(r, cls=DjangoJSONEncoder)
                     data_header_sent = True
+            except StopIteration as e:
+                if e.value is not None:
+                    yield "\n]" if data_header_sent else '{"%s":[]' % root_key
+                    for k, v in e.value.items():
+                        yield ",\n%s: %s" % (
+                            json.dumps(k),
+                            json.dumps(v),
+                        )
+                    yield "}"
+                    return
             except Exception as e:
                 logger.exception(e)
                 yield "\n]," if data_header_sent else "{"

@@ -23,6 +23,7 @@ const metaLabels = {
   en: {
     ch_slideLabel: 'Slide Label',
     ch_individualLabel: 'Individual No.',
+    nm_image_id: 'Photolith image ID',
     tx_sampleType: 'Sample Type',
     nm_length: 'Length',
     nm_weight: 'Weight',
@@ -42,6 +43,7 @@ const metaLabels = {
   is: {
     ch_slideLabel: 'Merking á gleri',
     ch_individualLabel: 'Einstaklingur nr.',
+    nm_image_id: 'Photolith mynd nr.',
     tx_sampleType: 'Tegund sýnis',
     nm_length: 'Lengd',
     nm_weight: 'Þyngd',
@@ -93,6 +95,7 @@ const fieldsFor = {
     'in_month'
   ],
   table_form: [ // i.e. ingest metadata table
+    'num_annotations',
     'ch_slideLabel',
     'ch_individualLabel',
     'tx_sampleType',

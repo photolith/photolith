@@ -111,7 +111,10 @@ class Image(models.Model):
     def px_to_mm(self):
         if not self.scale_mm:
             return None
-        return self.scale_mm / euclidean_dist(self.scale_line[0], self.scale_line[1])
+        px_length = euclidean_dist(self.scale_line[0], self.scale_line[1])
+        if px_length == 0:
+            return None
+        return self.scale_mm / px_length
 
 
 class Individual(models.Model):
@@ -165,7 +168,20 @@ class Individual(models.Model):
     @data.setter
     def data(self, new_value):
         for k, v in new_value.items():
-            if "_" not in k:
+            if k in set(
+                (
+                    "__str__",
+                    "id",
+                    "image_id",
+                    "dt_created_at",
+                    "dt_modified_at",
+                    "bounding_box",
+                    "num_annotations",
+                )
+            ) or k.startswith("image__"):
+                # Ignore these, they're photolith values that should be set elsewhere
+                continue
+            if not re.match(r"^[a-z]{2}_", k):
                 raise ValueError("'%s' has no type prefix" % k)
             t, k = k.split("_", 2)
 

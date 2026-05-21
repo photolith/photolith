@@ -270,6 +270,224 @@ class DataViewTest(RequiresUtils, TestCase):
             [x.id for x in inds[2:10]],
         )
 
+    def test_query_filter_image_id(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        # Each create_individual() call creates a fresh image, giving each ind a distinct image_id
+        inds = [self.create_individual() for _ in range(5)]
+        image_ids = [ind.image_id for ind in inds]
+
+        # Single value: used as both bounds, so matches exactly one image_id
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(userA, search=dict(nm_image_id=str(image_ids[2])))
+            ],
+            [inds[2].id],
+        )
+        # Range: inclusive on both ends
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(nm_image_id=(str(image_ids[1]), str(image_ids[3]))),
+                )
+            ],
+            [ind.id for ind in inds[1:4]],
+        )
+        # Lower bound only
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA, search=dict(nm_image_id=(str(image_ids[3]), ""))
+                )
+            ],
+            [ind.id for ind in inds[3:]],
+        )
+        # Upper bound only
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA, search=dict(nm_image_id=("", str(image_ids[1])))
+                )
+            ],
+            [ind.id for ind in inds[:2]],
+        )
+        # Can equivalently query by image filename
+        image_filenames = [
+            ind.image.content.name.replace("image_content/", "") for ind in inds
+        ]
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(
+                        ch_image_content=image_filenames[1],
+                    ),
+                )
+            ],
+            [inds[1].id],
+        )
+        self.assertEqual(
+            [
+                x["id"]
+                for x in self.data(
+                    userA,
+                    search=dict(
+                        ch_image_content=[image_filenames[2], image_filenames[3]],
+                    ),
+                )
+            ],
+            [inds[2].id, inds[3].id],
+        )
+
+    def test_with_associated_images(self):
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        img1 = self.create_image(
+            orig_filename="first.jpg",
+            scale_line=[(0, 0), (1, 0)],
+            scale_mm=2,
+        )
+        img2 = self.create_image(
+            orig_filename="second.jpg",
+            scale_line=[(0, 0), (4, 0)],
+            scale_mm=8,
+        )
+        # Two individuals share img1, one is on img2
+        ind1a = self.create_individual(image=img1, bounding_box=[(0, 0), (1, 1)])
+        ind1b = self.create_individual(image=img1, bounding_box=[(1, 1), (2, 2)])
+        ind2 = self.create_individual(image=img2, bounding_box=[(2, 2), (3, 3)])
+
+        # By default, no `images` extra returned, and no `image_id` on rows
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual([r["id"] for r in out["data"]], [ind1a.id, ind1b.id, ind2.id])
+        self.assertNotIn("image_id", out["data"][0])
+
+        # Empty value for the parameter is treated as falsy (no extra returned)
+        out = self.data(userA, dict(with_associated_images=""), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertNotIn("image_id", out["data"][0])
+
+        # With `with_associated_images` set, every row gets `image_id` and we get
+        # a top-level `images` dict, denormalised by image_id
+        out = self.data(userA, dict(with_associated_images="1"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "images"]))
+        self.assertEqual(
+            [r["image_id"] for r in out["data"]], [img1.id, img1.id, img2.id]
+        )
+        # JSON dict keys are strings, so img ids come back stringified
+        self.assertEqual(set(out["images"].keys()), {str(img1.id), str(img2.id)})
+        self.assertEqual(
+            out["images"][str(img1.id)],
+            dict(
+                url=img1.content.url,
+                scale_line=[[0, 0], [1, 0]],
+                scale_mm=2,
+                orig_filename="first.jpg",
+            ),
+        )
+        self.assertEqual(
+            out["images"][str(img2.id)],
+            dict(
+                url=img2.content.url,
+                scale_line=[[0, 0], [4, 0]],
+                scale_mm=8,
+                orig_filename="second.jpg",
+            ),
+        )
+
+    def test_with_associated_images__no_results(self):
+        """No `images` extra returned when no individuals match"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+        out = self.data(userA, dict(with_associated_images="1"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(out["data"], [])
+
+    def test_with_annotations_alert(self):
+        """`with_annotations=alert` lists all individuals, alert lists pre-annotated ones"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind_clean = self.create_individual(data=dict(ch_slideLabel="clean"))
+        ind_annotated = self.create_individual(data=dict(ch_slideLabel="annotated"))
+        self.create_annotation(ind_annotated)
+        self.create_annotation(ind_annotated, authority=50)
+
+        # Without `with_annotations`, no alert is emitted regardless of pre-existing annotations
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind_clean.id, 0), (ind_annotated.id, 2)],
+        )
+
+        # `with_annotations=alert` yields every individual, plus an alert listing the annotated one
+        out = self.data(userA, dict(with_annotations="alert"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "alert"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind_clean.id, 0), (ind_annotated.id, 2)],
+        )
+        self.assertEqual(out["alert"]["level"], "warning")
+        self.assertEqual(out["alert"]["timeout"], 0)
+        msg = out["alert"]["messageHTML"]
+        self.assertIn("There are already annotations present", msg)
+        self.assertIn('href="/annotate/%d"' % ind_annotated.id, msg)
+        self.assertIn(">annotated</a>", msg)
+        self.assertIn("2 ", msg)  # num_annotations for the annotated individual
+        # The clean individual should not be referenced in the alert
+        self.assertNotIn('href="/annotate/%d"' % ind_clean.id, msg)
+        self.assertNotIn(">clean</a>", msg)
+
+    def test_with_annotations_alert__no_existing(self):
+        """`with_annotations=alert` with no pre-annotated individuals: no alert key"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind1 = self.create_individual(data=dict(ch_slideLabel="a"))
+        ind2 = self.create_individual(data=dict(ch_slideLabel="b"))
+
+        out = self.data(userA, dict(with_annotations="alert"), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"], r["num_annotations"]) for r in out["data"]],
+            [(ind1.id, 0), (ind2.id, 0)],
+        )
+
+    def test_with_annotations_alert__project_scope(self):
+        """`with_annotations=alert` in a project falls over"""
+        userA = self.create_user(
+            "userA", groups=["General Annotation Editor", "Project Admin"]
+        )
+
+        ind_in_this_project = self.create_individual(data=dict(ch_slideLabel="this"))
+        this_project = self.create_project(
+            individuals=[ind_in_this_project],
+            team=[userA],
+        )
+
+        # Searching within `this_project`: only the annotation on this_project counts
+        out = self.data(
+            userA,
+            dict(project=this_project.id, with_annotations="alert"),
+            expect_success=False,
+        )
+        self.assertIn("project=x", out["error"])
+        self.assertIn("with_annotations=alert", out["error"])
+
     def test_truncated_results(self):
         userA = self.create_user(
             "userA", groups=["General Annotation Editor", "Project Admin"]
@@ -288,23 +506,26 @@ class DataViewTest(RequiresUtils, TestCase):
             )
 
         # A filtered subset is fine
-        out = [
-            (r["id"] if "id" in r else r)
-            for r in self.data(userA, dict(nm_category=[4, 5]))
-        ]
-        self.assertEqual(out, list(range(41, 61)))
+        out = self.data(userA, dict(nm_category=[4, 5]), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data"]))
+        self.assertEqual(
+            [(r["id"] if "id" in r else r) for r in out["data"]], list(range(41, 61))
+        )
 
         # Every possible result results in truncated response
-        out = [(r["id"] if "id" in r else r) for r in self.data(userA, dict())]
+        out = self.data(userA, dict(), expect_success=False)
+        self.assertEqual(set(out.keys()), set(["data", "alert"]))
         self.assertEqual(
-            out,
-            list(range(1, settings.SEARCH_RESULT_MAX_ROWS + 1))
-            + [
-                dict(
-                    truncated="Too many results, only first %d returned"
-                    % settings.SEARCH_RESULT_MAX_ROWS
-                )
-            ],
+            [(r["id"] if "id" in r else r) for r in out["data"]],
+            list(range(1, settings.SEARCH_RESULT_MAX_ROWS + 1)),
+        )
+        self.assertEqual(
+            out["alert"],
+            {
+                "level": "warning",
+                "messageHTML": "Too many results, only first 100 returned",
+                "timeout": 0,
+            },
         )
 
 

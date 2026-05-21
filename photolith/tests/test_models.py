@@ -18,6 +18,16 @@ class ImageTest(RequiresUtils, TestCase):
             0.2773500981126146,
         )
 
+        # No div/0 errors
+        self.assertEqual(
+            px_to_mm([(10, 20), (10, 20)], 10),
+            None,
+        )
+        self.assertEqual(
+            px_to_mm([(10, 20), (10, 30)], 0),
+            None,
+        )
+
         self.assertEqual(px_to_mm([(10, 20), (30, 50)], None), None)
 
 
@@ -152,6 +162,31 @@ class IndividualTest(RequiresUtils, TestCase):
         # Unknown types are an error
         with self.assertRaisesRegex(ValueError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])
+
+    def test_data_ignores_photolith_internal_keys(self):
+        """Photolith-internal keys in the data dict are silently ignored"""
+        ind = self.create_individual()
+        ind.data = dict(nm_length=10)
+
+        # All photolith-internal keys should be silently ignored
+        internal_keys = [
+            ("__str__", "Individual 1"),
+            ("id", 999),
+            ("image_id", 3),
+            ("dt_created_at", "2023-01-01"),
+            ("dt_modified_at", "2023-01-02"),
+            ("bounding_box", [[0, 0], [50, 50]]),
+            ("num_annotations", 5),
+            ("image__orig_filename", "photo.jpg"),
+            ("image__id", 42),
+        ]
+        for key, value in internal_keys:
+            ind.data = {key: value, "nm_length": 10}
+            self.assertEqual(
+                ind.data,
+                dict(nm_length=10),
+                msg="Expected '%s' to be silently ignored" % key,
+            )
 
     def test_data_int(self):
         ind1 = self.create_individual()

@@ -318,7 +318,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             get_all_annotations(ind, project=p, user=user4),
 
     def test_get_individual(self):
-        def get_ind(individual):
+        def get_ind(individual, user=None):
             request = RequestFactory().get(
                 "/",
                 dict(
@@ -327,6 +327,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
                     project="",
                 ),
             )
+            request.user = user or self.create_user()
             v = AnnotateView()
             v.setup(request, **(request.GET.dict()))
             out = v.get_individual()
@@ -347,6 +348,56 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         )
         self.assertAlmostEqual(out["image__px_to_mm"], None)
         self.assertAlmostEqual(out["image__mm_to_px"], None)
+
+        # image__id surfaces the image PK
+        img = self.create_image()
+        ind = self.create_individual(image=img)
+        out = get_ind(ind)
+        self.assertEqual(out["image__id"], img.id)
+
+    def test_get_individual__can_edit(self):
+        """can_edit mirrors check_individual_edit_access for the request user"""
+
+        def get_ind(individual, user):
+            request = RequestFactory().get(
+                "/",
+                dict(
+                    individual_id=individual.id,
+                    annotation_id="",
+                    project="",
+                ),
+            )
+            request.user = user
+            v = AnnotateView()
+            v.setup(request, **(request.GET.dict()))
+            return v.get_individual()
+
+        owner = self.create_user()
+        other = self.create_user()
+        superuser = self.create_user()
+        superuser.is_superuser = True
+        superuser.save()
+
+        # Owner of an un-annotated individual can edit
+        ind = self.create_individual(created_by=owner)
+        self.assertEqual(get_ind(ind, user=owner)["can_edit"], True)
+
+        # Superuser can edit someone else's un-annotated individual
+        self.assertEqual(get_ind(ind, user=superuser)["can_edit"], True)
+
+        # A non-owner, non-superuser cannot edit
+        self.assertEqual(get_ind(ind, user=other)["can_edit"], False)
+
+        # Individuals with no creator can only be edited by superusers
+        ind_anon = self.create_individual(created_by=None)
+        self.assertEqual(get_ind(ind_anon, user=owner)["can_edit"], False)
+        self.assertEqual(get_ind(ind_anon, user=superuser)["can_edit"], True)
+
+        # Once annotated, the owner loses edit access
+        self.create_annotation(ind, created_by=owner)
+        self.assertEqual(get_ind(ind, user=owner)["can_edit"], False)
+        self.assertEqual(get_ind(ind, user=superuser)["can_edit"], True)
+        self.assertEqual(get_ind(ind, user=other)["can_edit"], False)
 
     def test_get_context_data(self):
         def ctx_data(individual, annotation=None, project=None, user=None):

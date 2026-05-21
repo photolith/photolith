@@ -7,7 +7,7 @@ from ..response_json import StreamingJsonResponse
 
 class ExportViewTest(TestCase):
     def do_sjr(self, streaming_content):
-        sjr = StreamingJsonResponse(streaming_content)
+        sjr = StreamingJsonResponse(iter(streaming_content))
         self.assertEqual(sjr.headers["Content-Type"], "application/json")
         return json.loads(b"".join(sjr.streaming_content))
 
@@ -20,7 +20,8 @@ class ExportViewTest(TestCase):
 
     def test_success_empty(self):
         def stuff():
-            pass
+            if False:
+                yield "Banana"
 
         self.assertEqual(self.do_sjr(stuff()), dict(data=[]))
 
@@ -35,6 +36,34 @@ class ExportViewTest(TestCase):
             dict(
                 error_class="ValueError",
                 error="Three!",
+            ),
+        )
+
+    def test_return_with_extra(self):
+        def stuff(c):
+            for i in range(c):
+                yield "%d potato" % (i + 1)
+            return dict(extra="moo")
+
+        self.assertEqual(
+            self.do_sjr(stuff(0)),
+            dict(
+                data=[],
+                extra="moo",
+            ),
+        )
+        self.assertEqual(
+            self.do_sjr(stuff(1)),
+            dict(
+                data=["1 potato"],
+                extra="moo",
+            ),
+        )
+        self.assertEqual(
+            self.do_sjr(stuff(2)),
+            dict(
+                data=["1 potato", "2 potato"],
+                extra="moo",
             ),
         )
 

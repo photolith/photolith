@@ -93,6 +93,47 @@ test('renderMetaCell:form', function (test) {
     '</select>'
   ].join(''));
 
+  // num_annotations: positive counts link to the annotate page for this row
+  test.deepEqual(
+    renderMetaCell('num_annotations', 3, 'form', { id: 42 }),
+    '<a href="/annotate/42" target="_blank"><code>3</code></a>'
+  );
+
+  // num_annotations: string values get coerced via parseInt
+  test.deepEqual(
+    renderMetaCell('num_annotations', '7', 'form', { id: 9 }),
+    '<a href="/annotate/9" target="_blank"><code>7</code></a>'
+  );
+
+  // num_annotations: zero, missing or unparseable values hide the row by returning undefined
+  test.deepEqual(renderMetaCell('num_annotations', 0, 'form', { id: 42 }), undefined);
+  test.deepEqual(renderMetaCell('num_annotations', null, 'form', { id: 42 }), undefined);
+  test.deepEqual(renderMetaCell('num_annotations', undefined, 'form', { id: 42 }), undefined);
+  test.deepEqual(renderMetaCell('num_annotations', '', 'form', { id: 42 }), undefined);
+
+  test.end();
+});
+
+test('renderMetaCell:search-form', function (test) {
+  setupDom(test, '<html lang="en-gb"></html>');
+
+  const meta = { control_id: 'filter-tx_sex-control' };
+
+  // Taxonomy with choices renders an <option> for each, marking matches as selected
+  test.deepEqual(renderMetaCell('tx_sex', {
+    val: ['1'],
+    choices: [
+      { id: 1, en: 'M.', is: 'Ka.' },
+      { id: 2, en: 'F.', is: 'Kv.' }
+    ]
+  }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
+  '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> <option value="1" selected>1: M.</option>,<option value="2" >2: F.</option> </select>');
+
+  // Taxonomy without choices renders an empty <select> rather than throwing
+  // (happens when a tx_* field is added via search querystring with no metaFields entry)
+  test.deepEqual(renderMetaCell('tx_sex', { val: [] }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
+    '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> </select>');
+
   test.end();
 });
 
@@ -249,6 +290,72 @@ test('populateIndividualData', function (test) {
   });
 
   return p;
+});
+
+test('populateIndividualData:num_annotations', function (test) {
+  const dom = setupDom(test, '<html lang="en-gb"></html>');
+
+  class UTMetadataApi extends MetadataApi {
+    constructor (lang) {
+      super(lang);
+      this.intlExtend(this._metaLabels, {
+        en: {
+          ch_slideLabel: 'Slide Label',
+          num_annotations: '# Annotations'
+        }
+      });
+    }
+  }
+  dom.window.mApi = new UTMetadataApi('en-gb');
+
+  function pid (indData, tableMode) {
+    const elForm = dom.window.document.createElement('form');
+    elForm.innerHTML = '<table><tbody></tbody></table>';
+    populateIndividualData(indData, elForm.querySelector('tbody'), tableMode);
+    return Array.from(elForm.querySelectorAll('tr')).map((elRow) => {
+      // Capture the outerHTML of cells so we can see the align-middle class
+      return Array.from(elRow.querySelectorAll('td')).map((elCell) => elCell.outerHTML.trim());
+    });
+  }
+
+  // num_annotations > 0: row visible, with a link to the annotate page for that row
+  test.deepEqual(
+    pid({ id: 42, num_annotations: 3 }, 'form'),
+    [
+      [
+        '<td class="align-middle"><label class="col-form-label"># Annotations</label></td>',
+        '<td class="align-middle"><a href="/annotate/42" target="_blank"><code>3</code></a></td>'
+      ]
+    ]
+  );
+
+  // num_annotations === 0: row hidden, no <tr> emitted for it
+  test.deepEqual(
+    pid({ id: 42, num_annotations: 0, ch_slideLabel: 'AB-01' }, 'form'),
+    [
+      [
+        '<td class="align-middle"><label class="col-form-label">Slide Label</label></td>',
+        '<td class="align-middle"><input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="AB-01"></td>'
+      ]
+    ]
+  );
+
+  // Mixed: num_annotations > 0 alongside other rows — both visible, both align-middle
+  test.deepEqual(
+    pid({ id: 7, num_annotations: 2, ch_slideLabel: 'AB-02' }, 'form'),
+    [
+      [
+        '<td class="align-middle"><label class="col-form-label">Slide Label</label></td>',
+        '<td class="align-middle"><input type="text" class="form-control ph-meta" data-key="ch_slideLabel" name="" value="AB-02"></td>'
+      ],
+      [
+        '<td class="align-middle"><label class="col-form-label"># Annotations</label></td>',
+        '<td class="align-middle"><a href="/annotate/7" target="_blank"><code>2</code></a></td>'
+      ]
+    ]
+  );
+
+  test.end();
 });
 
 test('updateDataObject', function (test) {

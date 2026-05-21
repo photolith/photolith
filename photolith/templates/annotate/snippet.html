@@ -29,6 +29,9 @@
     </table>
     <div class="row">
       <div class="col-sm">
+        {% if ind_data.can_edit %}<a href="/ingest/?image_id={{ ind_data.image__id }}" target="_blank" class="btn btn-outline-danger">
+          {% translate 'Edit' %}
+        </a>{% endif %}
         {% if user.is_superuser %}<a href="/admin/photolith/individual/{{ ind_data.id }}/change/" target="_blank" class="btn btn-outline-danger">
           {% translate 'Administration' %}
         </a>{% endif %}

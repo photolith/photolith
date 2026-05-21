@@ -68,6 +68,10 @@ msgstr[0] "(%(count)d mynd)"
 msgstr[1] "(%(count)d myndir)"
 
 #: photolith/ingest/views.py
+msgid "Edit selected images"
+msgstr "Breyta völdum myndum"
+
+#: photolith/ingest/views.py
 #, python-format
 msgid "Uploaded by %(photo_dir)s"
 msgstr "Hlaðið upp af %(photo_dir)s"
@@ -108,6 +112,13 @@ msgid "Deleted %(count)d individual. "
 msgid_plural "Deleted %(count)d individuals. "
 msgstr[0] "%(count)d einstakling eytt."
 msgstr[1] "%(count)d einstaklingar eytt."
+
+#: photolith/ingest/views.py
+#, fuzzy, python-format
+msgid "Deleted %(count)d annotation. "
+msgid_plural "Deleted %(count)d annotations. "
+msgstr[0] "%(count)d aldursmerkingu eytt."
+msgstr[1] "%(count)d aldursmerkingar eytt."
 
 #: photolith/ingest/views.py
 msgid "Show individuals"
@@ -278,6 +289,7 @@ msgid "annotation"
 msgstr "aldursmerking"
 
 #: photolith/models.py photolith/templates/annotate/annotate.html
+#: photolith/templates/search/annotation_alert.html
 msgid "annotations"
 msgstr "aldursmerkingar"
 
@@ -571,6 +583,12 @@ msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 
 #: photolith/templates/annotate/snippet.html
+#: photolith/templates/project/list.html
+#: photolith/templates/project/list.html
+msgid "Edit"
+msgstr "Breyta"
+
+#: photolith/templates/annotate/snippet.html
 msgid "Administration"
 msgstr "Stjórnun"
 
@@ -744,6 +762,12 @@ msgstr ""
 "myndinni, sem kemur í veg fyrir að sá einstaklingur er færður inn."
 
 #: photolith/templates/ingest/index.html
+msgid ""
+"This will remove all individuals associated with this image. Are you sure?"
+msgstr ""
+"Þetta mun fjarlægja alla einstaklinga sem tengjast þessari mynd. Ertu viss?"
+
+#: photolith/templates/ingest/index.html
 #, python-format
 msgid "There are already %%d individuals uploaded with this label"
 msgstr "Það eru nú þegar %%d einstaklingar með þessi einkenni í kerfinu"
@@ -779,6 +803,10 @@ msgstr ""
 #: photolith/templates/ingest/index.html
 msgid "Auto crop"
 msgstr "Sjálfvirk aðlögun stærðar"
+
+#: photolith/templates/ingest/index.html
+msgid "Remove & reset"
+msgstr "Fjarlægja og endurstilla"
 
 #: photolith/templates/ingest/index.html
 #: photolith/templates/search/index.html
@@ -823,11 +851,6 @@ msgid "View results"
 msgstr "Sjá niðurstöður"
 
 #: photolith/templates/project/list.html
-#: photolith/templates/project/list.html
-msgid "Edit"
-msgstr "Breyta"
-
-#: photolith/templates/project/list.html
 msgid "Closed projects"
 msgstr "Verkefni sem eru búin"
 
@@ -848,6 +871,14 @@ msgstr "Hætta við"
 #: photolith/templates/project/update.html
 msgid "Delete"
 msgstr "Eyða"
+
+#: photolith/templates/search/annotation_alert.html
+msgid "There are already annotations present for individuals in this image:"
+msgstr "Það eru þegar til staðar skýringar fyrir einstaklinga á þessari mynd"
+
+#: photolith/templates/search/annotation_alert.html
+msgid "Editing these will result in the annotations being removed."
+msgstr "Ef þessum skýringum er breytt verða skýringarnar fjarlægðar."
 
 #: photolith/templates/search/index.html
 msgid "Individual Search"

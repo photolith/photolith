@@ -2,7 +2,6 @@
 import DataTable from 'datatables.net-bs5';
 import TomSelect from 'tom-select';
 
-import { displayAlert } from './alert.js';
 import { init as initCroppedViewer } from './cropped_viewer.js';
 import { htmlFetch, jsonFetch } from './fetch.js';
 import { renderMetaLabel, renderMetaCell, populateSearchFilters } from './meta.js';
@@ -56,13 +55,7 @@ export function init (parent) {
       autoWidth: false,
       ajax: function (data, callback) {
         // https://datatables.net/reference/option/ajax#Types
-        return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then((data) => {
-          if (data.data.length > 0 && data.data[data.data.length - 1].truncated) {
-            const truncRow = data.data.pop();
-            displayAlert('warning', truncRow.truncated, 0);
-          }
-          return data;
-        }).then(callback);
+        return jsonFetch('/search/data/' + removeDTState(window.document.location.search), {}).then(callback);
       },
       columns: Object.keys(metaLabels).map((k) => {
         // https://datatables.net/reference/option/columns

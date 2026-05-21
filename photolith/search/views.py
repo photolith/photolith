@@ -8,10 +8,12 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.views import View
 from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, Max, Q
+from django.template.loader import render_to_string
 
 from ..errors import json_errors
 from ..models import (
     Annotation,
+    Image,
     Individual,
     MetaNumeric,
     MetaInteger,
@@ -80,7 +82,9 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 
 class DataView(LoginRequiredMixin, View):
-    def query(self, with_annotations="", with_image_url=False):
+    def query(
+        self, with_annotations="", with_image_url=False, with_associated_images=False
+    ):
         qs = Individual.objects
         qs = (
             qs.select_related("image")
@@ -113,6 +117,8 @@ class DataView(LoginRequiredMixin, View):
             )
         )
 
+        extra = {}
+        annotation_alert = {}
         for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
@@ -130,6 +136,19 @@ class DataView(LoginRequiredMixin, View):
                         created_at__date__lt=datetime.date.fromisoformat(vs[1])
                         + datetime.timedelta(days=1)
                     )
+            elif k == "ch_image_content":
+                qs = qs.filter(
+                    image__content__in=set(
+                        Image.content.field.generate_filename(None, v) for v in vs
+                    )
+                )
+            elif k == "nm_image_id":
+                while len(vs) < 2:
+                    vs.append(vs[0])
+                if vs[0] != "":
+                    qs = qs.filter(image_id__gte=int(vs[0]))
+                if vs[1] != "":
+                    qs = qs.filter(image_id__lte=int(vs[1]))
             elif k.startswith("nm_"):
                 sq = MetaNumeric.objects.filter(
                     individual_id=OuterRef("id"),
@@ -196,11 +215,15 @@ class DataView(LoginRequiredMixin, View):
                     )
                 )
 
-        if with_annotations:
-            if with_annotations == "all" or with_annotations == "best":
-                ann_qs = Annotation.objects.order_by("-authority", "-created_at")
-            else:
-                raise ValueError("Unknown annotations type '%s'" % with_annotations)
+        if not with_annotations:
+            pass
+        elif with_annotations == "alert":
+            if p is not None:
+                raise ValueError(
+                    "Setting both project=x and with_annotations=alert doesn't make sense"
+                )
+        elif with_annotations == "all" or with_annotations == "best":
+            ann_qs = Annotation.objects.order_by("-authority", "-created_at")
             qs = qs.prefetch_related(
                 Prefetch(
                     "annotation_set",
@@ -208,16 +231,21 @@ class DataView(LoginRequiredMixin, View):
                     to_attr="_annotations",
                 )
             )
+        else:
+            raise ValueError("Unknown annotations type '%s'" % with_annotations)
 
         result_count = 0
         for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
             result_count += 1
             if result_count > settings.SEARCH_RESULT_MAX_ROWS:
-                yield dict(
-                    truncated=_("Too many results, only first %d returned")
-                    % settings.SEARCH_RESULT_MAX_ROWS
+                return dict(
+                    alert=dict(
+                        level="warning",
+                        messageHTML=_("Too many results, only first %d returned")
+                        % settings.SEARCH_RESULT_MAX_ROWS,
+                        timeout=0,
+                    )
                 )
-                break
 
             out = ind.full_data()
             out["bounding_box"] = ind.bounding_box
@@ -227,8 +255,23 @@ class DataView(LoginRequiredMixin, View):
                 out["image__content__url"] = self.request.build_absolute_uri(
                     ind.image.content.url
                 )
+            if with_associated_images:
+                out["image_id"] = ind.image.id
+                if "images" not in extra:
+                    extra["images"] = {}
+                if ind.image.id not in extra["images"]:
+                    extra["images"][ind.image.id] = dict(
+                        url=ind.image.content.url,
+                        scale_line=ind.image.scale_line,
+                        scale_mm=ind.image.scale_mm,
+                        orig_filename=ind.image.orig_filename,
+                    )
 
-            if with_annotations and len(ind._annotations) > 0:
+            if with_annotations == "alert":
+                if ind.num_annotations > 0:
+                    annotation_alert[str(ind)] = ind
+                yield out
+            elif with_annotations and len(ind._annotations) > 0:
                 px_to_mm = ind.image.px_to_mm()
                 for a in ind._annotations:
                     a_out = dict(
@@ -261,10 +304,29 @@ class DataView(LoginRequiredMixin, View):
                 yield {**out, **a_out}
             else:
                 yield out
+        if len(annotation_alert) > 0:
+            extra["alert"] = dict(
+                level="warning",
+                messageHTML=render_to_string(
+                    "search/annotation_alert.html",
+                    dict(annotation_alert=annotation_alert),
+                ),
+                timeout=0,
+            )
+        if len(extra.keys()) > 0:
+            return extra
 
     @json_errors
     def get(self, *args, **kwargs):
-        return StreamingJsonResponse(self.query())
+        return StreamingJsonResponse(
+            self.query(
+                with_image_url=False,
+                with_associated_images=bool(
+                    self.request.GET.get("with_associated_images")
+                ),
+                with_annotations=self.request.GET.get("with_annotations", ""),
+            )
+        )
 
 
 class ExportView(DataView):
