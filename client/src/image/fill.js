@@ -1,9 +1,7 @@
 /**
  * Span-fill (4-connected) over a `thresholdOtsu`-shaped mono image. Visits
- * every pixel reachable from (refX, refY) whose bit 0 is set, invoking
- * `callback` on each one in fill order. The seed pixel's own value does not
- * matter — if its bit 0 is 0 the fill terminates immediately, since the seed
- * itself fails the Inside test.
+ * every pixel reachable from (refX, refY) whose bit 0 equals `refVal`,
+ * invoking `callback` on each one in fill order.
  *
  * Visited cells are tracked in an internal bitmap, so `image` is treated as
  * read-only and the callback has no marking responsibility — it just gets
@@ -19,22 +17,26 @@
  *   luminance.
  * @param {number} refX - Column of the seed pixel (0-based).
  * @param {number} refY - Row of the seed pixel (0-based).
+ * @param {0 | 1 | undefined} refVal - Threshold bit value the fill targets.
+ *   `1` selects foreground, `0` selects background, `undefined` defers to
+ *   the seed pixel's own bit 0.
  * @param {(x: number, y: number, lum: number) => void} callback - Called
  *   once per filled pixel. `lum` is the cell value with bit 0 masked off,
  *   i.e. the 7-bit luminance shifted into bits 7..1.
  * @see https://en.wikipedia.org/wiki/Flood_fill#Span_filling — this is a
  *   direct port of the second (Inside/Set) pseudo-code algorithm.
  */
-export function floodFill (image, refX, refY, callback) {
+export function floodFill (image, refX, refY, refVal, callback) {
   const width = image.phWidth;
   const height = image.phHeight;
   const visited = new Uint8Array(width * height);
+  if (refVal === undefined) refVal = (refX < 0 || refX >= width || refY < 0 || refY >= height) ? 0x0 : (image[refY * width + refX] & 0x1);
 
   function inside (x, y) {
     if (x < 0 || x >= width || y < 0 || y >= height) return false;
     const i = y * width + x;
     if (visited[i]) return false;
-    return (image[i] & 0x1) === 1;
+    return (image[i] & 0x1) === refVal;
   }
 
   function set (x, y) {
@@ -112,7 +114,8 @@ export function floodFillBounds (image, refX, refY, border) {
   let y1 = refY;
   let x2 = refX;
   let y2 = refY;
-  floodFill(image, x1, y1, function (newX, newY) {
+  // NB: refVal is always 1, so we don't select background
+  floodFill(image, x1, y1, 1, function (newX, newY) {
     if (newX < x1) x1 = newX;
     if (newY < y1) y1 = newY;
     if (newX > x2) x2 = newX;

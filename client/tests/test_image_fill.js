@@ -24,10 +24,12 @@ function makeMonoImage (rows) {
 // Run floodFill from (refX, refY) and return the visited cells in callback
 // order. `image` is treated as read-only — floodFill tracks visits in its
 // own bitmap. A 1024-call cap guards against an infinite loop turning a
-// failing test into a hang.
-function collectFilled (image, refX, refY) {
+// failing test into a hang. `refVal` is passed through to floodFill so
+// individual tests can target foreground (1), background (0), or let the
+// seed's own bit decide (undefined).
+function collectFilled (image, refX, refY, refVal) {
   const visited = [];
-  floodFill(image, refX, refY, (x, y, lum) => {
+  floodFill(image, refX, refY, refVal, (x, y, lum) => {
     visited.push({ x, y, lum });
     if (visited.length > 1024) throw new Error('floodFill exceeded 1024 callbacks — likely revisiting cells');
   });
@@ -43,7 +45,7 @@ test('floodFill:single_pixel_region', function (test) {
     '...'
   ]);
 
-  const visited = collectFilled(image, 1, 1);
+  const visited = collectFilled(image, 1, 1, 1);
 
   test.equal(visited.length, 1, 'Exactly one pixel visited');
   test.deepEqual({ x: visited[0].x, y: visited[0].y }, { x: 1, y: 1 }, 'Visits the start pixel');
@@ -62,7 +64,7 @@ test('floodFill:solid_rectangle', function (test) {
     '.....'
   ]);
 
-  const visited = collectFilled(image, 2, 2);
+  const visited = collectFilled(image, 2, 2, 1);
   const coords = new Set(visited.map((v) => v.x + ',' + v.y));
 
   test.equal(visited.length, 9, 'All 9 interior pixels visited');
@@ -87,7 +89,7 @@ test('floodFill:diagonal_neighbour_is_not_connected', function (test) {
     '..#'
   ]);
 
-  const visited = collectFilled(image, 0, 0);
+  const visited = collectFilled(image, 0, 0, 1);
 
   test.equal(visited.length, 1, 'Only the starting pixel is reached');
   test.deepEqual({ x: visited[0].x, y: visited[0].y }, { x: 0, y: 0 }, 'Visits only (0,0)');
@@ -106,7 +108,7 @@ test('floodFill:concave_region_with_hole', function (test) {
     '#####'
   ]);
 
-  const visited = collectFilled(image, 0, 0);
+  const visited = collectFilled(image, 0, 0, 1);
   const coords = new Set(visited.map((v) => v.x + ',' + v.y));
 
   test.equal(visited.length, 16, 'All 16 perimeter pixels visited');
@@ -126,7 +128,7 @@ test('floodFill:disconnected_regions_are_independent', function (test) {
     '##.##'
   ]);
 
-  const visited = collectFilled(image, 0, 1);
+  const visited = collectFilled(image, 0, 1, 1);
   const coords = new Set(visited.map((v) => v.x + ',' + v.y));
 
   test.equal(visited.length, 6, 'Left region (6 cells) filled');
@@ -147,7 +149,7 @@ test('floodFill:region_against_image_edge', function (test) {
     '###'
   ]);
 
-  const visited = collectFilled(image, 0, 0);
+  const visited = collectFilled(image, 0, 0, 1);
   const coords = new Set(visited.map((v) => v.x + ',' + v.y));
 
   test.equal(visited.length, 8, 'All 8 boundary cells visited, centre skipped');
@@ -156,11 +158,11 @@ test('floodFill:region_against_image_edge', function (test) {
   test.end();
 });
 
-test('floodFill:seed_on_zero_bit_is_noop', function (test) {
-  // Inside is defined as bit 0 == 1, regardless of the seed pixel. Seeding
-  // on a '.' cell makes the seed itself fail Inside, so the fill terminates
-  // immediately with no callbacks — even if there are reachable '#' pixels
-  // nearby.
+test('floodFill:seed_on_zero_bit_is_noop_when_refVal_is_one', function (test) {
+  // With refVal=1 the fill targets foreground only, regardless of the seed.
+  // Seeding on a '.' cell makes the seed itself fail Inside, so the fill
+  // terminates immediately with no callbacks — even if there are reachable
+  // '#' pixels nearby.
   const image = makeMonoImage([
     '#####',
     '#...#',
@@ -169,25 +171,87 @@ test('floodFill:seed_on_zero_bit_is_noop', function (test) {
     '#####'
   ]);
 
-  const visited = collectFilled(image, 2, 2);
+  const visited = collectFilled(image, 2, 2, 1);
 
-  test.equal(visited.length, 0, 'No pixels visited when seed has bit 0 = 0');
+  test.equal(visited.length, 0, 'No pixels visited when seed bit ≠ refVal');
   test.end();
 });
 
-test('floodFill:seed_on_zero_bit_then_set_pixel_still_noop', function (test) {
+test('floodFill:seed_on_zero_bit_with_refVal_one_does_not_leak', function (test) {
   // Even seeding on a '.' immediately adjacent to a '#' pixel must not leak
-  // into the '#' region: the seed's Inside check fails, so no spans are
-  // ever enqueued.
+  // into the '#' region when refVal=1: the seed's Inside check fails, so no
+  // spans are ever enqueued.
   const image = makeMonoImage([
     '.###',
     '.###',
     '.###'
   ]);
 
-  const visited = collectFilled(image, 0, 1);
+  const visited = collectFilled(image, 0, 1, 1);
 
   test.equal(visited.length, 0, 'Seed bit determines termination, not neighbours');
+  test.end();
+});
+
+test('floodFill:undefined_refVal_takes_seed_bit', function (test) {
+  // With refVal=undefined, the seed pixel's own bit 0 becomes the target.
+  // Seeding on a '.' cell here fills the hollow centre but stops at the
+  // surrounding '#' frame — i.e. it's a background fill driven by the seed.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const visited = collectFilled(image, 2, 2, undefined);
+  const coords = new Set(visited.map((v) => v.x + ',' + v.y));
+
+  test.equal(visited.length, 9, 'All 9 background cells visited');
+  test.equal(coords.size, 9, 'Each background cell visited exactly once');
+  for (let y = 1; y <= 3; y += 1) {
+    for (let x = 1; x <= 3; x += 1) {
+      test.ok(coords.has(x + ',' + y), 'Background (' + x + ',' + y + ') was visited');
+    }
+  }
+  test.notOk(coords.has('0,0'), 'Frame pixel (0,0) not visited');
+  test.notOk(coords.has('2,0'), 'Frame pixel (2,0) not visited');
+  test.end();
+});
+
+test('floodFill:explicit_refVal_zero_selects_background', function (test) {
+  // With refVal=0 the fill targets background cells. Seeding inside the
+  // hollow centre yields the same 9 cells as the undefined-refVal case, but
+  // here the choice is explicit and independent of where the seed lands.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const visited = collectFilled(image, 2, 2, 0);
+
+  test.equal(visited.length, 9, 'All 9 background cells visited');
+  test.end();
+});
+
+test('floodFill:explicit_refVal_zero_with_foreground_seed_is_noop', function (test) {
+  // Mirror of the seed_on_zero_bit_is_noop_when_refVal_is_one case: with
+  // refVal=0, a seed on a '#' cell fails Inside and the fill terminates.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const visited = collectFilled(image, 0, 0, 0);
+
+  test.equal(visited.length, 0, 'No pixels visited when seed bit ≠ refVal');
   test.end();
 });
 
@@ -354,7 +418,7 @@ test('floodFill:each_pixel_visited_once_on_blob', function (test) {
     '..##..'
   ]);
 
-  const visited = collectFilled(image, 3, 3);
+  const visited = collectFilled(image, 3, 3, 1);
   const coords = new Set(visited.map((v) => v.x + ',' + v.y));
 
   // Row tallies: 2 + 4 + 6 + 6 + 4 + 2 = 24
