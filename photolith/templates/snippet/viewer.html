@@ -27,6 +27,10 @@
         <label for="{{ idPrefix }}-histogramExpansion-input" title="{% translate "Enhance contrast in the image, optionally targeting the individual targeted by the axis line" %}">{% translate 'Enhance' %}:</label>
         <input type="range" name="histogramExpansion" class="form-range" id="{{ idPrefix }}-histogramExpansion-input" min="0" max="1" value="0" step="0.01" />
       </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="thresholdImage" id="{{ idPrefix }}-thresholdImage">
+        <label class="form-check-label" for="{{ idPrefix }}-thresholdImage" title="{% translate "Preview the thresholding that the otolith selection/enhance view uses, for debugging" %}">{% translate 'Threshold' %}</label>
+      </div>
       <div class="text-end px-1">
         <a href="#" class="download-link btn btn-sm btn-secondary" title="{% translate 'Download original image' %}">
           <!-- https://icons.getbootstrap.com/icons/download/ -->

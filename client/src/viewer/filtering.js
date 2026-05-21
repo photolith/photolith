@@ -5,6 +5,7 @@ import { changeEvent } from '../events';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 import { floodFillHistogram, fullHistogram } from '../image/fill.js';
 import '../fabric/filter_histogramexpansion.js';
+import '../fabric/filter_thresholdimage.js';
 
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {
@@ -117,6 +118,13 @@ export class PhFilteringViewer extends PhViewer {
           -1, 8, -1,
           -1, -1, -1
         ]
+      }));
+    }
+
+    if (phFilters.thresholdImage) {
+      const [image] = this.thresholdedImage();
+      img.filters.push(new fabric.Image.filters.ThresholdImage({
+        image
       }));
     }
 

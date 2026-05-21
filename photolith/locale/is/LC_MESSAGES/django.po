@@ -935,6 +935,17 @@ msgid "Enhance"
 msgstr "Auka"
 
 #: photolith/templates/snippet/viewer.html
+msgid ""
+"Preview the thresholding that the otolith selection/enhance view uses, for "
+"debugging"
+msgstr ""
+"Forskoða þröskuldinn sem val/uppfærsla á otolith notar, til kembiforritunar"
+
+#: photolith/templates/snippet/viewer.html
+msgid "Threshold"
+msgstr "Þröskuldur"
+
+#: photolith/templates/snippet/viewer.html
 msgid "Download original image"
 msgstr "Hala niður upprunalega mynd"
 
