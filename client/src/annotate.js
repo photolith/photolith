@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Point } from 'fabric';
 
 import { displayAlert } from './alert';
 import { formUnloadWarning } from './events';
@@ -23,7 +23,7 @@ function formRefresh (pxMmRatio, event) {
 
   if (event.target.name === 'axis_poly') {
     const elTableBody = window.document.querySelector('#axis_poly_table tbody');
-    const pointData = JSON.parse(event.target.value || '[]').map((p) => new fabric.Point(p[0], p[1]));
+    const pointData = JSON.parse(event.target.value || '[]').map((p) => new Point(p[0], p[1]));
     let totalDist = 0;
 
     // Find currently selected point

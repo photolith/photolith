@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Point, Textbox } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
@@ -70,7 +70,7 @@ export class PhCropper extends PhSyncingViewer {
 
   boundingBox (objId, label) {
     // http://fabricjs.com/docs/fabric.Textbox.html
-    const obj = new fabric.Textbox(label, {
+    const obj = new Textbox(label, {
       id: objId,
       fontFamily: 'Arial',
       fontSize: 90,
@@ -153,8 +153,8 @@ export class PhCropper extends PhSyncingViewer {
       const [image, rescale] = this.thresholdedImage();
       const crop = floodFillBounds(
         image,
-        Math.floor(opt.absolutePointer.x * rescale),
-        Math.floor(opt.absolutePointer.y * rescale),
+        Math.floor(opt.scenePoint.x * rescale),
+        Math.floor(opt.scenePoint.y * rescale),
         2 // Border around cropped area
       );
       if (!crop) return;
@@ -227,7 +227,7 @@ export class PhCropper extends PhSyncingViewer {
         [this.fabCanvas.backgroundImage.width / 5, this.fabCanvas.backgroundImage.height / 10]
       ];
       formInput.value = JSON.stringify(defScale);
-      obj.phSetPoints(defScale.map((p) => new fabric.Point(p[0], p[1])));
+      obj.phSetPoints(defScale.map((p) => new Point(p[0], p[1])));
     }
     return obj;
   }
@@ -263,7 +263,7 @@ export class PhCropper extends PhSyncingViewer {
         this.fabCanvas.setActiveObject(obj);
       }
       // Stack objects backwards, so scale line is on top
-      this.fabCanvas.sendToBack(obj);
+      this.fabCanvas.sendObjectToBack(obj);
     });
   }
 }

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Canvas, FabricImage, Group } from 'fabric';
 
 import { toImageBitmap } from '../image/decode.js';
 
@@ -32,16 +32,14 @@ export class PhViewer {
     });
 
     // Never show rotate controls on groups (read: ctrl-drag to select multiple)
-    fabric.Group.prototype.lockRotation = true;
+    Group.ownDefaults.lockRotation = true;
 
-    this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'), {
-      fireMiddleClick: true,
-      fireRightClick: true,
-      stopContextMenu: true
-    });
+    this.fabCanvas = new Canvas(this.elViewer.querySelector(':scope > canvas.image'));
     this.fabCanvas.phViewer = this;
-    this.fabCanvas.setWidth(this.elViewer.clientWidth);
-    this.fabCanvas.setHeight(this.elViewer.clientHeight);
+    this.fabCanvas.setDimensions({
+      width: this.elViewer.clientWidth,
+      height: this.elViewer.clientHeight
+    });
     // NB: Any previous height will grow the elViewer container when page is shrinking,
     //    set to absolute so it's ignored
     this.fabCanvas.upperCanvasEl.parentNode.style.position = 'absolute';
@@ -105,15 +103,19 @@ export class PhViewer {
         if (entries.length < 1) return;
         const entry = entries[0];
 
-        this.fabCanvas.setWidth(entry.contentRect.width);
-        this.fabCanvas.setHeight(entry.contentRect.height);
+        this.fabCanvas.setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height
+        });
       });
       resizeObserver.observe(this.elViewer);
     } else {
       // Fall back to monitoring the entire window
       window.addEventListener('resize', function (event) {
-        this.fabCanvas.setWidth(this.elViewer.clientWidth);
-        this.fabCanvas.setHeight(this.elViewer.clientHeight);
+        this.fabCanvas.setDimensions({
+          width: this.elViewer.clientWidth,
+          height: this.elViewer.clientHeight
+        });
       }.bind(this));
     }
 
@@ -197,7 +199,7 @@ export class PhViewer {
   }
 
   load (blob, boundingBox) {
-    this.fabCanvas.setBackgroundImage(undefined);
+    this.fabCanvas.backgroundImage = undefined;
     this.fabCanvas.requestRenderAll();
     this.imgBlob = null;
 
@@ -215,10 +217,10 @@ export class PhViewer {
     return Promise.resolve().then(() => {
       return toImageBitmap(blob);
     }).then((imageBitmap) => {
-      const img = new fabric.Image(imageBitmap, {
+      const img = new FabricImage(imageBitmap, {
         selectable: false
       });
-      this.fabCanvas.setBackgroundImage(img);
+      this.fabCanvas.backgroundImage = img;
 
       // Zoom viewport to fit boundingBox, or Image
       this.fabCanvas.phFitBoundingBox(boundingBox || [[0, 0], [img.width, img.height]]);

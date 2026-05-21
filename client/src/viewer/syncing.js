@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Point, Polyline, Textbox, util } from 'fabric';
 
 import { changeEvent } from '../events';
 import { PhFilteringViewer } from './filtering';
@@ -102,13 +102,13 @@ export class PhSyncingViewer extends PhFilteringViewer {
       return out;
     }
 
-    if (obj instanceof fabric.Polyline) {
+    if (obj instanceof Polyline) {
       const objToCanvas = obj.calcTransformMatrix();
 
       newVal = obj.points.map((p) => {
-        return roundPoint(fabric.util.transformPoint(p, objToCanvas));
+        return roundPoint(util.transformPoint(p, objToCanvas));
       });
-    } else if (obj instanceof fabric.Textbox) {
+    } else if (obj instanceof Textbox) {
       // NB: Using left/top/... is more accurate than obj.calcACoords()
       newVal = [
         roundPoint({ x: obj.left, y: obj.top }),
@@ -157,10 +157,10 @@ export class PhSyncingViewer extends PhFilteringViewer {
     if (val === undefined) {
       // Empty value --> form hasn't been populated yet. Do opposite
       this.syncForm({ target: obj });
-    } else if (obj instanceof fabric.Polyline && obj.phSetPoints) {
-      obj.phSetPoints(val.map((x) => new fabric.Point(x[0], x[1])), true);
+    } else if (obj instanceof Polyline && obj.phSetPoints) {
+      obj.phSetPoints(val.map((x) => new Point(x[0], x[1])), true);
     } else {
-      if (obj instanceof fabric.Textbox && obj.text !== formEl.getAttribute('data-label')) {
+      if (obj instanceof Textbox && obj.text !== formEl.getAttribute('data-label')) {
         obj.text = formEl.getAttribute('data-label');
         obj.dirty = true;
         obj.canvas.requestRenderAll();

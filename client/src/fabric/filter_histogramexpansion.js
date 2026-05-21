@@ -1,15 +1,12 @@
-import { fabric } from 'fabric';
+import { filters, classRegistry } from 'fabric';
 
-fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
-  // Filter type name; required by fabric to register & serialise the filter.
-  type: 'HistogramExpansion',
-
+export class HistogramExpansion extends filters.BaseFilter {
   // GLSL fragment shader: looks up each input channel in the equalisation LUT
   // (a 256x1 LUMINANCE texture bound to unit 1) and mixes between the source
   // and the LUT-mapped value by uIntensity. The LUT encodes both the active
   // range — bins outside the populated histogram clamp to 0 / 1 — and the
   // non-linear redistribution inside it, so the shader needs nothing else.
-  fragmentSource: 'precision highp float;\n' +
+  static fragmentSource = 'precision highp float;\n' +
     'uniform sampler2D uTexture;\n' +
     'uniform sampler2D uLut;\n' +
     'uniform float uIntensity;\n' +
@@ -23,23 +20,27 @@ fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.f
       ');\n' +
       'color.rgb = mix(color.rgb, mapped, uIntensity);\n' +
       'gl_FragColor = color;\n' +
-    '}',
+    '}';
 
-  // Strength of the equalisation, 0 (no-op) to 1 (fully equalised).
-  histogramExpansion: 0,
-  // 256-bin Uint32Array (typically from floodFillIntensityBound) describing the
-  // intensity distribution of the region to equalise against. Bins outside the
-  // populated range get clamped to 0 / 1 by the LUT; null disables the filter.
-  histogram: null,
+  static defaults = {
+    // Strength of the equalisation, 0 (no-op) to 1 (fully equalised).
+    histogramExpansion: 0,
+    // 256-bin Uint32Array describing the intensity distribution of the region
+    // to equalise against. Bins outside the populated range get clamped to
+    // 0 / 1 by the LUT; null disables the filter.
+    histogram: null
+  };
 
-  // Tells fabric which property is set when the filter is constructed with a
-  // bare numeric argument, and which to read/write for serialisation.
-  mainParameter: 'histogramExpansion',
+  static type = 'HistogramExpansion';
+
+  getFragmentSource () {
+    return HistogramExpansion.fragmentSource;
+  }
 
   // Lets fabric skip applying the filter entirely when it would have no effect.
-  isNeutralState: function () {
+  isNeutralState () {
     return this.histogramExpansion === 0 || !this.histogram;
-  },
+  }
 
   // Build a 256-entry Uint8 LUT from the histogram using the standard
   // histogram-equalisation formula
@@ -47,7 +48,7 @@ fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.f
   // where CDF_min is the first non-zero CDF value. This pins the lowest
   // populated bin to 0 and the highest to 1, with the curve in between
   // determined by the local density of intensities.
-  _buildLut: function () {
+  _buildLut () {
     const lut = new Uint8Array(256);
     if (!this.histogram) return lut;
     let total = 0;
@@ -65,11 +66,11 @@ fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.f
       lut[i] = Math.round(Math.max(0, Math.min(1, v)) * 255);
     }
     return lut;
-  },
+  }
 
   // CPU fallback used when WebGL is unavailable; mirrors the fragment shader,
   // building the same LUT and mixing each channel toward its mapped value.
-  applyTo2d: function (options) {
+  applyTo2d (options) {
     if (this.histogramExpansion === 0 || !this.histogram) return;
     const data = options.imageData.data;
     const len = data.length;
@@ -81,13 +82,13 @@ fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.f
         data[i + j] = src + (lut[src] - src) * intensity;
       }
     }
-  },
+  }
 
   // Override the WebGL apply so we can upload the equalisation LUT as a
   // 256x1 LUMINANCE texture on unit 1 before letting the base class run the
   // shader. The texture is created and destroyed inline — filter instances
   // are short-lived (rebuilt on each filter change) so caching adds no value.
-  applyToWebGL: function (options) {
+  applyToWebGL (options) {
     const gl = options.context;
     const lutBytes = this._buildLut();
     const texture = gl.createTexture();
@@ -98,26 +99,26 @@ fabric.Image.filters.HistogramExpansion = fabric.util.createClass(fabric.Image.f
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
-    this.callSuper('applyToWebGL', options);
+    super.applyToWebGL(options);
     this.unbindAdditionalTexture(gl, gl.TEXTURE1);
     gl.deleteTexture(texture);
-  },
+  }
 
   // Resolves the shader's uniform handles once the program is compiled, so
   // sendUniformData can push values each frame without re-querying them.
-  getUniformLocations: function (gl, program) {
+  getUniformLocations (gl, program) {
     return {
       uIntensity: gl.getUniformLocation(program, 'uIntensity'),
       uLut: gl.getUniformLocation(program, 'uLut')
     };
-  },
+  }
 
   // Pushes the current JS-side parameter values into the shader's uniforms
   // before each draw. uLut samples from texture unit 1, bound in applyToWebGL.
-  sendUniformData: function (gl, uniformLocations) {
+  sendUniformData (gl, uniformLocations) {
     gl.uniform1f(uniformLocations.uIntensity, this.histogramExpansion);
     gl.uniform1i(uniformLocations.uLut, 1);
   }
-});
-// Standard fabric hook for rehydrating a filter instance from its serialised form.
-fabric.Image.filters.HistogramExpansion.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+}
+
+classRegistry.setClass(HistogramExpansion);

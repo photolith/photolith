@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Point, util } from 'fabric';
 
 import { PhSyncingViewer } from './syncing';
 import EditableLine from './editable_line';
@@ -19,9 +19,9 @@ export class PhAnnotate extends PhSyncingViewer {
         obj.phRemoveNode(opt.target);
       } else {
         // Double-clicked elsewhere (NB: including on an end-node), add a new node
-        obj.phAddNode(fabric.util.transformPoint(
-          new fabric.Point(opt.e.offsetX, opt.e.offsetY),
-          fabric.util.invertTransform(this.fabCanvas.viewportTransform)
+        obj.phAddNode(util.transformPoint(
+          new Point(opt.e.offsetX, opt.e.offsetY),
+          util.invertTransform(this.fabCanvas.viewportTransform)
         ), opt);
       }
     });
