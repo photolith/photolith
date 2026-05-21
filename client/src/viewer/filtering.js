@@ -102,8 +102,7 @@ export class PhFilteringViewer extends PhViewer {
       }));
     }
 
-    this.startRendering();
-    window.setTimeout(() => {
+    const applyFilters = () => {
       try {
         img.applyFilters();
       } catch (err) {
@@ -113,7 +112,17 @@ export class PhFilteringViewer extends PhViewer {
         throw new Error('Could not apply image filter, GPU out of memory(?)');
       }
       this.fabCanvas.renderAll();
-    }, 10);
+    };
+
+    if (!this.phFiltersApplied && img.filters.length > 0) {
+      // First attempt likely to take a while, as we copy to GPU
+      this.startRendering();
+      window.setTimeout(applyFilters, 10);
+      this.phFiltersApplied = true;
+    } else {
+      // No filters / already in GPU, just do it
+      applyFilters();
+    }
   }
 
   load (blob, boundingBox) {
