@@ -923,20 +923,27 @@ msgid "Gamma"
 msgstr "Gamma"
 
 #: photolith/templates/snippet/viewer.html
-msgid "Saturation"
-msgstr "Saturation"
+msgid ""
+"Enhance contrast in the image, optionally targeting the individual targeted "
+"by the axis line"
+msgstr ""
+"Auka birtuskil í myndinni, valfrjálst miðað á einstaklinginn sem áslínan "
+"miðar á"
 
 #: photolith/templates/snippet/viewer.html
-msgid "Saturation Hue"
-msgstr "Saturation Hue"
+msgid "Enhance"
+msgstr "Auka"
 
 #: photolith/templates/snippet/viewer.html
-msgid "Vibrance"
-msgstr "Vibrance"
+msgid ""
+"Preview the thresholding that the otolith selection/enhance view uses, for "
+"debugging"
+msgstr ""
+"Forskoða þröskuldinn sem val/uppfærsla á otolith notar, til kembiforritunar"
 
 #: photolith/templates/snippet/viewer.html
-msgid "Edge detection"
-msgstr "Greining jaðars"
+msgid "Threshold"
+msgstr "Þröskuldur"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"

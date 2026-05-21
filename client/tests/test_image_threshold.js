@@ -173,6 +173,52 @@ test('thresholdLocalOtsu:isolated_bright_spike_is_above_local_mean', function (t
   test.end();
 });
 
+test('thresholdLocalOtsu:default_sigma_divisor_matches_explicit_6', function (test) {
+  // Passing the default sigmaDivisor (6.0) explicitly must produce
+  // byte-identical output to omitting it.
+  const W = 100;
+  const H = 10;
+  const pixels = [];
+  for (let y = 0; y < H; y += 1) {
+    for (let x = 0; x < W; x += 1) {
+      pixels.push(x < W / 2 ? [50, 50, 50] : [200, 200, 200]);
+    }
+  }
+  const def = thresholdLocalOtsu(makeImageData(W, H, pixels));
+  const explicit = thresholdLocalOtsu(makeImageData(W, H, pixels), undefined, 6.0);
+
+  test.deepEqual(Array.from(explicit), Array.from(def), 'sigmaDivisor=6.0 matches default');
+  test.end();
+});
+
+test('thresholdLocalOtsu:sigma_divisor_changes_neighbourhood', function (test) {
+  // A larger sigmaDivisor shrinks sigma, narrowing the Gaussian neighbourhood.
+  // Near the step boundary this makes the local mean track the underlying
+  // pixel values more tightly, so fewer columns either side of the step end
+  // up flipped relative to the default. We just need one numerically distinct
+  // sigma to confirm the parameter is wired through; we compare the bit-0
+  // outputs and require them to differ.
+  const W = 100;
+  const H = 10;
+  const pixels = [];
+  for (let y = 0; y < H; y += 1) {
+    for (let x = 0; x < W; x += 1) {
+      pixels.push(x < W / 2 ? [50, 50, 50] : [200, 200, 200]);
+    }
+  }
+  const def = thresholdLocalOtsu(makeImageData(W, H, pixels));
+  const tight = thresholdLocalOtsu(makeImageData(W, H, pixels), undefined, 24.0);
+
+  let countDef = 0;
+  let countTight = 0;
+  for (let i = 0; i < def.length; i += 1) {
+    countDef += def[i] & 1;
+    countTight += tight[i] & 1;
+  }
+  test.notEqual(countTight, countDef, 'Different sigmaDivisor changes how many pixels land above the local mean');
+  test.end();
+});
+
 test('normaliseSelection:zeros_majority_unchanged', function (test) {
   // Three 0s and one 1 in bit 0: 0 is already the majority, so the array
   // should be returned untouched. Upper bits must be preserved either way.

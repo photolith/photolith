@@ -1,7 +1,11 @@
 import { fabric } from 'fabric';
 
 import { PhViewer } from './base';
+import { changeEvent } from '../events';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
+import { floodFillHistogram, fullHistogram } from '../image/fill.js';
+import '../fabric/filter_histogramexpansion.js';
+import '../fabric/filter_thresholdimage.js';
 
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {
@@ -13,20 +17,36 @@ export class PhFilteringViewer extends PhViewer {
     super(elViewer);
     this.elForm = this.elViewer.querySelector(':scope form');
     this.elForm.onchange = (event) => {
-      if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
-      this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 600);
+      // Serialise attempts to alter filters
+      if (!this.filterActiveTimeout) {
+        this.filterActiveTimeout = setTimeout(this.refreshFilters.bind(this), 0);
+      }
     };
-    this.elForm.onreset = (event) => {
-      if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
-      this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 10);
-    };
+    // oninput fires as range sliders are dragged, not just when let go
+    this.elForm.oninput = this.elForm.onchange;
+    this.elForm.onreset = this.elForm.onchange;
   }
 
   refreshFilters () {
     const img = this.fabCanvas.backgroundImage;
     const phFilters = Object.fromEntries(new FormData(this.elForm));
 
-    if (!img) return; // No image loaded
+    if (!img) {
+      this.filterActiveTimeout = undefined;
+      return; // No image loaded
+    }
+
+    // Check if filters actually changed
+    if (phFilters.histogramExpansion && phFilters.histogramExpansion !== '0') {
+      phFilters._focalPoint = this._focalPoint;
+    }
+    if (JSON.stringify(phFilters) === this._prevPhFilters) {
+      // Filters didn't change
+      this.filterActiveTimeout = undefined;
+      return;
+    }
+    this._prevPhFilters = phFilters;
+
     img.filters = [];
 
     if (phFilters.brightness && phFilters.brightness !== '0') {
@@ -74,6 +94,23 @@ export class PhFilteringViewer extends PhViewer {
       }));
     }
 
+    if (phFilters.histogramExpansion && phFilters.histogramExpansion !== '0') {
+      const [image, rescale] = this.thresholdedImage();
+      // If no focal point, or focal point out of bounds, use full image histogram
+      const histogram = (this._focalPoint
+        ? floodFillHistogram(
+          image,
+          Math.floor(this._focalPoint.x * rescale),
+          Math.floor(this._focalPoint.y * rescale)
+        )
+        : null) || fullHistogram(image);
+
+      img.filters.push(new fabric.Image.filters.HistogramExpansion({
+        histogramExpansion: parseFloat(phFilters.histogramExpansion),
+        histogram
+      }));
+    }
+
     if (phFilters.laplace) {
       img.filters.push(new fabric.Image.filters.Convolute({
         matrix: [
@@ -84,18 +121,52 @@ export class PhFilteringViewer extends PhViewer {
       }));
     }
 
-    this.startRendering();
-    window.setTimeout(() => {
+    if (phFilters.thresholdImage) {
+      const [image] = this.thresholdedImage();
+      img.filters.push(new fabric.Image.filters.ThresholdImage({
+        image
+      }));
+    }
+
+    const applyFilters = () => {
       try {
         img.applyFilters();
+        this.filterActiveTimeout = undefined;
       } catch (err) {
+        this.filterActiveTimeout = undefined;
         console.error(err);
         this.elForm.reset();
-        setTimeout(this.refreshFilters.bind(this), 600);
         throw new Error('Could not apply image filter, GPU out of memory(?)');
       }
       this.fabCanvas.renderAll();
-    }, 10);
+    };
+
+    if (!this.phFiltersApplied && img.filters.length > 0) {
+      // First attempt likely to take a while, as we copy to GPU
+      this.startRendering();
+      window.setTimeout(applyFilters, 10);
+      this.phFiltersApplied = true;
+    } else {
+      // No filters / already in GPU, just do it
+      applyFilters();
+    }
+  }
+
+  load (blob, boundingBox) {
+    return super.load(blob, boundingBox).finally(() => {
+      // Clear focal point on new image load
+      this.setFocalPoint(null);
+    });
+  }
+
+  // Set focal pixels as used by filters (e.g. currently selected individual)
+  setFocalPoint (x, y) {
+    const oldFp = this._focalPoint || null;
+    this._focalPoint = x === null ? null : { x, y };
+    // Trigger filters to update based on new focal point
+    if (x === null ? oldFp !== null : (oldFp === null || oldFp.x !== x || oldFp.y !== y)) {
+      this.elForm.dispatchEvent(changeEvent());
+    }
   }
 
   lowresImage () {
@@ -131,7 +202,9 @@ export class PhFilteringViewer extends PhViewer {
       bkgdImg.phThresholded = normaliseSelection(thresholdLocalOtsu(
         context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }),
         // i.e. ~55 pixels
-        Math.floor(context.canvas.width * 0.053)
+        Math.floor(context.canvas.width * 0.053),
+        // sigmaDivisor 1.0 gets flatter results with smaller images, e.g. homepage image
+        1.0
       ));
       // document.body.append(debugPreview(bkgdImg.phThresholded));
     }

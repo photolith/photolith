@@ -25,11 +25,11 @@ function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
   ));
 }
 
-export default function (props = {}, circleProps = {}, endcapRadius) {
+export default function (props = {}, circleProps = {}, opts = {}) {
   props.strokeWidth = props.strokeWidth || 3;
   circleProps.strokeWidth = circleProps.strokeWidth || props.strokeWidth;
   circleProps.radius = circleProps.radius || 10;
-  endcapRadius = endcapRadius || 3;
+  const endcapRadius = 3;
 
   const poly = new fabric.Polyline([], Object.assign({}, {
     left: 0,
@@ -114,6 +114,13 @@ export default function (props = {}, circleProps = {}, endcapRadius) {
     this.strokeWidth = props.strokeWidth / this.canvas.getZoom();
 
     if (this.canvas) {
+      if (opts.origin_is_focal_point) {
+        this.canvas.phViewer.setFocalPoint(
+          Math.floor(newPoints[0].x),
+          Math.floor(newPoints[0].y)
+        );
+      }
+
       this.canvas.fire('object:modified', { target: this, phSuppressChange: suppressChange });
       this.canvas.requestRenderAll();
     }

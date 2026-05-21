@@ -24,20 +24,12 @@
         <input type="range" name="gamma" class="form-range" id="{{ idPrefix }}-gamma-input" min="0.01" max="2.2" value="1" step="0.01" />
       </div>
       <div>
-        <label for="{{ idPrefix }}-saturation-input">{% translate 'Saturation' %}:</label>
-        <input type="range" name="saturation" class="form-range" id="{{ idPrefix }}-saturation-input" min="-1" max="1" value="0" step="0.01" />
-      </div>
-      <div>
-        <label for="{{ idPrefix }}-saturationhue-input">{% translate 'Saturation Hue' %}:</label>
-        <input type="range" name="saturationhue" class="form-range" id="{{ idPrefix }}-saturationhue-input" min="0" max="1" value="0" step="0.01" />
-      </div>
-      <div>
-        <label for="{{ idPrefix }}-vibrance-input">{% translate 'Vibrance' %}:</label>
-        <input type="range" name="vibrance" class="form-range" id="{{ idPrefix }}-vibrance-input" min="-1" max="1" value="0" step="0.01" />
+        <label for="{{ idPrefix }}-histogramExpansion-input" title="{% translate "Enhance contrast in the image, optionally targeting the individual targeted by the axis line" %}">{% translate 'Enhance' %}:</label>
+        <input type="range" name="histogramExpansion" class="form-range" id="{{ idPrefix }}-histogramExpansion-input" min="0" max="1" value="0" step="0.01" />
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="laplace" id="{{ idPrefix }}-laplace-input">
-        <label class="form-check-label" for="{{ idPrefix }}-laplace-input">{% translate 'Edge detection' %}</label>
+        <input class="form-check-input" type="checkbox" name="thresholdImage" id="{{ idPrefix }}-thresholdImage">
+        <label class="form-check-label" for="{{ idPrefix }}-thresholdImage" title="{% translate "Preview the thresholding that the otolith selection/enhance view uses, for debugging" %}">{% translate 'Threshold' %}</label>
       </div>
       <div class="text-end px-1">
         <a href="#" class="download-link btn btn-sm btn-secondary" title="{% translate 'Download original image' %}">
