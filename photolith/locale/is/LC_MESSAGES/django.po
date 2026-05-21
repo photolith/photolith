@@ -922,21 +922,7 @@ msgstr "Contrast"
 msgid "Gamma"
 msgstr "Gamma"
 
-#: photolith/templates/snippet/viewer.html
-msgid "Saturation"
-msgstr "Saturation"
 
-#: photolith/templates/snippet/viewer.html
-msgid "Saturation Hue"
-msgstr "Saturation Hue"
-
-#: photolith/templates/snippet/viewer.html
-msgid "Vibrance"
-msgstr "Vibrance"
-
-#: photolith/templates/snippet/viewer.html
-msgid "Edge detection"
-msgstr "Greining jaðars"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"
