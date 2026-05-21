@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { floodFill, floodFillBounds } from '../src/image/fill.js';
+import { floodFill, floodFillBounds, floodFillHistogram } from '../src/image/fill.js';
 
 // Build a thresholdOtsu-shaped mono image from ASCII art. '#' marks pixels
 // whose threshold bit (bit 0) is set, '.' marks pixels that are not. A
@@ -401,6 +401,181 @@ test('floodFillBounds:asymmetric_border_clamp', function (test) {
   const bounds = floodFillBounds(image, 0, 0, 2);
 
   test.deepEqual(bounds, { x1: 0, y1: 0, x2: 3, y2: 3 }, 'Left/top clamped, right/bottom grown');
+  test.end();
+});
+
+// Like makeMonoImage, but each cell's full 8-bit value is given as a number
+// in the row arrays — bit 0 is the threshold result, bits 7..1 are the
+// (already-quantised) luminance. Used to exercise floodFillHistogram against
+// varied luminance values, where the ASCII helper would only ever produce a
+// single value (0x80).
+function makeMonoImageRaw (rows) {
+  const height = rows.length;
+  const width = rows[0].length;
+  const mono = new Uint8ClampedArray(width * height);
+  mono.phWidth = width;
+  mono.phHeight = height;
+  for (let y = 0; y < height; y += 1) {
+    if (rows[y].length !== width) throw new Error('ragged row in test image');
+    for (let x = 0; x < width; x += 1) {
+      mono[y * width + x] = rows[y][x];
+    }
+  }
+  return mono;
+}
+
+test('floodFillHistogram:counts_match_visited_pixels', function (test) {
+  // The histogram's total mass must equal the number of visited pixels — i.e.
+  // it covers exactly the connected region the fill walked, no more, no less.
+  // makeMonoImage stamps a uniform luminance of 0x80 on every cell, so a 3x3
+  // foreground block contributes 9 hits to histogram[0x80].
+  const image = makeMonoImage([
+    '.....',
+    '.###.',
+    '.###.',
+    '.###.',
+    '.....'
+  ]);
+
+  const histogram = floodFillHistogram(image, 2, 2);
+
+  let total = 0;
+  for (let i = 0; i < histogram.length; i += 1) total += histogram[i];
+  test.equal(total, 9, 'Total histogram mass equals the 9 visited foreground pixels');
+  test.equal(histogram[0x80], 9, 'All 9 cells fall into the 0x80 luminance bin');
+  test.end();
+});
+
+test('floodFillHistogram:background_seed_picks_up_background_region', function (test) {
+  // refVal is left undefined, so the seed's own bit 0 decides which side of
+  // the threshold the fill targets. Seeding on a '.' cell inside the hollow
+  // centre must therefore tally the 9 background cells, NOT the surrounding
+  // foreground frame.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#...#',
+    '#...#',
+    '#####'
+  ]);
+
+  const histogram = floodFillHistogram(image, 2, 2);
+
+  let total = 0;
+  for (let i = 0; i < histogram.length; i += 1) total += histogram[i];
+  test.equal(total, 9, 'Histogram covers the 9-cell background region');
+  test.equal(histogram[0x80], 9, 'Background cells land in the 0x80 bin (frame excluded)');
+  test.end();
+});
+
+test('floodFillHistogram:bins_by_luminance_with_bit_zero_masked', function (test) {
+  // Mixed luminance across a connected foreground region. Each cell's bit 0
+  // is set (so the fill walks all 4), and bits 7..1 hold three different
+  // quantised luminances: 0x40, 0x80, and 0xC0. The histogram must place each
+  // pixel in the bin keyed by `value & 0xFE`, so odd-index slots stay zero.
+  const image = makeMonoImageRaw([
+    [0x41, 0x81, 0x00, 0x00],
+    [0xC1, 0x81, 0x00, 0x00]
+  ]);
+
+  const histogram = floodFillHistogram(image, 0, 0);
+
+  test.equal(histogram[0x40], 1, 'One pixel with luminance 0x40');
+  test.equal(histogram[0x80], 2, 'Two pixels with luminance 0x80');
+  test.equal(histogram[0xC0], 1, 'One pixel with luminance 0xC0');
+
+  let oddTotal = 0;
+  for (let i = 1; i < histogram.length; i += 2) oddTotal += histogram[i];
+  test.equal(oddTotal, 0, 'Odd-index bins are never written — bit 0 is masked off');
+  test.end();
+});
+
+test('floodFillHistogram:only_tallies_connected_component', function (test) {
+  // Two foreground regions separated by a background gap. Seeding inside the
+  // left region must only count its cells; the right region's pixels — even
+  // though they share the same luminance — must NOT appear in the histogram.
+  const image = makeMonoImage([
+    '##.##',
+    '##.##',
+    '##.##'
+  ]);
+
+  const histogram = floodFillHistogram(image, 0, 1);
+
+  let total = 0;
+  for (let i = 0; i < histogram.length; i += 1) total += histogram[i];
+  test.equal(total, 6, 'Only the 6 left-region cells contribute');
+  test.equal(histogram[0x80], 6, 'All 6 land in the 0x80 bin');
+  test.end();
+});
+
+test('floodFillHistogram:fractional_seed_is_floored', function (test) {
+  // Viewer passes a focal point in image space, which can be fractional. The
+  // function must floor refX/refY internally so callers don't need to.
+  // (2.9, 2.9) floors to (2, 2), which lies inside the 3x3 block; (1.0, 1.0)
+  // also lies inside the block, so the two calls must produce identical
+  // histograms.
+  const image = makeMonoImage([
+    '.....',
+    '.###.',
+    '.###.',
+    '.###.',
+    '.....'
+  ]);
+
+  const fractional = floodFillHistogram(image, 2.9, 2.9);
+  const integer = floodFillHistogram(image, 2, 2);
+
+  test.deepEqual(
+    Array.from(fractional),
+    Array.from(integer),
+    'Fractional and integer seeds inside the same cell give the same histogram'
+  );
+  test.end();
+});
+
+test('floodFillHistogram:seed_outside_image_returns_null', function (test) {
+  // The only way floodFill produces zero callbacks with refVal=undefined is a
+  // seed whose Inside check fails on bounds — i.e. it lies outside
+  // [0, phWidth) × [0, phHeight). The histogram has no meaningful content in
+  // that case, so the function returns null rather than an all-zero buffer.
+  const image = makeMonoImage([
+    '###',
+    '###',
+    '###'
+  ]);
+
+  test.equal(floodFillHistogram(image, -1, 0), null, 'Seed left of image → null');
+  test.equal(floodFillHistogram(image, 3, 0), null, 'Seed right of image → null');
+  test.equal(floodFillHistogram(image, 0, -1), null, 'Seed above image → null');
+  test.equal(floodFillHistogram(image, 0, 3), null, 'Seed below image → null');
+  test.end();
+});
+
+test('floodFillHistogram:in_bounds_seed_always_returns_a_histogram', function (test) {
+  // With refVal=undefined the seed's own bit becomes the target, so any
+  // in-bounds seed satisfies Inside and produces at least one callback. The
+  // background-cell seed proves this for the '.' side; the foreground seed
+  // proves it for the '#' side. Both must yield a non-null histogram whose
+  // mass equals the size of the connected component the seed sits in.
+  const image = makeMonoImage([
+    '#####',
+    '#...#',
+    '#####'
+  ]);
+
+  const fromBackground = floodFillHistogram(image, 2, 1);
+  const fromForeground = floodFillHistogram(image, 0, 0);
+
+  test.ok(fromBackground, 'Background seed yields a histogram');
+  test.ok(fromForeground, 'Foreground seed yields a histogram');
+
+  let bgTotal = 0;
+  for (let i = 0; i < fromBackground.length; i += 1) bgTotal += fromBackground[i];
+  let fgTotal = 0;
+  for (let i = 0; i < fromForeground.length; i += 1) fgTotal += fromForeground[i];
+  test.equal(bgTotal, 3, 'Background region has 3 cells');
+  test.equal(fgTotal, 12, 'Foreground region has 12 cells (15 total - 3 background)');
   test.end();
 });
 

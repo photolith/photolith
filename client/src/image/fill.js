@@ -133,3 +133,45 @@ export function floodFillBounds (image, refX, refY, border) {
 
   return { x1, y1, x2, y2 };
 }
+
+/**
+ * Run `floodFill` from (refX, refY) and tally the luminance of every visited
+ * pixel into a 256-entry histogram. `refVal` is left `undefined`, so the fill
+ * follows whichever side of the threshold the seed lands on — foreground or
+ * background — and the histogram describes the luminance distribution of that
+ * connected region.
+ *
+ * The histogram is indexed by the `lum` value supplied by `floodFill`, which
+ * is the cell with bit 0 masked off (`value & 0xFE`). Bit 0 is therefore
+ * always 0 in any index that gets incremented, so only the 128 even slots
+ * (0, 2, …, 254) are ever touched; the odd slots stay at zero. Callers that
+ * want a packed 128-entry histogram can read `histogram[i << 1]`.
+ *
+ * Returns `null` when the fill visits no pixels at all — i.e. the seed lies
+ * outside `[0, phWidth) × [0, phHeight)`.
+ *
+ * @param {Uint8ClampedArray} image - Output of `thresholdOtsu`, carrying
+ *   `phWidth` / `phHeight`. Index layout is `y * phWidth + x`. Bit 0 of
+ *   each cell is the threshold result; bits 7..1 are the (quantised)
+ *   luminance.
+ * @param {number} refX - Column of the seed pixel. Floored before use, so
+ *   fractional inputs are accepted.
+ * @param {number} refY - Row of the seed pixel. Floored before use.
+ * @returns {Uint32Array | null} A 256-entry histogram of `value & 0xFE`
+ *   counts over the connected region, or `null` if no pixels were visited.
+ */
+export function floodFillHistogram (image, refX, refY) {
+  refX = Math.floor(refX);
+  refY = Math.floor(refY);
+  const histogram = new Uint32Array(256);
+  let count = 0;
+
+  // NB: Refer to reference pixel, so we also select background
+  floodFill(image, refX, refY, undefined, function (newX, newY, val) {
+    histogram[val]++;
+    count++;
+  });
+  if (count === 0) return null;
+
+  return histogram;
+}
