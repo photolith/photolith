@@ -175,3 +175,13 @@ export function floodFillHistogram (image, refX, refY) {
 
   return histogram;
 }
+
+export function fullHistogram (image) {
+  const histogram = new Uint32Array(256);
+
+  for (let i = 0; i < image.length; i++) {
+    histogram[image[i] & 0xFE]++;
+  }
+
+  return histogram;
+}

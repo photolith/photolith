@@ -3,6 +3,8 @@ import { fabric } from 'fabric';
 import { PhViewer } from './base';
 import { changeEvent } from '../events';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
+import { floodFillHistogram, fullHistogram } from '../image/fill.js';
+import '../fabric/filter_histogramexpansion.js';
 
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {

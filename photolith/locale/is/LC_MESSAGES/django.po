@@ -922,7 +922,17 @@ msgstr "Contrast"
 msgid "Gamma"
 msgstr "Gamma"
 
+#: photolith/templates/snippet/viewer.html
+msgid ""
+"Enhance contrast in the image, optionally targeting the individual targeted "
+"by the axis line"
+msgstr ""
+"Auka birtuskil í myndinni, valfrjálst miðað á einstaklinginn sem áslínan "
+"miðar á"
 
+#: photolith/templates/snippet/viewer.html
+msgid "Enhance"
+msgstr "Auka"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"
