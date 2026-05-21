@@ -46,10 +46,6 @@ function formRefresh (event) {
     elForm.querySelector(':scope .label_help').classList.toggle('d-none', event.target.value);
     elForm.querySelector(':scope .individual-data').classList.toggle('d-none', !event.target.value);
 
-    // Clear out old individuals first
-    elForm.querySelector(':scope .individuals').innerHTML = '';
-    elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
-    elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
     elForm.classList.add('rendering');
     // Update rest of form to match new sample, getting data from fileset or mApi if none provided
     return Promise.resolve().then(() => {
@@ -68,17 +64,26 @@ function formRefresh (event) {
         checkExisting(new Set(individuals.map((x) => x.ch_slideLabel)), elForm.getAttribute('data-locale-warnexisting'));
       }
 
-      elForm.querySelector(':scope .individuals').innerHTML = individuals.map((ind, indIdx) => {
+      // Find biggest indIdx already present, our entries sit above this
+      let idxOffset = 0;
+      Array.from(elForm.elements).forEach((el) => {
+        if (el.name.startsWith('bounding_box:')) {
+          const idx = parseInt(el.name.replace('bounding_box:', ''), 10);
+          if (idx >= idxOffset) idxOffset = idx + 1;
+        }
+      });
+
+      elForm.querySelector(':scope .individuals').insertAdjacentHTML('beforeend', individuals.map((ind, indIdx) => {
         return `
-          <input type="hidden" name="data:${indIdx}" value="">
-          <input type="hidden" name="bounding_box:${indIdx}" value="">
+          <input type="hidden" name="data:${indIdx + idxOffset}" value="">
+          <input type="hidden" name="bounding_box:${indIdx + idxOffset}" value="">
         `;
-      }).join('\n');
+      }).join('\n'));
       individuals.forEach((ind, indIdx) => {
-        elForm.elements.individual.append(new window.Option(window.mApi.individualLabel(ind), indIdx));
-        elForm[`data:${indIdx}`].value = JSON.stringify(ind);
-        elForm[`bounding_box:${indIdx}`].value = ind.bounding_box ? JSON.stringify(ind.bounding_box) : '';
-        elForm[`bounding_box:${indIdx}`].setAttribute('data-label', window.mApi.individualLabel(ind));
+        elForm.elements.individual.append(new window.Option(window.mApi.individualLabel(ind), indIdx + idxOffset));
+        elForm[`data:${indIdx + idxOffset}`].value = JSON.stringify(ind);
+        elForm[`bounding_box:${indIdx + idxOffset}`].value = ind.bounding_box ? JSON.stringify(ind.bounding_box) : '';
+        elForm[`bounding_box:${indIdx + idxOffset}`].setAttribute('data-label', window.mApi.individualLabel(ind));
       });
       elForm.selection.value = '';
       // Lots of individuals, select the first rather than trying to display them all on-screen
@@ -112,6 +117,11 @@ function formRefresh (event) {
   if (event.target.name === 'image_file') {
     // If there's an image, we'll be able to fill in form
     elForm.querySelector('fieldset').disabled = !event.target.value;
+
+    // Clear out old individuals
+    elForm.querySelector(':scope .individuals').innerHTML = '';
+    elForm.elements.individual.innerHTML = '<option selected="selected" value="">*</option>';
+    elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
   }
 
   if (event.target.name === 'selection') {

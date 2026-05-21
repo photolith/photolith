@@ -24,10 +24,25 @@ function setInitBBs (bbEls, width, height) {
     ? { w: 0, h: 0 }
     : { w: box.w * 0.1, h: box.h * 0.2 };
 
+  let left = margin.w - box.w;
+  let top = margin.h;
   bbEls.forEach((el, i) => {
-    if (el.value) return; // Ignore bounding boxes with a value already set
-    const left = margin.w + (i % grid.w) * box.w;
-    const top = margin.h + Math.min(Math.floor(i / grid.w), grid.h) * box.h;
+    if (el.value) {
+      // Read existing boxes' positions, get most bottom-left one
+      const bounds = JSON.parse(el.value);
+      if ((top * width + left) < (bounds[0][1] * width + bounds[0][0])) {
+        left = bounds[0][0];
+        top = bounds[0][1];
+      }
+      return;
+    }
+
+    left += box.w;
+    if (left >= (width - margin.w)) {
+      // Reached end of row, CRLF.
+      left = margin.w;
+      top += box.h;
+    }
 
     el.value = JSON.stringify([
       [left, top],
