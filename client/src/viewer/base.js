@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
 
-import { toImageBitmap } from '../image.js';
+import { toImageBitmap } from '../image/decode.js';
 
 function getEventPoint (event) {
   if (event.clientX !== undefined) {

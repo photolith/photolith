@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 
 import { PhViewer } from './base';
+import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {
@@ -95,5 +96,45 @@ export class PhFilteringViewer extends PhViewer {
       }
       this.fabCanvas.renderAll();
     }, 10);
+  }
+
+  lowresImage () {
+    const bkgdImg = this.fabCanvas.backgroundImage;
+
+    // Reduce resolution of our working offscreen image to ~1000px wide
+    const rescale = bkgdImg._originalElement.width > 1000 ? 1 / Math.round(bkgdImg._originalElement.width / 1000) : 1;
+
+    let context = null;
+    if (!bkgdImg.phOffScreen) {
+      // Attach canvas to FabricImage, so it gets thrown away when background changes
+      bkgdImg.phOffScreen = new window.OffscreenCanvas(
+        bkgdImg._originalElement.width * rescale,
+        bkgdImg._originalElement.height * rescale
+      );
+      context = bkgdImg.phOffScreen.getContext('2d', { willReadFrequently: true });
+      context.drawImage(bkgdImg._originalElement, 0, 0, bkgdImg.phOffScreen.width, bkgdImg.phOffScreen.height);
+    } else {
+      // Already got one, just open context
+      context = bkgdImg.phOffScreen.getContext('2d', { willReadFrequently: true });
+    }
+    return [context, rescale];
+  }
+
+  thresholdedImage () {
+    const bkgdImg = this.fabCanvas.backgroundImage;
+
+    // Draw background image onto offscreen canvas, get 2d context to read
+    const [context, rescale] = this.lowresImage();
+
+    // Generate monochrome thresholded vesion if not already present
+    if (!bkgdImg.phThresholded) {
+      bkgdImg.phThresholded = normaliseSelection(thresholdLocalOtsu(
+        context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }),
+        // i.e. ~55 pixels
+        Math.floor(context.canvas.width * 0.053)
+      ));
+      // document.body.append(debugPreview(bkgdImg.phThresholded));
+    }
+    return [bkgdImg.phThresholded, rescale];
   }
 }
