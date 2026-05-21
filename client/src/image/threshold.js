@@ -100,11 +100,14 @@ export function thresholdOtsu (imageData) {
  * @param {number} [blockSize] - Neighbourhood size in pixels. Forced odd
  *   and clamped to >= 3 (scikit-image requires odd neighbourhood sizes).
  *   Defaults to 10% of image width, rounded down.
+ * @param {number} [sigmaDivisor=6.0] - Divisor used to derive the Gaussian
+ *   sigma from `blockSize` as `(blockSize - 1) / sigmaDivisor`. The default
+ *   of 6.0 matches scikit-image's automatic choice.
  * @returns {Uint8ClampedArray} A `width * height` array of packed
  *   luminance/threshold bytes (see `thresholdOtsu` for the bit layout).
  * @see https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_local
  */
-export function thresholdLocalOtsu (imageData, blockSize) {
+export function thresholdLocalOtsu (imageData, blockSize, sigmaDivisor = 6.0) {
   const { data, width, height } = imageData;
   const n = width * height;
   const mono = new Uint8ClampedArray(n);
@@ -126,7 +129,7 @@ export function thresholdLocalOtsu (imageData, blockSize) {
   if (blockSize === undefined) blockSize = Math.floor(width * 0.1);
   if (blockSize < 3) blockSize = 3;
   if (blockSize % 2 === 0) blockSize += 1;
-  const sigma = (blockSize - 1) / 6.0;
+  const sigma = (blockSize - 1) / sigmaDivisor;
 
   // 1D Gaussian kernel, truncated at 4σ to match scipy.ndimage's default.
   // The 2D filter is the outer product of this kernel with itself; we apply

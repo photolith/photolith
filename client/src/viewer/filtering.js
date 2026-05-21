@@ -202,7 +202,9 @@ export class PhFilteringViewer extends PhViewer {
       bkgdImg.phThresholded = normaliseSelection(thresholdLocalOtsu(
         context.getImageData(0, 0, context.canvas.width, context.canvas.height, { colorSpace: 'srgb' }),
         // i.e. ~55 pixels
-        Math.floor(context.canvas.width * 0.053)
+        Math.floor(context.canvas.width * 0.053),
+        // sigmaDivisor 1.0 gets flatter results with smaller images, e.g. homepage image
+        1.0
       ));
       // document.body.append(debugPreview(bkgdImg.phThresholded));
     }
