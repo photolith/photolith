@@ -14,20 +14,24 @@ export class PhFilteringViewer extends PhViewer {
     super(elViewer);
     this.elForm = this.elViewer.querySelector(':scope form');
     this.elForm.onchange = (event) => {
-      if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
-      this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 600);
+      // Serialise attempts to alter filters
+      if (!this.filterActiveTimeout) {
+        this.filterActiveTimeout = setTimeout(this.refreshFilters.bind(this), 0);
+      }
     };
-    this.elForm.onreset = (event) => {
-      if (this.formChangeTimeout) clearTimeout(this.formChangeTimeout);
-      this.formChangeTimeout = setTimeout(this.refreshFilters.bind(this), 10);
-    };
+    // oninput fires as range sliders are dragged, not just when let go
+    this.elForm.oninput = this.elForm.onchange;
+    this.elForm.onreset = this.elForm.onchange;
   }
 
   refreshFilters () {
     const img = this.fabCanvas.backgroundImage;
     const phFilters = Object.fromEntries(new FormData(this.elForm));
 
-    if (!img) return; // No image loaded
+    if (!img) {
+      this.filterActiveTimeout = undefined;
+      return; // No image loaded
+    }
     img.filters = [];
 
     if (phFilters.brightness && phFilters.brightness !== '0') {
@@ -105,10 +109,11 @@ export class PhFilteringViewer extends PhViewer {
     const applyFilters = () => {
       try {
         img.applyFilters();
+        this.filterActiveTimeout = undefined;
       } catch (err) {
+        this.filterActiveTimeout = undefined;
         console.error(err);
         this.elForm.reset();
-        setTimeout(this.refreshFilters.bind(this), 600);
         throw new Error('Could not apply image filter, GPU out of memory(?)');
       }
       this.fabCanvas.renderAll();
