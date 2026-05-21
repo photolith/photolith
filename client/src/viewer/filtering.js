@@ -32,6 +32,18 @@ export class PhFilteringViewer extends PhViewer {
       this.filterActiveTimeout = undefined;
       return; // No image loaded
     }
+
+    // Check if filters actually changed
+    if (phFilters.histogramExpansion && phFilters.histogramExpansion !== '0') {
+      phFilters._focalPoint = this._focalPoint;
+    }
+    if (JSON.stringify(phFilters) === this._prevPhFilters) {
+      // Filters didn't change
+      this.filterActiveTimeout = undefined;
+      return;
+    }
+    this._prevPhFilters = phFilters;
+
     img.filters = [];
 
     if (phFilters.brightness && phFilters.brightness !== '0') {
