@@ -181,17 +181,19 @@ export default function (props = {}, circleProps = {}, opts = {}) {
   };
 
   // Remove pointer to phNode
-  poly.phRemoveNode = function (phNode) {
-    const points = this.phNodes.map((n) => new Point(n.left, n.top));
+  poly.phRemoveNode = function (phNodeOrArray) {
+    const nodesToRemove = Array.isArray(phNodeOrArray) ? phNodeOrArray : [phNodeOrArray];
 
-    // Deleting sole point would remove the line
-    if (points.length < 2) return;
+    // We should at least have a line at the end of this
+    if (nodesToRemove.length === 0 || (this.phNodes.length - nodesToRemove.length) < 2) return;
 
-    // Remove point at given index
-    points.splice(phNode.phNodeIdx, 1);
-
+    const points = this.phNodes.filter((n) => !nodesToRemove.includes(n)).map((n) => {
+      return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
+    });
     poly.phSetPoints(points);
-    this.canvas.setActiveObject(this.phNodes[phNode.phNodeIdx - 1]);
+
+    const oldIdx = nodesToRemove[0].phNodeIdx;
+    this.canvas.setActiveObject(this.phNodes[Math.min(oldIdx, this.phNodes.length - 1)]);
   };
 
   poly.on('moving', (event) => {
