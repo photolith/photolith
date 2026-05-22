@@ -159,6 +159,10 @@ export class PhFilteringViewer extends PhViewer {
 
   load (blob, boundingBox) {
     return super.load(blob, boundingBox).finally(() => {
+      // Pre-cache thresholded version of image
+      if (this.fabCanvas.backgroundImage) {
+        this.thresholdedImage();
+      }
       // Clear focal point on new image load
       this.setFocalPoint(null);
     });
