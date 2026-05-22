@@ -95,40 +95,35 @@ export class PhCropper extends PhSyncingViewer {
 
     obj.phSnapToEdge = function (moving = false) {
       const tolerance = 10 / this.canvas.getZoom();
+      const oldPos = this.getPositionByOrigin('left', 'top');
 
       // If moving, we should keep the width/height constant, and move the box
       // Otherwise, we should vary width/height and steady the boxes position
-      if (Math.abs(this.top) < tolerance) {
-        this.set(moving
-          ? { top: 0 }
-          : {
-              top: 0,
-              fontSize: (this.height + this.top) / this._fontSizeMult
-            });
+      if (Math.abs(oldPos.y) < tolerance) {
+        if (!moving) this.set({ fontSize: (this.height + oldPos.y) / this._fontSizeMult });
+        this.setPositionByOrigin({ x: oldPos.x, y: 0 }, 'left', 'top');
       }
-      if (Math.abs(this.left) < tolerance) {
-        this.set(moving
-          ? { left: 0 }
-          : {
-              left: 0,
-              width: this.width + this.left
-            });
+      if (Math.abs(oldPos.x) < tolerance) {
+        if (!moving) this.set({ width: this.width + oldPos.x });
+        this.setPositionByOrigin({ x: 0, y: oldPos.y }, 'left', 'top');
       }
-      const heightDiff = this.top + this.height - this.canvas.backgroundImage.height;
+      const heightDiff = oldPos.y + this.height - this.canvas.backgroundImage.height;
       if (Math.abs(heightDiff) < tolerance) {
-        this.set(moving
-          ? { top: this.top - heightDiff }
-          : {
-              fontSize: (this.height - heightDiff) / this._fontSizeMult
-            });
+        if (moving) {
+          this.setPositionByOrigin({ x: oldPos.x, y: oldPos.y - heightDiff }, 'left', 'top');
+        } else {
+          this.set({ fontSize: (this.canvas.backgroundImage.height - oldPos.y) / this._fontSizeMult });
+          this.setPositionByOrigin({ x: oldPos.x, y: oldPos.y }, 'left', 'top');
+        }
       }
-      const widthDiff = this.left + this.width - this.canvas.backgroundImage.width;
+      const widthDiff = oldPos.x + this.width - this.canvas.backgroundImage.width;
       if (Math.abs(widthDiff) < tolerance) {
-        this.set(moving
-          ? { left: this.left - widthDiff }
-          : {
-              width: this.width - widthDiff
-            });
+        if (moving) {
+          this.setPositionByOrigin({ x: oldPos.x - widthDiff, y: oldPos.y }, 'left', 'top');
+        } else {
+          this.set({ width: this.canvas.backgroundImage.width - oldPos.x });
+          this.setPositionByOrigin({ x: oldPos.x, y: oldPos.y }, 'left', 'top');
+        }
       }
     };
 
@@ -164,11 +159,10 @@ export class PhCropper extends PhSyncingViewer {
       crop.y2 = crop.y2 / rescale;
 
       obj.set({
-        left: crop.x1,
-        top: crop.y1,
         width: crop.x2 - crop.x1,
         fontSize: ((crop.y2 - crop.y1) * (obj.scaleY || 1)) / obj._fontSizeMult
       });
+      obj.setPositionByOrigin({ x: crop.x1, y: crop.y1 }, 'left', 'top');
       obj.setCoords();
       obj.canvas.fire('object:modified', { target: obj });
     });

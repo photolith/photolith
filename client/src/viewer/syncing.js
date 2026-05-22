@@ -109,10 +109,11 @@ export class PhSyncingViewer extends PhFilteringViewer {
         return roundPoint(util.transformPoint(p, objToCanvas));
       });
     } else if (obj instanceof Textbox) {
+      const p = obj.getPositionByOrigin('left', 'top');
       // NB: Using left/top/... is more accurate than obj.calcACoords()
       newVal = [
-        roundPoint({ x: obj.left, y: obj.top }),
-        roundPoint({ x: obj.left + obj.width, y: obj.top + obj.height })
+        roundPoint({ x: p.x, y: p.y }),
+        roundPoint({ x: p.x + obj.width, y: p.y + obj.height })
       ];
     } else {
       const ac = obj.calcACoords();
@@ -165,10 +166,9 @@ export class PhSyncingViewer extends PhFilteringViewer {
         obj.dirty = true;
         obj.canvas.requestRenderAll();
       }
-      obj.left = val[0][0];
-      obj.top = val[0][1];
       obj.width = val[1][0] - val[0][0];
       obj.height = val[1][1] - val[0][1];
+      obj.setPositionByOrigin({ x: val[0][0], y: val[0][1] }, 'left', 'top');
       obj.setCoords(); // http://fabricjs.com/fabric-gotchas
       obj.fire('scaling', { transform: { target: obj } });
     }

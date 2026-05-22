@@ -56,8 +56,6 @@ export default function (props = {}, circleProps = {}, opts = {}) {
       const obj = new Circle(Object.assign({}, {
         fill: 'transparent',
         stroke: 'orangered',
-        originX: 'center',
-        originY: 'center',
         objectCaching: false // NB: So we can update obj.radius
       }, circleProps));
       // NB: We have to set position before canvas.add()
@@ -86,11 +84,10 @@ export default function (props = {}, circleProps = {}, opts = {}) {
           };
     }, null);
     this.set({
-      left: newLimits.left,
-      top: newLimits.top,
       width: newLimits.right - newLimits.left,
       height: newLimits.bottom - newLimits.top
     });
+    this.setPositionByOrigin({ x: newLimits.left, y: newLimits.top }, 'left', 'top');
     this.setCoords(); // http://fabricjs.com/fabric-gotchas
 
     // Reposition nodes & polyline points

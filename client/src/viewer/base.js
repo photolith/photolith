@@ -221,6 +221,10 @@ export class PhViewer {
         selectable: false
       });
       this.fabCanvas.backgroundImage = img;
+      // 7.0+ defaults to originX/originY default to 'center'
+      // 8.0+ gets rid of the originX/originY backward compatibility options
+      // https://fabricjs.com/docs/upgrading/upgrading-to-fabric-70/#warning-objectoriginx-and-objectoriginy-now-default-to-center
+      img.setPositionByOrigin({ x: 0, y: 0 }, 'left', 'top');
 
       // Zoom viewport to fit boundingBox, or Image
       this.fabCanvas.phFitBoundingBox(boundingBox || [[0, 0], [img.width, img.height]]);
