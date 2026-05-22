@@ -33,6 +33,9 @@ export class PhViewer {
 
     // Never show rotate controls on groups (read: ctrl-drag to select multiple)
     Group.ownDefaults.lockRotation = true;
+    Group.ownDefaults.lockScalingFlip = true;
+    Group.ownDefaults.lockSkewingX = true;
+    Group.ownDefaults.lockSkewingY = true;
 
     this.fabCanvas = new Canvas(this.elViewer.querySelector(':scope > canvas.image'));
     this.fabCanvas.phViewer = this;
@@ -137,10 +140,8 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:down', function (opt) {
-      /* TODO: Disable ctrl-drag support, it's too buggy - https://github.com/photolith/photolith/issues/110
       // Don't drag canvas on ctrl-mouse, to allow for selecting groups
       if (opt.e.ctrlKey) return;
-      */
       // Don't drag on left button when over a target (interact with target instead)
       if (opt.e.button === 0 && opt.target) return;
 
@@ -171,6 +172,48 @@ export class PhViewer {
       this.isDragging = false;
       this.selection = true;
     });
+
+    // Send object events on selection down to the children in the group
+    function propogateSelectionEvents (opt) {
+      const selObj = this.getActiveObject();
+      if (selObj && selObj instanceof Group) {
+        selObj.on('moving', function (opt) {
+          selObj.getObjects().forEach((o) => {
+            o.fire('moving', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
+          });
+        });
+        // NB: resizing won't be a thing, it only happens on a textbox for reflowing content
+        selObj.on('scaling', function (opt) {
+          // Remove activeSelection's scale, apply it to each object and let it deal with it
+          const oldScaleX = selObj.scaleX || 1;
+          const oldScaleY = selObj.scaleY || 1;
+          selObj.set({
+            width: selObj.width * oldScaleX,
+            height: selObj.height * oldScaleY,
+            scaleX: 1,
+            scaleY: 1
+          });
+          selObj.getObjects().forEach((o) => {
+            o.set({
+              left: o.left * oldScaleX,
+              top: o.top * oldScaleY,
+              scaleX: o.scaleX * oldScaleX,
+              scaleY: o.scaleY * oldScaleY
+            });
+            o.setCoords();
+            o.fire('scaling', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
+          });
+        });
+        selObj.on('modified', function (opt) {
+          selObj.getObjects().forEach((o) => {
+            o.canvas.fire('object:modified', { target: o });
+          });
+        });
+      }
+    }
+    this.fabCanvas.on('selection:created', propogateSelectionEvents);
+    this.fabCanvas.on('selection:updated', propogateSelectionEvents);
+    this.fabCanvas.on('selection:deleted', propogateSelectionEvents);
   }
 
   configureScale (scaleEl) {

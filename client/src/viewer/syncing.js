@@ -80,14 +80,6 @@ export class PhSyncingViewer extends PhFilteringViewer {
     const obj = opt.target;
     let newVal;
 
-    /* TODO: This won't work, we need to upgrade to v6: https://github.com/photolith/photolith/issues/110
-    // If we get a selection, sync everything within it
-    if (obj && obj.get("type") === "activeSelection") {
-      obj.getObjects().forEach((o) => { this.syncForm({ target: o })});
-      return;
-    }
-    */
-
     // No point without an associated form element
     if (!obj || !obj.id || !this.elSyncForm || !this.elSyncForm.elements[obj.id]) return;
     const formEl = this.elSyncForm.elements[obj.id];
@@ -102,23 +94,26 @@ export class PhSyncingViewer extends PhFilteringViewer {
       return out;
     }
 
+    const groupTransform = obj.group ? obj.group.calcTransformMatrix() : undefined;
+    const toCanvas = (p) => groupTransform ? util.transformPoint(p, groupTransform) : p;
+
     if (obj instanceof Polyline) {
       const objToCanvas = obj.calcTransformMatrix();
 
       newVal = obj.points.map((p) => {
-        return roundPoint(util.transformPoint(p, objToCanvas));
+        return roundPoint(toCanvas(util.transformPoint(p, objToCanvas)));
       });
     } else if (obj instanceof Textbox) {
       const p = obj.getPositionByOrigin('left', 'top');
       // NB: Using left/top/... is more accurate than obj.calcACoords()
       newVal = [
-        roundPoint({ x: p.x, y: p.y }),
-        roundPoint({ x: p.x + obj.width, y: p.y + obj.height })
+        roundPoint(toCanvas(new Point(p.x, p.y))),
+        roundPoint(toCanvas(new Point(p.x + obj.width, p.y + obj.height)))
       ];
     } else {
       const ac = obj.calcACoords();
 
-      newVal = [roundPoint(ac.tl), roundPoint(ac.br)];
+      newVal = [roundPoint(toCanvas(ac.tl)), roundPoint(toCanvas(ac.br))];
     }
 
     // If any of the points of this object are out-of-bounds, consider the whole thing out-of-bounds
@@ -161,6 +156,9 @@ export class PhSyncingViewer extends PhFilteringViewer {
     } else if (obj instanceof Polyline && obj.phSetPoints) {
       obj.phSetPoints(val.map((x) => new Point(x[0], x[1])), true);
     } else {
+      const invGroupTransform = obj.group ? util.invertTransform(obj.group.calcTransformMatrix()) : undefined;
+      const fromCanvas = (p) => invGroupTransform ? util.transformPoint(p, invGroupTransform) : p;
+
       if (obj instanceof Textbox && obj.text !== formEl.getAttribute('data-label')) {
         obj.text = formEl.getAttribute('data-label');
         obj.dirty = true;
@@ -168,7 +166,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
       }
       obj.width = val[1][0] - val[0][0];
       obj.height = val[1][1] - val[0][1];
-      obj.setPositionByOrigin({ x: val[0][0], y: val[0][1] }, 'left', 'top');
+      obj.setPositionByOrigin(fromCanvas(new Point(val[0][0], val[0][1])), 'left', 'top');
       obj.setCoords(); // http://fabricjs.com/fabric-gotchas
       obj.fire('scaling', { transform: { target: obj } });
     }

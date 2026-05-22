@@ -62,6 +62,13 @@ export default function (props = {}, circleProps = {}, opts = {}) {
       obj.setPositionByOrigin(newPoints[idx], 'center', 'center');
       obj.hasControls = false;
       obj.on('moving', poly.phUpdateNode.bind(poly, obj));
+      obj.on('scaling', (opt) => {
+        const obj = opt.transform.target;
+        // Ignore scaling (via. activeselection), instead update line based on node
+        obj.set({ scaleX: 1, scaleY: 1 });
+        poly.phUpdateNode(obj, opt);
+      });
+      obj.phPoly = this;
       this.phNodes.push(obj);
       this.canvas.add(obj);
     }
@@ -93,7 +100,9 @@ export default function (props = {}, circleProps = {}, opts = {}) {
     // Reposition nodes & polyline points
     const canvasToPoly = util.invertTransform(this.calcTransformMatrix());
     this.points = newPoints.map((p, i) => {
-      this.phNodes[i].setPositionByOrigin(p, 'center', 'center');
+      const group = this.phNodes[i].group;
+      const localP = group ? util.transformPoint(p, util.invertTransform(group.calcTransformMatrix())) : p;
+      this.phNodes[i].setPositionByOrigin(localP, 'center', 'center');
       this.phNodes[i].setCoords();
       this.phNodes[i].phNodeIdx = i;
       this.phNodes[i].id = `${this.id}[${i}]`;
@@ -151,7 +160,9 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
-    const points = this.phNodes.map((n) => new Point(n.left, n.top));
+    const points = this.phNodes.map((n) => {
+      return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
+    });
     // snap when both this.canvas.phPrefs["ph-pref-snap-to-axis"] opt.e.ctrlKey on or off
     const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
