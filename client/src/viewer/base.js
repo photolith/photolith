@@ -176,6 +176,8 @@ export class PhViewer {
     // Send object events on selection down to the children in the group
     function propogateSelectionEvents (opt) {
       const selObj = this.getActiveObject();
+      this.lowerCanvasEl.focus(); // Focus to receive keyboard events
+
       if (selObj && selObj instanceof Group) {
         selObj.on('moving', function (opt) {
           selObj.getObjects().forEach((o) => {
@@ -214,6 +216,20 @@ export class PhViewer {
     this.fabCanvas.on('selection:created', propogateSelectionEvents);
     this.fabCanvas.on('selection:updated', propogateSelectionEvents);
     this.fabCanvas.on('selection:deleted', propogateSelectionEvents);
+
+    this.elViewer.setAttribute('tabindex', '0');
+    this.elViewer.addEventListener('keydown', (e) => {
+      if (e.keyCode === 46) { // delete
+        const selObj = this.fabCanvas.getActiveObject();
+        const targetObjs = !selObj ? [] : selObj instanceof Group ? selObj.getObjects() : [selObj];
+
+        // If first node is an editable line, tell it to remove them
+        // NB: This is most certainly a bodge, is the only case we allow deletion currently
+        if (targetObjs.length > 0 && targetObjs[0].phPoly) {
+          targetObjs[0].phPoly.phRemoveNode(targetObjs);
+        }
+      }
+    });
   }
 
   configureScale (scaleEl) {
