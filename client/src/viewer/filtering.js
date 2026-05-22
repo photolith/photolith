@@ -1,17 +1,22 @@
-import { fabric } from 'fabric';
+import { filters, config, getEnv } from 'fabric';
 
 import { PhViewer } from './base';
 import { changeEvent } from '../events';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 import { floodFillHistogram, fullHistogram } from '../image/fill.js';
-import '../fabric/filter_histogramexpansion.js';
-import '../fabric/filter_thresholdimage.js';
+import { HistogramExpansion } from '../fabric/filter_histogramexpansion.js';
+import { ThresholdImage } from '../fabric/filter_thresholdimage.js';
 
 export class PhFilteringViewer extends PhViewer {
   constructor (elViewer) {
-    if (fabric.isWebglSupported()) {
-      // Increase textureSize to limit, so our images hopefully fit
-      fabric.textureSize = fabric.maxTextureSize;
+    // Push textureSize up to the GPU's max BEFORE the filter backend is
+    // lazily created — once WebGLFilterBackend exists, its internal canvas is
+    // locked at config.textureSize, so a smaller backing canvas would clip
+    // filter output for any image larger than the default 4096px.
+    const { WebGLProbe } = getEnv();
+    WebGLProbe.queryWebGL(document.createElement('canvas'));
+    if (WebGLProbe.maxTextureSize) {
+      config.textureSize = WebGLProbe.maxTextureSize;
     }
 
     super(elViewer);
@@ -50,20 +55,20 @@ export class PhFilteringViewer extends PhViewer {
     img.filters = [];
 
     if (phFilters.brightness && phFilters.brightness !== '0') {
-      img.filters.push(new fabric.Image.filters.Brightness({
+      img.filters.push(new filters.Brightness({
         brightness: parseFloat(phFilters.brightness)
       }));
     }
 
     if (phFilters.contrast && phFilters.contrast !== '0') {
-      img.filters.push(new fabric.Image.filters.Contrast({
+      img.filters.push(new filters.Contrast({
         contrast: parseFloat(phFilters.contrast)
       }));
     }
 
     if (phFilters.gamma && phFilters.gamma !== '1') {
       phFilters.gamma = parseFloat(phFilters.gamma);
-      img.filters.push(new fabric.Image.filters.Gamma({
+      img.filters.push(new filters.Gamma({
         gamma: [
           phFilters.gamma,
           phFilters.gamma,
@@ -75,21 +80,21 @@ export class PhFilteringViewer extends PhViewer {
     if (phFilters.saturation && phFilters.saturation !== '0') {
       if (phFilters.saturationhue && phFilters.saturationhue !== '0') {
         // https://fabricjs.com/api/namespaces/filters/classes/blendcolor/
-        img.filters.push(new fabric.Image.filters.BlendColor({
+        img.filters.push(new filters.BlendColor({
           color: 'hsl(' + Math.floor(parseFloat(phFilters.saturationhue) * 360) + ',100%,50%)',
           alpha: Math.abs(phFilters.saturation),
           mode: phFilters.saturation > 1 ? 'add' : 'subtract'
         }));
       } else {
         // Saturate / desaturate all colours
-        img.filters.push(new fabric.Image.filters.Saturation({
+        img.filters.push(new filters.Saturation({
           saturation: parseFloat(phFilters.saturation)
         }));
       }
     }
 
     if (phFilters.vibrance && phFilters.vibrance !== '0') {
-      img.filters.push(new fabric.Image.filters.Vibrance({
+      img.filters.push(new filters.Vibrance({
         vibrance: parseFloat(phFilters.vibrance)
       }));
     }
@@ -105,14 +110,14 @@ export class PhFilteringViewer extends PhViewer {
         )
         : null) || fullHistogram(image);
 
-      img.filters.push(new fabric.Image.filters.HistogramExpansion({
+      img.filters.push(new HistogramExpansion({
         histogramExpansion: parseFloat(phFilters.histogramExpansion),
         histogram
       }));
     }
 
     if (phFilters.laplace) {
-      img.filters.push(new fabric.Image.filters.Convolute({
+      img.filters.push(new filters.Convolute({
         matrix: [
           -1, -1, -1,
           -1, 8, -1,
@@ -123,7 +128,7 @@ export class PhFilteringViewer extends PhViewer {
 
     if (phFilters.thresholdImage) {
       const [image] = this.thresholdedImage();
-      img.filters.push(new fabric.Image.filters.ThresholdImage({
+      img.filters.push(new ThresholdImage({
         image
       }));
     }
@@ -154,6 +159,10 @@ export class PhFilteringViewer extends PhViewer {
 
   load (blob, boundingBox) {
     return super.load(blob, boundingBox).finally(() => {
+      // Pre-cache thresholded version of image
+      if (this.fabCanvas.backgroundImage) {
+        this.thresholdedImage();
+      }
       // Clear focal point on new image load
       this.setFocalPoint(null);
     });

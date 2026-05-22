@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Canvas, FabricImage, Group } from 'fabric';
 
 import { toImageBitmap } from '../image/decode.js';
 
@@ -32,16 +32,17 @@ export class PhViewer {
     });
 
     // Never show rotate controls on groups (read: ctrl-drag to select multiple)
-    fabric.Group.prototype.lockRotation = true;
+    Group.ownDefaults.lockRotation = true;
+    Group.ownDefaults.lockScalingFlip = true;
+    Group.ownDefaults.lockSkewingX = true;
+    Group.ownDefaults.lockSkewingY = true;
 
-    this.fabCanvas = new fabric.Canvas(this.elViewer.querySelector(':scope > canvas.image'), {
-      fireMiddleClick: true,
-      fireRightClick: true,
-      stopContextMenu: true
-    });
+    this.fabCanvas = new Canvas(this.elViewer.querySelector(':scope > canvas.image'));
     this.fabCanvas.phViewer = this;
-    this.fabCanvas.setWidth(this.elViewer.clientWidth);
-    this.fabCanvas.setHeight(this.elViewer.clientHeight);
+    this.fabCanvas.setDimensions({
+      width: this.elViewer.clientWidth,
+      height: this.elViewer.clientHeight
+    });
     // NB: Any previous height will grow the elViewer container when page is shrinking,
     //    set to absolute so it's ignored
     this.fabCanvas.upperCanvasEl.parentNode.style.position = 'absolute';
@@ -105,15 +106,19 @@ export class PhViewer {
         if (entries.length < 1) return;
         const entry = entries[0];
 
-        this.fabCanvas.setWidth(entry.contentRect.width);
-        this.fabCanvas.setHeight(entry.contentRect.height);
+        this.fabCanvas.setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height
+        });
       });
       resizeObserver.observe(this.elViewer);
     } else {
       // Fall back to monitoring the entire window
       window.addEventListener('resize', function (event) {
-        this.fabCanvas.setWidth(this.elViewer.clientWidth);
-        this.fabCanvas.setHeight(this.elViewer.clientHeight);
+        this.fabCanvas.setDimensions({
+          width: this.elViewer.clientWidth,
+          height: this.elViewer.clientHeight
+        });
       }.bind(this));
     }
 
@@ -135,10 +140,8 @@ export class PhViewer {
     });
 
     this.fabCanvas.on('mouse:down', function (opt) {
-      /* TODO: Disable ctrl-drag support, it's too buggy - https://github.com/photolith/photolith/issues/110
       // Don't drag canvas on ctrl-mouse, to allow for selecting groups
       if (opt.e.ctrlKey) return;
-      */
       // Don't drag on left button when over a target (interact with target instead)
       if (opt.e.button === 0 && opt.target) return;
 
@@ -169,6 +172,48 @@ export class PhViewer {
       this.isDragging = false;
       this.selection = true;
     });
+
+    // Send object events on selection down to the children in the group
+    function propogateSelectionEvents (opt) {
+      const selObj = this.getActiveObject();
+      if (selObj && selObj instanceof Group) {
+        selObj.on('moving', function (opt) {
+          selObj.getObjects().forEach((o) => {
+            o.fire('moving', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
+          });
+        });
+        // NB: resizing won't be a thing, it only happens on a textbox for reflowing content
+        selObj.on('scaling', function (opt) {
+          // Remove activeSelection's scale, apply it to each object and let it deal with it
+          const oldScaleX = selObj.scaleX || 1;
+          const oldScaleY = selObj.scaleY || 1;
+          selObj.set({
+            width: selObj.width * oldScaleX,
+            height: selObj.height * oldScaleY,
+            scaleX: 1,
+            scaleY: 1
+          });
+          selObj.getObjects().forEach((o) => {
+            o.set({
+              left: o.left * oldScaleX,
+              top: o.top * oldScaleY,
+              scaleX: o.scaleX * oldScaleX,
+              scaleY: o.scaleY * oldScaleY
+            });
+            o.setCoords();
+            o.fire('scaling', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
+          });
+        });
+        selObj.on('modified', function (opt) {
+          selObj.getObjects().forEach((o) => {
+            o.canvas.fire('object:modified', { target: o });
+          });
+        });
+      }
+    }
+    this.fabCanvas.on('selection:created', propogateSelectionEvents);
+    this.fabCanvas.on('selection:updated', propogateSelectionEvents);
+    this.fabCanvas.on('selection:deleted', propogateSelectionEvents);
   }
 
   configureScale (scaleEl) {
@@ -197,7 +242,7 @@ export class PhViewer {
   }
 
   load (blob, boundingBox) {
-    this.fabCanvas.setBackgroundImage(undefined);
+    this.fabCanvas.backgroundImage = undefined;
     this.fabCanvas.requestRenderAll();
     this.imgBlob = null;
 
@@ -215,10 +260,14 @@ export class PhViewer {
     return Promise.resolve().then(() => {
       return toImageBitmap(blob);
     }).then((imageBitmap) => {
-      const img = new fabric.Image(imageBitmap, {
+      const img = new FabricImage(imageBitmap, {
         selectable: false
       });
-      this.fabCanvas.setBackgroundImage(img);
+      this.fabCanvas.backgroundImage = img;
+      // 7.0+ defaults to originX/originY default to 'center'
+      // 8.0+ gets rid of the originX/originY backward compatibility options
+      // https://fabricjs.com/docs/upgrading/upgrading-to-fabric-70/#warning-objectoriginx-and-objectoriginy-now-default-to-center
+      img.setPositionByOrigin({ x: 0, y: 0 }, 'left', 'top');
 
       // Zoom viewport to fit boundingBox, or Image
       this.fabCanvas.phFitBoundingBox(boundingBox || [[0, 0], [img.width, img.height]]);

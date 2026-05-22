@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Circle, Point, Polyline, util } from 'fabric';
 
 function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
   // Treat originPoint as origin, get delta of linePoint & newPoint
@@ -19,7 +19,7 @@ function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
 
   // Rotate newDelta to cancel difference, add to originPoint
   const sinus = Math.sin(angleDelta); const cosinus = Math.cos(angleDelta);
-  return originPoint.add(new fabric.Point(
+  return originPoint.add(new Point(
     newDelta.x * cosinus - newDelta.y * sinus,
     newDelta.x * sinus + newDelta.y * cosinus
   ));
@@ -31,7 +31,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
   circleProps.radius = circleProps.radius || 10;
   const endcapRadius = 3;
 
-  const poly = new fabric.Polyline([], Object.assign({}, {
+  const poly = new Polyline([], Object.assign({}, {
     left: 0,
     top: 0,
     fill: 'transparent',
@@ -44,7 +44,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
   poly.cornerColor = 'rgba(0,0,255,0.5)';
 
   // Make sure our pathOffset is zero so we don't have to account for it in phSetPoints()
-  poly.pathOffset = new fabric.Point(0, 0);
+  poly.pathOffset = new Point(0, 0);
 
   // Array to store "sub-objects" acting as control handles
   poly.phNodes = [];
@@ -53,17 +53,22 @@ export default function (props = {}, circleProps = {}, opts = {}) {
     // Add any missing phNodes
     while (this.phNodes.length < newPoints.length) {
       const idx = this.phNodes.length;
-      const obj = new fabric.Circle(Object.assign({}, {
+      const obj = new Circle(Object.assign({}, {
         fill: 'transparent',
         stroke: 'orangered',
-        originX: 'center',
-        originY: 'center',
         objectCaching: false // NB: So we can update obj.radius
       }, circleProps));
       // NB: We have to set position before canvas.add()
       obj.setPositionByOrigin(newPoints[idx], 'center', 'center');
       obj.hasControls = false;
       obj.on('moving', poly.phUpdateNode.bind(poly, obj));
+      obj.on('scaling', (opt) => {
+        const obj = opt.transform.target;
+        // Ignore scaling (via. activeselection), instead update line based on node
+        obj.set({ scaleX: 1, scaleY: 1 });
+        poly.phUpdateNode(obj, opt);
+      });
+      obj.phPoly = this;
       this.phNodes.push(obj);
       this.canvas.add(obj);
     }
@@ -86,22 +91,23 @@ export default function (props = {}, circleProps = {}, opts = {}) {
           };
     }, null);
     this.set({
-      left: newLimits.left,
-      top: newLimits.top,
       width: newLimits.right - newLimits.left,
       height: newLimits.bottom - newLimits.top
     });
+    this.setPositionByOrigin({ x: newLimits.left, y: newLimits.top }, 'left', 'top');
     this.setCoords(); // http://fabricjs.com/fabric-gotchas
 
     // Reposition nodes & polyline points
-    const canvasToPoly = fabric.util.invertTransform(this.calcTransformMatrix());
+    const canvasToPoly = util.invertTransform(this.calcTransformMatrix());
     this.points = newPoints.map((p, i) => {
-      this.phNodes[i].setPositionByOrigin(p, 'center', 'center');
+      const group = this.phNodes[i].group;
+      const localP = group ? util.transformPoint(p, util.invertTransform(group.calcTransformMatrix())) : p;
+      this.phNodes[i].setPositionByOrigin(localP, 'center', 'center');
       this.phNodes[i].setCoords();
       this.phNodes[i].phNodeIdx = i;
       this.phNodes[i].id = `${this.id}[${i}]`;
 
-      return fabric.util.transformPoint(p, canvasToPoly);
+      return util.transformPoint(p, canvasToPoly);
     });
 
     // Make sure each phNode & line is scaled for current zoom level
@@ -129,7 +135,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
   // Helper to append point to existing list of nodes
   poly.phAddNode = function (newPoint, opt) {
     let i;
-    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    const points = this.phNodes.map((n) => new Point(n.left, n.top));
     // snap when this.canvas.phPrefs["ph-pref-snap-to-axis"] or ctrl
     const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
@@ -154,7 +160,9 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
-    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    const points = this.phNodes.map((n) => {
+      return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
+    });
     // snap when both this.canvas.phPrefs["ph-pref-snap-to-axis"] opt.e.ctrlKey on or off
     const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
@@ -174,7 +182,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   // Remove pointer to phNode
   poly.phRemoveNode = function (phNode) {
-    const points = this.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    const points = this.phNodes.map((n) => new Point(n.left, n.top));
 
     // Deleting sole point would remove the line
     if (points.length < 2) return;
@@ -188,13 +196,13 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   poly.on('moving', (event) => {
     // Refresh points based on their new position
-    const points = poly.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    const points = poly.phNodes.map((n) => new Point(n.left, n.top));
     return poly.phSetPoints(points);
   });
 
   poly.on('phCanvasZoom', (event) => {
     // Refresh points to correct for any zoom error
-    const points = poly.phNodes.map((n) => new fabric.Point(n.left, n.top));
+    const points = poly.phNodes.map((n) => new Point(n.left, n.top));
     return poly.phSetPoints(points, true);
   });
 
