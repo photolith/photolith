@@ -1,5 +1,5 @@
-import { displayAlert } from '../alert';
-import BaseMetadataApi from './base';
+import { displayAlert } from '../alert.js';
+import BaseMetadataApi from './base.js';
 
 const intlTemplates = {
   en: {
@@ -301,7 +301,7 @@ export default class MetadataApi extends BaseMetadataApi {
           out.in_sampleId,
           [out.ch_cruise, out.in_station].join('/'),
           out.tx_species.id,
-          (out.in_month < 10 ? '0' : '') + out.nm_stationMonth
+          (out.in_month < 10 ? '0' : '') + out.in_month
         ].join(' ');
 
         if (!suppressWarnings && out.ch_slideLabel !== slideLabel) {
