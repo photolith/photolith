@@ -56,7 +56,7 @@ const metaLabels = {
     in_sampleId: 'Raðnúmer (id)',
     ch_slideLabel: 'Merking á gleri',
     ch_individualLabel: 'Einstaklingur nr.',
-    nm_image_id: 'Photolith mynd nr.',
+    nm_image_id: 'Photolith raðnúmer.',
     tx_sampleType: 'Tegund sýnis',
     nm_length: 'Lengd',
     nm_weight: 'Þyngd',
@@ -67,11 +67,11 @@ const metaLabels = {
     in_station: 'Stöð',
     in_year: 'Ár',
     in_month: 'Mánuður',
-    dt_stationDate: 'Dagsetning leiðangurs',
+    dt_stationDate: 'Dagsetning',
     ch_gear: 'Veiðarfæri',
     nm_meshSize: 'Möskvastærð',
     num_annotations: 'Fjöldi aldursmerkinga',
-    in_measureId: 'Maeling Id',
+    in_measureId: 'Mæling Id',
     dt_created_at: 'Fært inn'
   }
 };
