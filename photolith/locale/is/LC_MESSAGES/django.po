@@ -111,14 +111,14 @@ msgstr[1] "%(count)d einstaklingar uppfærðir."
 msgid "Deleted %(count)d individual. "
 msgid_plural "Deleted %(count)d individuals. "
 msgstr[0] "%(count)d einstakling eytt."
-msgstr[1] "%(count)d einstaklingar eytt."
+msgstr[1] "%(count)d einstaklingum eytt."
 
 #: photolith/ingest/views.py
 #, fuzzy, python-format
 msgid "Deleted %(count)d annotation. "
 msgid_plural "Deleted %(count)d annotations. "
 msgstr[0] "%(count)d aldursmerkingu eytt."
-msgstr[1] "%(count)d aldursmerkingar eytt."
+msgstr[1] "%(count)d aldursmerkingum eytt."
 
 #: photolith/ingest/views.py
 msgid "Show individuals"
@@ -861,8 +861,7 @@ msgstr "Búðu til verkefni með því að nota <kbd>leitina</kbd>."
 #: photolith/templates/project/list.html
 msgid "Then click <kbd>Save as project</kbd> in the top right corner."
 msgstr ""
-"Leitaðu með síunni að þeim eiginleikum sem þarf fyrir verkefnið og ýttu svo "
-"á <kbd>Vista sem verkefni</kbd>."
+"Ýttu svo á <kbd>Vista sem verkefni</kbd>."
 
 #: photolith/templates/project/update.html
 msgid "Cancel"
@@ -874,11 +873,11 @@ msgstr "Eyða"
 
 #: photolith/templates/search/annotation_alert.html
 msgid "There are already annotations present for individuals in this image:"
-msgstr "Það eru þegar til staðar skýringar fyrir einstaklinga á þessari mynd"
+msgstr "Það eru þegar til staðar aldursmerkingar fyrir einstaklinga á þessari mynd"
 
 #: photolith/templates/search/annotation_alert.html
 msgid "Editing these will result in the annotations being removed."
-msgstr "Ef þessum skýringum er breytt verða skýringarnar fjarlægðar."
+msgstr "Breyting á þessum einstaklingum mun eyða aldursmerkingum sem eru til staðar."
 
 #: photolith/templates/search/index.html
 msgid "Individual Search"
@@ -927,23 +926,22 @@ msgid ""
 "Enhance contrast in the image, optionally targeting the individual targeted "
 "by the axis line"
 msgstr ""
-"Auka birtuskil í myndinni, valfrjálst miðað á einstaklinginn sem áslínan "
-"miðar á"
+"Auka contrast í myndinni, miðað að einstaklingnum sem lestrarásinn er á"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Enhance"
-msgstr "Auka"
+msgstr "Auka skýrleika"
 
 #: photolith/templates/snippet/viewer.html
 msgid ""
 "Preview the thresholding that the otolith selection/enhance view uses, for "
 "debugging"
 msgstr ""
-"Forskoða þröskuldinn sem val/uppfærsla á otolith notar, til kembiforritunar"
+"Prófa þröskuldun sem er notuð af innsetningu mynda, fyrir debugging"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Threshold"
-msgstr "Þröskuldur"
+msgstr "Þröskuldun"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Download original image"
