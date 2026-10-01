@@ -186,6 +186,8 @@ msgid ""
 "trigger \"Activate / password reset\" as above so they get e-mailed a "
 "link."
 msgstr ""
+"Láttu nýja notandann fá notendanafnið eða lykilorðið, eða ýttu á "
+"\"Virkja / endursett lykilorð\" svo þeir fá hlekk í tölvupósti. "
 
 msgid "User permissions"
 msgstr "Leyfi notenda á síðunni"
