@@ -109,7 +109,7 @@ class Image(models.Model):
         verbose_name_plural = _("images")
 
     def px_to_mm(self):
-        if not self.scale_mm:
+        if not self.scale_mm or not self.scale_line:
             return None
         px_length = euclidean_dist(self.scale_line[0], self.scale_line[1])
         if px_length == 0:

@@ -30,6 +30,9 @@ class ImageTest(RequiresUtils, TestCase):
 
         self.assertEqual(px_to_mm([(10, 20), (30, 50)], None), None)
 
+        # Scale set, but no scale line
+        self.assertEqual(px_to_mm(None, 10), None)
+
 
 class IndividualTest(RequiresUtils, TestCase):
     def test_data(self):
