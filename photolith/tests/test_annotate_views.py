@@ -136,8 +136,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(get_initial(ind, project=p.id)["project"], p)
 
     def test_get_object(self):
-        def get_object(**kwargs):
+        def get_object(user=None, **kwargs):
             request = RequestFactory().get("/", kwargs)
+            request.user = user or user1
             v = AnnotateView()
             v.setup(request, **(request.GET.dict()))
             out = v.get_object()
@@ -161,6 +162,15 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         # individual mismatch reported
         with self.assertRaisesRegex(BadRequest, r"individual"):
             get_object(individual_id=ind.id + 1, annotation_id=ann.id)
+
+        # Other users can't fetch it, superusers can
+        user2 = self.create_user("user2")
+        with self.assertRaisesRegex(PermissionDenied, r"do not own"):
+            get_object(user=user2, individual_id=ind.id, annotation_id=ann.id)
+        user2.is_superuser = True
+        self.assertEqual(
+            get_object(user=user2, individual_id=ind.id, annotation_id=ann.id), ann
+        )
 
     def test_get_all_annotations(self):
         def get_all_annotations(individual, project=None, user=None):

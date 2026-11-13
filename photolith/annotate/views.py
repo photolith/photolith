@@ -64,6 +64,9 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
                 "Annotation %s is for individual %d, not %d"
                 % (str(obj), obj.individual_id, self.individual_id)
             )
+        # NB: Only the owner can edit, and others shouldn't see it whilst a project is open
+        if not (self.request.user.is_superuser or obj.created_by == self.request.user):
+            raise PermissionDenied("You do not own annotation %s" % obj)
         return obj
 
     def get_initial(self):
