@@ -289,7 +289,8 @@ class DataView(LoginRequiredMixin, View):
                         age=a.age,
                         rating=a.rating,
                         authority=a.authority,
-                        annotated_by=a.created_by,
+                        # NB: Username, as in CSV export (User isn't JSON-serialisable)
+                        annotated_by=a.created_by.username if a.created_by else None,
                         annotated_at=a.created_at,
                         comment=a.comment,
                     )

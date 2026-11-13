@@ -528,6 +528,17 @@ class DataViewTest(RequiresUtils, TestCase):
             },
         )
 
+    def test_with_annotations_all(self):
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        self.create_annotation(ind, created_by=userA, comment="UT comment")
+
+        out = self.data(userA, dict(with_annotations="all"))
+        self.assertEqual(
+            [(r["annotated_by"], r["comment"]) for r in out],
+            [("userA", "UT comment")],
+        )
+
 
 class ExportViewTest(RequiresUtils, TestCase):
     maxDiff = None
