@@ -128,12 +128,24 @@ test('renderMetaCell:search-form', function (test) {
       { id: 2, en: 'F.', is: 'Kv.' }
     ]
   }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
-  '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> <option value="1" selected>1: M.</option>,<option value="2" >2: F.</option> </select>');
+  '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> <option value="1" selected>1: M.</option><option value="2" >2: F.</option> </select>');
 
   // Taxonomy without choices renders an empty <select> rather than throwing
   // (happens when a tx_* field is added via search querystring with no metaFields entry)
   test.deepEqual(renderMetaCell('tx_sex', { val: [] }, 'search-form', {}, meta).replace(/\s+/g, ' ').trim(),
     '<select multiple name="tx_sex" class="form-select" id="filter-tx_sex-control"> </select>');
+
+  // Keys & values come from the querystring, so shouldn't be able to inject HTML
+  const evil = '"><img src=x onerror=alert(1)>';
+  const imgCount = (html) => {
+    const el = global.document.createElement('div');
+    el.innerHTML = html;
+    return el.querySelectorAll('img').length;
+  };
+  ['ch_x', 'nm_x', 'in_x', 'dt_x', 'zz_x', 'ch_' + evil].forEach((k) => {
+    test.deepEqual(imgCount(renderMetaCell(k, { val: [evil, evil], min: evil, max: evil }, 'search-form', {}, { control_id: evil })), 0, `${k}: Values escaped`);
+  });
+  test.deepEqual(imgCount(renderMetaCell('tx_x', { val: [], choices: [{ id: evil, en: evil }] }, 'search-form', {}, meta)), 0, 'tx: Choices escaped');
 
   test.end();
 });
