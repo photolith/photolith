@@ -18,6 +18,33 @@ function attribEscape (s) {
   return (new window.Option('', s)).outerHTML.match(/value="(.*?)"/)[1];
 }
 
+/** DataTables type for column (k), so DT doesn't have to scan all data to detect it. NB: Needs registerDTTypes() */
+export function metaDTType (k) {
+  if (/^(nm|in|tx|num)_/.test(k)) return 'num'; // NB: Taxonomies sort by numeric ID
+  if (k.startsWith('dt_')) return 'date';
+  return 'ph-string';
+}
+
+/** Register custom types returned by metaDTType() with DataTable instance (dt) */
+export function registerDTTypes (dt) {
+  if (dt.ext.type.order['ph-string-asc']) return;
+
+  // As string-utf8, sort accented characters alongside unaccented ones, but with a single
+  // collator rather than a localeCompare() per comparison, which is ~35x slower
+  const collator = new Intl.Collator(document.documentElement.lang || undefined, {
+    numeric: true,
+    ignorePunctuation: true
+  });
+  dt.type('ph-string', {
+    order: {
+      pre: (a) => a === null || a === undefined ? '' : a.toString().toLowerCase(),
+      asc: collator.compare,
+      desc: (a, b) => collator.compare(b, a)
+    },
+    search: dt.ext.type.search['string-utf8']
+  });
+}
+
 // https://datatables.net/reference/option/columns.render#function
 export function renderMetaCell (k, data, type, row, meta) {
   // Resolve language, stripping off any -GB

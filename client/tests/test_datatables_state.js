@@ -94,7 +94,6 @@ test('removeDTState', function (test) {
 
 test('applyDTState', function (test) {
   setupDom(test);
-  setupMApi(['a', 'b', 'c']);
 
   function doApply (data, order, searchCols) {
     setupMApi(searchCols || Object.keys(data[1]));
@@ -107,44 +106,87 @@ test('applyDTState', function (test) {
   let out;
 
   test.deepEqual(doApply([
-    { a: 1, b: 2 },
-    { a: 10, b: 3 },
-    { a: 3, b: 2 }
+    { nm_length: 1, in_year: 2 },
+    { nm_length: 10, in_year: 3 },
+    { nm_length: 3, in_year: 2 }
   ], [[0, 'desc']]), [
-    { a: 10, b: 3, __rowpos: 1 },
-    { a: 3, b: 2, __rowpos: 2 },
-    { a: 1, b: 2, __rowpos: 0 }
+    { nm_length: 10, in_year: 3, __rowpos: 1 },
+    { nm_length: 3, in_year: 2, __rowpos: 2 },
+    { nm_length: 1, in_year: 2, __rowpos: 0 }
   ], 'Sorted by first column, descending');
 
   test.deepEqual(doApply([
-    { a: '1', b: 2 },
-    { a: '10', b: 3 },
-    { a: '3', b: 2 }
-  ], [[0, 'desc']]), [
-    { a: '3', b: 2, __rowpos: 2 },
-    { a: '10', b: 3, __rowpos: 1 },
-    { a: '1', b: 2, __rowpos: 0 }
-  ], 'Sorted by first column, string order');
-
-  test.deepEqual(doApply([
-    { a: 1, b: 2 },
-    { a: 10, b: 3 },
-    { a: 3, b: 2 }
+    { nm_length: 1, in_year: 2 },
+    { nm_length: 10, in_year: 3 },
+    { nm_length: 3, in_year: 2 }
   ], [[1, 'asc']]), [
-    { a: 1, b: 2, __rowpos: 0 },
-    { a: 3, b: 2, __rowpos: 2 },
-    { a: 10, b: 3, __rowpos: 1 }
+    { nm_length: 1, in_year: 2, __rowpos: 0 },
+    { nm_length: 3, in_year: 2, __rowpos: 2 },
+    { nm_length: 10, in_year: 3, __rowpos: 1 }
   ], 'Sorted by second column, then preserving original order');
 
   test.deepEqual(doApply([
-    { a: 1, b: 2 },
-    { a: 10, b: 3 },
-    { a: 3, b: 2 }
+    { nm_length: 1, in_year: 2 },
+    { nm_length: 10, in_year: 3 },
+    { nm_length: 3, in_year: 2 }
   ], [[1, 'asc'], [0, 'desc']]), [
-    { a: 3, b: 2, __rowpos: 2 },
-    { a: 1, b: 2, __rowpos: 0 },
-    { a: 10, b: 3, __rowpos: 1 }
+    { nm_length: 3, in_year: 2, __rowpos: 2 },
+    { nm_length: 1, in_year: 2, __rowpos: 0 },
+    { nm_length: 10, in_year: 3, __rowpos: 1 }
   ], 'Sorted by second column, then first');
+
+  test.deepEqual(doApply([
+    { nm_length: 1, ch_gear: 'x' },
+    { nm_length: 2, ch_gear: 'y' },
+    { nm_length: 1, ch_gear: 'z' },
+    { nm_length: 2, ch_gear: 'w' }
+  ], [[0, 'desc']]), [
+    { nm_length: 2, ch_gear: 'w', __rowpos: 3 },
+    { nm_length: 2, ch_gear: 'y', __rowpos: 1 },
+    { nm_length: 1, ch_gear: 'z', __rowpos: 2 },
+    { nm_length: 1, ch_gear: 'x', __rowpos: 0 }
+  ], 'Descending first sort reverses original order of ties (orderDescReverse)');
+
+  test.deepEqual(doApply([
+    { ch_cruise: 'cherry' },
+    { ch_cruise: 'Ábót' },
+    { ch_cruise: 'banana' }
+  ], [[0, 'asc']]), [
+    { ch_cruise: 'Ábót', __rowpos: 1 },
+    { ch_cruise: 'banana', __rowpos: 2 },
+    { ch_cruise: 'cherry', __rowpos: 0 }
+  ], 'Strings sorted case-insensitively, accented characters alongside unaccented');
+
+  test.deepEqual(doApply([
+    { ch_slideLabel: 'TG1-2023-10' },
+    { ch_slideLabel: 'TG1-2023-9' },
+    { ch_slideLabel: 'TG1-2023-100' }
+  ], [[0, 'asc']]), [
+    { ch_slideLabel: 'TG1-2023-9', __rowpos: 1 },
+    { ch_slideLabel: 'TG1-2023-10', __rowpos: 0 },
+    { ch_slideLabel: 'TG1-2023-100', __rowpos: 2 }
+  ], 'Numbers within strings sorted numerically');
+
+  test.deepEqual(doApply([
+    { dt_created_at: '2024-01-01T10:00:00+05:00' },
+    { dt_created_at: '2024-01-01T06:00:00Z' },
+    { dt_created_at: '2024-01-01T04:00:00.123Z' }
+  ], [[0, 'asc']]), [
+    { dt_created_at: '2024-01-01T04:00:00.123Z', __rowpos: 2 },
+    { dt_created_at: '2024-01-01T10:00:00+05:00', __rowpos: 0 },
+    { dt_created_at: '2024-01-01T06:00:00Z', __rowpos: 1 }
+  ], 'Dates sorted by timestamp, not lexically');
+
+  // Taxonomy columns (tx_) carry objects; renderMetaCell(..., 'sort') pulls data.id
+  test.deepEqual(doApply([
+    { tx_sex: { id: 3, en: 'Male' } },
+    { tx_sex: { id: 1, en: 'Female' } },
+    { tx_sex: { id: 2, en: 'Unknown' } }
+  ], [[0, 'asc']]), [
+    { tx_sex: { id: 1, en: 'Female' }, __rowpos: 1 },
+    { tx_sex: { id: 2, en: 'Unknown' }, __rowpos: 2 },
+    { tx_sex: { id: 3, en: 'Male' }, __rowpos: 0 }
+  ], 'Taxonomy objects sort by id, not by English name');
 
   test.end();
 });
