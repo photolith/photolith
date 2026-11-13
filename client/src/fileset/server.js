@@ -1,6 +1,6 @@
 import { parse } from 'content-disposition-header';
 
-import { Cancelled } from '../errors';
+import { Cancelled } from '../errors.js';
 
 function timedPromise (rv, timeout) {
   return new Promise((resolve) => window.setTimeout(resolve.bind(null, rv), timeout));
@@ -33,7 +33,8 @@ export class ServerFileSet {
   }
 
   next (overridePrev) {
-    const url = `/ingest/next-photo/${this.photoDir}/?prev=${overridePrev !== undefined ? (overridePrev || '') : this.prev ? this.prev : ''}`;
+    const prev = overridePrev !== undefined ? (overridePrev || '') : (this.prev || '');
+    const url = `/ingest/next-photo/${encodeURIComponent(this.photoDir)}/?prev=${encodeURIComponent(prev)}`;
     return this.cancellable(window.fetch(url)).then((resp) => {
       this._remaining = parseInt(resp.headers.get('X-Photolith-Remaining') || 0, 10);
 
