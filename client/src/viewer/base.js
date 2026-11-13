@@ -258,6 +258,8 @@ export class PhViewer {
   }
 
   load (blob, boundingBox) {
+    // Note which load this is, so a slower earlier load can't overwrite a later one
+    const loadId = this.loadId = (this.loadId || 0) + 1;
     this.fabCanvas.backgroundImage = undefined;
     this.fabCanvas.requestRenderAll();
     this.imgBlob = null;
@@ -276,6 +278,7 @@ export class PhViewer {
     return Promise.resolve().then(() => {
       return toImageBitmap(blob);
     }).then((imageBitmap) => {
+      if (loadId !== this.loadId) return; // Superseded by another load()
       const img = new FabricImage(imageBitmap, {
         selectable: false
       });
@@ -298,6 +301,7 @@ export class PhViewer {
         return new Promise((resolve) => {
           img.toCanvasElement().toBlob(resolve, 'image/jpeg', 0.9);
         }).then((newBlob) => {
+          if (loadId !== this.loadId) return; // Superseded by another load()
           this.imgBlob = newBlob;
           this.imgBlob.name = blob.name;
         });
