@@ -1,4 +1,4 @@
-import { Cancelled } from '../errors';
+import { Cancelled } from '../errors.js';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaStream
@@ -30,6 +30,7 @@ export class WebcamFileSet {
   }
 
   close () {
+    this.closed = true;
     if (this.reject) this.reject(new Cancelled());
     if (this.video) {
       this.video.srcObject.getTracks().forEach((t) => { t.stop(); });
@@ -46,6 +47,11 @@ export class WebcamFileSet {
 
       // Open a new video stream
       return navigator.mediaDevices.getUserMedia({ video: { deviceId: this.deviceId, facingMode: 'environment' } }).then((stream) => {
+        if (this.closed) {
+          // Closed whilst waiting for the user to allow access, don't leave the camera on
+          stream.getTracks().forEach((t) => { t.stop(); });
+          throw new Cancelled();
+        }
         this.video = document.createElement('VIDEO');
         this.streamLabel = stream.getVideoTracks()[0].label; // NB: So we can later extract a filename from the element
         this.video.setAttribute('style', this.elViewer.querySelector(':scope>.canvas-container').getAttribute('style'));

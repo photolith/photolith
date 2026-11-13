@@ -1,5 +1,5 @@
 import { Cancelled } from '../errors.js';
-import { jsonFetch } from '../fetch.js';
+import { blobFetch, jsonFetch } from '../fetch.js';
 
 export class PhotolithFileSet {
   /**
@@ -31,40 +31,43 @@ export class PhotolithFileSet {
   }
 
   next (overridePrev) {
+    if (this.imageIds[0] === undefined) return Promise.resolve(null);
+    return this.cancellable(this._fetchNext());
+  }
+
+  _fetchNext () {
     const imageId = this.imageIds[0];
 
     if (imageId === undefined) return Promise.resolve(null);
 
-    return this.cancellable(jsonFetch(`/search/data?nm_image_id=${imageId}&with_associated_images=y&with_annotations=alert`).then((searchData) => {
-      if ((searchData.data || []).length === 0) return null;
+    return jsonFetch(`/search/data?nm_image_id=${imageId}&with_associated_images=y&with_annotations=alert`).then((searchData) => {
+      if ((searchData.data || []).length === 0) {
+        // No individuals (so no image URL either), nothing to ingest. Skip on to the next image
+        this.imageIds.shift();
+        return this._fetchNext();
+      }
       const imageMeta = searchData.images[imageId];
 
       // Fetch associated image with first row (assuming they're all the same)
-      return window.fetch(imageMeta.url).then((resp) => {
-        if (resp.status !== 200) {
-          console.error('Failed to fetch image', resp);
-          throw new Error(`Failed to fetch image ${imageMeta.url}`);
-        }
+      return blobFetch(imageMeta.url).then((blob) => {
+        // Return both blob & data
+        const out = {
+          image_id: imageId,
+          blob,
+          individuals: searchData.data,
+          // The name we populate the selectbar with
+          name: searchData.data[0].ch_slideLabel,
+          'slide-label': searchData.data[0].ch_slideLabel,
+          scale_mm: imageMeta.scale_mm,
+          scale_line: imageMeta.scale_line
+        };
+        // The name we send on as orig_filename
+        blob.name = imageMeta.orig_filename;
 
-        // Get image as blob, return both blob & data
-        return resp.blob().then((blob) => {
-          const out = { image_id: imageId, blob, individuals: searchData.data, name: `photolith:${imageId}` };
-
-          if (searchData.data.length > 0) {
-            // The name we populate the selectbar with
-            out.name = searchData.data[0].ch_slideLabel;
-            // The name we send on as orig_filename
-            blob.name = imageMeta.orig_filename;
-            out['slide-label'] = searchData.data[0].ch_slideLabel;
-            out.scale_mm = imageMeta.scale_mm;
-            out.scale_line = imageMeta.scale_line;
-          }
-
-          this.imageIds.shift();
-          return out;
-        });
+        this.imageIds.shift();
+        return out;
       });
-    }));
+    });
   }
 
   remaining () {

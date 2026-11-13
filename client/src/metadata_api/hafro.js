@@ -257,9 +257,10 @@ export default class MetadataApi extends BaseMetadataApi {
           out.nm_length = od.measureDTO.length;
           out.tx_sex = od.measureDTO.sexNo;
           out.tx_sex = this.txFor('sex')[out.tx_sex] || { id: out.tx_sex, en: 'Unknown' };
-          out.tx_maturity = od.measureDTO.sexualMaturity.sexualMaturityId;
-          // NB: We don't have a taxonomy for this yet
-          out.tx_maturity = { id: out.tx_maturity, en: 'Unknown' };
+          if (od.measureDTO.sexualMaturity) {
+            // NB: We don't have a taxonomy for this yet
+            out.tx_maturity = { id: od.measureDTO.sexualMaturity.sexualMaturityId, en: 'Unknown' };
+          }
         }
         if (od.speciesDTO) {
           out.tx_species = {
@@ -281,7 +282,7 @@ export default class MetadataApi extends BaseMetadataApi {
           if (lbl.month) out.in_month = lbl.month;
         }
         if (od.sampleResponse) {
-          out.ch_gear = od.sampleResponse.gear.isscfgNo;
+          if (od.sampleResponse.gear) out.ch_gear = od.sampleResponse.gear.isscfgNo;
           out.nm_meshSize = od.sampleResponse.meshSize;
         }
 

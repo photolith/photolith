@@ -2,6 +2,7 @@ import hashlib
 import io
 import json
 import os.path
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -256,7 +257,8 @@ class UploadImageView(PermissionRequiredMixin, View):
         # Read file into memory
         # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
         file = io.BytesIO(self.request.read())
-        orig_filename = self.request.META.get("HTTP_X_PHOTOLITH_FILENAME")
+        # NB: Client URI-encodes, as headers can only contain ISO-8859-1
+        orig_filename = unquote(self.request.META.get("HTTP_X_PHOTOLITH_FILENAME", ""))
         # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
 
         # Generate content-addressed filename to store as
@@ -270,7 +272,7 @@ class UploadImageView(PermissionRequiredMixin, View):
             content=digest_path,
             defaults=dict(
                 created_by=self.request.user,
-                orig_filename=self.request.META.get("HTTP_X_PHOTOLITH_FILENAME"),
+                orig_filename=orig_filename,
                 mimetype=mimetype,
             ),
         )

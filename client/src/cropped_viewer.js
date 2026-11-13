@@ -32,6 +32,7 @@ export function init (parent) {
         elCanvas.width,
         elCanvas.height
       );
+    }).finally(() => {
       elViewer.classList.remove('rendering');
     });
   });

@@ -178,7 +178,10 @@ export class PhViewer {
       const selObj = this.getActiveObject();
       this.lowerCanvasEl.focus(); // Focus to receive keyboard events
 
-      if (selObj && selObj instanceof Group) {
+      // NB: selection:updated (e.g. ctrl-click to add to a selection) fires with the same object,
+      //     so only add handlers once, otherwise they stack up and run once per update
+      if (selObj && selObj instanceof Group && !selObj.phPropagating) {
+        selObj.phPropagating = true;
         selObj.on('moving', function (opt) {
           selObj.getObjects().forEach((o) => {
             o.fire('moving', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
@@ -258,6 +261,8 @@ export class PhViewer {
   }
 
   load (blob, boundingBox) {
+    // Note which load this is, so a slower earlier load can't overwrite a later one
+    const loadId = this.loadId = (this.loadId || 0) + 1;
     this.fabCanvas.backgroundImage = undefined;
     this.fabCanvas.requestRenderAll();
     this.imgBlob = null;
@@ -276,6 +281,7 @@ export class PhViewer {
     return Promise.resolve().then(() => {
       return toImageBitmap(blob);
     }).then((imageBitmap) => {
+      if (loadId !== this.loadId) return; // Superseded by another load()
       const img = new FabricImage(imageBitmap, {
         selectable: false
       });
@@ -298,6 +304,7 @@ export class PhViewer {
         return new Promise((resolve) => {
           img.toCanvasElement().toBlob(resolve, 'image/jpeg', 0.9);
         }).then((newBlob) => {
+          if (loadId !== this.loadId) return; // Superseded by another load()
           this.imgBlob = newBlob;
           this.imgBlob.name = blob.name;
         });

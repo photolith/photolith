@@ -2,6 +2,7 @@ import itertools
 import json
 import os
 import tempfile
+from urllib.parse import quote
 
 from django.core.cache import cache
 from django.test import Client, TestCase, RequestFactory
@@ -1077,6 +1078,19 @@ class UploadImageViewTest(RequiresUtils, TestCase):
         self.assertEqual(self.upload_img(user), 403)
         user = self.create_user(groups=["Ingest"])
         self.assertEqual(self.upload_img(user)["created_by"], user.id)
+
+    def test_call__filename_encoding(self):
+        """Filename is URI-encoded by the client, as headers can't contain anything outside ISO-8859-1"""
+        user = self.create_user(groups=["Ingest"])
+
+        out = self.upload_img(
+            user,
+            GIF_VALID,
+            mimetype="image/gif",
+            filename=quote("Þorskur — 100%.gif"),
+        )
+        self.assertEqual(out["orig_filename"], "Þorskur — 100%.gif")
+        self.assertTrue(out["content"].endswith(".gif"))
 
     def test_call__save(self):
         """Successfully save image & metadata"""

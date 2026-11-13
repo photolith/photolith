@@ -54,3 +54,57 @@ class UserActivateTest(RequiresUtils, TestCase):
         self.assertEqual(users[1].is_active, True)
         self.assertEqual(users[2].is_active, True)
         self.assertEqual(users[3].is_active, False)
+
+
+class IndividualAdminTest(RequiresUtils, TestCase):
+    def test_data(self):
+        ind = self.create_individual(
+            data=dict(ch_slideLabel="<script>alert(1)</script>", nm_length=4.5)
+        )
+        ia = IndividualAdmin(Individual, admin.site)
+
+        out = ia.data(ind)
+        self.assertNotIn("<script>", out)
+        self.assertIn(
+            "<td>ch_slideLabel</td><td>&lt;script&gt;alert(1)&lt;/script&gt;</td>", out
+        )
+        self.assertIn("<td>nm_length</td><td>4.5</td></tr><tr>", out)
+
+    def test_image_preview(self):
+        ind = self.create_individual(
+            bounding_box=[[0, 0], ["</script><script>alert(1)</script>", "'"]]
+        )
+        ia = IndividualAdmin(Individual, admin.site)
+
+        out = ia.image_preview(ind)
+        # Only our own script tag is present
+        self.assertEqual(out.count("<script>"), 1)
+        self.assertEqual(out.count("</script>"), 1)
+        self.assertIn("\\u003C/script\\u003E", out)
+
+
+class SaveModelTest(RequiresUtils, TestCase):
+    def test_save_model(self):
+        reader = self.create_user("reader")
+        admin_user = self.create_user("admin_user")
+        request = RequestFactory().post("/admin")
+        request.user = admin_user
+
+        ann = self.create_annotation(self.create_individual(), created_by=reader)
+        proj = self.create_project(created_by=reader)
+
+        for model_admin, obj in (
+            (AnnotationAdmin(Annotation, admin.site), ann),
+            (ProjectAdmin(Project, admin.site), proj),
+        ):
+            # Editing leaves the original creator alone
+            model_admin.save_model(request, obj, None, True)
+            obj.refresh_from_db()
+            self.assertEqual(obj.created_by, reader)
+
+        # Creating something new sets the creator
+        team = Team(name="UT team")
+        TeamAdmin(Team, admin.site).save_model(request, team, None, False)
+        self._ru_objects.append(team)
+        team.refresh_from_db()
+        self.assertEqual(team.created_by, admin_user)

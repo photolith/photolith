@@ -1,7 +1,7 @@
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
 import { jsonFetch } from './fetch';
-import { populateIndividualData, updateDataObject } from './meta';
+import { htmlEscape, populateIndividualData, updateDataObject } from './meta';
 
 function checkExisting (labels, warnMsg) {
   const sp = new URLSearchParams();
@@ -15,7 +15,7 @@ function checkExisting (labels, warnMsg) {
     if (!data.data.length) return;
     displayAlert('warning',
       warnMsg.replace('%d', `<b><a href="/search/?${sp}" target="_blank">${data.data.length}</a></b>`) +
-      `:<ul>${data.data.map((i) => `<li>${i.__str__}</li>`).join('\n')}</ul>`,
+      `:<ul>${data.data.map((i) => `<li>${htmlEscape(i.__str__)}</li>`).join('\n')}</ul>`,
       0); // No timeout for the alert, you have to dismiss it
   });
 }
@@ -190,13 +190,15 @@ function formRefresh (event) {
 function formSubmit (event) {
   const elForm = event.submitter.form;
 
+  // Still busy (e.g. uploading), ignore repeated clicks rather than uploading the image twice
+  if (elForm.classList.contains('rendering')) return false;
+
   if (event.submitter.name === 'clear_all' && !window.confirm(elForm.getAttribute('data-locale-warnclear'))) {
     return false;
   }
 
+  elForm.classList.add('rendering');
   return Promise.resolve().then(() => {
-    elForm.classList.add('rendering');
-
     // Clear all bounding boxes first, triggering mass deletion
     if (event.submitter.name === 'clear_all') {
       Array.from(elForm.elements).forEach((el) => {
@@ -217,7 +219,8 @@ function formSubmit (event) {
       headers: {
         'X-CSRFToken': elForm.csrfmiddlewaretoken.value,
         'X-Photolith-fileset': elForm.image_file.value,
-        'X-Photolith-filename': elForm.image_file.phBlob.name
+        // NB: Headers can only contain ISO-8859-1, so encode
+        'X-Photolith-filename': encodeURIComponent(elForm.image_file.phBlob.name)
       }
     }).then((data) => {
       elForm.image_id.value = data.id;

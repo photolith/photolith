@@ -1,5 +1,4 @@
 from django.urls import path
-from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
@@ -16,7 +15,7 @@ urlpatterns = [
     ),
     path(
         "delete/<int:annotation_id>/",
-        csrf_exempt(views.DeleteView.as_view(http_method_names=["post"])),
+        views.DeleteView.as_view(http_method_names=["post"]),
         name="annotate_delete",
     ),
     path(

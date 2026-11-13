@@ -4,7 +4,7 @@ import TomSelect from 'tom-select';
 
 import { init as initCroppedViewer } from './cropped_viewer.js';
 import { htmlFetch, jsonFetch } from './fetch.js';
-import { renderMetaLabel, renderMetaCell, populateSearchFilters } from './meta.js';
+import { metaDTType, registerDTTypes, renderMetaLabel, renderMetaCell, populateSearchFilters } from './meta.js';
 import { getDTState, setDTState, removeDTState } from './datatables_state.js';
 
 function filterChange (elForm, elTarget) {
@@ -48,6 +48,7 @@ export function init (parent) {
 
     // https://datatables.net/reference/option/%24.fn.dataTable.ext.errMode
     DataTable.ext.errMode = 'throw';
+    registerDTTypes(DataTable);
     const table = new DataTable(elSearchTable, {
       // Load language from plugin: https://datatables.net/plug-ins/i18n/
       language: { url: lang === 'en-us' ? undefined : `/static/datatables.net-plugins/i18n/${lang.replace(/-\w*/, (x) => x.toUpperCase())}.json` },
@@ -63,6 +64,7 @@ export function init (parent) {
           data: k,
           defaultContent: '',
           title: renderMetaLabel(k),
+          type: metaDTType(k),
           // https://datatables.net/reference/option/columns.createdCell
           createdCell: function (td, cellData) {
             if (typeof cellData === 'number') td.classList.add('text-end');

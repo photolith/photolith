@@ -14,6 +14,7 @@ function mockFetch (routes) {
       status: route.status || 200,
       statusText: route.statusText || 'OK',
       json: () => Promise.resolve(route.json),
+      text: () => Promise.resolve(JSON.stringify(route.json)),
       blob: () => Promise.resolve(route.blob)
     });
   };
@@ -107,6 +108,34 @@ test('PhotolithFileSet:next empty data', async function (test) {
   const fs = new PhotolithFileSet('7');
   const result = await fs.next();
   test.equal(result, null, 'returns null when search returns no data');
+  test.equal(fs.remaining(), 0, 'Nothing remaining');
+
+  test.end();
+});
+
+test('PhotolithFileSet:next skips images with empty data', async function (test) {
+  setupDom(test);
+
+  const blob = { size: 4 };
+  global.window.fetch = mockFetch({
+    '/search/data?nm_image_id=7&with_associated_images=y&with_annotations=alert': {
+      json: { data: [], images: {} }
+    },
+    '/search/data?nm_image_id=8&with_associated_images=y&with_annotations=alert': {
+      json: {
+        data: [{ id: 1, ch_slideLabel: 'SL-8' }],
+        images: { 8: { url: '/media/8.jpg', orig_filename: '8.jpg', scale_mm: null, scale_line: null } }
+      }
+    },
+    '/media/8.jpg': { blob }
+  });
+
+  const fs = new PhotolithFileSet('7,8');
+  const result = await fs.next();
+  test.equal(result.image_id, 8, 'Skipped image with no data, returned next image');
+  test.equal(result.name, 'SL-8', 'Named after next image');
+  test.equal(fs.remaining(), 0, 'Nothing remaining');
+  test.equal(await fs.next(), null, 'Then at end');
 
   test.end();
 });
@@ -129,7 +158,7 @@ test('PhotolithFileSet:next image fetch failure', async function (test) {
     await fs.next();
     test.fail('expected error');
   } catch (e) {
-    test.ok(/Failed to fetch/.test(e.message), 'rejects when image fetch returns non-200');
+    test.equal(e.message, 'Failed to fetch /media/8.jpg: 404 Not Found', 'rejects when image fetch returns non-200, saying what failed');
   }
 
   test.end();

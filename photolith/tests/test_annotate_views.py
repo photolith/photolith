@@ -107,6 +107,63 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         ann = self.form_post(user1, ind, project=None, qs_project=p1)
         self.assertEqual(ann.project, None)
 
+    def test_form_valid__existing(self):
+        """Edits can't move annotations out of closed projects, or to other individuals"""
+        user1 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
+        ind = self.create_individual()
+        p1 = self.create_project(team=[user1], individuals=[ind])
+        ann = self.form_post(user1, ind, project=p1, qs_project=p1)
+        self.assertEqual(ann.project, p1)
+
+        # Can edit within an open project
+        ann = self.form_post(
+            user1, ind, project=p1, qs_project=p1, annotation_id=ann.id
+        )
+        self.assertEqual(ann.project, p1)
+
+        # Can't move to another individual
+        ind2 = self.create_individual()
+        client = Client()
+        client.force_login(user1)
+        resp = client.post(
+            "/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id),
+            dict(
+                individual=ind2.id,
+                project=p1.id,
+                age=4,
+                axis_poly="[[0, 0], [1, 1]]",
+                comment="UT moved",
+                authority="50",
+                rating=Annotation.Rating.GOOD,
+            ),
+        )
+        self.assertEqual(resp.status_code, 400)
+        ann.refresh_from_db()
+        self.assertEqual(ann.individual, ind)
+
+        # Can view the edit form for it
+        client = Client()
+        client.force_login(user1)
+        resp = client.get("/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["read_only"], False)
+
+        # Once closed, can't edit, or move the annotation out of the project
+        self.close_project(p1)
+        resp = client.get("/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["read_only"], True)
+        with self.assertRaisesRegex(PermissionDenied, p1.name):
+            self.form_post(user1, ind, project=p1, qs_project=p1, annotation_id=ann.id)
+        with self.assertRaisesRegex(PermissionDenied, p1.name):
+            self.form_post(
+                user1, ind, project=None, qs_project=p1, annotation_id=ann.id
+            )
+        ann.refresh_from_db()
+        self.assertEqual(ann.project, p1)
+
     def test_get_initial(self):
         user1 = self.create_user(
             "user1", groups=["General Annotation Viewer"], base_authority_level=50
@@ -136,8 +193,9 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         self.assertEqual(get_initial(ind, project=p.id)["project"], p)
 
     def test_get_object(self):
-        def get_object(**kwargs):
+        def get_object(user=None, **kwargs):
             request = RequestFactory().get("/", kwargs)
+            request.user = user or user1
             v = AnnotateView()
             v.setup(request, **(request.GET.dict()))
             out = v.get_object()
@@ -161,6 +219,15 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         # individual mismatch reported
         with self.assertRaisesRegex(BadRequest, r"individual"):
             get_object(individual_id=ind.id + 1, annotation_id=ann.id)
+
+        # Other users can't fetch it, superusers can
+        user2 = self.create_user("user2")
+        with self.assertRaisesRegex(PermissionDenied, r"do not own"):
+            get_object(user=user2, individual_id=ind.id, annotation_id=ann.id)
+        user2.is_superuser = True
+        self.assertEqual(
+            get_object(user=user2, individual_id=ind.id, annotation_id=ann.id), ann
+        )
 
     def test_get_all_annotations(self):
         def get_all_annotations(individual, project=None, user=None):
@@ -567,6 +634,45 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
+    def test_form_valid__authority(self):
+        """Can't save an annotation with more authority than we have"""
+        user = self.create_user(
+            groups=["General Annotation Editor"],
+            base_authority_level=UserSpeciesAuthority.AuthorityLevel.JUNIOR,
+        )
+        ind = self.create_individual()
+
+        def post(authority):
+            client = Client()
+            client.force_login(user)
+            resp = client.post(
+                "/annotate/%d/" % ind.id,
+                dict(
+                    individual=ind.id,
+                    project="",
+                    age=4,
+                    axis_poly="[[0, 0], [1, 1]]",
+                    comment="UT authority %d" % authority,
+                    authority=str(authority),
+                    rating=Annotation.Rating.GOOD,
+                ),
+            )
+            return (
+                resp.status_code,
+                list(
+                    Annotation.objects.filter(
+                        comment="UT authority %d" % authority
+                    ).values_list("authority", flat=True)
+                ),
+            )
+
+        # Own level (and "with original otoliths") is fine
+        self.assertEqual(post(80), (302, [80]))
+        self.assertEqual(post(85), (302, [85]))
+        # Higher levels are rejected, form shown again
+        self.assertEqual(post(100), (200, []))
+        self.assertEqual(post(125), (200, []))
+
     def test_get_context_data__authority(self):
         def auth_choices(user, individual):
             request = RequestFactory().get(
@@ -833,3 +939,38 @@ class AnnotateDeleteViewTest(RequiresUtils, TestCase):
             ),
         )
         self.assertEqual(Annotation.objects.filter(pk=ann.id).first(), None)
+
+    def test_csrf(self):
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        ann = self.create_annotation(ind, created_by=user1)
+
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(user1)
+        token = "a" * 32
+        client.cookies["csrftoken"] = token
+
+        # No token, rejected & annotation still there
+        resp = client.post("/annotate/delete/%d/" % (ann.id,), {})
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 1)
+
+        # Token in header (as client sends), deleted
+        resp = client.post(
+            "/annotate/delete/%d/" % (ann.id,), {}, headers={"X-CSRFToken": token}
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 0)
+
+    def test_call__closed_project(self):
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        p = self.create_project(team=[user1], individuals=[ind])
+        ann = self.create_annotation(ind, created_by=user1, project=p)
+        self.close_project(p)
+
+        # Can't delete annotations from a closed project, even our own
+        status, out = self.ann_del(ann, user1)
+        self.assertEqual(out["error_class"], "PermissionDenied")
+        self.assertIn("closed", out["error"])
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 1)

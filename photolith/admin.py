@@ -1,7 +1,7 @@
 import json
 
 from django.utils import timezone
-from django.utils.html import escape, mark_safe
+from django.utils.html import escape, escapejs, format_html_join, mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -22,7 +22,7 @@ def image_preview_html(href, bounding_box):
             window.initCroppedViewer(this);
         }.bind(document.currentScript.parentElement))
         </script>
-        """ % (href.replace("'", "\\'"), bounding_box.replace("'", "\\'")))
+        """ % (escapejs(href), escapejs(bounding_box)))
 
 
 class IndividualInline(admin.StackedInline):
@@ -130,8 +130,9 @@ class ImageAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -171,8 +172,8 @@ class IndividualAdmin(admin.ModelAdmin):
     def data(self, obj):
         return mark_safe(
             "<table><tr>%s</tr></table>"
-            % "</tr><tr>".join(
-                "<td>%s</td><td>%s</td>" % (k, v) for k, v in obj.data.items()
+            % format_html_join(
+                mark_safe("</tr><tr>"), "<td>{}</td><td>{}</td>", obj.data.items()
             )
         )
 
@@ -183,8 +184,9 @@ class IndividualAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -245,8 +247,9 @@ class AnnotationAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -291,8 +294,9 @@ class ProjectAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -317,6 +321,7 @@ class TeamAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)

@@ -35,20 +35,40 @@ export function jsonFetchCached (baseResource, params, options) {
   });
 }
 
+/** window.fetch, but network errors (blocked, offline, ...) say what failed */
+export function fetchResource (resource, options) {
+  return window.fetch(resource, options).catch((err) => {
+    // NB: Callers check for aborts, pass them on as-is
+    if (err.name === 'AbortError') throw err;
+    console.error(`Failed to fetch ${resource}`, err);
+    throw new Error(`Failed to fetch ${resource}: Network error, could not reach server (${err.message})`, { cause: err });
+  });
+}
+
+/** Describe a failed HTTP response (NB: statusText is always empty over HTTP/2) */
+export function statusMessage (response) {
+  return `${response.status} ${response.statusText}`.trim();
+}
+
 export function jsonFetch (resource, options = {}) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/json';
-  return window.fetch(resource, options).then((response) => {
+  return fetchResource(resource, options).then((response) => {
     if (response.ok) {
-      return response.json().then((rv) => {
+      return response.text().then((body) => {
+        try {
+          return JSON.parse(body);
+        } catch (e) {
+          console.error('Failed to parse JSON response', e);
+          const snippet = body.trim().replace(/\s+/g, ' ');
+          throw new Error(`Failed to fetch ${resource}: Unparsable (${snippet.length > 20 ? snippet.slice(0, 20) + '...' : snippet})`);
+        }
+      }).then((rv) => {
         // NB: Streaming responses might have reported an error after starting
         if (rv.error) {
           throw new Error(`Failed to fetch ${resource} ${rv.error_class ? `[${rv.error_class}]` : ''}: ${rv.error}`);
         }
         return rv;
-      }).catch((e) => {
-        console.error('Failed to parse JSON response', e);
-        throw new Error(`Failed to fetch ${resource}`);
       });
     }
 
@@ -72,18 +92,18 @@ export function jsonFetch (resource, options = {}) {
 export function htmlFetch (resource, options = {}) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/html';
-  return window.fetch(resource, options).then((response) => {
+  return fetchResource(resource, options).then((response) => {
     if (response.ok) return response.text();
 
-    throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
+    throw new Error(`Failed to fetch ${resource}: ${statusMessage(response)}`);
   });
 }
 
 export function blobFetch (resource, options = {}) {
-  return window.fetch(resource, options).then((response) => {
+  return fetchResource(resource, options).then((response) => {
     if (response.ok) return response.blob();
 
-    throw new Error(`Failed to fetch ${resource}: ${response.statusText}`);
+    throw new Error(`Failed to fetch ${resource}: ${statusMessage(response)}`);
   }).then((blob) => {
     // NB: toImageBitmap uses the name to quickly guess JPEG
     blob.name = resource;

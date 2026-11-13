@@ -1,9 +1,13 @@
 import DataTable from 'datatables.net-bs5';
 
-import { renderMetaCell } from './meta.js';
+import { metaDTType, registerDTTypes, renderMetaCell } from './meta.js';
 
 const SEP_INNER = '.';
 const SEP_OUTER = '-';
+
+// Minimal stand-in for DT's settings object, as passed to type pre functions
+// NB: Our i18n plugins all use the default decimal of ''
+const DT_SETTINGS = { oLanguage: { sDecimal: '' } };
 
 /** Pull DT state from querystring */
 export function getDTState (searchString) {
@@ -54,7 +58,9 @@ export function applyDTState (data, searchString) {
 
   // NB: Under nodeJS, DataTable is a function that needs to be fed a window
   //     https://github.com/DataTables/Dist-DataTables-Bootstrap5/blob/7d09afc9038aaea5d8d045e18116d4d089203c9b/js/dataTables.bootstrap5.js#L21-L40
-  const dtExt = DataTable.ext || DataTable(global.window).ext;
+  const dt = DataTable.ext ? DataTable : DataTable(global.window);
+  registerDTTypes(dt);
+  const dtExt = dt.ext;
 
   // Array of column keys to sort by
   const colKeys = Object.keys(window.mApi.metaLabels('search_columns'));
@@ -63,36 +69,35 @@ export function applyDTState (data, searchString) {
   // Array of directions each sort is in (asc/desc)
   const orderDir = dtState.order.map((o) => o[1]);
 
-  // Find relevant formatter/order functions for each sort
-  const genericPre = (x) => x;
-  const genericSort = {
-    asc: (a, b) => a < b ? -1 : a > b ? 1 : 0,
-    desc: (a, b) => a < b ? 1 : a > b ? -1 : 0
-  };
-  const formatterFns = orderKeys.map((k) => dtExt.type.order[`${typeof datA}-pre`] || genericPre);
-  const orderFns = orderKeys.map((k, i) => dtExt.type.order[`${typeof datA}-${orderDir[i]}`] || genericSort[orderDir[i]]);
+  // Find relevant formatter/order functions for each sort, based on column type (as search table uses)
+  const orderTypes = orderKeys.map(metaDTType);
+  const formatterFns = orderTypes.map((t) => dtExt.type.order[`${t}-pre`] || ((x) => x));
+  const orderFns = orderTypes.map((t, i) => dtExt.type.order[`${t}-${orderDir[i]}`] || (orderDir[i] === 'desc'
+    ? (a, b) => a < b ? 1 : a > b ? -1 : 0
+    : (a, b) => a < b ? -1 : a > b ? 1 : 0));
 
-  // Append each row position to data
+  // Pre-format sort data & original row position for each row
+  // NB: orderDescReverse is on by default, so if first sort is desc, original order is reversed
+  const rowReverse = orderDir[0] === 'desc';
   for (let i = 0; i < data.length; i++) {
     data[i].__rowpos = i;
   }
+  const sortData = new Map(data.map((row) => [row, orderKeys.map((k, i) => formatterFns[i](renderMetaCell(k, row[k], 'sort'), DT_SETTINGS))]));
 
   // Emulate datatables.net sorting
   // See: https://github.com/DataTables/DataTablesSrc/blob/master/js/core/core.sort.js#L207
   data.sort(function (rowA, rowB) {
-    for (let i = 0; i < orderKeys.length; i++) {
-      const k = orderKeys[i];
+    const sortA = sortData.get(rowA);
+    const sortB = sortData.get(rowB);
 
+    for (let i = 0; i < orderKeys.length; i++) {
       // Compare key in both rows, if not equal stop
-      const rv = orderFns[i](
-        formatterFns[i](renderMetaCell(k, rowA[k], 'sort')),
-        formatterFns[i](renderMetaCell(k, rowB[k], 'sort'))
-      );
+      const rv = orderFns[i](sortA[i], sortB[i]);
       if (rv !== 0) return rv;
     }
 
     // Finally compare original row order to keep stable (aiOrig)
-    return genericSort.asc(rowA.__rowpos, rowB.__rowpos);
+    return rowReverse ? rowB.__rowpos - rowA.__rowpos : rowA.__rowpos - rowB.__rowpos;
   });
 
   return data;

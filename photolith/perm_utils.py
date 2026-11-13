@@ -3,7 +3,11 @@ from django.core.exceptions import PermissionDenied
 
 def check_annotate_access(project, user, rw=False):
     if project:
-        if not (project.team.users.contains(user) or project.created_by == user):
+        # NB: Team is set to NULL if deleted
+        if not (
+            (project.team and project.team.users.contains(user))
+            or project.created_by == user
+        ):
             raise PermissionDenied(
                 "Contact an administrator to be added to this project"
             )

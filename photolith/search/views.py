@@ -223,7 +223,18 @@ class DataView(LoginRequiredMixin, View):
                     "Setting both project=x and with_annotations=alert doesn't make sense"
                 )
         elif with_annotations == "all" or with_annotations == "best":
-            ann_qs = Annotation.objects.order_by("-authority", "-created_at")
+            ann_qs = Annotation.objects.select_related("created_by")
+            if p is None:
+                # Annotations in open projects aren't visible outside them yet
+                ann_qs = ann_qs.exclude(project__date_end__gte=datetime.date.today())
+            else:
+                ann_qs = ann_qs.filter(project=p)
+                if p.is_open and not (
+                    self.request.user.is_superuser or p.created_by == self.request.user
+                ):
+                    # Open project, members can only see their own annotations
+                    ann_qs = ann_qs.filter(created_by=self.request.user)
+            ann_qs = ann_qs.order_by("-authority", "-created_at")
             qs = qs.prefetch_related(
                 Prefetch(
                     "annotation_set",
@@ -278,7 +289,8 @@ class DataView(LoginRequiredMixin, View):
                         age=a.age,
                         rating=a.rating,
                         authority=a.authority,
-                        annotated_by=a.created_by,
+                        # NB: Username, as in CSV export (User isn't JSON-serialisable)
+                        annotated_by=a.created_by.username if a.created_by else None,
                         annotated_at=a.created_at,
                         comment=a.comment,
                     )

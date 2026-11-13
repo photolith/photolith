@@ -16,7 +16,10 @@ export function init (parent) {
     if (elViewer.hasAttribute('data-src')) {
       v.startRendering();
       return blobFetch(elViewer.getAttribute('data-src')).then((blob) => {
-        v.load(blob, JSON.parse(elViewer.getAttribute('data-bounding-box') || 'null'));
+        return v.load(blob, JSON.parse(elViewer.getAttribute('data-bounding-box') || 'null'));
+      }).catch((err) => {
+        v.load(null); // Clear spinner
+        throw err;
       });
     }
     return v;

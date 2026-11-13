@@ -69,6 +69,7 @@ class RequiresUtils:
             if up is None:
                 up = UserProfile.objects.create(user=out)
             up.base_authority_level = base_authority_level
+            up.save()
 
         for species_name, level in species_authority:
             if up is None:

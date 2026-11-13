@@ -201,6 +201,12 @@ class IndividualTest(RequiresUtils, TestCase):
         ind1.data = dict(in_station=135, nm_length=42.5)
         self.assertEqual(ind1.data, dict(in_station=135, nm_length=42.5))
 
+    def test_data_underscore(self):
+        """Only the type prefix is split off keys"""
+        ind1 = self.create_individual()
+        ind1.data = dict(ch_slide_label="x", nm_otolith_length=4.5)
+        self.assertEqual(ind1.data, dict(ch_slide_label="x", nm_otolith_length=4.5))
+
     def test_str(self):
         self.assertEqual(str(self.create_individual()), "Individual 1")
         self.assertEqual(str(self.create_individual()), "Individual 2")

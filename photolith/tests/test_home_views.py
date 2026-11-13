@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
+from django.utils import translation
 
 from ..home.views import IndexView
 from ..models import Annotation, Individual, Image, Project
@@ -83,6 +84,16 @@ class IndexViewTest(RequiresUtils, TestCase):
                 individuals=20,
             ),
         )
+
+        # Language-specific names used, English if there's no translation
+        with translation.override("is"):
+            self.assertEqual(
+                self.ctx()["headline_numbers"]["ind_by_species"], dict(Fiskur=20)
+            )
+        with translation.override("de"):
+            self.assertEqual(
+                self.ctx()["headline_numbers"]["ind_by_species"], dict(Fish=20)
+            )
 
         # Minor species not included in breakdown
         inds = [

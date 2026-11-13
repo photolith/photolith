@@ -10,12 +10,40 @@ const ISO_DT_REGEX = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0
 // Cache renderers, changing locale requires a page reload
 let renderNumber;
 
-function htmlEscape (s) {
+export function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 
 function attribEscape (s) {
-  return (new window.Option('', s)).outerHTML.match(/value="(.*?)"/)[1];
+  // NB: [^"] rather than ., as attribute values can contain newlines
+  return (new window.Option('', s)).outerHTML.match(/value="([^"]*)"/)[1];
+}
+
+/** DataTables type for column (k), so DT doesn't have to scan all data to detect it. NB: Needs registerDTTypes() */
+export function metaDTType (k) {
+  if (/^(nm|in|tx|num)_/.test(k)) return 'num'; // NB: Taxonomies sort by numeric ID
+  if (k.startsWith('dt_')) return 'date';
+  return 'ph-string';
+}
+
+/** Register custom types returned by metaDTType() with DataTable instance (dt) */
+export function registerDTTypes (dt) {
+  if (dt.ext.type.order['ph-string-asc']) return;
+
+  // As string-utf8, sort accented characters alongside unaccented ones, but with a single
+  // collator rather than a localeCompare() per comparison, which is ~35x slower
+  const collator = new Intl.Collator(document.documentElement.lang || undefined, {
+    numeric: true,
+    ignorePunctuation: true
+  });
+  dt.type('ph-string', {
+    order: {
+      pre: (a) => a === null || a === undefined ? '' : a.toString().toLowerCase(),
+      asc: collator.compare,
+      desc: (a, b) => collator.compare(b, a)
+    },
+    search: dt.ext.type.search['string-utf8']
+  });
 }
 
 // https://datatables.net/reference/option/columns.render#function
@@ -26,43 +54,47 @@ export function renderMetaCell (k, data, type, row, meta) {
   if (type === undefined) return data;
 
   if (type === 'search-form') {
+    // NB: Keys & values come from the querystring, so escape everything
+    const a = (x) => attribEscape(x === undefined || x === null ? '' : x);
+    const id = a(meta.control_id);
+
     if (k.startsWith('ch')) {
       let vs = data.val.filter((v) => !!v);
       if (vs.length === 0) vs = ['']; // Should be at least one box, so we have something to copy
 
       return `<div class="input-group">
-          ${vs.map((v) => `<input type="text" name="${k}" value="${v}" class="form-control">`).join('\n')}
+          ${vs.map((v) => `<input type="text" name="${a(k)}" value="${a(v)}" class="form-control">`).join('\n')}
           <button type="button" class="btn btn-outline-secondary" title="Add extra search" onclick="el = event.target.previousElementSibling; el.after(el.cloneNode()) ; return false">+</button>
       </div>`;
     }
     if (k.startsWith('nm')) {
       return `<div class="input-group">
-          <input type="number" name="${k}" value="${data.val[0] || ''}" min="${data.min}" max="${data.max}" class="form-control range-start" id="${meta.control_id}">
+          <input type="number" name="${a(k)}" value="${a(data.val[0])}" min="${a(data.min)}" max="${a(data.max)}" class="form-control range-start" id="${id}">
           <span class="input-group-text">..</span>
-          <input type="number" name="${k}" value="${data.val[1] || ''}" min="${data.min}" max="${data.max}" class="form-control range-end" id="${meta.control_id}-2">
+          <input type="number" name="${a(k)}" value="${a(data.val[1])}" min="${a(data.min)}" max="${a(data.max)}" class="form-control range-end" id="${id}-2">
         </div>`;
     }
     if (k.startsWith('in')) {
       return `<div class="input-group">
-          <input type="number" name="${k}" value="${data.val[0] || ''}" min="${data.min}" max="${data.max}" class="form-control range-start" id="${meta.control_id}" step="1">
+          <input type="number" name="${a(k)}" value="${a(data.val[0])}" min="${a(data.min)}" max="${a(data.max)}" class="form-control range-start" id="${id}" step="1">
           <span class="input-group-text">..</span>
-          <input type="number" name="${k}" value="${data.val[1] || ''}" min="${data.min}" max="${data.max}" class="form-control range-end" id="${meta.control_id}-2" step="1">
+          <input type="number" name="${a(k)}" value="${a(data.val[1])}" min="${a(data.min)}" max="${a(data.max)}" class="form-control range-end" id="${id}-2" step="1">
         </div>`;
     }
     if (k.startsWith('tx')) {
-      return `<select multiple name="${k}" class="form-select" id="${meta.control_id}">
-          ${(data.choices || []).map((tx) => `<option value="${tx.id}" ${data.val.indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${tx.id}: ${tx[document.documentElement.lang.replace(/\W.*/, '')]}</option>`)}
+      return `<select multiple name="${a(k)}" class="form-select" id="${id}">
+          ${(data.choices || []).map((tx) => `<option value="${a(tx.id)}" ${data.val.indexOf(tx.id.toString()) > -1 ? 'selected' : ''}>${htmlEscape(`${tx.id}: ${tx[lang] || tx.en}`)}</option>`).join('')}
         </select>`;
     }
     if (k.startsWith('dt')) {
       return `<div class="input-group">
-          <input type="date" name="${k}" value="${data.val[0] || ''}" class="form-control range-start" id="${meta.control_id}">
+          <input type="date" name="${a(k)}" value="${a(data.val[0])}" class="form-control range-start" id="${id}">
           <span class="input-group-text">..</span>
-          <input type="date" name="${k}" value="${data.val[1] || ''}" class="form-control range-end" id="${meta.control_id}-2">
+          <input type="date" name="${a(k)}" value="${a(data.val[1])}" class="form-control range-end" id="${id}-2">
         </div>`;
     }
     // e.g. project entries, ordering
-    return data.val.map((v) => `<input type="hidden" name="${k}" value="${v}">`).join('');
+    return data.val.map((v) => `<input type="hidden" name="${a(k)}" value="${a(v)}">`).join('');
   }
 
   if (type === 'form') {
@@ -154,7 +186,7 @@ export function renderMetaLabel (k, type, row, meta) {
     return `<label class="col-form-label">${htmlEscape(metaLabels[k])}</label>`;
   }
   if (type === 'search-form') {
-    return `<label for="${meta.control_id}" class="form-label">${metaLabels[k]}</label>`;
+    return `<label for="${attribEscape(meta.control_id)}" class="form-label">${htmlEscape(metaLabels[k])}</label>`;
   }
 
   return htmlEscape(metaLabels[k]);
