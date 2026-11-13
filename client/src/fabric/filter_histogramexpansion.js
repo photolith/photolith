@@ -52,8 +52,17 @@ export class HistogramExpansion extends filters.BaseFilter {
     const lut = new Uint8Array(256);
     if (!this.histogram) return lut;
     let total = 0;
-    for (let i = 0; i < 256; i++) total += this.histogram[i];
-    if (!total) return lut;
+    let populated = 0;
+    for (let i = 0; i < 256; i++) {
+      total += this.histogram[i];
+      if (this.histogram[i] > 0) populated++;
+    }
+    if (populated < 2) {
+      // No range to expand (e.g. a flat region), leave intensities as they are
+      // NB: Otherwise CDF_min is 1, and everything maps to 0, i.e. black
+      for (let i = 0; i < 256; i++) lut[i] = i;
+      return lut;
+    }
 
     let cumulative = 0;
     let cdfMin = 0;
@@ -61,8 +70,7 @@ export class HistogramExpansion extends filters.BaseFilter {
       cumulative += this.histogram[i];
       if (cdfMin === 0 && cumulative > 0) cdfMin = cumulative / total;
       const cdf = cumulative / total;
-      const denom = 1 - cdfMin;
-      const v = denom > 0 ? (cdf - cdfMin) / denom : 0;
+      const v = (cdf - cdfMin) / (1 - cdfMin);
       lut[i] = Math.round(Math.max(0, Math.min(1, v)) * 255);
     }
     return lut;
