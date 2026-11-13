@@ -33,9 +33,9 @@ class IndexView(TemplateView):
             .annotate(count=Count("metatx"))
         ):
             if x["count"] > 10:
-                ind_by_species[re.sub(r"\s*\[.*\]", "", x.get(lang_lbl, "str_en"))] = x[
-                    "count"
-                ]
+                ind_by_species[
+                    re.sub(r"\s*\[.*\]", "", x.get(lang_lbl, x["str_en"]))
+                ] = x["count"]
 
         return dict(
             images=Image.objects.count(),
