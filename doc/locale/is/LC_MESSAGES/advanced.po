@@ -16,7 +16,253 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "Photolith API"
+msgstr ""
+
+msgid "Conventions"
+msgstr ""
+
+msgid "All endpoints live under ``/api/v1/``."
+msgstr ""
+
+msgid ""
+"Authenticate with a per-user API token, issued via the admin interface or"
+" ``./manage.py create_api_token <username>``::"
+msgstr ""
+
+msgid ""
+"This works for any Photolith URL, including ``/search/data/``. The user's"
+" existing permissions apply. An unknown token returns ``401``, rather "
+"than redirecting to the login page."
+msgstr ""
+
+msgid "Request & response bodies are JSON, except for image upload."
+msgstr ""
+
+msgid ""
+"Status codes: ``200`` OK, ``201`` created, ``400`` invalid input, ``401``"
+" bad token, ``403`` forbidden, ``404`` not found, ``409`` conflict, "
+"``412`` precondition failed."
+msgstr ""
+
+msgid ""
+"Errors use the same shape as existing JSON views, plus per-field errors "
+"when a form fails validation (e.g. annotations):"
+msgstr ""
+
+msgid ""
+"Bounding boxes, scale lines & axis polygons are ``[[x, y], ...]`` arrays "
+"in image pixel co-ordinates, as stored by the web client."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Individual metadata uses the same type-prefixed keys as the ingest form: "
+"``ch_`` (text), ``nm_`` (number), ``in_`` (integer), ``dt_`` (date/time),"
+" ``tx_`` (taxonomy, e.g. ``{\"id\": 1}``)."
+msgstr ""
+
+msgid "Python client"
+msgstr ""
+
+msgid ""
+"``photolith_client/`` in the Photolith repository is a Python package "
+"wrapping this API, e.g. for batch-import tools. It depends only on "
+"`requests <https://requests.readthedocs.io/>`_, and can be installed "
+"without the rest of Photolith::"
+msgstr ""
+
+msgid "See ``photolith_client/README.md`` for usage."
+msgstr ""
+
+msgid "Who am I"
+msgstr ""
+
+msgid ""
+"``GET /api/v1/whoami/``: Check a token & what it can do before starting a"
+" batch:"
+msgstr ""
+
+msgid "Images"
+msgstr ""
+
+msgid ""
+"``POST /api/v1/images/``: Upload an image (requires ``add_image``), the "
+"request body is the raw file::"
+msgstr ""
+
+msgid ""
+"Images are stored by content hash, so uploading the same file twice "
+"returns the existing image (``200`` rather than ``201``, ``created`` is "
+"false):"
+msgstr ""
+
+msgid ""
+"``GET /api/v1/images/<id>/``: Fetch an image object (requires "
+"``view_image``), as above without ``created``."
+msgstr ""
+
+msgid ""
+"``PATCH /api/v1/images/<id>/``: Set the image's scale. Requires "
+"``add_individual``, as when setting the scale whilst ingesting. Keys not "
+"given are left alone, ``null`` clears:"
+msgstr ""
+
+msgid "Individuals on an image"
+msgstr ""
+
+msgid "``GET /api/v1/images/<id>/individuals/``: All individuals on an image:"
+msgstr ""
+
+msgid "The response includes an ``ETag`` header."
+msgstr ""
+
+msgid ""
+"``PUT /api/v1/images/<id>/individuals/``: Replace the full set of "
+"individuals on an image. Every existing individual must be included by "
+"``id``, either to update it, or with a ``null`` bounding box to delete "
+"it. Entries without an ``id`` create new individuals:"
+msgstr ""
+
+msgid ""
+"A newly uploaded image has no individuals, so can be PUT to straight "
+"away. Otherwise (e.g. the upload returned ``\"created\": false``, as the "
+"image already existed), GET the image's individuals first, and match them"
+" to your own records (e.g. by ``ch_slideLabel`` & ``ch_individualLabel``)"
+" to find their IDs. Leaving any out returns ``400``, rather than deleting"
+" them."
+msgstr ""
+
+msgid ""
+"Within an image, individuals are identified to people by the combination "
+"of ``ch_slideLabel`` & ``ch_individualLabel``, e.g. individual ``3`` can "
+"be on more than one slide. So every entry not being deleted must have "
+"both labels, and the combination cannot repeat within the request. Labels"
+" can be changed, as the ``id`` identifies the individual."
+msgstr ""
+
+msgid ""
+"Each entry's ``data`` replaces that individual's metadata, keys not given"
+" are removed."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The update is all-or-nothing: if any entry is invalid, nothing is saved. "
+"Errors, and the rest of the response, refer to entries by their position "
+"in the request, e.g. ``\"fields\": {\"individuals[1].data.tx_species\": "
+"[...]}``. Existing individuals missing from the request are reported in "
+"``\"fields\": {\"individuals\": [...]}``."
+msgstr ""
+
+msgid ""
+"The API never deletes annotations as a side-effect. If the update would "
+"change the bounding box of, or remove, an individual with annotations, "
+"nothing is saved and ``409`` is returned, listing annotation IDs by "
+"entry. The client is responsible for deleting these annotations first "
+"(see below), and if it cannot, it should not be changing those "
+"individuals:"
+msgstr ""
+
+msgid ""
+"Send the ``ETag`` from a previous GET as ``If-Match`` to get ``412`` "
+"instead of overwriting changes made since."
+msgstr ""
+
+msgid ""
+"On success, the response is the same as GET, plus the individual IDs "
+"changed by each entry, including those created:"
+msgstr ""
+
+msgid ""
+"``PATCH /api/v1/individuals/<id>/``: Update a single individual, ``<id>``"
+" is the individual's ID from the GET / PUT responses above. ``data`` is "
+"merged with existing metadata:"
+msgstr ""
+
+msgid ""
+"Changing the bounding box of an individual with annotations returns "
+"``409``, as above, but ``annotations`` is a list of IDs, e.g. ``[9001]``."
+" Changing the labels to those of another individual on the image returns "
+"``400``."
+msgstr ""
+
+msgid ""
+"``DELETE /api/v1/individuals/<id>/``: Delete an individual. Returns "
+"``409``, as PATCH, if it has annotations."
+msgstr ""
+
+msgid "Finding individuals"
+msgstr ""
+
+msgid ""
+"Use the existing ``/search/data/`` endpoint, which accepts API tokens. "
+"Filters are the same as the search form, e.g::"
+msgstr ""
+
+msgid ""
+"``nm_`` / ``in_`` / ``dt_`` filters are ranges, so give the same value "
+"twice for an exact match. Add ``with_associated_images=1`` to include "
+"``image_id`` in each row. Metadata is flattened into each row, rather "
+"than nested under ``data``:"
+msgstr ""
+
+msgid ""
+"With ``with_annotations``, each row also includes ``annotation_id`` (for "
+"e.g. ``DELETE /api/v1/annotations/<id>/``) and ``project_id`` (``null`` "
+"for annotations not in a project), both ``null`` for individuals without "
+"annotations. ``rating`` is returned as stored (``100``/``50``/``0`` for "
+"``\"1\"``/``\"2\"``/``\"3\"``)."
+msgstr ""
+
+msgid ""
+"``num_annotations`` only counts annotations in the ``project`` searched, "
+"or without one, annotations not in any project. Use ``num_annotations`` "
+"from ``GET /api/v1/images/<id>/individuals/`` for the total, e.g. before "
+"a PUT."
+msgstr ""
+
+msgid "Clients should check the response for:"
+msgstr ""
+
+msgid ""
+"``alert``: More than ``SEARCH_RESULT_MAX_ROWS`` results, the list is "
+"truncated."
+msgstr ""
+
+msgid ""
+"``error_class`` / ``error``: An error occurred part-way through. The "
+"status code will still be ``200``."
+msgstr ""
+
+msgid "Annotations"
+msgstr ""
+
+msgid ""
+"``POST /api/v1/individuals/<id>/annotations/``: Add an annotation, "
+"``<id>`` is the individual's ID from the GET / PUT responses above:"
+msgstr ""
+
+msgid "Returns ``201``:"
+msgstr ""
+
+msgid ""
+"Validation is as per the annotate form: ``authority`` cannot exceed the "
+"user's own level, and ``project`` must be open. Use ``authority: 20`` "
+"(\"Automated reader\") for machine-generated readings."
+msgstr ""
+
+msgid ""
+"``rating`` uses the official notation: ``\"1\"`` (good), ``\"2\"`` "
+"(difficult) or ``\"3\"`` (unreadable)."
+msgstr ""
+
+msgid ""
+"``DELETE /api/v1/annotations/<id>/``: Delete an annotation. Only the "
+"owner (or a superuser) can do this."
+msgstr ""
 
 msgid "Development notes"
 msgstr ""
@@ -143,3 +389,4 @@ msgstr ""
 
 msgid "User accounts for the FTP server can be added with::"
 msgstr ""
+
