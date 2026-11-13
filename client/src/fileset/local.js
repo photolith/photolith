@@ -1,4 +1,4 @@
-import { Cancelled } from '../errors';
+import { Cancelled } from '../errors.js';
 
 export class LocalFileSet {
   constructor () {
@@ -26,10 +26,14 @@ export class LocalFileSet {
       // Open dialog, return any files selected
       this.input.onchange = (e) => {
         // Previously selected files, pressed cancel.
-        if (e.target.files.length === 0) reject(new Cancelled());
+        if (e.target.files.length === 0) return reject(new Cancelled());
         this.files = Array.from(e.target.files);
         resolve(this.files);
       };
+      // Dialog closed without choosing anything (browsers fire this instead of change)
+      this.input.oncancel = (e) => reject(new Cancelled());
+      // Clear previous selection, otherwise choosing the same files again doesn't fire change
+      this.input.value = '';
       this.input.click();
     }).then((files) => {
       this._remaining = files.length - 1;
