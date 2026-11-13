@@ -219,7 +219,8 @@ function formSubmit (event) {
       headers: {
         'X-CSRFToken': elForm.csrfmiddlewaretoken.value,
         'X-Photolith-fileset': elForm.image_file.value,
-        'X-Photolith-filename': elForm.image_file.phBlob.name
+        // NB: Headers can only contain ISO-8859-1, so encode
+        'X-Photolith-filename': encodeURIComponent(elForm.image_file.phBlob.name)
       }
     }).then((data) => {
       elForm.image_id.value = data.id;
