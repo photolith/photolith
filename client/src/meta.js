@@ -10,7 +10,7 @@ const ISO_DT_REGEX = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0
 // Cache renderers, changing locale requires a page reload
 let renderNumber;
 
-function htmlEscape (s) {
+export function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 

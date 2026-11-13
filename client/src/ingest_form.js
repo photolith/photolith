@@ -1,7 +1,7 @@
 import { displayAlert } from './alert';
 import { changeEvent } from './events';
 import { jsonFetch } from './fetch';
-import { populateIndividualData, updateDataObject } from './meta';
+import { htmlEscape, populateIndividualData, updateDataObject } from './meta';
 
 function checkExisting (labels, warnMsg) {
   const sp = new URLSearchParams();
@@ -15,7 +15,7 @@ function checkExisting (labels, warnMsg) {
     if (!data.data.length) return;
     displayAlert('warning',
       warnMsg.replace('%d', `<b><a href="/search/?${sp}" target="_blank">${data.data.length}</a></b>`) +
-      `:<ul>${data.data.map((i) => `<li>${i.__str__}</li>`).join('\n')}</ul>`,
+      `:<ul>${data.data.map((i) => `<li>${htmlEscape(i.__str__)}</li>`).join('\n')}</ul>`,
       0); // No timeout for the alert, you have to dismiss it
   });
 }
