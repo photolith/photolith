@@ -739,3 +739,36 @@ class ExportViewTest(RequiresUtils, TestCase):
                 }
             ],
         )
+
+    def test_call__project_annotations(self):
+        """Annotations in open projects aren't visible to other readers"""
+        owner = self.create_user("owner", groups=["General Annotation Editor"])
+        reader1 = self.create_user("reader1")
+        reader2 = self.create_user("reader2")
+        ind = self.create_individual()
+        p_open = self.create_project(
+            team=[reader1, reader2], individuals=[ind], created_by=owner
+        )
+        p_closed = self.create_project(
+            team=[reader1, reader2], individuals=[ind], created_by=owner
+        )
+        self.create_annotation(ind, owner, comment="general")
+        self.create_annotation(ind, reader1, comment="open r1", project=p_open)
+        self.create_annotation(ind, reader2, comment="open r2", project=p_open)
+        self.create_annotation(ind, reader2, comment="closed r2", project=p_closed)
+        self.close_project(p_closed)
+
+        def comments(user, project=None):
+            search = dict(project=project.id) if project else dict()
+            return sorted(r.get("comment") for r in self.export(user, "all", search))
+
+        # Open project: members see only their own, owner sees everything
+        self.assertEqual(comments(reader1, p_open), ["open r1"])
+        self.assertEqual(comments(reader2, p_open), ["open r2"])
+        self.assertEqual(comments(owner, p_open), ["open r1", "open r2"])
+
+        # Closed project: everyone sees everything in that project
+        self.assertEqual(comments(reader1, p_closed), ["closed r2"])
+
+        # General search: no annotations from open projects
+        self.assertEqual(comments(owner), ["closed r2", "general"])
