@@ -28,3 +28,12 @@ def json_errors(func):
             )
 
     return wrapper
+
+
+def json_unauthorized(error):
+    """401 response, in the same shape as json_errors"""
+    return JsonResponse(
+        dict(error_class="Unauthorized", error=error),
+        status=401,
+        headers={"WWW-Authenticate": "Token"},
+    )

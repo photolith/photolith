@@ -7,6 +7,8 @@ from django.core.files.storage import storages
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
 
+from .token_auth.models import ApiToken  # noqa: F401
+
 
 def euclidean_dist(a, b):
     """Distance between 2 (x, y) tuples"""
