@@ -40,6 +40,12 @@ class PhotoDirTestCase(TestCase):
         self.create_file(self.base_path / "f_file")
         self.assertEqual(lpd(), ["a_dibble", "z_cuthbert"])
 
+        # Hyphens are fine, directories we couldn't fetch from aren't listed
+        os.makedirs(self.base_path / "m-hyphen")
+        os.makedirs(self.base_path / "m.dot")
+        os.makedirs(self.base_path / ".hidden")
+        self.assertEqual(lpd(), ["a_dibble", "m-hyphen", "z_cuthbert"])
+
     def test_get_next_photo(self):
         def gnp(photo_dir, prev=None):
             return get_next_photo(self.base_path, photo_dir, prev)
@@ -47,6 +53,7 @@ class PhotoDirTestCase(TestCase):
         os.makedirs(self.base_path / "pd")
         os.makedirs(self.base_path / "pd" / "nested")
         os.makedirs(self.base_path / "pd2")
+        os.makedirs(self.base_path / "pd-3")
 
         # Invalid photoDirs
         with self.assertRaises(ValueError):
@@ -60,6 +67,7 @@ class PhotoDirTestCase(TestCase):
         self.assertEqual(gnp("pd"), None)
         self.assertEqual(gnp("pd", prev="001.jpg"), None)
         self.assertEqual(gnp("pd2"), None)
+        self.assertEqual(gnp("pd-3"), None)
 
         # Create files, returned in order
         self.create_file(self.base_path / "pd" / "001.jpg")

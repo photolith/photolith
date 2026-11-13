@@ -6,16 +6,19 @@ import re
 
 from PIL import Image, UnidentifiedImageError
 
+# NB: Should match the <slug:photo_dir> in ingest/urls.py
+PHOTO_DIR_RE = re.compile(r"^[-\w]+$", re.ASCII)
+
 
 def list_photo_dirs(base):
     for p in sorted(pathlib.Path(base).iterdir()):
-        if p.is_dir():
+        if p.is_dir() and PHOTO_DIR_RE.match(os.path.basename(p)):
             yield os.path.basename(p)
 
 
 def get_next_photo(base, photo_dir, prev=None):
     dir_path = pathlib.Path(base) / photo_dir
-    if not re.match(r"^\w+$", photo_dir) or not os.path.exists(dir_path):
+    if not PHOTO_DIR_RE.match(photo_dir) or not os.path.exists(dir_path):
         raise ValueError("Invalid photo_dir '%s'" % photo_dir)
 
     file_path = None
