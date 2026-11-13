@@ -190,13 +190,15 @@ function formRefresh (event) {
 function formSubmit (event) {
   const elForm = event.submitter.form;
 
+  // Still busy (e.g. uploading), ignore repeated clicks rather than uploading the image twice
+  if (elForm.classList.contains('rendering')) return false;
+
   if (event.submitter.name === 'clear_all' && !window.confirm(elForm.getAttribute('data-locale-warnclear'))) {
     return false;
   }
 
+  elForm.classList.add('rendering');
   return Promise.resolve().then(() => {
-    elForm.classList.add('rendering');
-
     // Clear all bounding boxes first, triggering mass deletion
     if (event.submitter.name === 'clear_all') {
       Array.from(elForm.elements).forEach((el) => {
