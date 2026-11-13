@@ -833,3 +833,25 @@ class AnnotateDeleteViewTest(RequiresUtils, TestCase):
             ),
         )
         self.assertEqual(Annotation.objects.filter(pk=ann.id).first(), None)
+
+    def test_csrf(self):
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        ann = self.create_annotation(ind, created_by=user1)
+
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(user1)
+        token = "a" * 32
+        client.cookies["csrftoken"] = token
+
+        # No token, rejected & annotation still there
+        resp = client.post("/annotate/delete/%d/" % (ann.id,), {})
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 1)
+
+        # Token in header (as client sends), deleted
+        resp = client.post(
+            "/annotate/delete/%d/" % (ann.id,), {}, headers={"X-CSRFToken": token}
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 0)
