@@ -40,15 +40,20 @@ export function jsonFetch (resource, options = {}) {
   options.headers.Accept = 'application/json';
   return window.fetch(resource, options).then((response) => {
     if (response.ok) {
-      return response.json().then((rv) => {
+      return response.text().then((body) => {
+        try {
+          return JSON.parse(body);
+        } catch (e) {
+          console.error('Failed to parse JSON response', e);
+          const snippet = body.trim().replace(/\s+/g, ' ');
+          throw new Error(`Failed to fetch ${resource}: Unparsable (${snippet.length > 20 ? snippet.slice(0, 20) + '...' : snippet})`);
+        }
+      }).then((rv) => {
         // NB: Streaming responses might have reported an error after starting
         if (rv.error) {
           throw new Error(`Failed to fetch ${resource} ${rv.error_class ? `[${rv.error_class}]` : ''}: ${rv.error}`);
         }
         return rv;
-      }).catch((e) => {
-        console.error('Failed to parse JSON response', e);
-        throw new Error(`Failed to fetch ${resource}`);
       });
     }
 

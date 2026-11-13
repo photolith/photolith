@@ -14,6 +14,7 @@ function mockFetch (routes) {
       status: route.status || 200,
       statusText: route.statusText || 'OK',
       json: () => Promise.resolve(route.json),
+      text: () => Promise.resolve(JSON.stringify(route.json)),
       blob: () => Promise.resolve(route.blob)
     });
   };
