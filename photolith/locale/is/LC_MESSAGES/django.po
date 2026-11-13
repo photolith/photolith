@@ -142,7 +142,7 @@ msgstr "Reynd/ur"
 
 #: photolith/models.py
 msgid "Senior expert"
-msgstr "Sérfræðingur"
+msgstr "Reyndari sérfræðingur"
 
 #: photolith/models.py
 msgid "The species for which the user is more expert in"
@@ -160,12 +160,12 @@ msgstr ""
 "Reynsla (aldursmerkingar frá reyndari notendum eru valdar framyfir aðra)"
 
 #: photolith/models.py
-msgid "user species authority"
-msgstr "reynsla notanda á tegund"
+msgid "USser species authority"
+msgstr "Reynsla notanda á tegund"
 
 #: photolith/models.py
-msgid "user species authorities"
-msgstr "reynsla notanda á tegundum"
+msgid "User species authorities"
+msgstr "Reynsla notanda á tegundum"
 
 #: photolith/models.py
 msgid ""
@@ -205,8 +205,8 @@ msgid "individuals"
 msgstr "einstaklingar"
 
 #: photolith/models.py
-msgid "metadata key"
-msgstr "gögn úr gagnagrunni"
+msgid "Metadata key"
+msgstr "Gögn úr gagnagrunni"
 
 #: photolith/models.py
 msgid ""
