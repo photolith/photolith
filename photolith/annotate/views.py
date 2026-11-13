@@ -218,7 +218,12 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
         # See if saving will be allowed, if not page should be read only
         try:
             check_annotate_access(
-                context["form"].initial["project"],
+                # NB: For existing annotations, initial["project"] is an ID, not a Project
+                (
+                    self.object.project
+                    if self.object
+                    else context["form"].initial["project"]
+                ),
                 self.request.user,
                 rw=True,
             )

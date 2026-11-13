@@ -143,8 +143,18 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         ann.refresh_from_db()
         self.assertEqual(ann.individual, ind)
 
+        # Can view the edit form for it
+        client = Client()
+        client.force_login(user1)
+        resp = client.get("/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["read_only"], False)
+
         # Once closed, can't edit, or move the annotation out of the project
         self.close_project(p1)
+        resp = client.get("/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["read_only"], True)
         with self.assertRaisesRegex(PermissionDenied, p1.name):
             self.form_post(user1, ind, project=p1, qs_project=p1, annotation_id=ann.id)
         with self.assertRaisesRegex(PermissionDenied, p1.name):
