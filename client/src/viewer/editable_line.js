@@ -25,6 +25,11 @@ function snapLine (originPoint, linePoint, newPoint, notBeyondDp = false) {
   ));
 }
 
+/** Canvas position of (node), which could be within a group (e.g. ActiveSelection) */
+function nodePoint (n) {
+  return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
+}
+
 export default function (props = {}, circleProps = {}, opts = {}) {
   props.strokeWidth = props.strokeWidth || 3;
   circleProps.strokeWidth = circleProps.strokeWidth || props.strokeWidth;
@@ -135,7 +140,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
   // Helper to append point to existing list of nodes
   poly.phAddNode = function (newPoint, opt) {
     let i;
-    const points = this.phNodes.map((n) => new Point(n.left, n.top));
+    const points = this.phNodes.map(nodePoint);
     // snap when this.canvas.phPrefs["ph-pref-snap-to-axis"] or ctrl
     const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
@@ -160,9 +165,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   // Update location of a moved node
   poly.phUpdateNode = function (phNode, opt) {
-    const points = this.phNodes.map((n) => {
-      return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
-    });
+    const points = this.phNodes.map(nodePoint);
     // snap when both this.canvas.phPrefs["ph-pref-snap-to-axis"] opt.e.ctrlKey on or off
     const snapToAxis = (this.canvas.phPrefs['ph-pref-snap-to-axis'] && !opt.e.ctrlKey) || (!this.canvas.phPrefs['ph-pref-snap-to-axis'] && opt.e.ctrlKey);
 
@@ -175,7 +178,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
       // End: Snap to line formed by previous point
       if (points.length > 2) points[phNode.phNodeIdx] = snapLine(points[points.length - 3], points[points.length - 2], points[phNode.phNodeIdx]);
     } else {
-      points[phNode.phNodeIdx] = points[phNode.phNodeIdx] = snapLine(points[phNode.phNodeIdx - 1], points[phNode.phNodeIdx + 1], points[phNode.phNodeIdx], true);
+      points[phNode.phNodeIdx] = snapLine(points[phNode.phNodeIdx - 1], points[phNode.phNodeIdx + 1], points[phNode.phNodeIdx], true);
     }
     poly.phSetPoints(points);
   };
@@ -187,9 +190,7 @@ export default function (props = {}, circleProps = {}, opts = {}) {
     // We should at least have a line at the end of this
     if (nodesToRemove.length === 0 || (this.phNodes.length - nodesToRemove.length) < 2) return;
 
-    const points = this.phNodes.filter((n) => !nodesToRemove.includes(n)).map((n) => {
-      return n.group ? util.transformPoint(new Point(n.left, n.top), n.group.calcTransformMatrix()) : new Point(n.left, n.top);
-    });
+    const points = this.phNodes.filter((n) => !nodesToRemove.includes(n)).map(nodePoint);
     poly.phSetPoints(points);
 
     const oldIdx = nodesToRemove[0].phNodeIdx;
@@ -198,13 +199,13 @@ export default function (props = {}, circleProps = {}, opts = {}) {
 
   poly.on('moving', (event) => {
     // Refresh points based on their new position
-    const points = poly.phNodes.map((n) => new Point(n.left, n.top));
+    const points = poly.phNodes.map(nodePoint);
     return poly.phSetPoints(points);
   });
 
   poly.on('phCanvasZoom', (event) => {
     // Refresh points to correct for any zoom error
-    const points = poly.phNodes.map((n) => new Point(n.left, n.top));
+    const points = poly.phNodes.map(nodePoint);
     return poly.phSetPoints(points, true);
   });
 
