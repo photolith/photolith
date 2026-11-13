@@ -183,7 +183,7 @@ class Individual(models.Model):
                 continue
             if not re.match(r"^[a-z]{2}_", k):
                 raise ValueError("'%s' has no type prefix" % k)
-            t, k = k.split("_", 2)
+            t, k = k.split("_", 1)
 
             if v is None:
                 # We don't allow nulls in, means an empty required field in UI
