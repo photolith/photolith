@@ -130,8 +130,9 @@ class ImageAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -183,8 +184,9 @@ class IndividualAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -245,8 +247,9 @@ class AnnotationAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -291,8 +294,9 @@ class ProjectAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -317,6 +321,7 @@ class TeamAdmin(admin.ModelAdmin):
         form,
         change,
     ):
-        """Force created_by to current user"""
-        obj.created_by = request.user
+        """Force created_by to current user, when creating"""
+        if not change:
+            obj.created_by = request.user
         super().save_model(request, obj, form, change)
