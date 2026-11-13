@@ -15,7 +15,8 @@ function htmlEscape (s) {
 }
 
 function attribEscape (s) {
-  return (new window.Option('', s)).outerHTML.match(/value="(.*?)"/)[1];
+  // NB: [^"] rather than ., as attribute values can contain newlines
+  return (new window.Option('', s)).outerHTML.match(/value="([^"]*)"/)[1];
 }
 
 /** DataTables type for column (k), so DT doesn't have to scan all data to detect it. NB: Needs registerDTTypes() */

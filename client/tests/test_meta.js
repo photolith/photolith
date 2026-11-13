@@ -74,6 +74,7 @@ test('renderMetaCell:form', function (test) {
 
   // Wrapped in text field, escaped
   test.deepEqual(renderMetaCell('ch_chchanges', '<hello>"world"</hello>', 'form'), '<input type="text" class="form-control ph-meta" data-key="ch_chchanges" name="" value="<hello>&quot;world&quot;</hello>">');
+  test.deepEqual(renderMetaCell('ch_chchanges', 'hello\nworld', 'form'), '<input type="text" class="form-control ph-meta" data-key="ch_chchanges" name="" value="hello\nworld">', 'Newlines in values escaped without error');
 
   // Numbers get a number field
   test.deepEqual(renderMetaCell('nm_n', 1234567.4562, 'form'), '<input type="number" class="form-control ph-meta" data-key="nm_n" name="" value="1234567.4562" step="any">');
