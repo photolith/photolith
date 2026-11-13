@@ -1,4 +1,5 @@
 import { displayAlert } from './alert';
+import { htmlEscape } from './meta';
 import { init as initIngestSelectBar } from './ingest_selectbar';
 import { init as initIngestForm } from './ingest_form';
 import { init as initSearch } from './search';
@@ -29,9 +30,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  displayAlert('danger', event.reason, -1);
+  // NB: Error messages can contain user input (e.g. slide labels), so escape
+  displayAlert('danger', htmlEscape(event.reason), -1);
 });
 
 window.onerror = (event, source, lineno, colno, error) => {
-  displayAlert('danger', `<details><summary>${error}</summary><pre>${error.stack}</pre></details>`, -1);
+  // NB: error is null for e.g. cross-origin "Script error." events
+  const stack = (error && error.stack) || `${source}:${lineno}:${colno}`;
+  displayAlert('danger', `<details><summary>${htmlEscape(error || event)}</summary><pre>${htmlEscape(stack)}</pre></details>`, -1);
 };
