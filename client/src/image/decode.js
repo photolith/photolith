@@ -22,18 +22,20 @@ function decodeTIFF (buff, fileName) {
     JPEGInterchangeFormatLength: 't514'
   };
 
+  // First value of tag (t) in (ifd), NB: tags not present in the file are missing entirely
+  const tag = (ifd, t) => (ifd[t] || [])[0];
+
   let selIFD = { width: 0 };
   for (const ifd of ifds) {
     // First search subIFDs for JPEGs
     let jpegBuff = { byteLength: 0 };
     for (const subIFD of ifd.subIFD || []) {
-      if (subIFD[tt.Compression][0] === 6 && subIFD[tt.JPEGInterchangeFormat][0] && subIFD[tt.JPEGInterchangeFormatLength][0]) {
+      const offset = tag(subIFD, tt.JPEGInterchangeFormat);
+      const length = tag(subIFD, tt.JPEGInterchangeFormatLength);
+      if (tag(subIFD, tt.Compression) === 6 && offset && length) {
         // We want the biggest image, assume file size is a good proxy
-        if (subIFD[tt.JPEGInterchangeFormatLength][0] > jpegBuff.byteLength) {
-          jpegBuff = buff.slice(
-            subIFD[tt.JPEGInterchangeFormat][0],
-            subIFD[tt.JPEGInterchangeFormat][0] + subIFD[tt.JPEGInterchangeFormatLength][0]
-          );
+        if (length > jpegBuff.byteLength) {
+          jpegBuff = buff.slice(offset, offset + length);
         }
       }
     }
