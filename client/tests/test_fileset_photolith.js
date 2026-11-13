@@ -158,7 +158,7 @@ test('PhotolithFileSet:next image fetch failure', async function (test) {
     await fs.next();
     test.fail('expected error');
   } catch (e) {
-    test.ok(/Failed to fetch/.test(e.message), 'rejects when image fetch returns non-200');
+    test.equal(e.message, 'Failed to fetch /media/8.jpg: 404 Not Found', 'rejects when image fetch returns non-200, saying what failed');
   }
 
   test.end();

@@ -30,3 +30,23 @@ test('ServerFileSet:next', function (test) {
     test.deepEqual(new URLSearchParams(urls[1].replace(/^.*\?/, '')).get('prev'), 'A+B & C #1 100%.jpg', 'Server would decode original filename');
   });
 });
+
+test('ServerFileSet:next errors', function (test) {
+  const dom = setupDom(test);
+  let nextResponse;
+  dom.window.fetch = () => nextResponse;
+  const origConsoleError = console.error;
+  console.error = () => {};
+  test.teardown(() => { console.error = origConsoleError; });
+
+  const fs = new ServerFileSet('photos');
+  nextResponse = Promise.reject(new TypeError('Failed to fetch'));
+  return fs.next().then(() => test.fail('Should have thrown'), (err) => {
+    test.deepEqual(err.message, 'Failed to fetch /ingest/next-photo/photos/?prev=: Network error, could not reach server (Failed to fetch)', 'Network errors say what failed');
+  }).then(() => {
+    nextResponse = Promise.resolve(new Response('', { status: 502 }));
+    return fs.next().then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch next image: 502', 'Unexpected statuses reported');
+    });
+  });
+});

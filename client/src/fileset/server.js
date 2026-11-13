@@ -1,6 +1,7 @@
 import { parse } from 'content-disposition-header';
 
 import { Cancelled } from '../errors.js';
+import { fetchResource, statusMessage } from '../fetch.js';
 
 function timedPromise (rv, timeout) {
   return new Promise((resolve) => window.setTimeout(resolve.bind(null, rv), timeout));
@@ -35,7 +36,7 @@ export class ServerFileSet {
   next (overridePrev) {
     const prev = overridePrev !== undefined ? (overridePrev || '') : (this.prev || '');
     const url = `/ingest/next-photo/${encodeURIComponent(this.photoDir)}/?prev=${encodeURIComponent(prev)}`;
-    return this.cancellable(window.fetch(url)).then((resp) => {
+    return this.cancellable(fetchResource(url)).then((resp) => {
       this._remaining = parseInt(resp.headers.get('X-Photolith-Remaining') || 0, 10);
 
       if (resp.status === 204) {
@@ -65,7 +66,7 @@ export class ServerFileSet {
         });
       }
       console.error('Failed to fetch next image', resp);
-      throw new Error('Failed to fetch next image');
+      throw new Error(`Failed to fetch next image: ${statusMessage(resp)}`);
     });
   }
 

@@ -36,7 +36,7 @@ export function jsonFetchCached (baseResource, params, options) {
 }
 
 /** window.fetch, but network errors (blocked, offline, ...) say what failed */
-function fetchResource (resource, options) {
+export function fetchResource (resource, options) {
   return window.fetch(resource, options).catch((err) => {
     // NB: Callers check for aborts, pass them on as-is
     if (err.name === 'AbortError') throw err;
@@ -46,7 +46,7 @@ function fetchResource (resource, options) {
 }
 
 /** Describe a failed HTTP response (NB: statusText is always empty over HTTP/2) */
-function statusMessage (response) {
+export function statusMessage (response) {
   return `${response.status} ${response.statusText}`.trim();
 }
 

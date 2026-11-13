@@ -1,5 +1,5 @@
 import { Cancelled } from '../errors.js';
-import { jsonFetch } from '../fetch.js';
+import { blobFetch, jsonFetch } from '../fetch.js';
 
 export class PhotolithFileSet {
   /**
@@ -49,30 +49,23 @@ export class PhotolithFileSet {
       const imageMeta = searchData.images[imageId];
 
       // Fetch associated image with first row (assuming they're all the same)
-      return window.fetch(imageMeta.url).then((resp) => {
-        if (resp.status !== 200) {
-          console.error('Failed to fetch image', resp);
-          throw new Error(`Failed to fetch image ${imageMeta.url}`);
-        }
+      return blobFetch(imageMeta.url).then((blob) => {
+        // Return both blob & data
+        const out = {
+          image_id: imageId,
+          blob,
+          individuals: searchData.data,
+          // The name we populate the selectbar with
+          name: searchData.data[0].ch_slideLabel,
+          'slide-label': searchData.data[0].ch_slideLabel,
+          scale_mm: imageMeta.scale_mm,
+          scale_line: imageMeta.scale_line
+        };
+        // The name we send on as orig_filename
+        blob.name = imageMeta.orig_filename;
 
-        // Get image as blob, return both blob & data
-        return resp.blob().then((blob) => {
-          const out = {
-            image_id: imageId,
-            blob,
-            individuals: searchData.data,
-            // The name we populate the selectbar with
-            name: searchData.data[0].ch_slideLabel,
-            'slide-label': searchData.data[0].ch_slideLabel,
-            scale_mm: imageMeta.scale_mm,
-            scale_line: imageMeta.scale_line
-          };
-          // The name we send on as orig_filename
-          blob.name = imageMeta.orig_filename;
-
-          this.imageIds.shift();
-          return out;
-        });
+        this.imageIds.shift();
+        return out;
       });
     });
   }
