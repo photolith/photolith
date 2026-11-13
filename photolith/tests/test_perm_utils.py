@@ -1,12 +1,31 @@
+from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from ..perm_utils import (
     check_annotate_access,
     check_annotation_edit_access,
+    check_perms,
 )
 
 from .requires_utils import RequiresUtils
+
+
+class CheckPermsTest(RequiresUtils, TestCase):
+    def test_check_perms(self):
+        user = self.create_user()
+        user.user_permissions.set(
+            Permission.objects.filter(codename__in=["view_image", "add_image"])
+        )
+
+        check_perms(user)
+        check_perms(user, "photolith.view_image")
+        check_perms(user, "photolith.view_image", "photolith.add_image")
+        with self.assertRaisesRegex(
+            PermissionDenied,
+            r"^Missing permission photolith.view_image, photolith.add_individual$",
+        ):
+            check_perms(user, "photolith.view_image", "photolith.add_individual")
 
 
 class CheckAnnotateAccessTest(RequiresUtils, TestCase):

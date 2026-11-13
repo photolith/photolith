@@ -2,8 +2,8 @@ import functools
 import logging
 
 
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
+from django.http import Http404, JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,14 @@ def json_errors(func):
             # NB: code is e.g. "invalid" for Django's own ValidationErrors, only use HTTP status codes
             status = getattr(e, "code", None)
             if not (isinstance(status, int) and 400 <= status < 600):
-                status = 400 if isinstance(e, ValidationError) else 500
+                if isinstance(e, (BadRequest, ValidationError)):
+                    status = 400
+                elif isinstance(e, PermissionDenied):
+                    status = 403
+                elif isinstance(e, Http404):
+                    status = 404
+                else:
+                    status = 500
             return JsonResponse(
                 dict(
                     error_class=e.__class__.__name__,

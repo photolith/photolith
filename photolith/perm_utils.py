@@ -1,6 +1,12 @@
 from django.core.exceptions import PermissionDenied
 
 
+def check_perms(user, *perms):
+    """Raise PermissionDenied unless user has all perms"""
+    if not user.has_perms(perms):
+        raise PermissionDenied("Missing permission %s" % ", ".join(perms))
+
+
 def check_annotate_access(project, user, rw=False):
     if project:
         # NB: Team is set to NULL if deleted

@@ -542,7 +542,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 {
                     "error_class": "PermissionDenied",
                     "error": "Cannot edit Individual %d, was created by %s not you"
@@ -595,7 +595,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="Cannot edit %s, has already been annotated %d times"
@@ -623,7 +623,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="Cannot edit %s, has already been annotated %d times"
@@ -649,7 +649,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="Cannot edit %s, has already been annotated %d times"
@@ -678,7 +678,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="Cannot edit %s, has already been annotated %d times"
@@ -718,7 +718,7 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="Cannot edit %s, was created by %s not you"

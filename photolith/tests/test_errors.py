@@ -1,6 +1,7 @@
 import json
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import Http404
 from django.test import TestCase
 
 from ..errors import json_errors
@@ -30,10 +31,19 @@ class JsonErrorsTest(TestCase):
             self.call(ValidationError("Bad")),
             (400, dict(error_class="ValidationError", error="Bad")),
         )
-        # Anything else
+        # Permissions / not found
         self.assertEqual(
             self.call(PermissionDenied("No")),
-            (500, dict(error_class="PermissionDenied", error="No")),
+            (403, dict(error_class="PermissionDenied", error="No")),
+        )
+        self.assertEqual(
+            self.call(Http404("Where")),
+            (404, dict(error_class="Http404", error="Where")),
+        )
+        # Anything else
+        self.assertEqual(
+            self.call(PermissionError("No")),
+            (500, dict(error_class="PermissionError", error="No")),
         )
         self.assertEqual(
             self.call(KeyError("x")),
