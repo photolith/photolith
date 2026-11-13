@@ -14,8 +14,14 @@ export function init (parent) {
   parent.querySelectorAll('select.pref-session').forEach((elSelect) => {
     // Reset initial state based on sessionStorage
     let initValue = window.sessionStorage.getItem(elSelect.id);
+    try {
+      initValue = initValue === null ? null : new Set(JSON.parse(initValue));
+    } catch (e) {
+      // Not something we stored, ignore it rather than breaking the rest of the page
+      console.warn(`Ignoring unparsable sessionStorage value for ${elSelect.id}`, e);
+      initValue = null;
+    }
     if (initValue !== null) {
-      initValue = new Set(JSON.parse(initValue));
       Array.from(elSelect.options).forEach((o) => {
         o.defaultSelected = o.selected = initValue.has(o.value);
       });

@@ -79,3 +79,23 @@ test('init select', function (test) {
 
   test.end();
 });
+
+test('init select unparsable storage', function (test) {
+  setupDom(test, `<html lang="en"><body>
+    <form>
+      <select id="pref-view" class="pref-session" multiple>
+        <option value="list" selected>List</option>
+        <option value="grid">Grid</option>
+      </select>
+    </form>
+  </body></html>`);
+  const elSelect = global.window.document.getElementById('pref-view');
+
+  ['on', '5', '{not json'].forEach((badValue) => {
+    global.window.sessionStorage.setItem('pref-view', badValue);
+    test.doesNotThrow(() => init(global.window.document), `Init doesn't throw with stored "${badValue}"`);
+    test.deepEqual(Array.from(elSelect.selectedOptions).map((o) => o.value), ['list'], 'Default selection kept');
+  });
+
+  test.end();
+});
