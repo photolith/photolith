@@ -44,6 +44,14 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
                 or self.object.created_by == self.request.user
             ):
                 raise PermissionDenied("You do not own annotation %s" % self.object)
+            # NB: The form has already updated self.object, so check against what's in the DB
+            orig = Annotation.objects.select_related("project").get(pk=self.object.pk)
+            if form.instance.individual_id != orig.individual_id:
+                raise BadRequest(
+                    "Cannot move annotation %s to another individual" % orig
+                )
+            # Cannot edit, or move annotations out of, a closed project
+            check_annotate_access(orig.project, self.request.user, rw=True)
         else:
             form.instance.created_by = self.request.user
 
@@ -258,6 +266,8 @@ class DeleteView(LoginRequiredMixin, View):
         obj = get_object_or_404(Annotation, pk=int(self.kwargs["annotation_id"]))
         if not (self.request.user.is_superuser or obj.created_by == self.request.user):
             raise PermissionDenied("You do not own annotation %s" % obj)
+        # Cannot remove annotations from a closed project
+        check_annotate_access(obj.project, self.request.user, rw=True)
 
         old_annotation_id = obj.id
         obj.delete()

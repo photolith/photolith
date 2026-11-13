@@ -107,6 +107,53 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         ann = self.form_post(user1, ind, project=None, qs_project=p1)
         self.assertEqual(ann.project, None)
 
+    def test_form_valid__existing(self):
+        """Edits can't move annotations out of closed projects, or to other individuals"""
+        user1 = self.create_user(
+            groups=["General Annotation Editor"], base_authority_level=50
+        )
+        ind = self.create_individual()
+        p1 = self.create_project(team=[user1], individuals=[ind])
+        ann = self.form_post(user1, ind, project=p1, qs_project=p1)
+        self.assertEqual(ann.project, p1)
+
+        # Can edit within an open project
+        ann = self.form_post(
+            user1, ind, project=p1, qs_project=p1, annotation_id=ann.id
+        )
+        self.assertEqual(ann.project, p1)
+
+        # Can't move to another individual
+        ind2 = self.create_individual()
+        client = Client()
+        client.force_login(user1)
+        resp = client.post(
+            "/annotate/%d/%d?project=%d" % (ind.id, ann.id, p1.id),
+            dict(
+                individual=ind2.id,
+                project=p1.id,
+                age=4,
+                axis_poly="[[0, 0], [1, 1]]",
+                comment="UT moved",
+                authority="50",
+                rating=Annotation.Rating.GOOD,
+            ),
+        )
+        self.assertEqual(resp.status_code, 400)
+        ann.refresh_from_db()
+        self.assertEqual(ann.individual, ind)
+
+        # Once closed, can't edit, or move the annotation out of the project
+        self.close_project(p1)
+        with self.assertRaisesRegex(PermissionDenied, p1.name):
+            self.form_post(user1, ind, project=p1, qs_project=p1, annotation_id=ann.id)
+        with self.assertRaisesRegex(PermissionDenied, p1.name):
+            self.form_post(
+                user1, ind, project=None, qs_project=p1, annotation_id=ann.id
+            )
+        ann.refresh_from_db()
+        self.assertEqual(ann.project, p1)
+
     def test_get_initial(self):
         user1 = self.create_user(
             "user1", groups=["General Annotation Viewer"], base_authority_level=50
@@ -904,3 +951,16 @@ class AnnotateDeleteViewTest(RequiresUtils, TestCase):
         )
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 0)
+
+    def test_call__closed_project(self):
+        user1 = self.create_user(groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        p = self.create_project(team=[user1], individuals=[ind])
+        ann = self.create_annotation(ind, created_by=user1, project=p)
+        self.close_project(p)
+
+        # Can't delete annotations from a closed project, even our own
+        status, out = self.ann_del(ann, user1)
+        self.assertEqual(out["error_class"], "PermissionDenied")
+        self.assertIn("closed", out["error"])
+        self.assertEqual(Annotation.objects.filter(pk=ann.id).count(), 1)
