@@ -178,7 +178,10 @@ export class PhViewer {
       const selObj = this.getActiveObject();
       this.lowerCanvasEl.focus(); // Focus to receive keyboard events
 
-      if (selObj && selObj instanceof Group) {
+      // NB: selection:updated (e.g. ctrl-click to add to a selection) fires with the same object,
+      //     so only add handlers once, otherwise they stack up and run once per update
+      if (selObj && selObj instanceof Group && !selObj.phPropagating) {
+        selObj.phPropagating = true;
         selObj.on('moving', function (opt) {
           selObj.getObjects().forEach((o) => {
             o.fire('moving', { e: opt.e, pointer: opt.pointer, transform: { target: o } });
