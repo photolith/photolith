@@ -212,6 +212,50 @@ test('MetadataApi(hafro):sampleDetail unknown sex falls back', async function (t
   test.end();
 });
 
+test('MetadataApi(hafro):sampleDetail missing maturity / gear', async function (test) {
+  const mApi = setupHafroApi(test, {});
+
+  global.window.fetch = mockFetch({
+    '/biota/otolith/sample/537572/combined/filter?speciesNo=1': {
+      json: {
+        otoliths: [{
+          serialNo: 1,
+          sampleId: 537572,
+          measureId: 111,
+          measureDTO: { length: 10, sexNo: 1, sexualMaturity: null },
+          speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
+          sampleResponse: {
+            station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
+            gear: null,
+            meshSize: 32
+          }
+        }, {
+          serialNo: 2,
+          sampleId: 537572,
+          measureId: 112,
+          measureDTO: { length: 12, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
+          sampleResponse: {
+            station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
+            gear: { isscfgNo: 'PT1' },
+            meshSize: 32
+          }
+        }]
+      }
+    }
+  });
+
+  const out = await mApi.sampleDetail('537572 TG1-2023/110 1 03');
+  test.equal(out.length, 2, 'Both individuals returned');
+  test.equal(out[0].tx_maturity, undefined, 'No maturity when API has none');
+  test.equal(out[0].ch_gear, undefined, 'No gear when API has none');
+  test.equal(out[0].nm_length, 10, 'Rest of individual still mapped');
+  test.deepEqual(out[1].tx_maturity, { id: 2, en: 'Unknown' }, 'Maturity mapped when present');
+  test.equal(out[1].ch_gear, 'PT1', 'Gear mapped when present');
+
+  test.end();
+});
+
 test('MetadataApi(hafro):sampleDetail unwraps single-element array response', async function (test) {
   const mApi = setupHafroApi(test, {});
 
