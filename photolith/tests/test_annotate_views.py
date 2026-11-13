@@ -577,6 +577,45 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             ],
         )
 
+    def test_form_valid__authority(self):
+        """Can't save an annotation with more authority than we have"""
+        user = self.create_user(
+            groups=["General Annotation Editor"],
+            base_authority_level=UserSpeciesAuthority.AuthorityLevel.JUNIOR,
+        )
+        ind = self.create_individual()
+
+        def post(authority):
+            client = Client()
+            client.force_login(user)
+            resp = client.post(
+                "/annotate/%d/" % ind.id,
+                dict(
+                    individual=ind.id,
+                    project="",
+                    age=4,
+                    axis_poly="[[0, 0], [1, 1]]",
+                    comment="UT authority %d" % authority,
+                    authority=str(authority),
+                    rating=Annotation.Rating.GOOD,
+                ),
+            )
+            return (
+                resp.status_code,
+                list(
+                    Annotation.objects.filter(
+                        comment="UT authority %d" % authority
+                    ).values_list("authority", flat=True)
+                ),
+            )
+
+        # Own level (and "with original otoliths") is fine
+        self.assertEqual(post(80), (302, [80]))
+        self.assertEqual(post(85), (302, [85]))
+        # Higher levels are rejected, form shown again
+        self.assertEqual(post(100), (200, []))
+        self.assertEqual(post(125), (200, []))
+
     def test_get_context_data__authority(self):
         def auth_choices(user, individual):
             request = RequestFactory().get(

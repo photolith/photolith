@@ -87,6 +87,29 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
         return p
 
     @cached_property
+    def authority_level(self):
+        """The current user's authority level for this individual"""
+        if hasattr(self.request.user, "userprofile"):
+            return self.request.user.userprofile.authority_level(self.ind_data)
+        return UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if self.individual_id:
+            # Only allow authority choices up to the user's level (or the existing value when editing)
+            form.fields["authority"].choices = [
+                (v, n)
+                for v, n in form.fields["authority"].choices
+                if v < self.authority_level + 10
+                or (self.object and v == self.object.authority)
+            ]
+        return form
+
+    @cached_property
+    def ind_data(self):
+        return self.get_individual()
+
+    @cached_property
     def individual_id(self):
         if "individual_id" in self.kwargs:
             return int(self.kwargs["individual_id"])
@@ -152,21 +175,9 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
             return None
 
         if self.individual_id:
-            context["ind_data"] = self.get_individual()
+            context["ind_data"] = self.ind_data
             context["all_annotations"] = self.get_all_annotations()
-
-            if hasattr(self.request.user, "userprofile"):
-                auth_level = self.request.user.userprofile.authority_level(
-                    context["ind_data"]
-                )
-            else:
-                auth_level = UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
-            context["form"].initial["authority"] = auth_level
-            context["form"].fields["authority"].choices = [
-                (v, n)
-                for v, n in context["form"].fields["authority"].choices
-                if (v < auth_level + 10)
-            ]
+            context["form"].initial["authority"] = self.authority_level
 
             if self.object and self.object.id:
                 # Editing an existing annotation
