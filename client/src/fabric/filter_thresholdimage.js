@@ -61,6 +61,7 @@ export class ThresholdImage extends filters.BaseFilter {
         data[j] = v;
         data[j + 1] = v;
         data[j + 2] = v;
+        data[j + 3] = 255; // NB: As WebGL, output is opaque
       }
     }
   }
