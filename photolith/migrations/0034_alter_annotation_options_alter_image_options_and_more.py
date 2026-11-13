@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name="userspeciesauthority",
             options={
-                "verbose_name": "user species authority",
-                "verbose_name_plural": "user species authorities",
+                "verbose_name": "User species authority",
+                "verbose_name_plural": "User species authorities",
             },
         ),
         migrations.AlterField(
@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 help_text="The taxonomy this entry is added to, a lower-case identifier, e.g. 'species'",
                 max_length=255,
-                verbose_name="metadata key",
+                verbose_name="Metadata key",
             ),
         ),
         migrations.AlterField(

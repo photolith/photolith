@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "photolith",
 ]
 MIDDLEWARE = [
+    "photolith.middleware.EcsHealthCheckMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
