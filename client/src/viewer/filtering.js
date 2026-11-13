@@ -1,7 +1,7 @@
 import { filters, config, getEnv } from 'fabric';
 
-import { PhViewer } from './base';
-import { changeEvent } from '../events';
+import { PhViewer } from './base.js';
+import { changeEvent } from '../events.js';
 import { thresholdLocalOtsu, normaliseSelection } from '../image/threshold.js';
 import { floodFillHistogram, fullHistogram } from '../image/fill.js';
 import { HistogramExpansion } from '../fabric/filter_histogramexpansion.js';
@@ -45,12 +45,14 @@ export class PhFilteringViewer extends PhViewer {
     if (phFilters.histogramExpansion && phFilters.histogramExpansion !== '0') {
       phFilters._focalPoint = this._focalPoint;
     }
-    if (JSON.stringify(phFilters) === this._prevPhFilters) {
+    const filtersKey = JSON.stringify(phFilters);
+    if (img === this._prevFilteredImg && filtersKey === this._prevPhFilters) {
       // Filters didn't change
       this.filterActiveTimeout = undefined;
       return;
     }
-    this._prevPhFilters = phFilters;
+    this._prevPhFilters = filtersKey;
+    this._prevFilteredImg = img;
 
     img.filters = [];
 
