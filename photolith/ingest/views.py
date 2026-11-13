@@ -1,13 +1,10 @@
-import hashlib
 import io
 import json
-import os.path
 from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.cache import cache
-from django.forms.models import model_to_dict
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
@@ -118,13 +115,14 @@ class UploadView(PermissionRequiredMixin, View):
     @json_errors
     def post(self, *args, **kwargs):
         image = Image.objects.get(pk=self.request.POST["image_id"])
-        image.scale_line = json.loads(self.request.POST["scale_line"] or "null")
-        image.scale_mm = (
-            int(self.request.POST["scale_mm"])
-            if self.request.POST["scale_mm"]
-            else None
+        image.set_scale(
+            json.loads(self.request.POST["scale_line"] or "null"),
+            (
+                int(self.request.POST["scale_mm"])
+                if self.request.POST["scale_mm"]
+                else None
+            ),
         )
-        image.save()
 
         # Prefetch all existing individuals for images
         existing_inds = {
@@ -250,39 +248,12 @@ class UploadImageView(PermissionRequiredMixin, View):
 
     @json_errors
     def post(self, *args, **kwargs):
-        mimetype = self.request.content_type
-        if not mimetype.startswith("image/"):  # e.g. image/jpeg, image/x-nikon-nef
-            raise ValueError("Unknown content type %s" % mimetype)
-
-        # Read file into memory
-        # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
-        file = io.BytesIO(self.request.read())
-        # NB: Client URI-encodes, as headers can only contain ISO-8859-1
-        orig_filename = unquote(self.request.META.get("HTTP_X_PHOTOLITH_FILENAME", ""))
-        # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
-
-        # Generate content-addressed filename to store as
-        digest = hashlib.file_digest(file, hashlib.sha256)
-        _, file_ext = os.path.splitext(orig_filename)
-        digest_filename = "%s%s" % (digest.hexdigest(), file_ext or "")
-        digest_path = Image.content.field.generate_filename(None, digest_filename)
-
-        # If we already have an image with that sha1 sum, otherwise create & save to storage
-        image, created = Image.objects.get_or_create(
-            content=digest_path,
-            defaults=dict(
-                created_by=self.request.user,
-                orig_filename=orig_filename,
-                mimetype=mimetype,
-            ),
+        image, _created = Image.objects.store(
+            # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
+            io.BytesIO(self.request.read()),
+            # NB: Client URI-encodes, as headers can only contain ISO-8859-1
+            unquote(self.request.META.get("HTTP_X_PHOTOLITH_FILENAME", "")),
+            self.request.content_type,
+            self.request.user,
         )
-
-        # If the image file doesn't exist, save it afresh
-        if not image.content.storage.exists(image.content.name):
-            image.content.save(digest_filename, file)
-
-        image.save()
-
-        out = model_to_dict(image)
-        out["content"] = out["content"].name
-        return JsonResponse(out)
+        return JsonResponse(image.full_data())

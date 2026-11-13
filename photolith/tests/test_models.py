@@ -1,9 +1,12 @@
 import datetime
+import io
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from ..models import *
 
+from .binaries import GIF_VALID, JPEG_VALID
 from .requires_utils import RequiresUtils
 
 
@@ -32,6 +35,80 @@ class ImageTest(RequiresUtils, TestCase):
 
         # Scale set, but no scale line
         self.assertEqual(px_to_mm(None, 10), None)
+
+    def test_store(self):
+        user = self.create_user()
+
+        image, created = Image.objects.store(
+            io.BytesIO(JPEG_VALID), "a.jpeg", "image/jpeg", user
+        )
+        self.assertTrue(created)
+        self.assertEqual(image.orig_filename, "a.jpeg")
+        self.assertEqual(image.created_by, user)
+        self.assertTrue(image.content.name.endswith(".jpeg"))
+        self.assertEqual(image.content.read(), JPEG_VALID)
+
+        # Same content returns the same image, regardless of filename / user
+        image2, created = Image.objects.store(
+            io.BytesIO(JPEG_VALID), "b.jpeg", "image/jpeg", self.create_user()
+        )
+        self.assertFalse(created)
+        self.assertEqual(image2.id, image.id)
+        self.assertEqual(image2.orig_filename, "a.jpeg")
+
+        # Different content is a different image
+        image3, created = Image.objects.store(
+            io.BytesIO(GIF_VALID), "a.gif", "image/gif", user
+        )
+        self.assertTrue(created)
+        self.assertNotEqual(image3.id, image.id)
+
+        # Only images accepted
+        with self.assertRaisesRegex(ValidationError, "Unknown content type text/plain"):
+            Image.objects.store(io.BytesIO(b"Hello"), "a.txt", "text/plain", user)
+
+    def test_full_data(self):
+        image = self.create_image(scale_line=[[0, 0], [10, 0]], scale_mm=5)
+        self.assertEqual(
+            image.full_data(),
+            dict(
+                id=image.id,
+                content=image.content.name,
+                orig_filename=image.orig_filename,
+                mimetype="image/jpeg",
+                scale_line=[[0, 0], [10, 0]],
+                scale_mm=5,
+                created_by=None,
+            ),
+        )
+
+    def test_set_scale(self):
+        image = self.create_image(scale_line=None, scale_mm=None)
+
+        def sis(scale_line, scale_mm):
+            image.set_scale(scale_line, scale_mm)
+            image.refresh_from_db()
+            return image.scale_line, image.scale_mm
+
+        self.assertEqual(sis([[0, 0], [10.5, 0]], 5), ([[0, 0], [10.5, 0]], 5))
+        self.assertEqual(sis(None, None), (None, None))
+
+        # Invalid values aren't saved
+        sis([[1, 1], [2, 2]], 4)
+        for scale_line, scale_mm, err in [
+            ([[0, 0]], 5, "scale_line should be"),
+            ([[0, 0], [1, 2, 3]], 5, "scale_line should be"),
+            ([[0, 0], ["1", 2]], 5, "scale_line should be"),
+            ([[0, 0], [True, 2]], 5, "scale_line should be"),
+            ("[[0, 0], [1, 1]]", 5, "scale_line should be"),
+            ([[0, 0], [1, 1]], 5.5, "scale_mm should be"),
+            ([[0, 0], [1, 1]], "5", "scale_mm should be"),
+            ([[0, 0], [1, 1]], True, "scale_mm should be"),
+        ]:
+            with self.assertRaisesRegex(ValidationError, err):
+                image.set_scale(scale_line, scale_mm)
+        image.refresh_from_db()
+        self.assertEqual((image.scale_line, image.scale_mm), ([[1, 1], [2, 2]], 4))
 
 
 class IndividualTest(RequiresUtils, TestCase):

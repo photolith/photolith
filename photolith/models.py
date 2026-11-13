@@ -1,10 +1,14 @@
 import datetime
+import hashlib
+import numbers
+import os.path
 import re
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.db import models
+from django.forms.models import model_to_dict
 from django.utils.translation import get_language, gettext_lazy as _
 
 from .token_auth.models import ApiToken  # noqa: F401
@@ -87,6 +91,42 @@ class UserProfile(models.Model):
         return self.base_authority_level
 
 
+class ImageManager(models.Manager):
+    def store(self, file, orig_filename, mimetype, user):
+        """
+        Store an uploaded image file, returning (image, created)
+
+        Images are stored by content hash, so storing the same file twice returns the existing image.
+        NB: S3 storage backend requires something with is_close, e.g. io.BytesIO
+        """
+        if not mimetype.startswith("image/"):  # e.g. image/jpeg, image/x-nikon-nef
+            raise ValidationError("Unknown content type %s" % mimetype, code=400)
+        # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
+
+        # Generate content-addressed filename to store as
+        digest = hashlib.file_digest(file, hashlib.sha256)
+        _, file_ext = os.path.splitext(orig_filename)
+        digest_filename = "%s%s" % (digest.hexdigest(), file_ext or "")
+        digest_path = self.model.content.field.generate_filename(None, digest_filename)
+
+        # If we already have an image with that sha1 sum, otherwise create & save to storage
+        image, created = self.get_or_create(
+            content=digest_path,
+            defaults=dict(
+                created_by=user,
+                orig_filename=orig_filename,
+                mimetype=mimetype,
+            ),
+        )
+
+        # If the image file doesn't exist, save it afresh
+        if not image.content.storage.exists(image.content.name):
+            image.content.save(digest_filename, file)
+
+        image.save()
+        return image, created
+
+
 class Image(models.Model):
     """
     An image containing one or more otoliths
@@ -109,6 +149,42 @@ class Image(models.Model):
     class Meta:
         verbose_name = _("image")
         verbose_name_plural = _("images")
+
+    objects = ImageManager()
+
+    def full_data(self):
+        """Dict of image properties, for JSON responses"""
+        out = model_to_dict(self)
+        out["content"] = out["content"].name
+        return out
+
+    def set_scale(self, scale_line, scale_mm):
+        """Set & save scale, a [[x, y], [x, y]] line of scale_mm length, or None"""
+
+        def is_number(x):
+            return isinstance(x, numbers.Real) and not isinstance(x, bool)
+
+        if scale_line is not None and not (
+            isinstance(scale_line, list)
+            and len(scale_line) == 2
+            and all(
+                isinstance(p, list) and len(p) == 2 and all(is_number(x) for x in p)
+                for p in scale_line
+            )
+        ):
+            raise ValidationError(
+                "scale_line should be [[x, y], [x, y]], not %s" % scale_line, code=400
+            )
+        if scale_mm is not None and not (
+            isinstance(scale_mm, int) and not isinstance(scale_mm, bool)
+        ):
+            raise ValidationError(
+                "scale_mm should be a whole number, not %s" % scale_mm, code=400
+            )
+
+        self.scale_line = scale_line
+        self.scale_mm = scale_mm
+        self.save()
 
     def px_to_mm(self):
         if not self.scale_mm or not self.scale_line:
