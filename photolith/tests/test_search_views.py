@@ -143,11 +143,14 @@ class IndexViewTest(RequiresUtils, TestCase):
 class DataViewTest(RequiresUtils, TestCase):
     maxDiff = None
 
-    def data(self, user, search=dict(), expect_success=True):
+    def data(self, user, search=dict(), expect_success=True, status=200):
         client = Client()
         client.force_login(user)
         resp = client.get("/search/data/", search)
-        out = json.loads(b"".join(resp.streaming_content))
+        self.assertEqual(resp.status_code, status)
+        out = json.loads(
+            b"".join(resp.streaming_content) if resp.streaming else resp.content
+        )
         if expect_success:
             if "error" in out.keys():
                 self.fail(out)
@@ -160,7 +163,7 @@ class DataViewTest(RequiresUtils, TestCase):
         user = self.create_user(groups=[])
 
         self.assertEqual(
-            self.data(user, expect_success=False),
+            self.data(user, expect_success=False, status=403),
             dict(
                 error_class="PermissionDenied",
                 error="Contact an administrator to be added to the general annotation group",
@@ -168,12 +171,54 @@ class DataViewTest(RequiresUtils, TestCase):
         )
         p = self.create_project()
         self.assertEqual(
-            self.data(user, dict(project=p.id), expect_success=False),
+            self.data(user, dict(project=p.id), expect_success=False, status=403),
             dict(
                 error_class="PermissionDenied",
                 error="Contact an administrator to be added to this project",
             ),
         )
+
+    def test_call__invalid(self):
+        """Invalid searches are an error, before streaming starts"""
+        user = self.create_user(groups=["General Annotation Editor"])
+
+        for search, status, error_class, error in [
+            (
+                dict(project=9999),
+                404,
+                "Http404",
+                "No Project matches the given query.",
+            ),
+            (
+                dict(nm_length="x"),
+                400,
+                "BadRequest",
+                "Invalid search: could not convert string to float: 'x'",
+            ),
+            (
+                dict(in_station="1.5"),
+                400,
+                "BadRequest",
+                "Invalid search: invalid literal for int() with base 10: '1.5'",
+            ),
+            (
+                dict(dt_caught="yesterday"),
+                400,
+                "BadRequest",
+                "Invalid search: Invalid isoformat string: 'yesterday'",
+            ),
+            (
+                dict(with_annotations="parp"),
+                400,
+                "BadRequest",
+                "Unknown annotations type 'parp'",
+            ),
+        ]:
+            self.assertEqual(
+                self.data(user, search, expect_success=False, status=status),
+                dict(error_class=error_class, error=error),
+                msg=search,
+            )
 
     def test_query_filter_numeric(self):
         userA = self.create_user(
@@ -479,11 +524,11 @@ class DataViewTest(RequiresUtils, TestCase):
             team=[userA],
         )
 
-        # Searching within `this_project`: only the annotation on this_project counts
         out = self.data(
             userA,
             dict(project=this_project.id, with_annotations="alert"),
             expect_success=False,
+            status=400,
         )
         self.assertIn("project=x", out["error"])
         self.assertIn("with_annotations=alert", out["error"])
@@ -582,11 +627,13 @@ class ExportViewTest(RequiresUtils, TestCase):
         """Not allowed access without general annotation / project"""
         user = self.create_user(groups=[])
 
-        with self.assertRaisesRegex(PermissionDenied, "general annotation"):
-            out = list(self.export(user, "all"))
-        with self.assertRaisesRegex(PermissionDenied, "project"):
-            p = self.create_project()
-            out = list(self.export(user, "all", dict(project=p.id)))
+        client = Client()
+        client.force_login(user)
+        self.assertEqual(client.get("/search/export/all/").status_code, 403)
+        p = self.create_project()
+        self.assertEqual(
+            client.get("/search/export/all/", dict(project=p.id)).status_code, 403
+        )
 
     def test_call(self):
         userA = self.create_user(

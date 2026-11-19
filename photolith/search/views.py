@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
+from django.core.exceptions import BadRequest
 from django.core.cache import cache
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
@@ -85,6 +86,10 @@ class DataView(LoginRequiredMixin, View):
     def query(
         self, with_annotations="", with_image_url=False, with_associated_images=False
     ):
+        """
+        Check access & build the query for the request, returning a generator of rows.
+        NB: Errors in the request are raised now, rather than once a streaming response has started
+        """
         qs = Individual.objects
         qs = (
             qs.select_related("image")
@@ -117,8 +122,45 @@ class DataView(LoginRequiredMixin, View):
             )
         )
 
-        extra = {}
-        annotation_alert = {}
+        try:
+            qs = self.filter_query(qs)
+        except ValueError as e:
+            raise BadRequest("Invalid search: %s" % e)
+
+        if not with_annotations:
+            pass
+        elif with_annotations == "alert":
+            if p is not None:
+                raise BadRequest(
+                    "Setting both project=x and with_annotations=alert doesn't make sense"
+                )
+        elif with_annotations == "all" or with_annotations == "best":
+            ann_qs = Annotation.objects.select_related("created_by")
+            if p is None:
+                # Annotations in open projects aren't visible outside them yet
+                ann_qs = ann_qs.exclude(project__date_end__gte=datetime.date.today())
+            else:
+                ann_qs = ann_qs.filter(project=p)
+                if p.is_open and not (
+                    self.request.user.is_superuser or p.created_by == self.request.user
+                ):
+                    # Open project, members can only see their own annotations
+                    ann_qs = ann_qs.filter(created_by=self.request.user)
+            ann_qs = ann_qs.order_by("-authority", "-created_at")
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "annotation_set",
+                    queryset=ann_qs,
+                    to_attr="_annotations",
+                )
+            )
+        else:
+            raise BadRequest("Unknown annotations type '%s'" % with_annotations)
+
+        return self._rows(qs, with_annotations, with_image_url, with_associated_images)
+
+    def filter_query(self, qs):
+        """Filter qs by the search in the request"""
         for k, vs in self.request.GET.lists():
             if all(v == "" for v in vs):
                 # Ignore all-blank entries, didn't fill in the form
@@ -214,37 +256,12 @@ class DataView(LoginRequiredMixin, View):
                         )
                     )
                 )
+        return qs
 
-        if not with_annotations:
-            pass
-        elif with_annotations == "alert":
-            if p is not None:
-                raise ValueError(
-                    "Setting both project=x and with_annotations=alert doesn't make sense"
-                )
-        elif with_annotations == "all" or with_annotations == "best":
-            ann_qs = Annotation.objects.select_related("created_by")
-            if p is None:
-                # Annotations in open projects aren't visible outside them yet
-                ann_qs = ann_qs.exclude(project__date_end__gte=datetime.date.today())
-            else:
-                ann_qs = ann_qs.filter(project=p)
-                if p.is_open and not (
-                    self.request.user.is_superuser or p.created_by == self.request.user
-                ):
-                    # Open project, members can only see their own annotations
-                    ann_qs = ann_qs.filter(created_by=self.request.user)
-            ann_qs = ann_qs.order_by("-authority", "-created_at")
-            qs = qs.prefetch_related(
-                Prefetch(
-                    "annotation_set",
-                    queryset=ann_qs,
-                    to_attr="_annotations",
-                )
-            )
-        else:
-            raise ValueError("Unknown annotations type '%s'" % with_annotations)
-
+    def _rows(self, qs, with_annotations, with_image_url, with_associated_images):
+        """Generator of rows from qs, returning any extra keys for the response"""
+        extra = {}
+        annotation_alert = {}
         result_count = 0
         for ind in qs.iterator(chunk_size=settings.SEARCH_RESULT_CHUNK_SIZE):
             result_count += 1
