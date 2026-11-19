@@ -600,12 +600,32 @@ class DataViewTest(RequiresUtils, TestCase):
     def test_with_annotations_all(self):
         userA = self.create_user("userA", groups=["General Annotation Editor"])
         ind = self.create_individual()
-        self.create_annotation(ind, created_by=userA, comment="UT comment")
+        ind_unannotated = self.create_individual()
+        p = self.create_project(team=[userA], individuals=[ind], created_by=userA)
+        ann = self.create_annotation(ind, created_by=userA, comment="UT comment")
+        ann_p = self.create_annotation(
+            ind, created_by=userA, comment="UT project", project=p
+        )
+        self.close_project(p)
 
+        # Rows include the annotation & its project
         out = self.data(userA, dict(with_annotations="all"))
         self.assertEqual(
-            [(r["annotated_by"], r["comment"]) for r in out],
-            [("userA", "UT comment")],
+            [
+                (
+                    r["id"],
+                    r["annotation_id"],
+                    r["project_id"],
+                    r["annotated_by"],
+                    r["comment"],
+                )
+                for r in out
+            ],
+            [
+                (ind.id, ann.id, None, "userA", "UT comment"),
+                (ind.id, ann_p.id, p.id, "userA", "UT project"),
+                (ind_unannotated.id, None, None, None, None),
+            ],
         )
 
 
@@ -707,6 +727,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "age": "10",
                     "annotated_by": "annotator",
+                    "annotation_id": str(ann12.id),
                     "authority": "80",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "comment": "A much better annotation",
@@ -721,6 +742,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "age": "10",
                     "annotated_by": "annotator",
+                    "annotation_id": str(ann11.id),
                     "authority": "20",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "comment": "Ekki mjög góð skýring",
@@ -748,6 +770,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "age": "10",
                     "annotated_by": "annotator",
+                    "annotation_id": str(ann12.id),
                     "authority": "80",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "comment": "A much better annotation",
@@ -793,6 +816,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "age": "10",
                     "annotated_by": "annotator",
+                    "annotation_id": str(ann11.id),
                     "authority": "0",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "image__content__url": img.content.url,
@@ -811,6 +835,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                 {
                     "age": "10",
                     "annotated_by": "annotator",
+                    "annotation_id": str(ann11.id),
                     "authority": "0",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "growth_1": "1.0",

@@ -304,6 +304,8 @@ class DataView(LoginRequiredMixin, View):
                 px_to_mm = ind.image.px_to_mm()
                 for a in ind._annotations:
                     a_out = dict(
+                        annotation_id=a.id,
+                        project_id=a.project_id,
                         age=a.age,
                         rating=a.rating,
                         authority=a.authority,
@@ -323,6 +325,8 @@ class DataView(LoginRequiredMixin, View):
             elif with_annotations:
                 # Output row with dummy data
                 a_out = dict(
+                    annotation_id=None,
+                    project_id=None,
                     age=None,
                     rating=None,
                     authority=None,
