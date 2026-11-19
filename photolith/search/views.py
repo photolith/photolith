@@ -94,6 +94,7 @@ class DataView(LoginRequiredMixin, View):
         qs = (
             qs.select_related("image")
             .prefetch_related("metanumeric_set")
+            .prefetch_related("metainteger_set")
             .prefetch_related("metachar_set")
             .prefetch_related("metadt_set")
             .prefetch_related("metatx_set")

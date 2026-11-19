@@ -5,7 +5,9 @@ import json
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import connection
 from django.test import Client, TestCase, RequestFactory
+from django.test.utils import CaptureQueriesContext
 
 from ..search.views import IndexView
 from ..models import Annotation, Individual, Image, Project
@@ -314,6 +316,28 @@ class DataViewTest(RequiresUtils, TestCase):
             [x["id"] for x in self.data(userA, search=dict(in_station=(2, 99)))],
             [x.id for x in inds[2:10]],
         )
+
+    def test_query_count(self):
+        """All metadata is prefetched, the number of queries doesn't grow with results"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+
+        def num_queries():
+            with CaptureQueriesContext(connection) as ctx:
+                self.data(userA)
+            return len(ctx.captured_queries)
+
+        data = dict(
+            nm_length=4.5,
+            in_station=3,
+            ch_slideLabel="12",
+            dt_caught="2024-01-01",
+            tx_species=dict(id=100),
+        )
+        self.create_individual(data=data)
+        one = num_queries()
+        for i in range(4):
+            self.create_individual(data=data)
+        self.assertEqual(num_queries(), one)
 
     def test_query_filter_image_id(self):
         userA = self.create_user(
