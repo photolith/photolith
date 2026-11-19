@@ -110,7 +110,12 @@ class NextPhotoView(PermissionRequiredMixin, View):
 
 
 class UploadView(PermissionRequiredMixin, View):
-    permission_required = ("photolith.add_individual",)
+    # NB: Upload can create, update & delete individuals
+    permission_required = (
+        "photolith.add_individual",
+        "photolith.change_individual",
+        "photolith.delete_individual",
+    )
 
     @json_errors
     def post(self, *args, **kwargs):

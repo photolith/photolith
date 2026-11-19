@@ -4,6 +4,7 @@ import os
 import tempfile
 from urllib.parse import quote
 
+from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.test import Client, TestCase, RequestFactory
 from django.test.testcases import override_settings
@@ -209,6 +210,16 @@ class UploadViewTest(RequiresUtils, TestCase):
                 del out[k]["dt_created_at"]
                 del out[k]["dt_modified_at"]
         return out
+
+    def test_post__permissions(self):
+        """Need add, change & delete individual, as upload can do any of them"""
+        all_perms = ["add_individual", "change_individual", "delete_individual"]
+        for perms in [all_perms[:2], all_perms[1:], all_perms[::2]]:
+            user = self.create_user()
+            user.user_permissions.set(Permission.objects.filter(codename__in=perms))
+            self.assertEqual(self.form_post(user), 403)
+        user.user_permissions.set(Permission.objects.filter(codename__in=all_perms))
+        self.assertEqual(self.form_post(user)["alert"]["level"], "warning")
 
     def test_post(self):
         # You need to be part of the ingest group to post
