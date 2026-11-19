@@ -8,6 +8,23 @@ from django.http import Http404, JsonResponse
 logger = logging.getLogger(__name__)
 
 
+class Conflict(Exception):
+    """Request conflicts with current state, json_data is added to the response"""
+
+    code = 409
+
+    def __init__(self, message, **json_data):
+        super().__init__(message)
+        self.message = message
+        self.json_data = json_data
+
+
+class PreconditionFailed(Exception):
+    """An If-Match (or similar) header didn't match"""
+
+    code = 412
+
+
 def json_errors(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
@@ -26,13 +43,12 @@ def json_errors(func):
                     status = 404
                 else:
                     status = 500
-            return JsonResponse(
-                dict(
-                    error_class=e.__class__.__name__,
-                    error=getattr(e, "message", str(e)),
-                ),
-                status=status,
+            out = dict(
+                error_class=e.__class__.__name__,
+                error=getattr(e, "message", str(e)),
             )
+            out.update(getattr(e, "json_data", {}))
+            return JsonResponse(out, status=status)
 
     return wrapper
 

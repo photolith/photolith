@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
 from django.test import TestCase
 
-from ..errors import json_errors
+from ..errors import Conflict, PreconditionFailed, json_errors
 
 
 class JsonErrorsTest(TestCase):
@@ -48,4 +48,17 @@ class JsonErrorsTest(TestCase):
         self.assertEqual(
             self.call(KeyError("x")),
             (500, dict(error_class="KeyError", error="'x'")),
+        )
+
+    def test_json_data(self):
+        self.assertEqual(
+            self.call(Conflict("2 things", things=dict(x=[1, 2]))),
+            (
+                409,
+                dict(error_class="Conflict", error="2 things", things=dict(x=[1, 2])),
+            ),
+        )
+        self.assertEqual(
+            self.call(PreconditionFailed("Changed")),
+            (412, dict(error_class="PreconditionFailed", error="Changed")),
         )
