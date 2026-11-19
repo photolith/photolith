@@ -47,6 +47,10 @@ def json_errors(func):
                 error_class=e.__class__.__name__,
                 error=getattr(e, "message", str(e)),
             )
+            if isinstance(e, ValidationError) and hasattr(e, "error_dict"):
+                # Errors for individual fields, e.g. from a form
+                out["error"] = " ".join(e.messages)
+                out["fields"] = e.message_dict
             out.update(getattr(e, "json_data", {}))
             return JsonResponse(out, status=status)
 

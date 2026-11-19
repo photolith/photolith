@@ -50,6 +50,20 @@ class JsonErrorsTest(TestCase):
             (500, dict(error_class="KeyError", error="'x'")),
         )
 
+    def test_fields(self):
+        """Per-field errors are listed, error is all messages"""
+        self.assertEqual(
+            self.call(ValidationError(dict(a=["A is bad"], b=["B is bad", "Very"]))),
+            (
+                400,
+                dict(
+                    error_class="ValidationError",
+                    error="A is bad B is bad Very",
+                    fields=dict(a=["A is bad"], b=["B is bad", "Very"]),
+                ),
+            ),
+        )
+
     def test_json_data(self):
         self.assertEqual(
             self.call(Conflict("2 things", things=dict(x=[1, 2]))),
