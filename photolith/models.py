@@ -193,6 +193,12 @@ class Image(models.Model):
         self.scale_mm = scale_mm
         self.save()
 
+    def individuals_with_ann_counts(self):
+        """Individuals on this image, with num_annotations, as check_individual_edit_access() needs"""
+        return self.individual_set.annotate(
+            num_annotations=models.Count("annotation")
+        ).order_by("id")
+
     def px_to_mm(self):
         if not self.scale_mm or not self.scale_line:
             return None

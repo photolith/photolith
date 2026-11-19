@@ -110,6 +110,22 @@ class ImageTest(RequiresUtils, TestCase):
         image.refresh_from_db()
         self.assertEqual((image.scale_line, image.scale_mm), ([[1, 1], [2, 2]], 4))
 
+    def test_individuals_with_ann_counts(self):
+        image = self.create_image()
+        self.assertEqual(list(image.individuals_with_ann_counts()), [])
+
+        ind1 = self.create_individual(image=image)
+        ind2 = self.create_individual(image=image)
+        self.create_individual()  # Other image
+        self.create_annotation(individual=ind2)
+        self.create_annotation(individual=ind2)
+
+        # In ID order, with annotation counts
+        self.assertEqual(
+            [(i.id, i.num_annotations) for i in image.individuals_with_ann_counts()],
+            [(ind1.id, 0), (ind2.id, 2)],
+        )
+
 
 class IndividualTest(RequiresUtils, TestCase):
     def test_data(self):

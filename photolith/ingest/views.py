@@ -10,7 +10,6 @@ from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
-from django.db.models import Count
 
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
@@ -130,14 +129,7 @@ class UploadView(PermissionRequiredMixin, View):
         )
 
         # Prefetch all existing individuals for images
-        existing_inds = {
-            i.id: i
-            for i in (
-                Individual.objects.filter(image=image).annotate(
-                    num_annotations=Count("annotation")
-                )
-            )
-        }
+        existing_inds = {i.id: i for i in image.individuals_with_ann_counts()}
 
         out = {}
         created_inds = {}
