@@ -1061,11 +1061,13 @@ class UploadViewTest(RequiresUtils, TestCase):
                     error_class="ValidationError",
                     error="'length' is missing for slideLabel : 44",
                     fields={
-                        "data.nm_length": ["'length' is missing for slideLabel : 44"]
+                        "0.data.nm_length": ["'length' is missing for slideLabel : 44"]
                     },
                 ),
             ),
         )
+        # The whole upload is rolled back
+        self.assertEqual(Individual.objects.count(), 0)
 
     def test_post__cacheempty(self):
         """Will empty search's cache"""

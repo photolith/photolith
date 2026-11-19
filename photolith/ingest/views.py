@@ -4,17 +4,16 @@ from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.cache import cache
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
+from .individuals import sync_individuals
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
-from ..models import Image, Individual, Taxonomy
-from ..perm_utils import check_individual_edit_access
+from ..models import Image, Taxonomy
 
 
 class IndexView(PermissionRequiredMixin, TemplateView):
@@ -128,74 +127,49 @@ class UploadView(PermissionRequiredMixin, View):
             ),
         )
 
-        # Prefetch all existing individuals for images
-        existing_inds = {i.id: i for i in image.individuals_with_ann_counts()}
-
-        out = {}
-        created_inds = {}
-        updated_inds = {}
-        deleted_inds = {}
-        deleted_anns = {}
+        changes = []
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
                 continue
-            ind_data = json.loads(self.request.POST[post_key])
             ind_client_idx = post_key.replace("data:", "")
+            ind_data = json.loads(self.request.POST[post_key])
             ind_bounding_box = json.loads(
                 self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
+            changes.append(
+                (
+                    ind_client_idx,
+                    # No bounding box --> this individual shouldn't exist
+                    ind_bounding_box or None,
+                    ind_data,
+                )
+            )
+        # NB: Only superusers can change annotated individuals, see check_individual_edit_access()
+        result = sync_individuals(
+            image, self.request.user, changes, drop_annotations=True
+        )
+        deleted_inds = result["deleted"]
+        deleted_anns = result["deleted_annotations"]
 
-            # If an ID is given, fetch any existant individual
-            ind = existing_inds.get(ind_data["id"]) if "id" in ind_data else None
+        out = {}
+        created_inds = {}
+        updated_inds = {}
+        for ind_client_idx, ind_bounding_box, ind_data in changes:
+            if ind_client_idx in deleted_inds:
+                del ind_data["id"]
+                out["data:%s" % ind_client_idx] = ind_data
+            ind = result["created"].get(ind_client_idx) or result["updated"].get(
+                ind_client_idx
+            )
             if ind:
-                check_individual_edit_access(ind, self.request.user)
-
-            # No bounding box --> this individual shouldn't exist
-            if not ind_bounding_box:
-                if ind:
-                    deleted_inds[ind_client_idx] = ind.id
-                    # NB: Will cascade-delete
-                    # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
-                    if ind.num_annotations > 0:
-                        deleted_anns[ind_client_idx] = [
-                            a.id for a in ind.annotation_set.all()
-                        ]
-                    ind.delete()
-                    del ind_data["id"]
-                    out["data:%s" % ind_client_idx] = ind_data
-                continue
-
-            # Check if we should be invalidating existing annotations
-            if (
-                ind
-                and ind.num_annotations > 0
-                and ind.bounding_box
-                and ind.bounding_box != ind_bounding_box
-            ):
-                # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
-                deleted_anns[ind_client_idx] = [a.id for a in ind.annotation_set.all()]
-                ind.annotation_set.all().delete()
-
-            # If no individual was found, create one at this point
-            if not ind:
-                ind = Individual(created_by=self.request.user)
-
-            ind.image = image
-            ind.bounding_box = ind_bounding_box
-            ind.save()
-            ind.data = ind_data
-            ind.save()
-            out["data:%s" % ind_client_idx] = ind.full_data()
-            del out["data:%s" % ind_client_idx]["__str__"]
-            if ind_data.get("id"):
-                updated_inds[ind_client_idx] = ind.id
-            else:
-                created_inds[ind_client_idx] = ind.id
-
-        if len(created_inds) > 0 or len(updated_inds) > 0:
-            # Clear meta_fields cache created in search/views
-            cache.delete("photolith_meta_fields")
+                out["data:%s" % ind_client_idx] = ind.full_data()
+                del out["data:%s" % ind_client_idx]["__str__"]
+                # NB: An individual restored with it's old (deleted) ID counts as updated
+                if ind_data.get("id"):
+                    updated_inds[ind_client_idx] = ind.id
+                else:
+                    created_inds[ind_client_idx] = ind.id
 
         alert = ""
         alert_status = "success"
