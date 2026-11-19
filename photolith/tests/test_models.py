@@ -278,6 +278,31 @@ class IndividualTest(RequiresUtils, TestCase):
         ind1.data = dict(in_station=135, nm_length=42.5)
         self.assertEqual(ind1.data, dict(in_station=135, nm_length=42.5))
 
+    def test_set_bounding_box(self):
+        ind = self.create_individual(bounding_box=[[0, 0], [100, 100]])
+
+        # Set, but not saved
+        ind.set_bounding_box([[0, 0], [10.5, 20]])
+        self.assertEqual(ind.bounding_box, [[0, 0], [10.5, 20]])
+        ind.refresh_from_db()
+        self.assertEqual(ind.bounding_box, [[0, 0], [100, 100]])
+        ind.set_bounding_box([[1, 1], [2, 2], [3, 3]])
+        self.assertEqual(ind.bounding_box, [[1, 1], [2, 2], [3, 3]])
+
+        # Invalid values aren't set
+        for bounding_box in [
+            None,
+            [],
+            [0, 0],
+            [[0, 0], [1, 2, 3]],
+            [[0, 0], ["1", 2]],
+            [[0, 0], [True, 2]],
+            "[[0, 0], [1, 1]]",
+        ]:
+            with self.assertRaisesRegex(ValidationError, "bounding_box should be"):
+                ind.set_bounding_box(bounding_box)
+        self.assertEqual(ind.bounding_box, [[1, 1], [2, 2], [3, 3]])
+
     def test_data_underscore(self):
         """Only the type prefix is split off keys"""
         ind1 = self.create_individual()

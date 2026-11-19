@@ -23,6 +23,23 @@ def default_storage():
     return storages["default"]
 
 
+def _is_point_list(v, length=None):
+    """True iff v is a non-empty [[x, y], ...] list of points, of length if given"""
+
+    def is_number(x):
+        return isinstance(x, numbers.Real) and not isinstance(x, bool)
+
+    return (
+        isinstance(v, list)
+        and len(v) > 0
+        and (length is None or len(v) == length)
+        and all(
+            isinstance(p, list) and len(p) == 2 and all(is_number(x) for x in p)
+            for p in v
+        )
+    )
+
+
 def isisoformat(v):
     try:
         datetime.datetime.fromisoformat(v)
@@ -161,17 +178,7 @@ class Image(models.Model):
     def set_scale(self, scale_line, scale_mm):
         """Set & save scale, a [[x, y], [x, y]] line of scale_mm length, or None"""
 
-        def is_number(x):
-            return isinstance(x, numbers.Real) and not isinstance(x, bool)
-
-        if scale_line is not None and not (
-            isinstance(scale_line, list)
-            and len(scale_line) == 2
-            and all(
-                isinstance(p, list) and len(p) == 2 and all(is_number(x) for x in p)
-                for p in scale_line
-            )
-        ):
+        if scale_line is not None and not _is_point_list(scale_line, 2):
             raise ValidationError(
                 "scale_line should be [[x, y], [x, y]], not %s" % scale_line, code=400
             )
@@ -227,6 +234,14 @@ class Individual(models.Model):
         out.update(self.data)
         out["__str__"] = str(self)
         return out
+
+    def set_bounding_box(self, bounding_box):
+        """Set bounding_box, a [[x, y], ...] list of points. NB: Doesn't save"""
+        if not _is_point_list(bounding_box):
+            raise ValidationError(
+                "bounding_box should be [[x, y], ...], not %s" % bounding_box, code=400
+            )
+        self.bounding_box = bounding_box
 
     @property
     def data(self):
