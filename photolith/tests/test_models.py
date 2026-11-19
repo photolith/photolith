@@ -490,6 +490,45 @@ class AnnotationTest(RequiresUtils, TestCase):
         )
 
 
+class UserProfileTest(RequiresUtils, TestCase):
+    def test_for_user(self):
+        Taxonomy.objects.create(
+            key="species", identifier=100, str_en="Fish", str_is="Fiskur"
+        )
+        fish = dict(tx_species=dict(id=100))
+
+        # Existing profile
+        user = self.create_user(
+            base_authority_level=UserSpeciesAuthority.AuthorityLevel.JUNIOR
+        )
+        self.assertEqual(UserProfile.for_user(user), user.userprofile)
+
+        # No profile, an unsaved default one
+        user = self.create_user()
+        profile = UserProfile.for_user(user)
+        self.assertEqual((profile.pk, profile.user), (None, user))
+        self.assertEqual(
+            profile.base_authority_level,
+            UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED,
+        )
+        self.assertEqual(
+            profile.authority_level(fish),
+            UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED,
+        )
+        self.assertFalse(UserProfile.objects.filter(user=user).exists())
+
+        # ...that still uses any species authority
+        UserSpeciesAuthority.objects.create(
+            user=user,
+            species=Taxonomy.objects.get(key="species", identifier=100),
+            level=UserSpeciesAuthority.AuthorityLevel.EXPERT,
+        )
+        self.assertEqual(
+            UserProfile.for_user(user).authority_level(fish),
+            UserSpeciesAuthority.AuthorityLevel.EXPERT,
+        )
+
+
 class ProjectTest(TestCase):
     maxDiff = None
 

@@ -97,6 +97,14 @@ class UserProfile(models.Model):
         ),
     )
 
+    @classmethod
+    def for_user(cls, user):
+        """User's profile, or an unsaved default one if they don't have one"""
+        try:
+            return user.userprofile
+        except cls.DoesNotExist:
+            return cls(user=user)
+
     def authority_level(self, ind_data):
         if "id" in ind_data.get("tx_species", dict()):
             sa = UserSpeciesAuthority.objects.filter(

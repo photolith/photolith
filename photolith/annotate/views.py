@@ -11,7 +11,7 @@ from django.views.generic.edit import UpdateView
 
 
 from ..errors import json_errors
-from ..models import Individual, Annotation, Project, UserSpeciesAuthority
+from ..models import Individual, Annotation, Project, UserProfile
 
 from .forms import AnnotationForm
 from ..perm_utils import check_annotate_access, check_individual_edit_access
@@ -97,9 +97,7 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
     @cached_property
     def authority_level(self):
         """The current user's authority level for this individual"""
-        if hasattr(self.request.user, "userprofile"):
-            return self.request.user.userprofile.authority_level(self.ind_data)
-        return UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
+        return UserProfile.for_user(self.request.user).authority_level(self.ind_data)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
