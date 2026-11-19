@@ -256,7 +256,7 @@ class IndividualTest(RequiresUtils, TestCase):
         )
 
         # Unknown types are an error
-        with self.assertRaisesRegex(ValueError, "parents"):
+        with self.assertRaisesRegex(ValidationError, "parents"):
             ind2.data = dict(parents=["Bob", "Carla"])
 
     def test_data_ignores_photolith_internal_keys(self):
@@ -319,6 +319,56 @@ class IndividualTest(RequiresUtils, TestCase):
                 ind.set_bounding_box(bounding_box)
         self.assertEqual(ind.bounding_box, [[1, 1], [2, 2], [3, 3]])
 
+    def test_data_replace(self):
+        """Setting data replaces all of it, all or nothing"""
+        ind1 = self.create_individual(
+            data=dict(
+                ch_slideLabel="x",
+                ch_individualLabel="1",
+                nm_length=4.5,
+                in_station=3,
+                dt_caught="2024-01-01",
+                tx_species=dict(id=100),
+            )
+        )
+        ind2 = self.create_individual(data=dict(ch_slideLabel="y", nm_length=5.5))
+
+        # Keys not given are removed, matching type prefix too. "id" etc. ignored
+        ind1.data = dict(
+            ch_slideLabel="z", nm_station=4, tx_species=dict(id=100), id=99
+        )
+        self.assertEqual(
+            ind1.data,
+            dict(
+                ch_slideLabel="z",
+                nm_station=4.0,
+                tx_species=Taxonomy.objects.get(key="species", identifier=100).dict,
+            ),
+        )
+        ind1.data = dict()
+        self.assertEqual(ind1.data, dict())
+        ind1.data = dict(ch_slideLabel="x", nm_length=4.5)
+
+        # Errors for every invalid key, nothing changed
+        with self.assertRaises(ValidationError) as cm:
+            ind1.data = dict(
+                ch_slideLabel="q", nm_length="x", length=3, ch_comment=None
+            )
+        self.assertEqual(
+            cm.exception.message_dict,
+            {
+                "data.nm_length": ["could not convert string to float: 'x'"],
+                "data.length": ["'length' has no type prefix"],
+                "data.ch_comment": ["'comment' is missing for q"],
+            },
+        )
+        self.assertEqual(ind1.data, dict(ch_slideLabel="x", nm_length=4.5))
+        ind1.refresh_from_db()
+        self.assertEqual(ind1.data, dict(ch_slideLabel="x", nm_length=4.5))
+
+        # Other individuals unaffected
+        self.assertEqual(ind2.data, dict(ch_slideLabel="y", nm_length=5.5))
+
     def test_data_prefetched(self):
         """Changing data on a prefetched individual doesn't leave stale copies"""
         ind = self.create_individual(
@@ -334,18 +384,30 @@ class IndividualTest(RequiresUtils, TestCase):
             self.assertEqual(str(out), expected_str)
             return out
 
-        # Data setter
+        # Updating
         ind_pf = prefetched("12 : 3")
-        ind_pf.data = dict(ch_individualLabel="4", tx_species=dict(id=100, en="Fish"))
+        ind_pf.data = dict(
+            ch_slideLabel="12",
+            ch_individualLabel="4",
+            tx_species=dict(id=100, en="Fish"),
+        )
         self.assertEqual(str(ind_pf), "12 : 4")
         self.assertEqual(ind_pf.labels(), ("12", "4"))
         self.assertEqual(ind_pf.data["tx_species"]["en"], "Fish")
 
-        # ...even if it fails part-way through, after saving some keys
+        # ...rolling back, after saving some keys
         ind_pf = prefetched("12 : 4")
         with self.assertRaisesRegex(ValidationError, "is missing"):
-            ind_pf.data = dict(ch_individualLabel="5", nm_length=None)
-        self.assertEqual(str(ind_pf), "12 : 5")
+            ind_pf.data = dict(
+                ch_slideLabel="12", ch_individualLabel="5", nm_length=None
+            )
+        self.assertEqual(str(ind_pf), "12 : 4")
+
+        # ...removing keys
+        ind_pf = prefetched("12 : 4")
+        ind_pf.data = dict(ch_individualLabel="5")
+        self.assertEqual(str(ind_pf), "Individual %d" % ind.id)
+        self.assertEqual(ind_pf.data, dict(ch_individualLabel="5"))
 
     def test_data_underscore(self):
         """Only the type prefix is split off keys"""

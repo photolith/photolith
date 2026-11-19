@@ -1004,6 +1004,39 @@ class UploadViewTest(RequiresUtils, TestCase):
         self.assertEqual(img.scale_line, None)
         self.assertEqual(img.scale_mm, None)
 
+    def test_post__cleared_data(self):
+        """Values cleared in the form (thus missing from data) are removed"""
+        user = self.create_user(groups=["Ingest"])
+        image = self.create_image()
+        ind = self.create_individual(
+            image=image,
+            created_by=user,
+            data=dict(
+                ch_slideLabel="12",
+                ch_individualLabel="3",
+                nm_length=35.0,
+                tx_species={"id": 100, "en": "Fish", "is": "Fiskur"},
+            ),
+        )
+
+        out = self.form_post(
+            user,
+            [
+                dict(
+                    ch_slideLabel="12",
+                    ch_individualLabel="3",
+                    _bb=ind.bounding_box,
+                    id=ind.id,
+                )
+            ],
+            image=image,
+        )
+        self.assertIn("Updated 1 individual", out["alert"]["messageHTML"])
+        self.assertEqual(
+            out["data:0"], dict(id=ind.id, ch_slideLabel="12", ch_individualLabel="3")
+        )
+        self.assertEqual(ind.data, dict(ch_slideLabel="12", ch_individualLabel="3"))
+
     def test_post__nulldata(self):
         """null entries in data generate an error"""
 
@@ -1027,6 +1060,9 @@ class UploadViewTest(RequiresUtils, TestCase):
                 dict(
                     error_class="ValidationError",
                     error="'length' is missing for slideLabel : 44",
+                    fields={
+                        "data.nm_length": ["'length' is missing for slideLabel : 44"]
+                    },
                 ),
             ),
         )

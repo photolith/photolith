@@ -7,7 +7,7 @@ import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
-from django.db import models
+from django.db import models, transaction
 from django.forms.models import model_to_dict
 from django.utils.translation import get_language, gettext_lazy as _
 
@@ -266,6 +266,37 @@ class Individual(models.Model):
 
     @data.setter
     def data(self, new_value):
+        """
+        Replace all metadata with new_value. If any key is invalid nothing is
+        changed, and a ValidationError is raised with errors for each, as data.(key)
+        """
+        errors = {}
+        # NB: Rolled back if there are errors. Prefetched meta is forgotten as soon as it's changed
+        with transaction.atomic():
+            # Remove any keys not in new_value, matching type prefix too
+            for prefix, metaset in (
+                ("nm", self.metanumeric_set),
+                ("in", self.metainteger_set),
+                ("ch", self.metachar_set),
+                ("dt", self.metadt_set),
+                ("tx", self.metatx_set),
+            ):
+                metaset.exclude(
+                    key__in=[k[3:] for k in new_value if k.startswith(prefix + "_")]
+                ).delete()
+            self._forget_prefetched_meta()
+            for k, v in new_value.items():
+                try:
+                    self._set_meta({k: v})
+                except ValidationError as e:
+                    errors["data.%s" % k] = e.messages
+                except (TypeError, ValueError) as e:
+                    errors["data.%s" % k] = [str(e)]
+            if errors:
+                raise ValidationError(errors)
+
+    def _set_meta(self, new_value):
+        """Upsert metadata keys (with type prefix, e.g. ch_x) in new_value, leaving others alone"""
         for k, v in new_value.items():
             if k in set(
                 (
