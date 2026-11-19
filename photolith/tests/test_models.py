@@ -319,11 +319,66 @@ class IndividualTest(RequiresUtils, TestCase):
                 ind.set_bounding_box(bounding_box)
         self.assertEqual(ind.bounding_box, [[1, 1], [2, 2], [3, 3]])
 
+    def test_data_prefetched(self):
+        """Changing data on a prefetched individual doesn't leave stale copies"""
+        ind = self.create_individual(
+            data=dict(
+                ch_slideLabel="12", ch_individualLabel="3", tx_species=dict(id=100)
+            )
+        )
+
+        def prefetched(expected_str):
+            out = Individual.objects.prefetch_related(
+                "metachar_set", "metatx_set__value"
+            ).get(pk=ind.id)
+            self.assertEqual(str(out), expected_str)
+            return out
+
+        # Data setter
+        ind_pf = prefetched("12 : 3")
+        ind_pf.data = dict(ch_individualLabel="4", tx_species=dict(id=100, en="Fish"))
+        self.assertEqual(str(ind_pf), "12 : 4")
+        self.assertEqual(ind_pf.labels(), ("12", "4"))
+        self.assertEqual(ind_pf.data["tx_species"]["en"], "Fish")
+
+        # ...even if it fails part-way through, after saving some keys
+        ind_pf = prefetched("12 : 4")
+        with self.assertRaisesRegex(ValidationError, "is missing"):
+            ind_pf.data = dict(ch_individualLabel="5", nm_length=None)
+        self.assertEqual(str(ind_pf), "12 : 5")
+
     def test_data_underscore(self):
         """Only the type prefix is split off keys"""
         ind1 = self.create_individual()
         ind1.data = dict(ch_slide_label="x", nm_otolith_length=4.5)
         self.assertEqual(ind1.data, dict(ch_slide_label="x", nm_otolith_length=4.5))
+
+    def test_labels(self):
+        self.assertEqual(self.create_individual().labels(), (None, None))
+        self.assertEqual(
+            self.create_individual(data=dict(ch_slideLabel="12")).labels(), ("12", None)
+        )
+        self.assertEqual(
+            self.create_individual(data=dict(ch_individualLabel="3")).labels(),
+            (None, "3"),
+        )
+        self.assertEqual(
+            self.create_individual(
+                data=dict(ch_slideLabel="12", ch_individualLabel="3", ch_other="x")
+            ).labels(),
+            ("12", "3"),
+        )
+
+    def test_data_labels(self):
+        self.assertEqual(Individual.data_labels({}), (None, None))
+        self.assertEqual(
+            Individual.data_labels(dict(ch_slideLabel="12", ch_other="x")),
+            ("12", None),
+        )
+        self.assertEqual(
+            Individual.data_labels(dict(ch_slideLabel="12", ch_individualLabel="3")),
+            ("12", "3"),
+        )
 
     def test_str(self):
         self.assertEqual(str(self.create_individual()), "Individual 1")

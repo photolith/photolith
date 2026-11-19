@@ -320,6 +320,12 @@ class Individual(models.Model):
             if not created:
                 m.value = v
                 m.save()
+            self._forget_prefetched_meta()
+
+    def _forget_prefetched_meta(self):
+        """After changing meta, forget any prefetch_related() copies, which are now stale"""
+        # NB: As refresh_from_db() does
+        getattr(self, "_prefetched_objects_cache", {}).clear()
 
     def save(self, *args, **kwargs):
         """Save any associated meta objects as well as ourselves"""
@@ -335,19 +341,26 @@ class Individual(models.Model):
             tx.value.save(*args, **kwargs)
         return
 
-    def __str__(self):
+    @staticmethod
+    def data_labels(data):
+        """(ch_slideLabel, ch_individualLabel) tuple from a data dict, None for either if not set"""
+        return data.get("ch_slideLabel"), data.get("ch_individualLabel")
+
+    def labels(self):
+        """(ch_slideLabel, ch_individualLabel) tuple, None for either if not set"""
         # Fetch all metachars
         # NB: Ideally .prefetch_related("metachar_set") should be used as part of any query
         #     We don't filter here to make sure any prefetch is used
-        data = {x.key: x.value for x in self.metachar_set.all()}
+        return self.data_labels(
+            {"ch_" + x.key: x.value for x in self.metachar_set.all()}
+        )
 
-        if data.get("individualLabel") and data.get("slideLabel"):
-            return "%s : %s" % (
-                data["slideLabel"],
-                data["individualLabel"],
-            )
-        if data.get("slideLabel"):
-            return data["slideLabel"]
+    def __str__(self):
+        slide_label, individual_label = self.labels()
+        if individual_label and slide_label:
+            return "%s : %s" % (slide_label, individual_label)
+        if slide_label:
+            return slide_label
         return "Individual %d" % self.pk
 
 
