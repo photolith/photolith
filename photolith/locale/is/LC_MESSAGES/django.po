@@ -250,18 +250,6 @@ msgid "with original otoliths or slides"
 msgstr "með upprunalegu kvarnirnar og/eða glerin"
 
 #: photolith/models.py
-msgid "3"
-msgstr "3"
-
-#: photolith/models.py
-msgid "2"
-msgstr "2"
-
-#: photolith/models.py
-msgid "1"
-msgstr "1"
-
-#: photolith/models.py
 msgid "part of project"
 msgstr "hluti af verkefni"
 

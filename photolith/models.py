@@ -557,9 +557,10 @@ class Annotation(models.Model):
     """
 
     class Rating(models.IntegerChoices):
-        UNREADABLE = 0, _("3")
-        DIFFICULT = 50, _("2")
-        GOOD = 100, _("1")
+        # NB: Labels are the official notation, not translatable text
+        UNREADABLE = 0, "3"
+        DIFFICULT = 50, "2"
+        GOOD = 100, "1"
 
     individual = models.ForeignKey("Individual", on_delete=models.CASCADE, null=False)
     created_by = models.ForeignKey(
