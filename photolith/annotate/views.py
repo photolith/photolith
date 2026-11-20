@@ -99,17 +99,11 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
         """The current user's authority level for this individual"""
         return UserProfile.for_user(self.request.user).authority_level(self.ind_data)
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
         if self.individual_id:
-            # Only allow authority choices up to the user's level (or the existing value when editing)
-            form.fields["authority"].choices = [
-                (v, n)
-                for v, n in form.fields["authority"].choices
-                if v < self.authority_level + 10
-                or (self.object and v == self.object.authority)
-            ]
-        return form
+            kwargs["authority_level"] = self.authority_level
+        return kwargs
 
     @cached_property
     def ind_data(self):
