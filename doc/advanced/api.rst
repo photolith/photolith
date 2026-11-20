@@ -24,6 +24,15 @@ Bounding boxes, scale lines & axis polygons are ``[[x, y], ...]`` arrays in imag
 
 Individual metadata uses the same type-prefixed keys as the ingest form: ``ch_`` (text), ``nm_`` (number), ``in_`` (integer), ``dt_`` (date/time), ``tx_`` (taxonomy, e.g. ``{"id": 1}``).
 
+Python client
+-------------
+
+``photolith_client/`` in the Photolith repository is a Python package wrapping this API, e.g. for batch-import tools. It depends only on `requests <https://requests.readthedocs.io/>`_, and can be installed without the rest of Photolith::
+
+    pip install "photolith-client @ git+https://github.com/photolith/photolith.git@main#subdirectory=photolith_client"
+
+See ``photolith_client/README.md`` for usage.
+
 Who am I
 --------
 
