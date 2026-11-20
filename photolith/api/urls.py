@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import images, individuals, whoami
+from . import annotations, images, individuals, whoami
 
 app_name = "photolith"
 
@@ -18,5 +18,15 @@ urlpatterns = [
         "individuals/<int:individual_id>/",
         individuals.IndividualView.as_view(),
         name="individual",
+    ),
+    path(
+        "individuals/<int:individual_id>/annotations/",
+        annotations.IndividualAnnotationsView.as_view(),
+        name="individual_annotations",
+    ),
+    path(
+        "annotations/<int:annotation_id>/",
+        annotations.AnnotationView.as_view(),
+        name="annotation",
     ),
 ]
