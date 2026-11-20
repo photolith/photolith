@@ -76,6 +76,43 @@ Error responses raise a `PhotolithError` subclass, with `status`,
 * Other filters can be a single value or a list, where any value matches.
 * `True` flags (e.g. `with_associated_images=True`) are sent as `1`.
 
+### Rollback
+
+Individuals & annotations the client creates are logged in
+`client.rollback_log`, a JSON-serialisable list of
+`{"type": "individual" / "annotation", "id": ...}`, oldest first.
+`client.rollback()` deletes them again, newest first, so annotations go before
+their individuals. Items deleted via the client are removed from the log.
+
+A batch import tool can save the log, and remove a previous run's work before
+replaying it:
+
+```python
+import json, os
+
+log_path = "import-rollback.json"
+rollback_log = []
+if os.path.exists(log_path):
+    with open(log_path) as f:
+        rollback_log = json.load(f)
+
+client = PhotolithClient(url, token, rollback_log=rollback_log)
+client.rollback()  # Remove the previous run's work
+try:
+    ...  # Import
+finally:
+    with open(log_path, "w") as f:
+        json.dump(client.rollback_log, f)
+```
+
+`rollback()` carries on past items it can't delete (e.g. an individual someone
+else has since annotated), leaving them in the log, then raises the first
+error. Items already deleted are dropped from the log.
+
+Only creation is logged: updates to existing individuals, or their deletion,
+aren't undone. Images aren't logged either, as the API can't delete them.
+Uploading the same image again returns the existing one.
+
 ## Tests
 
 The tests are part of the Photolith test suite, as they need a server, see

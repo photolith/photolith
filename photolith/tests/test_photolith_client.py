@@ -1,4 +1,5 @@
 import datetime
+import json
 from urllib.parse import urlsplit
 
 import requests
@@ -60,14 +61,14 @@ class DjangoClientAdapter(requests.adapters.BaseAdapter):
 class PhotolithClientTest(RequiresUtils, TestCase):
     maxDiff = None
 
-    def client_for(self, user, key=None):
+    def client_for(self, user, key=None, **kwargs):
         if key is None:
             token = ApiToken(user=user, name="UT client")
             key = token.generate_key()
             token.save()
         session = requests.Session()
         session.mount("http://testserver/", DjangoClientAdapter())
-        return PhotolithClient("http://testserver/", key, session=session)
+        return PhotolithClient("http://testserver/", key, session=session, **kwargs)
 
     def superuser(self):
         out = self.create_user(groups=["Ingest"])
@@ -371,3 +372,106 @@ class PhotolithClientTest(RequiresUtils, TestCase):
         self.assertFalse(Annotation.objects.filter(pk=ann["id"]).exists())
         with self.assertRaises(NotFound):
             client.delete_annotation(ann["id"])
+
+    def test_rollback(self):
+        client = self.client_for(self.superuser())
+        other = self.client_for(self.create_user(groups=["General Annotation Editor"]))
+        img = self.create_image()
+        existing = self.create_individual(
+            image=img, data=dict(ch_slideLabel="1", ch_individualLabel="1")
+        )
+
+        # Individuals & annotations created are logged, existing ones aren't
+        out = client.sync_individuals(
+            img.id,
+            [
+                dict(
+                    bounding_box=[[0, 0], [10, 10]],
+                    data=dict(ch_slideLabel="1", ch_individualLabel="1", nm_length=2.0),
+                ),
+                dict(
+                    bounding_box=[[0, 0], [20, 20]],
+                    data=dict(ch_slideLabel="1", ch_individualLabel="2"),
+                ),
+                dict(
+                    bounding_box=[[0, 0], [30, 30]],
+                    data=dict(ch_slideLabel="1", ch_individualLabel="3"),
+                ),
+            ],
+        )
+        ind1, ind2, ind3 = out["ids"]
+        self.assertEqual(ind1, existing.id)
+        ann = client.create_annotation(
+            ind2, age=7, rating="1", authority=20, axis_poly=[[0, 0], [1, 1]]
+        )
+        self.assertEqual(
+            client.rollback_log,
+            [
+                dict(type="individual", id=ind2),
+                dict(type="individual", id=ind3),
+                dict(type="annotation", id=ann["id"]),
+            ],
+        )
+
+        # Deleting via the client, or a PUT, removes from the log
+        client.delete_individual(ind3)
+        self.assertEqual(
+            client.rollback_log,
+            [dict(type="individual", id=ind2), dict(type="annotation", id=ann["id"])],
+        )
+        out = client.sync_individuals(
+            img.id,
+            [
+                dict(
+                    bounding_box=[[0, 0], [40, 40]],
+                    data=dict(ch_slideLabel="1", ch_individualLabel="4"),
+                ),
+            ],
+        )
+        ind4 = out["ids"][0]
+        client.put_individuals(
+            img.id,
+            [
+                dict(id=ind1, bounding_box=[[0, 0], [10, 10]], data=existing.data),
+                dict(
+                    id=ind2,
+                    bounding_box=[[0, 0], [20, 20]],
+                    data=dict(ch_slideLabel="1", ch_individualLabel="2"),
+                ),
+                dict(id=ind4, bounding_box=None),
+            ],
+        )
+        self.assertEqual(
+            client.rollback_log,
+            [dict(type="individual", id=ind2), dict(type="annotation", id=ann["id"])],
+        )
+
+        # A later client can rollback a saved log. Someone else's annotation
+        # gets in the way, the rest is still removed
+        other_ann = other.create_annotation(
+            ind2, age=7, rating="1", authority=20, axis_poly=[[0, 0], [1, 1]]
+        )
+        client2 = self.client_for(
+            self.superuser(),
+            rollback_log=json.loads(json.dumps(client.rollback_log)),
+        )
+        with self.assertRaises(Conflict):
+            client2.rollback()
+        self.assertEqual(client2.rollback_log, [dict(type="individual", id=ind2)])
+        self.assertFalse(Annotation.objects.filter(pk=ann["id"]).exists())
+
+        other.delete_annotation(other_ann["id"])
+        client2.rollback()
+        self.assertEqual(client2.rollback_log, [])
+        self.assertEqual(
+            [i.id for i in Individual.objects.filter(image=img)], [existing.id]
+        )
+        # NB: Updates aren't rolled back
+        self.assertEqual(Individual.objects.get(pk=existing.id).data["nm_length"], 2.0)
+
+        # Items already gone are dropped from the log
+        client3 = self.client_for(
+            self.superuser(), rollback_log=[dict(type="annotation", id=ann["id"])]
+        )
+        client3.rollback()
+        self.assertEqual(client3.rollback_log, [])

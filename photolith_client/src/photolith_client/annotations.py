@@ -20,7 +20,7 @@ class AnnotationsMixin:
           reader") for machine-generated readings
         * project: Project ID, or None for a general annotation
         """
-        return self.request(
+        out = self.request(
             "POST",
             "/api/v1/individuals/%d/annotations/" % individual_id,
             json=dict(
@@ -32,7 +32,10 @@ class AnnotationsMixin:
                 project=project,
             ),
         )
+        self._log_created("annotation", out["id"])
+        return out
 
     def delete_annotation(self, annotation_id):
         """Delete an annotation. Only the owner (or a superuser) can do this"""
         self.request("DELETE", "/api/v1/annotations/%d/" % annotation_id)
+        self._log_deleted("annotation", annotation_id)

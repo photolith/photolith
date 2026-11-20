@@ -5,6 +5,7 @@ from .annotations import AnnotationsMixin
 from .errors import ERRORS_BY_STATUS, PhotolithError
 from .images import ImagesMixin
 from .individuals import IndividualsMixin
+from .rollback import RollbackMixin
 from .search import SearchMixin
 from .whoami import WhoAmIMixin
 
@@ -24,6 +25,7 @@ class PhotolithClient(
     IndividualsMixin,
     SearchMixin,
     AnnotationsMixin,
+    RollbackMixin,
 ):
     """
     Client for the Photolith API, see doc/advanced/api.rst.
@@ -33,10 +35,15 @@ class PhotolithClient(
     'jbloggs'
 
     Any error response raises a PhotolithError subclass, see errors.py.
+
+    Individuals & annotations created are logged in rollback_log, to be
+    removed with rollback(). Give a previous rollback_log to remove the
+    work of an earlier client, see RollbackMixin.
     """
 
-    def __init__(self, base_url, token, session=None, timeout=60):
+    def __init__(self, base_url, token, session=None, timeout=60, rollback_log=None):
         self.base_url = base_url.rstrip("/")
+        self.rollback_log = list(rollback_log or [])
         self.timeout = timeout
         self.session = session or requests.Session()
         self.session.headers.update(

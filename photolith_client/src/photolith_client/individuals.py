@@ -29,12 +29,17 @@ class IndividualsMixin:
         Give an etag from get_individuals() as if_match to raise
         PreconditionFailed rather than overwriting changes made since.
         """
-        return self.request(
+        out = self.request(
             "PUT",
             "/api/v1/images/%d/individuals/" % image_id,
             json=dict(individuals=individuals),
             headers={"If-Match": if_match} if if_match else {},
         )
+        for ind_id in out["created"].values():
+            self._log_created("individual", ind_id)
+        for ind_id in out["deleted"].values():
+            self._log_deleted("individual", ind_id)
+        return out
 
     def sync_individuals(self, image_id, individuals, delete_missing=False):
         """
@@ -98,3 +103,4 @@ class IndividualsMixin:
     def delete_individual(self, individual_id):
         """Delete an individual, raising Conflict if it has annotations"""
         self.request("DELETE", "/api/v1/individuals/%d/" % individual_id)
+        self._log_deleted("individual", individual_id)
