@@ -489,6 +489,32 @@ class AnnotationTest(RequiresUtils, TestCase):
             [14.142135623730951, 14.142135623730951],
         )
 
+    def test_set_axis_poly(self):
+        ind = self.create_individual()
+        ann = self.create_annotation(ind, axis_poly=[[0, 0], [100, 100]])
+
+        # Set, but not saved
+        ann.set_axis_poly([[0, 0], [10.5, 20]])
+        self.assertEqual(ann.axis_poly, [[0, 0], [10.5, 20]])
+        ann.refresh_from_db()
+        self.assertEqual(ann.axis_poly, [[0, 0], [100, 100]])
+        ann.set_axis_poly([[1, 1], [2, 2], [3, 3]])
+        self.assertEqual(ann.axis_poly, [[1, 1], [2, 2], [3, 3]])
+
+        # Invalid values aren't set
+        for axis_poly in [
+            None,
+            [],
+            [0, 0],
+            [[0, 0], [1, 2, 3]],
+            [[0, 0], ["1", 2]],
+            [[0, 0], [True, 2]],
+            "[[0, 0], [1, 1]]",
+        ]:
+            with self.assertRaisesRegex(ValidationError, "axis_poly should be"):
+                ann.set_axis_poly(axis_poly)
+        self.assertEqual(ann.axis_poly, [[1, 1], [2, 2], [3, 3]])
+
 
 class UserProfileTest(RequiresUtils, TestCase):
     def test_for_user(self):

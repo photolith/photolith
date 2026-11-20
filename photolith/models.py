@@ -611,6 +611,14 @@ class Annotation(models.Model):
             models.Index(fields=["created_by", "individual"]),
         ]
 
+    def set_axis_poly(self, axis_poly):
+        """Set axis_poly, a [[x, y], ...] list of points. NB: Doesn't save"""
+        if not _is_point_list(axis_poly):
+            raise ValidationError(
+                "axis_poly should be [[x, y], ...], not %s" % axis_poly, code=400
+            )
+        self.axis_poly = axis_poly
+
     def axis_poly_dists(self):
         return [
             euclidean_dist(a, b) for a, b in zip(self.axis_poly, self.axis_poly[1:])
