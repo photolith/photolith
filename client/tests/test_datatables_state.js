@@ -188,5 +188,28 @@ test('applyDTState', function (test) {
     { tx_sex: { id: 3, en: 'Male' }, __rowpos: 0 }
   ], 'Taxonomy objects sort by id, not by English name');
 
+  // DT cycles a column "asc" -> "desc" -> "", the latter ending up as "0." in the querystring
+  test.deepEqual(doApply([
+    { nm_length: 1, in_year: 2 },
+    { nm_length: 10, in_year: 3 },
+    { nm_length: 3, in_year: 2 }
+  ], [[0, '']]), [
+    { nm_length: 1, in_year: 2, __rowpos: 0 },
+    { nm_length: 10, in_year: 3, __rowpos: 1 },
+    { nm_length: 3, in_year: 2, __rowpos: 2 }
+  ], 'Empty sort direction ignored, original order preserved');
+
+  test.deepEqual(doApply([
+    { nm_length: 1, ch_gear: 'x' },
+    { nm_length: 2, ch_gear: 'y' },
+    { nm_length: 1, ch_gear: 'z' },
+    { nm_length: 2, ch_gear: 'w' }
+  ], [[1, ''], [0, 'desc']]), [
+    { nm_length: 2, ch_gear: 'w', __rowpos: 3 },
+    { nm_length: 2, ch_gear: 'y', __rowpos: 1 },
+    { nm_length: 1, ch_gear: 'z', __rowpos: 2 },
+    { nm_length: 1, ch_gear: 'x', __rowpos: 0 }
+  ], 'Empty sort direction skipped, following sort used (and decides orderDescReverse)');
+
   test.end();
 });

@@ -56,6 +56,9 @@ export function removeDTState (searchString) {
 export function applyDTState (data, searchString) {
   const dtState = getDTState(searchString);
 
+  // NB: dt toggles through columns "5.asc" -> "5.desc" -> "5.", the latter being noise
+  dtState.order = dtState.order.filter((o) => o[1] === 'asc' || o[1] === 'desc');
+
   // NB: Under nodeJS, DataTable is a function that needs to be fed a window
   //     https://github.com/DataTables/Dist-DataTables-Bootstrap5/blob/7d09afc9038aaea5d8d045e18116d4d089203c9b/js/dataTables.bootstrap5.js#L21-L40
   const dt = DataTable.ext ? DataTable : DataTable(global.window);
