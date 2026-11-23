@@ -103,6 +103,12 @@ class IndividualAnnotationsViewTest(ApiAnnotationsTestBase):
         )
         self.assertEqual((status, out["comment"], out["project"]), (201, "", None))
 
+        # Points can be labelled, labels are kept
+        axis_poly = [[50, 50, "C"], [70, 35, "F1"], [90, 20, "S+"]]
+        status, out = self.post(user, ind.id, self.body(axis_poly=axis_poly))
+        self.assertEqual((status, out["axis_poly"]), (201, axis_poly))
+        self.assertEqual(Annotation.objects.get(pk=out["id"]).axis_poly, axis_poly)
+
         # Unreadable annotations can have no age or points, either empty or missing
         for body in [
             self.body(rating="3", age=None, axis_poly=[]),
@@ -155,7 +161,9 @@ class IndividualAnnotationsViewTest(ApiAnnotationsTestBase):
                 "authority": [
                     "Select a valid choice. parp is not one of the available choices."
                 ],
-                "axis_poly": ["axis_poly should be [[x, y], ...], not [0, 0]"],
+                "axis_poly": [
+                    "axis_poly should be [[x, y], ...] or [[x, y, label], ...], not [0, 0]"
+                ],
             },
         )
         # Readable annotations need an age & points
