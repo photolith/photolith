@@ -103,6 +103,29 @@ class IndividualAnnotationsViewTest(ApiAnnotationsTestBase):
         )
         self.assertEqual((status, out["comment"], out["project"]), (201, "", None))
 
+        # Unreadable annotations can have no age or points, either empty or missing
+        for body in [
+            self.body(rating="3", age=None, axis_poly=[]),
+            {
+                k: v
+                for k, v in self.body(rating="3").items()
+                if k not in ("age", "axis_poly")
+            },
+        ]:
+            status, out = self.post(user, ind.id, body)
+            self.assertEqual(
+                (status, out["rating"], out["age"], out["axis_poly"]),
+                (201, "3", None, []),
+            )
+            ann = Annotation.objects.get(pk=out["id"])
+            self.assertEqual((ann.age, ann.axis_poly), (None, []))
+
+        # ...but can still have them
+        status, out = self.post(user, ind.id, self.body(rating="3", age=0))
+        self.assertEqual(
+            (status, out["age"], out["axis_poly"]), (201, 0, [[50, 50], [90, 20]])
+        )
+
     def test_post__validation(self):
         user = self.create_user(groups=["General Annotation Editor"])
         ind = self.create_individual()
@@ -135,6 +158,15 @@ class IndividualAnnotationsViewTest(ApiAnnotationsTestBase):
                 "axis_poly": ["axis_poly should be [[x, y], ...], not [0, 0]"],
             },
         )
+        # Readable annotations need an age & points
+        for rating in ["1", "2"]:
+            self.assertEqual(
+                post_err(self.body(rating=rating, age=None, axis_poly=[])),
+                {
+                    "age": ["This field is required."],
+                    "axis_poly": ["This field is required."],
+                },
+            )
         self.assertEqual(
             post_err(self.body(rating="4", project=9999)),
             {

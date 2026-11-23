@@ -41,7 +41,8 @@ def create_annotation(individual, user, data):
         authority_level=UserProfile.for_user(user).authority_level(individual.data),
     )
     errors = {k: list(v) for k, v in form.errors.items()}
-    if "axis_poly" in form.cleaned_data:
+    if form.cleaned_data.get("axis_poly"):
+        # NB: The form allows an empty axis_poly for unreadable images
         try:
             form.instance.set_axis_poly(form.cleaned_data["axis_poly"])
         except ValidationError as e:

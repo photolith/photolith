@@ -712,8 +712,9 @@ class Project(models.Model):
                 .order_by("-created_at")
                 .first()
             )
-            if a:
+            if a and a.axis_poly:
                 # Create copy without age assignment, intermediate nodes
+                # NB: Unreadable annotations can have no points to copy
                 a.pk = None
                 a.age = 0
                 a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]

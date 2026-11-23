@@ -384,6 +384,19 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=user4),
 
+        # base_user's most recent annotation is unreadable, with no points, so nothing to copy
+        self.create_annotation(ind, user1, created_delta=dict(days=-1), axis_poly=[])
+        self.assertEqual(
+            get_all_annotations(
+                ind,
+                project=dict(
+                    created_by=user3, base_user=user1, team=[user1, user2, user3]
+                ),
+                user=user3,
+            ),
+            [],
+        )
+
     def test_get_individual(self):
         def get_ind(individual, user=None):
             request = RequestFactory().get(
