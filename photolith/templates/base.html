@@ -11,10 +11,10 @@
     <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'tom-select/dist/css/tom-select.bootstrap5.css' %}" rel="stylesheet" >
     <link href="{% static 'datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" >
-    <link href="{% static 'app.css' %}" rel="stylesheet">
+    <link href="{% static 'app.css' %}?v={{ settings.CS_GIT_REVISION|urlencode }}" rel="stylesheet">
     <script defer src="{% static '@popperjs/core/dist/umd/popper.min.js' %}"></script>
     <script defer src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script defer src="{% static 'app.js' %}"></script>
+    <script defer src="{% static 'app.js' %}?v={{ settings.CS_GIT_REVISION|urlencode }}"></script>
     {% include "snippet/cs_config.html" %}
 
     <title>{% block title %}{% translate "Photolith" %}{% endblock title %} | {% translate "Photolith" %}</title>
