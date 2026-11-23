@@ -860,8 +860,7 @@ msgstr "Búðu til verkefni með því að nota <kbd>leitina</kbd>."
 
 #: photolith/templates/project/list.html
 msgid "Then click <kbd>Save as project</kbd> in the top right corner."
-msgstr ""
-"Ýttu svo á <kbd>Vista sem verkefni</kbd>."
+msgstr "Ýttu svo á <kbd>Vista sem verkefni</kbd>."
 
 #: photolith/templates/project/update.html
 msgid "Cancel"
@@ -873,11 +872,13 @@ msgstr "Eyða"
 
 #: photolith/templates/search/annotation_alert.html
 msgid "There are already annotations present for individuals in this image:"
-msgstr "Það eru þegar til staðar aldursmerkingar fyrir einstaklinga á þessari mynd"
+msgstr ""
+"Það eru þegar til staðar aldursmerkingar fyrir einstaklinga á þessari mynd"
 
 #: photolith/templates/search/annotation_alert.html
 msgid "Editing these will result in the annotations being removed."
-msgstr "Breyting á þessum einstaklingum mun eyða aldursmerkingum sem eru til staðar."
+msgstr ""
+"Breyting á þessum einstaklingum mun eyða aldursmerkingum sem eru til staðar."
 
 #: photolith/templates/search/index.html
 msgid "Individual Search"
@@ -936,8 +937,7 @@ msgstr "Auka skýrleika"
 msgid ""
 "Preview the thresholding that the otolith selection/enhance view uses, for "
 "debugging"
-msgstr ""
-"Prófa þröskuldun sem er notuð af innsetningu mynda, fyrir debugging"
+msgstr "Prófa þröskuldun sem er notuð af innsetningu mynda, fyrir debugging"
 
 #: photolith/templates/snippet/viewer.html
 msgid "Threshold"

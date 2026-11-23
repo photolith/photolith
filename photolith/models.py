@@ -52,8 +52,8 @@ class UserSpeciesAuthority(models.Model):
     )
 
     class Meta:
-        verbose_name = _("user species authority")
-        verbose_name_plural = _("user species authorities")
+        verbose_name = _("User species authority")
+        verbose_name_plural = _("User species authorities")
         unique_together = (
             "user",
             "species",
@@ -336,7 +336,7 @@ class Taxonomy(models.Model):
     # NB: key isn't generally needed, but key/identifier is our business-logic key, and
     #     we compare this when upserting
     key = models.CharField(
-        verbose_name=_("metadata key"),
+        verbose_name=_("Metadata key"),
         max_length=255,
         blank=False,
         null=False,

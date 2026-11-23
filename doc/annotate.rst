@@ -75,6 +75,6 @@ Image rating
 Reader authority
     How highly regarded your reading will be, an expert's opinion is more highly regarded than an inexperienced reader. You can also state you have access to the physical slide, giving your reading greater prominence. See :ref:`administration/users:User annotation authority / species experts` for how these values are chosen.
 Comments
-    Any other comments you may have.
+    Any other comments you may have, f.ex. if you are not certain of an age and want to explain why.
 
 Once done, press *Save* and then *Next >* in the individual selection bar at the top of the page.
