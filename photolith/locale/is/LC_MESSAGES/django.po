@@ -160,7 +160,7 @@ msgstr ""
 "Reynsla (aldursmerkingar frá reyndari notendum eru valdar framyfir aðra)"
 
 #: photolith/models.py
-msgid "USser species authority"
+msgid "User species authority"
 msgstr "Reynsla notanda á tegund"
 
 #: photolith/models.py
