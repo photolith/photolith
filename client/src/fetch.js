@@ -45,43 +45,67 @@ export function fetchResource (resource, options) {
   });
 }
 
+/**
+ * Current CSRF token, for X-CSRFToken headers
+ *
+ * NB: Read from the cookie rather than a form's csrfmiddlewaretoken, which
+ * goes stale if the user logs in again in another tab (login rotates it)
+ * https://docs.djangoproject.com/en/5.2/howto/csrf/#acquiring-the-token-if-csrf-use-sessions-and-csrf-cookie-httponly-are-false
+ */
+function getCookie (name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 /** Describe a failed HTTP response (NB: statusText is always empty over HTTP/2) */
 export function statusMessage (response) {
   return `${response.status} ${response.statusText}`.trim();
 }
 
+/** Start of a response body, whitespace collapsed, to show in error messages */
+function bodySnippet (body) {
+  const snippet = body.trim().replace(/\s+/g, ' ');
+  return snippet.length > 20 ? snippet.slice(0, 20) + '...' : snippet;
+}
+
 export function jsonFetch (resource, options = {}) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/json';
-  return fetchResource(resource, options).then((response) => {
-    if (response.ok) {
-      return response.text().then((body) => {
-        try {
-          return JSON.parse(body);
-        } catch (e) {
-          console.error('Failed to parse JSON response', e);
-          const snippet = body.trim().replace(/\s+/g, ' ');
-          throw new Error(`Failed to fetch ${resource}: Unparsable (${snippet.length > 20 ? snippet.slice(0, 20) + '...' : snippet})`);
-        }
-      }).then((rv) => {
-        // NB: Streaming responses might have reported an error after starting
-        if (rv.error) {
-          throw new Error(`Failed to fetch ${resource} ${rv.error_class ? `[${rv.error_class}]` : ''}: ${rv.error}`);
-        }
-        return rv;
-      });
+  if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(options.method || 'GET')) {
+    // Django requires a CSRF token for any unsafe method
+    options.headers['X-CSRFToken'] = getCookie('csrftoken');
+  }
+  return fetchResource(resource, options).then((response) => response.text().then((body) => {
+    let rv;
+    try {
+      rv = JSON.parse(body);
+    } catch (e) {
+      // Not one of our JSON responses, e.g. CSRF failure / proxy error page
+      console.error('Failed to parse JSON response', e);
+      const snippet = bodySnippet(body);
+      throw new Error(`Failed to fetch ${resource}: ${response.ok ? 'Unparsable' : statusMessage(response)}${snippet ? ` (${snippet})` : ''}`);
     }
 
-    return response.json().catch((e) => {
-      console.error('Failed to parse error response', e);
-      return {
-        error_class: response.status,
-        error: response.statusText || 'Unknown error'
-      };
-    }).then((errData) => {
-      throw new Error(`Failed to fetch ${resource} ${errData.error_class ? `[${errData.error_class}]` : ''}: ${errData.error}`);
-    });
-  }).then((rv) => {
+    // NB: Streaming responses might have reported an error after starting
+    if (rv.error) {
+      throw new Error(`Failed to fetch ${resource} ${rv.error_class ? `[${rv.error_class}]` : ''}: ${rv.error}`);
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${resource}: ${statusMessage(response)}`);
+    }
+    return rv;
+  })).then((rv) => {
     if (rv.alert) {
       displayAlert(rv.alert.level, rv.alert.messageHTML, rv.alert.timeout);
     }

@@ -33,6 +33,22 @@ test('jsonFetch', function (test) {
     return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
       test.deepEqual(err.message, 'Failed to fetch /ut/ [PermissionDenied]: No', 'Error response passed on');
     });
+  }).then(() => {
+    // e.g. Django CSRF failure page, NB: no statusText over HTTP/2
+    nextResponse = new Response('<!DOCTYPE html>\n<html lang="en">\n<h1>Forbidden</h1>', { status: 403 });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 403 (<!DOCTYPE html> <htm...)', 'Non-JSON error response includes status & start of body');
+    });
+  }).then(() => {
+    nextResponse = new Response('', { status: 502, statusText: 'Bad Gateway' });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 502 Bad Gateway', 'Empty error response includes status');
+    });
+  }).then(() => {
+    nextResponse = new Response('{"a": 1}', { status: 404 });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 404', 'JSON error response without an error reports status');
+    });
   });
 });
 
@@ -72,5 +88,35 @@ test('fetch:HTTP errors', function (test) {
     return htmlFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
       test.deepEqual(err.message, 'Failed to fetch /ut/: 500 Internal Server Error', 'statusText included when available');
     });
+  });
+});
+
+test('jsonFetch:csrf', function (test) {
+  const dom = setupDom(test);
+  let lastOptions;
+  dom.window.fetch = (resource, options) => {
+    lastOptions = options;
+    return Promise.resolve(new Response('{}', { status: 200 }));
+  };
+
+  return jsonFetch('/ut/').then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], undefined, 'No token sent for GET');
+
+    return jsonFetch('/ut/', { method: 'POST' });
+  }).then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], null, 'No cookie, no token');
+
+    dom.window.document.cookie = 'csrftoken=aaaa';
+    return jsonFetch('/ut/', { method: 'POST', headers: { 'X-Other': 'x' } });
+  }).then(() => {
+    test.deepEqual(lastOptions.headers, { 'X-Other': 'x', Accept: 'application/json', 'X-CSRFToken': 'aaaa' }, 'Token read from cookie, other headers kept');
+
+    // e.g. login in another tab rotated the token
+    dom.window.document.cookie = 'xcsrftoken=nope';
+    dom.window.document.cookie = 'csrftoken=bbbb';
+    dom.window.document.cookie = 'sessionid=cccc';
+    return jsonFetch('/ut/', { method: 'delete' });
+  }).then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], 'bbbb', 'Current token read, other cookies ignored');
   });
 });

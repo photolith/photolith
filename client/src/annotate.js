@@ -60,8 +60,7 @@ function allAnnotationsClick (elForm, event) {
 
     if (event.target.classList.contains('ph-delete')) {
       return jsonFetch(`/annotate/delete/${elSelected.getAttribute('data-annotation-id')}/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': elForm.csrfmiddlewaretoken.value }
+        method: 'POST'
       }).then((data) => {
         elSelected.remove();
         existingAnnotationsPopulate(
