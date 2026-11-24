@@ -14,7 +14,7 @@ export function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 
-function attribEscape (s) {
+export function attribEscape (s) {
   // NB: [^"] rather than ., as attribute values can contain newlines
   return (new window.Option('', s)).outerHTML.match(/value="([^"]*)"/)[1];
 }

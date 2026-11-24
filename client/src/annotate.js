@@ -4,7 +4,7 @@ import { displayAlert } from './alert';
 import { formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
-import { populateIndividualData } from './meta';
+import { attribEscape, populateIndividualData } from './meta';
 
 const existingPallete = [
   '230, 159, 0',
@@ -149,7 +149,8 @@ function existingAnnotationsPopulate (elForm, tableEl) {
     const col = existingPallete[i % existingPallete.length];
 
     el.style.borderColor = `rgb(${col})`;
-    return `<input type="hidden" name="view_poly:${i}" data-stroke="${col}" value="${el.getAttribute('data-axis-poly')}" />`;
+    // NB: axis_poly labels are strings, so the JSON contains quotes
+    return `<input type="hidden" name="view_poly:${i}" data-stroke="${col}" value="${attribEscape(el.getAttribute('data-axis-poly'))}" />`;
   }).join('\n');
   elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
 }
