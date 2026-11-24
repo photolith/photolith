@@ -4,7 +4,7 @@ import { displayAlert } from './alert';
 import { changeEvent, formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
-import { attribEscape, populateIndividualData } from './meta';
+import { attribEscape, htmlEscape, populateIndividualData } from './meta';
 
 const existingPallete = [
   '230, 159, 0',
@@ -23,8 +23,15 @@ function formRefresh (pxMmRatio, event) {
 
   if (event.target.name === 'axis_poly') {
     const elTableBody = window.document.querySelector('#axis_poly_table tbody');
-    const pointData = JSON.parse(event.target.value || '[]').map((p) => new Point(p[0], p[1]));
+    const rawPoints = JSON.parse(event.target.value || '[]');
+    const pointData = rawPoints.map((p) => new Point(p[0], p[1]));
     let totalDist = 0;
+
+    // Point's label if it has one (i.e. [x, y, label]), otherwise its number, or E for the end
+    function pointName (i) {
+      if (rawPoints[i].length > 2) return htmlEscape(rawPoints[i][2]);
+      return i === pointData.length - 1 ? 'E' : i;
+    }
 
     // Find currently selected point
     let selectedIdx = event.target.form.selection.value.match(/^axis_poly\[(\d+)\]$/);
@@ -33,7 +40,7 @@ function formRefresh (pxMmRatio, event) {
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
       ? ''
       : `<tr class="${i === selectedIdx ? 'table-info' : ''}" data-idx="${i}">
-      <td>${i === pointData.length - 1 ? 'E' : i}</td>
+      <td>${pointName(i)}</td>
       <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
       <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
     </tr>`).join('\n');
