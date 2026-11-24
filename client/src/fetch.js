@@ -45,6 +45,29 @@ export function fetchResource (resource, options) {
   });
 }
 
+/**
+ * Current CSRF token, for X-CSRFToken headers
+ *
+ * NB: Read from the cookie rather than a form's csrfmiddlewaretoken, which
+ * goes stale if the user logs in again in another tab (login rotates it)
+ * https://docs.djangoproject.com/en/5.2/howto/csrf/#acquiring-the-token-if-csrf-use-sessions-and-csrf-cookie-httponly-are-false
+ */
+function getCookie (name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 /** Describe a failed HTTP response (NB: statusText is always empty over HTTP/2) */
 export function statusMessage (response) {
   return `${response.status} ${response.statusText}`.trim();
@@ -59,6 +82,10 @@ function bodySnippet (body) {
 export function jsonFetch (resource, options = {}) {
   options.headers = options.headers || {};
   options.headers.Accept = 'application/json';
+  if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(options.method || 'GET')) {
+    // Django requires a CSRF token for any unsafe method
+    options.headers['X-CSRFToken'] = getCookie('csrftoken');
+  }
   return fetchResource(resource, options).then((response) => response.text().then((body) => {
     let rv;
     try {

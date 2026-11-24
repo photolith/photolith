@@ -90,3 +90,33 @@ test('fetch:HTTP errors', function (test) {
     });
   });
 });
+
+test('jsonFetch:csrf', function (test) {
+  const dom = setupDom(test);
+  let lastOptions;
+  dom.window.fetch = (resource, options) => {
+    lastOptions = options;
+    return Promise.resolve(new Response('{}', { status: 200 }));
+  };
+
+  return jsonFetch('/ut/').then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], undefined, 'No token sent for GET');
+
+    return jsonFetch('/ut/', { method: 'POST' });
+  }).then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], null, 'No cookie, no token');
+
+    dom.window.document.cookie = 'csrftoken=aaaa';
+    return jsonFetch('/ut/', { method: 'POST', headers: { 'X-Other': 'x' } });
+  }).then(() => {
+    test.deepEqual(lastOptions.headers, { 'X-Other': 'x', Accept: 'application/json', 'X-CSRFToken': 'aaaa' }, 'Token read from cookie, other headers kept');
+
+    // e.g. login in another tab rotated the token
+    dom.window.document.cookie = 'xcsrftoken=nope';
+    dom.window.document.cookie = 'csrftoken=bbbb';
+    dom.window.document.cookie = 'sessionid=cccc';
+    return jsonFetch('/ut/', { method: 'delete' });
+  }).then(() => {
+    test.equal(lastOptions.headers['X-CSRFToken'], 'bbbb', 'Current token read, other cookies ignored');
+  });
+});

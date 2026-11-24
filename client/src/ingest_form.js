@@ -217,7 +217,6 @@ function formSubmit (event) {
       method: 'POST',
       body: elForm.image_file.phBlob,
       headers: {
-        'X-CSRFToken': elForm.csrfmiddlewaretoken.value,
         'X-Photolith-fileset': elForm.image_file.value,
         // NB: Headers can only contain ISO-8859-1, so encode
         'X-Photolith-filename': encodeURIComponent(elForm.image_file.phBlob.name)
@@ -226,9 +225,12 @@ function formSubmit (event) {
       elForm.image_id.value = data.id;
     });
   }).then(() => {
+    const formData = new FormData(elForm);
+    // NB: Django prefers a (possibly stale) csrfmiddlewaretoken over jsonFetch's X-CSRFToken
+    formData.delete('csrfmiddlewaretoken');
     return jsonFetch('/ingest/upload/', {
       method: 'POST',
-      body: new FormData(elForm)
+      body: formData
     });
   }).then((data) => {
     if (event.submitter.name === 'clear_all') {
