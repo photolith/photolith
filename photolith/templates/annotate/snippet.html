@@ -1,9 +1,10 @@
 {% comment %}NB: AJAX snippet, so not inheriting from base{% endcomment %}
 {% load i18n %}
 {% load verbose_name %}
+{% load tojson %}
 <div class="row">
   <div class="col-5" style="line-height: 0">
-    <div class="ph-cropped-viewer" data-src="{{ ind_data.image__content__url }}" data-bounding-box="{{ ind_data.bounding_box }}"></div>
+    <div class="ph-cropped-viewer" data-src="{{ ind_data.image__content__url }}" data-bounding-box="{{ ind_data.bounding_box|tojson }}"></div>
   </div>
   <div class="col-7">
     <table class="table table-bordered" style="">
@@ -17,7 +18,7 @@
       </tr></thead>
       <tbody>{% for a in all_annotations %}
         <tr>
-          <script class="axis_poly" type="application/json">{{ a.axis_poly }}</script></td>
+          {{ a.axis_poly|json_script }}</td>
           <td class="text-nowrap"><code>{{ a.created_at|date:'SHORT_DATE_FORMAT' }} {{ a.created_at|time:'H:i' }}</code></td>
           <td class="text-nowrap"><code>{{ a.created_by }}</code></td>
           <td class="text-nowrap"><code>{{ a.get_authority_display }}</code></td>
