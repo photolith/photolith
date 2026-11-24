@@ -33,6 +33,22 @@ test('jsonFetch', function (test) {
     return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
       test.deepEqual(err.message, 'Failed to fetch /ut/ [PermissionDenied]: No', 'Error response passed on');
     });
+  }).then(() => {
+    // e.g. Django CSRF failure page, NB: no statusText over HTTP/2
+    nextResponse = new Response('<!DOCTYPE html>\n<html lang="en">\n<h1>Forbidden</h1>', { status: 403 });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 403 (<!DOCTYPE html> <htm...)', 'Non-JSON error response includes status & start of body');
+    });
+  }).then(() => {
+    nextResponse = new Response('', { status: 502, statusText: 'Bad Gateway' });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 502 Bad Gateway', 'Empty error response includes status');
+    });
+  }).then(() => {
+    nextResponse = new Response('{"a": 1}', { status: 404 });
+    return jsonFetch('/ut/').then(() => test.fail('Should have thrown'), (err) => {
+      test.deepEqual(err.message, 'Failed to fetch /ut/: 404', 'JSON error response without an error reports status');
+    });
   });
 });
 
