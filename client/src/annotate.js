@@ -1,7 +1,7 @@
 import { Point } from 'fabric';
 
 import { displayAlert } from './alert';
-import { formUnloadWarning } from './events';
+import { changeEvent, formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
 import { attribEscape, populateIndividualData } from './meta';
@@ -32,7 +32,7 @@ function formRefresh (pxMmRatio, event) {
 
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
       ? ''
-      : `<tr class="${i === selectedIdx ? 'table-info' : ''}">
+      : `<tr class="${i === selectedIdx ? 'table-info' : ''}" data-idx="${i}">
       <td>${i === pointData.length - 1 ? 'E' : i}</td>
       <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
       <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
@@ -167,6 +167,17 @@ export function init (parent) {
     });
 
     formUnloadWarning(elForm);
+
+    // Select a point by clicking on its row in axis_poly_table
+    elForm.querySelector('#axis_poly_table').addEventListener('click', (event) => {
+      const elRow = event.target.closest('tbody > tr[data-idx]');
+      if (!elRow || event.target.closest('select')) return;
+
+      const newVal = `axis_poly[${elRow.getAttribute('data-idx')}]`;
+      if (elForm.selection.value === newVal) return;
+      elForm.selection.value = newVal;
+      elForm.selection.dispatchEvent(changeEvent());
+    });
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 

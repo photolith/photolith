@@ -61,6 +61,21 @@ export class PhSyncingViewer extends PhFilteringViewer {
         return;
       }
 
+      // Select the object the form has selected, e.g. from clicking on a table row
+      if (event.target.name === 'selection') {
+        const activeObj = this.fabCanvas.getActiveObject();
+        if ((activeObj?.id || '') === event.target.value) return;
+
+        const obj = this.fabCanvas.getObjects().find((obj) => obj.id && obj.id === event.target.value);
+        if (obj) {
+          this.fabCanvas.setActiveObject(obj);
+        } else {
+          this.fabCanvas.discardActiveObject();
+        }
+        this.fabCanvas.requestRenderAll();
+        return;
+      }
+
       this.reverseSyncForm({ target: this.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
     });
 
