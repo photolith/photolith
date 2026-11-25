@@ -568,6 +568,10 @@ msgid "Cumulative (mm)"
 msgstr "Samtals lengd (mm)"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Back-calculated length"
+msgstr "Bakreiknuð lengd"
+
+#: photolith/templates/annotate/annotate.html
 msgid "Press <kbd>Next</kbd> to start"
 msgstr "Ýttu á <kbd>Næsti</kbd> til að byrja"
 

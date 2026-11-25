@@ -16,7 +16,7 @@ const existingPallete = [
   '204, 121, 167'
 ];
 
-function formRefresh (pxMmRatio, lifecycle, event) {
+function formRefresh (pxMmRatio, lifecycle, indData, event) {
   function pxToMM (px) {
     const mm = px * pxMmRatio;
     return Math.round(mm * 100) / 100;
@@ -64,12 +64,17 @@ function formRefresh (pxMmRatio, lifecycle, event) {
     let selectedIdx = event.target.form.selection.value.match(/^axis_poly\[(\d+)\]$/);
     selectedIdx = selectedIdx ? parseInt(selectedIdx[1], 10) : null;
 
+    // Back-calculated lengths, only show the column if there are any
+    const backCalc = lifecycle.backCalc(rawPoints, indData);
+    window.document.querySelector('#axis_poly_table thead .ph-back-calc').classList.toggle('d-none', !backCalc);
+
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
       ? ''
       : `<tr class="${i === selectedIdx ? 'table-info' : ''}" data-idx="${i}">
       <td>${pointLabelSelect(i)}</td>
       <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
       <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
+      ${backCalc ? `<td>${backCalc[i] === null ? '' : Math.round(backCalc[i] * 100) / 100}</td>` : ''}
     </tr>`).join('\n');
 
     event.target.form.age.value = lifecycle.age(rawPoints);
@@ -89,7 +94,7 @@ function formRefresh (pxMmRatio, lifecycle, event) {
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh(pxMmRatio, lifecycle, { target: event.target.form.axis_poly });
+    formRefresh(pxMmRatio, lifecycle, indData, { target: event.target.form.axis_poly });
   }
 }
 
@@ -204,7 +209,7 @@ export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
-    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')), getLifecycle(indData));
+    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')), getLifecycle(indData), indData);
     elForm.addEventListener('change', refresh);
     elForm.addEventListener('reset', (event) => {
       // NB: A form reset event fires before value is updated, so wait until it has
