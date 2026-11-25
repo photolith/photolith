@@ -9,23 +9,35 @@ function pts (labels) {
 
 const freshwater = { tx_lifecycle: { id: 1, en: 'Freshwater', is: 'Staðbundinn' } };
 const anadromous = { tx_lifecycle: { id: 2, en: 'Anadromous', is: 'Sjógenginn' } };
+const scale = { tx_sampleType: { id: 2, en: 'Scale', is: 'Hreistur' } };
+const otolith = { tx_sampleType: { id: 1, en: 'Otolith', is: 'Kvörn' } };
+
+// CHARR_Mývatn_2007_000047_0047.mei: Its measures, length & Fishalysis' calculated F1..F4, F+
+const charrPoints = [[1016, 841], [1032, 625, 'F1'], [1049, 421, 'F2'], [1053, 184, 'F3'], [1055, 58, 'F4'], [1055, 52, 'F+']];
+const charrData = { ...scale, nm_length: 41.0 };
+const charrFishalysis = [11.2358825182546, 21.8552374809919, 34.1515645917162, 40.6887449075467, 41.0];
+
+function roundAll (arr, dp = 6) {
+  return arr.map((x) => x === null ? null : Math.round(x * Math.pow(10, dp)) / Math.pow(10, dp));
+}
 
 test('getLifecycle', function (test) {
   const lcDefault = getLifecycle({});
 
   test.equal(typeof lcDefault.labelOptions, 'function', 'Default has labelOptions');
   test.equal(typeof lcDefault.age, 'function', 'Default has age');
+  test.equal(typeof lcDefault.backCalc, 'function', 'Default has backCalc');
 
   txLifecycle.forEach((tx) => {
     const lc = getLifecycle({ tx_lifecycle: tx });
-    test.notEqual(lc, lcDefault, `${tx.en} has its own lifecycle`);
+    test.notEqual(lc.labelOptions, lcDefault.labelOptions, `${tx.en} has its own lifecycle`);
     test.equal(typeof lc.labelOptions, 'function', `${tx.en} has labelOptions`);
     test.equal(typeof lc.age, 'function', `${tx.en} has age`);
   });
 
-  test.equal(getLifecycle({ tx_lifecycle: { id: 99, en: 'Parp' } }), lcDefault, 'Unknown tx_lifecycle uses default');
-  test.equal(getLifecycle({ tx_lifecycle: {} }), lcDefault, 'tx_lifecycle without id uses default');
-  test.equal(getLifecycle({ tx_species: { id: 1 } }), lcDefault, 'Other metadata uses default');
+  test.equal(getLifecycle({ tx_lifecycle: { id: 99, en: 'Parp' } }).labelOptions, lcDefault.labelOptions, 'Unknown tx_lifecycle uses default');
+  test.equal(getLifecycle({ tx_lifecycle: {} }).labelOptions, lcDefault.labelOptions, 'tx_lifecycle without id uses default');
+  test.equal(getLifecycle({ tx_species: { id: 1 } }).labelOptions, lcDefault.labelOptions, 'Other metadata uses default');
   test.end();
 });
 
@@ -90,12 +102,7 @@ test('lifecycleFreshwater:age', function (test) {
   test.equal(lc.age(pts([null, 'F1', 'F2', 'F3'])), 3, 'Count all points apart from centre, including end');
   test.equal(lc.age(pts([null, 'F1', 'F2', 'F+', 'G1'])), 3, 'F+ is not counted');
 
-  // CHARR_Mývatn_2007_000047_0047.mei, as per test_lengthatage.js
-  test.equal(
-    lc.age([[1016, 841], [1032, 625, 'F1'], [1049, 421, 'F2'], [1053, 184, 'F3'], [1055, 58, 'F4'], [1055, 52, 'F+']]),
-    4,
-    'Mývatn charr is 4'
-  );
+  test.equal(lc.age(charrPoints), 4, 'Mývatn charr is 4');
   test.end();
 });
 
@@ -140,5 +147,49 @@ test('lifecycleAnadromous:age', function (test) {
   test.equal(lc.age(pts([null, 'F1', 'F2', 'F+', 'S1', 'S+', 'G1', 'G2'])), 5, 'F+ & S+ are not counted, end is');
   test.equal(lc.age(pts([null, 'F+', 'S+'])), 0, 'Only plus-growth, no age');
   test.equal(lc.age(pts([null, null, null])), 2, 'Unlabelled points are counted');
+  test.end();
+});
+
+test('getLifecycle:backCalc', function (test) {
+  const bcDisabled = getLifecycle({}).backCalc;
+  test.equal(bcDisabled([[0, 0], [3, 4], [6, 8]], { nm_length: 30 }), null, 'Default gives null');
+
+  test.notEqual(getLifecycle(scale).backCalc, bcDisabled, 'Scales have a back-calculation');
+  test.equal(getLifecycle(otolith).backCalc, bcDisabled, 'Otoliths use default');
+  test.equal(getLifecycle({ tx_sampleType: {} }).backCalc, bcDisabled, 'tx_sampleType without id uses default');
+  test.equal(getLifecycle({ tx_species: { id: 1 } }).backCalc, bcDisabled, 'Other metadata uses default');
+  test.end();
+});
+
+test('backCalc:dahlLea', function (test) {
+  const bc = getLifecycle(scale).backCalc;
+
+  test.deepEqual(
+    bc([[0, 0], [3, 4], [6, 8], [9, 12]], { ...scale, nm_length: 30 }),
+    [0, 10, 20, 30],
+    'Proportional to radius'
+  );
+  test.deepEqual(
+    roundAll(bc([[0, 0], [3, 4], [3, 9]], { ...scale, nm_length: 10 })),
+    roundAll([0, 10 * 5 / Math.sqrt(90), 10]),
+    'Measured straight from the centre'
+  );
+  // NB: Fishalysis measured each radius along the path from point-to-point, rather than straight from the centre,
+  // so its values differ from ours slightly. The more the points zig-zag, the bigger the difference
+  test.deepEqual(
+    roundAll(bc(charrPoints, charrData), 0),
+    roundAll([0, ...charrFishalysis], 0),
+    'Within a fraction of a cm of Fishalysis for a near-straight reading'
+  );
+  test.end();
+});
+
+test('backCalc:missing', function (test) {
+  const bc = getLifecycle(scale).backCalc;
+
+  test.equal(bc([[0, 0], [3, 4], [6, 8]], { ...scale, nm_length: 0 }), null, 'Zero length gives null');
+  test.equal(bc([[0, 0], [3, 4], [6, 8]], { ...scale, nm_length: null }), null, 'No length gives null');
+  test.equal(bc([[0, 0], [3, 4], [6, 8]], scale), null, 'Undefined length gives null');
+  test.deepEqual(bc([[5, 5], [5, 5]], { ...scale, nm_length: 20 }), [null, null], 'No radius gives nulls');
   test.end();
 });
