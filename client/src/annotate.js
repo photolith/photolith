@@ -5,6 +5,7 @@ import { changeEvent, formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
 import { attribEscape, htmlEscape, populateIndividualData } from './meta';
+import { getLifecycle } from './lifecycle';
 
 const existingPallete = [
   '230, 159, 0',
@@ -15,7 +16,7 @@ const existingPallete = [
   '204, 121, 167'
 ];
 
-function formRefresh (pxMmRatio, event) {
+function formRefresh (pxMmRatio, lifecycle, event) {
   function pxToMM (px) {
     const mm = px * pxMmRatio;
     return Math.round(mm * 100) / 100;
@@ -27,10 +28,36 @@ function formRefresh (pxMmRatio, event) {
     const pointData = rawPoints.map((p) => new Point(p[0], p[1]));
     let totalDist = 0;
 
-    // Point's label if it has one (i.e. [x, y, label]), otherwise its number, or E for the end
-    function pointName (i) {
-      if (rawPoints[i].length > 2) return htmlEscape(rawPoints[i][2]);
-      return i === pointData.length - 1 ? 'E' : i;
+    // Replace any labels that aren't possible with the first option, one at a time as each affects the next
+    let labelOptions;
+    let labelsChanged = false;
+    while (true) {
+      labelOptions = lifecycle.labelOptions(rawPoints);
+      const i = rawPoints.findIndex((p, i) => !labelOptions[i].includes(p.length > 2 ? p[2] : null));
+      if (i < 0) break;
+
+      rawPoints[i] = rawPoints[i].slice(0, 2);
+      if (labelOptions[i][0] !== null) rawPoints[i].push(labelOptions[i][0]);
+      labelsChanged = true;
+    }
+    if (labelsChanged) {
+      if (event.formReset) {
+        // Form was just reset, update the default & reset again so we don't trigger onbeforeunload
+        setDefaultValue(event.target, JSON.stringify(rawPoints));
+        event.target.form.reset();
+      } else {
+        // Labels changed, update axis_poly & let the change event update viewer / table
+        event.target.value = JSON.stringify(rawPoints);
+        event.target.dispatchEvent(changeEvent());
+      }
+      return;
+    }
+
+    // Select box of possible labels for point (i)
+    function pointLabelSelect (i) {
+      return `<select class="form-select form-select-sm ph-point-label" data-idx="${i}">${labelOptions[i].filter((l) => l !== null).map((l) =>
+        `<option value="${attribEscape(l)}"${l === rawPoints[i][2] ? ' selected' : ''}>${htmlEscape(l)}</option>`
+      ).join('')}</select>`;
     }
 
     // Find currently selected point
@@ -40,18 +67,29 @@ function formRefresh (pxMmRatio, event) {
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
       ? ''
       : `<tr class="${i === selectedIdx ? 'table-info' : ''}" data-idx="${i}">
-      <td>${pointName(i)}</td>
+      <td>${pointLabelSelect(i)}</td>
       <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
       <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
     </tr>`).join('\n');
 
-    // Count ring markers and use that as age value
-    event.target.form.age.value = pointData.length - 2;
+    event.target.form.age.value = lifecycle.age(rawPoints);
+  }
+
+  if (event.target.classList.contains('ph-point-label')) {
+    // Write new label back into axis_poly, and let the viewer / table update from that
+    const elAxisPoly = event.target.form.axis_poly;
+    const rawPoints = JSON.parse(elAxisPoly.value || '[]');
+    const i = parseInt(event.target.getAttribute('data-idx'), 10);
+
+    rawPoints[i] = rawPoints[i].slice(0, 2);
+    if (event.target.value) rawPoints[i].push(event.target.value);
+    elAxisPoly.value = JSON.stringify(rawPoints);
+    elAxisPoly.dispatchEvent(changeEvent());
   }
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh(pxMmRatio, { target: event.target.form.axis_poly });
+    formRefresh(pxMmRatio, lifecycle, { target: event.target.form.axis_poly });
   }
 }
 
@@ -166,7 +204,7 @@ export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
-    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')));
+    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')), getLifecycle(indData));
     elForm.addEventListener('change', refresh);
     elForm.addEventListener('reset', (event) => {
       // NB: A form reset event fires before value is updated, so wait until it has
