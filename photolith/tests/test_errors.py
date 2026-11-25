@@ -1,9 +1,10 @@
 import json
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import Http404
 from django.test import TestCase
 
-from ..errors import json_errors
+from ..errors import Conflict, PreconditionFailed, json_errors
 
 
 class JsonErrorsTest(TestCase):
@@ -30,12 +31,48 @@ class JsonErrorsTest(TestCase):
             self.call(ValidationError("Bad")),
             (400, dict(error_class="ValidationError", error="Bad")),
         )
-        # Anything else
+        # Permissions / not found
         self.assertEqual(
             self.call(PermissionDenied("No")),
-            (500, dict(error_class="PermissionDenied", error="No")),
+            (403, dict(error_class="PermissionDenied", error="No")),
+        )
+        self.assertEqual(
+            self.call(Http404("Where")),
+            (404, dict(error_class="Http404", error="Where")),
+        )
+        # Anything else
+        self.assertEqual(
+            self.call(PermissionError("No")),
+            (500, dict(error_class="PermissionError", error="No")),
         )
         self.assertEqual(
             self.call(KeyError("x")),
             (500, dict(error_class="KeyError", error="'x'")),
+        )
+
+    def test_fields(self):
+        """Per-field errors are listed, error is all messages"""
+        self.assertEqual(
+            self.call(ValidationError(dict(a=["A is bad"], b=["B is bad", "Very"]))),
+            (
+                400,
+                dict(
+                    error_class="ValidationError",
+                    error="A is bad B is bad Very",
+                    fields=dict(a=["A is bad"], b=["B is bad", "Very"]),
+                ),
+            ),
+        )
+
+    def test_json_data(self):
+        self.assertEqual(
+            self.call(Conflict("2 things", things=dict(x=[1, 2]))),
+            (
+                409,
+                dict(error_class="Conflict", error="2 things", things=dict(x=[1, 2])),
+            ),
+        )
+        self.assertEqual(
+            self.call(PreconditionFailed("Changed")),
+            (412, dict(error_class="PreconditionFailed", error="Changed")),
         )

@@ -11,10 +11,14 @@ from django.views.generic.edit import UpdateView
 
 
 from ..errors import json_errors
-from ..models import Individual, Annotation, Project, UserSpeciesAuthority
+from ..models import Individual, Annotation, Project, UserProfile
 
 from .forms import AnnotationForm
-from ..perm_utils import check_annotate_access, check_individual_edit_access
+from ..perm_utils import (
+    check_annotate_access,
+    check_annotation_edit_access,
+    check_individual_edit_access,
+)
 
 
 class AnnotateView(LoginRequiredMixin, UpdateView):
@@ -39,19 +43,14 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         # Set / check created_by
         if self.object:
-            if not (
-                self.request.user.is_superuser
-                or self.object.created_by == self.request.user
-            ):
-                raise PermissionDenied("You do not own annotation %s" % self.object)
             # NB: The form has already updated self.object, so check against what's in the DB
             orig = Annotation.objects.select_related("project").get(pk=self.object.pk)
+            # Must own it, cannot edit, or move annotations out of, a closed project
+            check_annotation_edit_access(orig, self.request.user)
             if form.instance.individual_id != orig.individual_id:
                 raise BadRequest(
                     "Cannot move annotation %s to another individual" % orig
                 )
-            # Cannot edit, or move annotations out of, a closed project
-            check_annotate_access(orig.project, self.request.user, rw=True)
         else:
             form.instance.created_by = self.request.user
 
@@ -97,21 +96,13 @@ class AnnotateView(LoginRequiredMixin, UpdateView):
     @cached_property
     def authority_level(self):
         """The current user's authority level for this individual"""
-        if hasattr(self.request.user, "userprofile"):
-            return self.request.user.userprofile.authority_level(self.ind_data)
-        return UserSpeciesAuthority.AuthorityLevel.INEXPERIENCED
+        return UserProfile.for_user(self.request.user).authority_level(self.ind_data)
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
         if self.individual_id:
-            # Only allow authority choices up to the user's level (or the existing value when editing)
-            form.fields["authority"].choices = [
-                (v, n)
-                for v, n in form.fields["authority"].choices
-                if v < self.authority_level + 10
-                or (self.object and v == self.object.authority)
-            ]
-        return form
+            kwargs["authority_level"] = self.authority_level
+        return kwargs
 
     @cached_property
     def ind_data(self):
@@ -269,11 +260,7 @@ class DeleteView(LoginRequiredMixin, View):
     @json_errors
     def post(self, *args, **kwargs):
         obj = get_object_or_404(Annotation, pk=int(self.kwargs["annotation_id"]))
-        if not (self.request.user.is_superuser or obj.created_by == self.request.user):
-            raise PermissionDenied("You do not own annotation %s" % obj)
-        # Cannot remove annotations from a closed project
-        check_annotate_access(obj.project, self.request.user, rw=True)
-
+        check_annotation_edit_access(obj, self.request.user)
         old_annotation_id = obj.id
         obj.delete()
 

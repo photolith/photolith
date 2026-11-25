@@ -1,6 +1,12 @@
 from django.core.exceptions import PermissionDenied
 
 
+def check_perms(user, *perms):
+    """Raise PermissionDenied unless user has all perms"""
+    if not user.has_perms(perms):
+        raise PermissionDenied("Missing permission %s" % ", ".join(perms))
+
+
 def check_annotate_access(project, user, rw=False):
     if project:
         # NB: Team is set to NULL if deleted
@@ -24,6 +30,14 @@ def check_annotate_access(project, user, rw=False):
             raise PermissionDenied(
                 "Contact an administrator to be added to the general annotation group"
             )
+
+
+def check_annotation_edit_access(annotation, user):
+    """Can user change / delete annotation, an existing annotation as stored"""
+    if not (user.is_superuser or annotation.created_by == user):
+        raise PermissionDenied("You do not own annotation %s" % annotation)
+    # Cannot edit, or remove annotations from, a closed project
+    check_annotate_access(annotation.project, user, rw=True)
 
 
 def check_individual_edit_access(ind, user):

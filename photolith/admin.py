@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 
 from .models import *
 
+from .token_auth.admin import ApiTokenAdmin  # noqa: F401
+
 
 def image_preview_html(href, bounding_box):
     return mark_safe("""<script>

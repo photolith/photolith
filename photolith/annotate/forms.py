@@ -6,8 +6,16 @@ from ..models import Annotation
 
 
 class AnnotationForm(ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, authority_level=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if authority_level is not None:
+            # Only allow authority choices up to the user's level (or the existing value when editing)
+            self.fields["authority"].choices = [
+                (v, n)
+                for v, n in self.fields["authority"].choices
+                if v < authority_level + 10
+                or (self.instance.pk and v == self.instance.authority)
+            ]
         self.fields["comment"].widget.attrs["rows"] = 2
         self.fields["comment"].required = False
         self.fields["authority"].widget.attrs["class"] = "pref-session"

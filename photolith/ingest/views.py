@@ -1,24 +1,19 @@
-import hashlib
 import io
 import json
-import os.path
 from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.cache import cache
-from django.forms.models import model_to_dict
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.utils.translation import ngettext
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
-from django.db.models import Count
 
+from .individuals import sync_individuals
 from .photo_dir import get_next_photo, list_photo_dirs, verify_image
 from ..errors import json_errors
-from ..models import Image, Individual, Taxonomy
-from ..perm_utils import check_individual_edit_access
+from ..models import Image, Taxonomy
 
 
 class IndexView(PermissionRequiredMixin, TemplateView):
@@ -113,94 +108,68 @@ class NextPhotoView(PermissionRequiredMixin, View):
 
 
 class UploadView(PermissionRequiredMixin, View):
-    permission_required = ("photolith.add_individual",)
+    # NB: Upload can create, update & delete individuals
+    permission_required = (
+        "photolith.add_individual",
+        "photolith.change_individual",
+        "photolith.delete_individual",
+    )
 
     @json_errors
     def post(self, *args, **kwargs):
         image = Image.objects.get(pk=self.request.POST["image_id"])
-        image.scale_line = json.loads(self.request.POST["scale_line"] or "null")
-        image.scale_mm = (
-            int(self.request.POST["scale_mm"])
-            if self.request.POST["scale_mm"]
-            else None
+        image.set_scale(
+            json.loads(self.request.POST["scale_line"] or "null"),
+            (
+                int(self.request.POST["scale_mm"])
+                if self.request.POST["scale_mm"]
+                else None
+            ),
         )
-        image.save()
 
-        # Prefetch all existing individuals for images
-        existing_inds = {
-            i.id: i
-            for i in (
-                Individual.objects.filter(image=image).annotate(
-                    num_annotations=Count("annotation")
-                )
-            )
-        }
-
-        out = {}
-        created_inds = {}
-        updated_inds = {}
-        deleted_inds = {}
-        deleted_anns = {}
+        changes = []
         for post_key in self.request.POST.keys():
             if not post_key.startswith("data:"):
                 continue
-            ind_data = json.loads(self.request.POST[post_key])
             ind_client_idx = post_key.replace("data:", "")
+            ind_data = json.loads(self.request.POST[post_key])
             ind_bounding_box = json.loads(
                 self.request.POST[post_key.replace("data:", "bounding_box:", 1)]
                 or "null"
             )
+            changes.append(
+                (
+                    ind_client_idx,
+                    # No bounding box --> this individual shouldn't exist
+                    ind_bounding_box or None,
+                    ind_data,
+                )
+            )
+        # NB: Only superusers can change annotated individuals, see check_individual_edit_access()
+        result = sync_individuals(
+            image, self.request.user, changes, drop_annotations=True
+        )
+        deleted_inds = result["deleted"]
+        deleted_anns = result["deleted_annotations"]
 
-            # If an ID is given, fetch any existant individual
-            ind = existing_inds.get(ind_data["id"]) if "id" in ind_data else None
+        out = {}
+        created_inds = {}
+        updated_inds = {}
+        for ind_client_idx, ind_bounding_box, ind_data in changes:
+            if ind_client_idx in deleted_inds:
+                del ind_data["id"]
+                out["data:%s" % ind_client_idx] = ind_data
+            ind = result["created"].get(ind_client_idx) or result["updated"].get(
+                ind_client_idx
+            )
             if ind:
-                check_individual_edit_access(ind, self.request.user)
-
-            # No bounding box --> this individual shouldn't exist
-            if not ind_bounding_box:
-                if ind:
-                    deleted_inds[ind_client_idx] = ind.id
-                    # NB: Will cascade-delete
-                    # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
-                    if ind.num_annotations > 0:
-                        deleted_anns[ind_client_idx] = [
-                            a.id for a in ind.annotation_set.all()
-                        ]
-                    ind.delete()
-                    del ind_data["id"]
-                    out["data:%s" % ind_client_idx] = ind_data
-                continue
-
-            # Check if we should be invalidating existing annotations
-            if (
-                ind
-                and ind.num_annotations > 0
-                and ind.bounding_box
-                and ind.bounding_box != ind_bounding_box
-            ):
-                # NB: We have to be a superuser at this point, thanks to check_individual_edit_access()
-                deleted_anns[ind_client_idx] = [a.id for a in ind.annotation_set.all()]
-                ind.annotation_set.all().delete()
-
-            # If no individual was found, create one at this point
-            if not ind:
-                ind = Individual(created_by=self.request.user)
-
-            ind.image = image
-            ind.bounding_box = ind_bounding_box
-            ind.save()
-            ind.data = ind_data
-            ind.save()
-            out["data:%s" % ind_client_idx] = ind.full_data()
-            del out["data:%s" % ind_client_idx]["__str__"]
-            if ind_data.get("id"):
-                updated_inds[ind_client_idx] = ind.id
-            else:
-                created_inds[ind_client_idx] = ind.id
-
-        if len(created_inds) > 0 or len(updated_inds) > 0:
-            # Clear meta_fields cache created in search/views
-            cache.delete("photolith_meta_fields")
+                out["data:%s" % ind_client_idx] = ind.full_data()
+                del out["data:%s" % ind_client_idx]["__str__"]
+                # NB: An individual restored with it's old (deleted) ID counts as updated
+                if ind_data.get("id"):
+                    updated_inds[ind_client_idx] = ind.id
+                else:
+                    created_inds[ind_client_idx] = ind.id
 
         alert = ""
         alert_status = "success"
@@ -250,39 +219,12 @@ class UploadImageView(PermissionRequiredMixin, View):
 
     @json_errors
     def post(self, *args, **kwargs):
-        mimetype = self.request.content_type
-        if not mimetype.startswith("image/"):  # e.g. image/jpeg, image/x-nikon-nef
-            raise ValueError("Unknown content type %s" % mimetype)
-
-        # Read file into memory
-        # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
-        file = io.BytesIO(self.request.read())
-        # NB: Client URI-encodes, as headers can only contain ISO-8859-1
-        orig_filename = unquote(self.request.META.get("HTTP_X_PHOTOLITH_FILENAME", ""))
-        # NB: We could do verify_image(file) at this point, but it doesn't accept .nef
-
-        # Generate content-addressed filename to store as
-        digest = hashlib.file_digest(file, hashlib.sha256)
-        _, file_ext = os.path.splitext(orig_filename)
-        digest_filename = "%s%s" % (digest.hexdigest(), file_ext or "")
-        digest_path = Image.content.field.generate_filename(None, digest_filename)
-
-        # If we already have an image with that sha1 sum, otherwise create & save to storage
-        image, created = Image.objects.get_or_create(
-            content=digest_path,
-            defaults=dict(
-                created_by=self.request.user,
-                orig_filename=orig_filename,
-                mimetype=mimetype,
-            ),
+        image, _created = Image.objects.store(
+            # NB: S3 storage backend requires something with is_close, self.request doesn't fit the bill
+            io.BytesIO(self.request.read()),
+            # NB: Client URI-encodes, as headers can only contain ISO-8859-1
+            unquote(self.request.META.get("HTTP_X_PHOTOLITH_FILENAME", "")),
+            self.request.content_type,
+            self.request.user,
         )
-
-        # If the image file doesn't exist, save it afresh
-        if not image.content.storage.exists(image.content.name):
-            image.content.save(digest_filename, file)
-
-        image.save()
-
-        out = model_to_dict(image)
-        out["content"] = out["content"].name
-        return JsonResponse(out)
+        return JsonResponse(image.full_data())

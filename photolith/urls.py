@@ -27,6 +27,7 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("", include("photolith.home.urls", namespace="home")),
     path("annotate/", include("photolith.annotate.urls", namespace="annotate")),
+    path("api/v1/", include("photolith.api.urls", namespace="api")),
     path("ingest/", include("photolith.ingest.urls", namespace="ingest")),
     path("project/", include("photolith.project.urls", namespace="project")),
     path("search/", include("photolith.search.urls", namespace="search")),

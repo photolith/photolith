@@ -189,6 +189,7 @@ msgid "created by"
 msgstr "notandi"
 
 #: photolith/models.py photolith/models.py photolith/models.py
+#: photolith/token_auth/models.py
 msgid "Created at"
 msgstr "Dags."
 
@@ -247,18 +248,6 @@ msgstr "með mynd"
 #: photolith/models.py
 msgid "with original otoliths or slides"
 msgstr "með upprunalegu kvarnirnar og/eða glerin"
-
-#: photolith/models.py
-msgid "3"
-msgstr "3"
-
-#: photolith/models.py
-msgid "2"
-msgstr "2"
-
-#: photolith/models.py
-msgid "1"
-msgstr "1"
 
 #: photolith/models.py
 msgid "part of project"
@@ -950,3 +939,28 @@ msgstr "Hala niður upprunalega mynd"
 #: photolith/templates/snippet/viewer.html
 msgid "Reset"
 msgstr "Endurstilla"
+
+#: photolith/token_auth/admin.py
+#, python-format
+msgid "API token key: %(key)s (copy this now, it will not be shown again)"
+msgstr "API-aðgangslykill: %(key)s (afritaðu hann núna, hann verður ekki birtur aftur)"
+
+#: photolith/token_auth/models.py
+msgid "Name"
+msgstr "Heiti"
+
+#: photolith/token_auth/models.py
+msgid "What the token is used for, e.g. the name of an import script"
+msgstr "Til hvers lykillinn er notaður, t.d. heiti innflutningsskriftu"
+
+#: photolith/token_auth/models.py
+msgid "Last used at"
+msgstr "Síðast notaður"
+
+#: photolith/token_auth/models.py
+msgid "API token"
+msgstr "API-aðgangslykill"
+
+#: photolith/token_auth/models.py
+msgid "API tokens"
+msgstr "API-aðgangslyklar"

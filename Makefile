@@ -42,8 +42,8 @@ coverage: compile lib/.requirements-dev.txt node_modules/.package-dev.json
 	echo "Visit https://.../static/htmlcov/ & https://.../static/clientcov/"
 
 lint: lib/.requirements-dev.txt node_modules/.package-dev.json
-	./bin/autoflake -r  --imports django,requests photolith/ | patch -p1
-	./bin/black $(PROJECT)
+	./bin/autoflake -r  --imports django,requests photolith/ photolith_client/ | patch -p1
+	./bin/black $(PROJECT) photolith_client
 	npm run lint
 
 node_modules/.package.json: package.json

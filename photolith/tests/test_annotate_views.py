@@ -919,7 +919,7 @@ class AnnotateDeleteViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             out,
             (
-                500,
+                403,
                 dict(
                     error_class="PermissionDenied",
                     error="You do not own annotation %s" % str(ann),
