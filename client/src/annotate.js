@@ -158,7 +158,12 @@ export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
-    elForm.addEventListener('change', formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm'))));
+    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')));
+    elForm.addEventListener('change', refresh);
+    elForm.addEventListener('reset', (event) => {
+      // NB: A form reset event fires before value is updated, so wait until it has
+      window.setTimeout(() => refresh({ formReset: true, target: elForm.elements.axis_poly }), 0);
+    });
 
     formUnloadWarning(elForm);
 
