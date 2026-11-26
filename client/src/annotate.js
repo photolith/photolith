@@ -4,7 +4,7 @@ import { displayAlert } from './alert';
 import { changeEvent, formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
-import { attribEscape, htmlEscape, populateIndividualData } from './meta';
+import { attribEscape, htmlEscape, populateIndividualData, renderAgeStages, updateAgeStages } from './meta';
 import { getLifecycle } from './lifecycle';
 
 const existingPallete = [
@@ -78,6 +78,10 @@ function formRefresh (pxMmRatio, lifecycle, indData, event) {
     </tr>`).join('\n');
 
     event.target.form.age.value = lifecycle.age(rawPoints);
+
+    if (lifecycle.ageStages) {
+      event.target.form.querySelector('.ph-age-stages output').innerHTML = renderAgeStages(lifecycle.ageStages(rawPoints));
+    }
   }
 
   if (event.target.classList.contains('ph-point-label')) {
@@ -132,7 +136,7 @@ function allAnnotationsClick (elForm, event) {
       // NB: Wait until after the change event has auto-updated the age
       window.setTimeout((newVal) => {
         setDefaultValue(elForm.elements.age, newVal);
-      }, 100, elSelected.querySelector('.val-age').textContent);
+      }, 100, elSelected.querySelector('.val-age').getAttribute('data-value'));
 
       setDefaultValue(elForm.elements.rating, elSelected.querySelector('.val-rating').getAttribute('data-value'));
       setDefaultValue(elForm.elements.authority, elSelected.querySelector('.val-authority').getAttribute('data-value'));
@@ -215,6 +219,12 @@ export function init (parent) {
       // NB: A form reset event fires before value is updated, so wait until it has
       window.setTimeout(() => refresh({ formReset: true, target: elForm.elements.axis_poly }), 0);
     });
+
+    // Lifecycles with stages calculate the age from labels, so show the stages instead of an editable age
+    const hasAgeStages = !!getLifecycle(indData).ageStages;
+    elForm.querySelector('.ph-age-input').classList.toggle('d-none', hasAgeStages);
+    elForm.querySelector('.ph-age-stages').classList.toggle('d-none', !hasAgeStages);
+    updateAgeStages(document.querySelector('.ph-all-annotations'), getLifecycle(indData));
 
     formUnloadWarning(elForm);
 

@@ -26,12 +26,14 @@ test('getLifecycle', function (test) {
   test.equal(typeof lcDefault.labelOptions, 'function', 'Default has labelOptions');
   test.equal(typeof lcDefault.age, 'function', 'Default has age');
   test.equal(typeof lcDefault.backCalc, 'function', 'Default has backCalc');
+  test.equal(lcDefault.ageStages, undefined, 'Default has no ageStages');
 
   txLifecycle.forEach((tx) => {
     const lc = getLifecycle({ tx_lifecycle: tx });
     test.notEqual(lc.labelOptions, lcDefault.labelOptions, `${tx.en} has its own lifecycle`);
     test.equal(typeof lc.labelOptions, 'function', `${tx.en} has labelOptions`);
     test.equal(typeof lc.age, 'function', `${tx.en} has age`);
+    test.equal(typeof lc.ageStages, 'function', `${tx.en} has ageStages`);
   });
 
   test.equal(getLifecycle({ tx_lifecycle: { id: 99, en: 'Parp' } }).labelOptions, lcDefault.labelOptions, 'Unknown tx_lifecycle uses default');
@@ -150,6 +152,28 @@ test('lifecycleAnadromous:age', function (test) {
   test.equal(lc.age(pts([null, 'F1', 'F+', 'S1', 'S+', null])), 2, 'Unlabelled point after the edge is not counted');
 
   test.equal(lc.age(charrPoints), 4, 'Mývatn charr is 4');
+  test.end();
+});
+
+test('lifecycleAnadromous:ageStages', function (test) {
+  const lc = getLifecycle(anadromous);
+
+  test.deepEqual(lc.ageStages([]), { F: 0, G: 0 }, 'No points, freshwater with no years');
+  test.deepEqual(lc.ageStages(pts([null, 'F1', 'F2', 'F3', 'F+'])), { F: 3, G: 0 }, 'No S labels, no sea stage');
+  test.deepEqual(lc.ageStages(pts([null, 'F1', 'F2', 'G1', 'F+'])), { F: 2, G: 1 }, 'Freshwater spawning marks');
+  test.deepEqual(lc.ageStages(pts([null, 'F1', 'F2', 'F+', 'S1', 'G1', 'G2', 'S+'])), { F: 2, S: 1, G: 2 }, 'F+ & S+ are not counted');
+  test.deepEqual(lc.ageStages(pts([null, 'F1', 'F+', 'S+'])), { F: 1, S: 0, G: 0 }, 'S+ alone is a sea stage with no years');
+  test.deepEqual(lc.ageStages(pts([null, 'F1', 'F+', 'S1', 'S+', null])), { F: 1, S: 1, G: 0 }, 'Unlabelled points are not counted');
+  test.deepEqual(lc.ageStages(charrPoints), { F: 4, G: 0 }, 'Mývatn charr is 4 freshwater years');
+
+  [
+    [null, 'F1', 'F2', 'F+', 'S1', 'G1', 'G2', 'S+'],
+    [null, 'F1', 'F2', 'G1', 'F+'],
+    [null, 'F+', 'S+']
+  ].forEach((labels) => {
+    const stages = lc.ageStages(pts(labels));
+    test.equal(Object.values(stages).reduce((a, b) => a + b, 0), lc.age(pts(labels)), `Stages of ${labels.join(' ')} add up to age`);
+  });
   test.end();
 });
 

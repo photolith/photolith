@@ -3,8 +3,16 @@ import test from 'tape';
 import { setupDom } from './util_dom.js';
 
 import { changeEvent } from '../src/events.js';
-import { renderMetaCell, populateIndividualData, updateDataObject, populateSearchFilters } from '../src/meta.js';
+import { renderAgeStages, renderMetaCell, populateIndividualData, updateDataObject, populateSearchFilters } from '../src/meta.js';
 import MetadataApi from '../src/metadata_api/base.js';
+
+test('renderAgeStages', function (test) {
+  setupDom(test, '<html lang="en-gb"></html>');
+
+  test.equal(renderAgeStages({ F: 3, S: 1, G: 0 }), '<code title="F : S : G">3 : 1 : 0</code>', 'Values joined, stages in title');
+  test.equal(renderAgeStages({ F: 3, G: 1 }), '<code title="F : G">3 : 1</code>', 'No sea stage');
+  test.end();
+});
 
 test('renderMetaCell:undefined', function (test) {
   setupDom(test, '<html lang="ge"></html>');

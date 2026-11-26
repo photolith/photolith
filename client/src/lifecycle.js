@@ -51,6 +51,15 @@ function ageAnadromous (points) {
   return points.filter((p) => p[2] && p[2] !== 'F+' && p[2] !== 'S+').length;
 }
 
+// For a set of points, count years in each stage as { F, S, G }, or { F, G } if the fish never went to sea (no S labels)
+function ageStagesAnadromous (points) {
+  const labels = points.map((p) => p[2]).filter((l) => l);
+  const count = (stage) => labels.filter((l) => l[0] === stage && l !== stage + '+').length;
+  return labels.some((l) => l[0] === 'S')
+    ? { F: count('F'), S: count('S'), G: count('G') }
+    : { F: count('F'), G: count('G') };
+}
+
 // For a set of axis_poly points, number each point, or E for the end
 function labelOptionsDefault (points) {
   return points.map((p, i) => {
@@ -118,13 +127,14 @@ const lifecycleDefault = { labelOptions: labelOptionsDefault, age: ageDefault };
 
 // tx_lifecycle id -> lifecycle, anything not here uses lifecycleDefault
 const lifecycles = {
-  1: { labelOptions: labelOptionsAnadromous, age: ageAnadromous }
+  1: { labelOptions: labelOptionsAnadromous, age: ageAnadromous, ageStages: ageStagesAnadromous }
 };
 
 /**
  * Lifecycle for an individual's (indData), an object containing:
  * - labelOptions(points): Turn a list of axis_poly points into a list of possible labels for each point
  * - age(points): Calculate age from a list of axis_poly points, i.e. [x, y] or [x, y, label]
+ * - ageStages(points): (optional) Break the age down into years per stage, e.g. { F: 3, S: 1, G: 0 }
  * - backCalc(points, indData): Turn a list of axis_poly points into a length for each point, see above, or null if disabled
  */
 export function getLifecycle (indData) {
