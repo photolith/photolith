@@ -7,8 +7,7 @@ function pts (labels) {
   return labels.map((l, i) => l === null ? [i, i] : [i, i, l]);
 }
 
-const freshwater = { tx_lifecycle: { id: 1, en: 'Freshwater', is: 'Staðbundinn' } };
-const anadromous = { tx_lifecycle: { id: 2, en: 'Anadromous', is: 'Sjógenginn' } };
+const anadromous = { tx_lifecycle: { id: 1, en: 'Anadromous', is: 'Sjógenginn' } };
 const scale = { tx_sampleType: { id: 2, en: 'Scale', is: 'Hreistur' } };
 const otolith = { tx_sampleType: { id: 1, en: 'Otolith', is: 'Kvörn' } };
 
@@ -71,41 +70,6 @@ test('lifecycleDefault:age', function (test) {
   test.end();
 });
 
-test('lifecycleFreshwater:labelOptions', function (test) {
-  const lc = getLifecycle(freshwater);
-
-  test.deepEqual(lc.labelOptions([]), [], 'No points, no options');
-  test.deepEqual(lc.labelOptions(pts([null])), [[null]], 'Centre never has a label');
-  test.deepEqual(
-    lc.labelOptions(pts([null, null, null, null])),
-    [[null], ['F1', 'F+'], ['F2', 'F+'], ['F3', 'F+']],
-    'Unlabelled points continue counting freshwater years'
-  );
-  test.deepEqual(
-    lc.labelOptions(pts([null, 'F1', 'F2', 'F+', null, null])),
-    [[null], ['F1', 'F+'], ['F2', 'F+'], ['F+', 'F3'], ['G1'], ['G2']],
-    'F+ moves on to growth (G) years, keeping F+ as first option'
-  );
-  test.deepEqual(
-    lc.labelOptions(pts([null, 'F+', 'S+', null])),
-    [[null], ['F+', 'F1'], ['G1'], ['G2']],
-    'No sea (S) years'
-  );
-  test.end();
-});
-
-test('lifecycleFreshwater:age', function (test) {
-  const lc = getLifecycle(freshwater);
-
-  test.equal(lc.age([]), 0, 'No points, no age');
-  test.equal(lc.age(pts([null])), 0, 'Centre is not counted');
-  test.equal(lc.age(pts([null, 'F1', 'F2', 'F3'])), 3, 'Count all points apart from centre, including end');
-  test.equal(lc.age(pts([null, 'F1', 'F2', 'F+', 'G1'])), 3, 'F+ is not counted');
-
-  test.equal(lc.age(charrPoints), 4, 'Mývatn charr is 4');
-  test.end();
-});
-
 test('lifecycleAnadromous:labelOptions', function (test) {
   const lc = getLifecycle(anadromous);
 
@@ -113,43 +77,53 @@ test('lifecycleAnadromous:labelOptions', function (test) {
   test.deepEqual(lc.labelOptions(pts([null])), [[null]], 'Centre never has a label');
   test.deepEqual(
     lc.labelOptions(pts([null, null, null, null])),
-    [[null], ['F1', 'F+'], ['F2', 'F+'], ['F3', 'F+']],
-    'Unlabelled points continue counting freshwater years'
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+']],
+    'Unlabelled points continue counting freshwater years, spawning marks (G) can follow at least one'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2'], ['S1', 'S+'], ['S2', 'G1', 'S+']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+']],
     'F+ moves on to sea (S) years'
   );
   test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F4', 'F+'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+', 'F5', 'G1']],
+    'No sea (S) years, the reading ends at F+ (CHARR_Mývatn_2007_000047_0047.mei)'
+  );
+  test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'G1', null, 'F+', null])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['G1', 'F3', 'F+'], ['G2', 'F+'], ['F+', 'G3'], ['S1', 'S+']],
+    'Freshwater spawning marks return to F+, then sea (S) years'
+  );
+  test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['S3', 'G1', 'S+']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['S3', 'G1', 'S+']],
     'Spawning marks (G) can follow at least one sea year'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', 'G1', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['G3', 'S+']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['G3', 'S+']],
     'G1 moves on to spawning marks, keeping G1 as first option'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', 'S+', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2'], ['S1', 'S+'], ['S+', 'S2', 'G1'], [null], [null]],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S+', 'S2', 'G1'], [null], [null]],
     'S+ is the edge, nothing comes after it'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F4', 'F+', 'S1', 'G1', 'G2', 'S+'])),
-    [[null], ['F1', 'F+'], ['F2', 'F+'], ['F3', 'F+'], ['F4', 'F+'], ['F+', 'F5'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+', 'F5', 'G1'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
     'SALMON_Kjarrá_2011_000217_0001.mei is valid'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F+', 'S1', 'S2', 'G1', 'G2', 'S+'])),
-    [[null], ['F1', 'F+'], ['F2', 'F+'], ['F3', 'F+'], ['F+', 'F4'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['G1', 'S3', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F+', 'F4', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['G1', 'S3', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
     'SEATROUT_Ölfusá_2012_000005_0001.mei is valid'
   );
   test.deepEqual(
-    lc.labelOptions(pts([null, 'F+', 'G1', 'S+'])),
-    [[null], ['F+', 'F1'], ['S1', 'S+'], ['S+', 'S2', 'G1']],
-    'No spawning marks before a sea year'
+    lc.labelOptions(pts([null, 'G1', 'F+', 'G1', 'S+'])),
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S+', 'S2', 'G1']],
+    'No spawning marks before a freshwater or sea year'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F+', 'S+'])),
@@ -158,7 +132,7 @@ test('lifecycleAnadromous:labelOptions', function (test) {
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'S+', 'F+'])),
-    [[null], ['F1', 'F+'], ['F+', 'F2']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1']],
     'S+ in freshwater stage does not move on'
   );
   test.end();
@@ -170,9 +144,12 @@ test('lifecycleAnadromous:age', function (test) {
   test.equal(lc.age([]), 0, 'No points, no age');
   test.equal(lc.age(pts([null])), 0, 'Centre is not counted');
   test.equal(lc.age(pts([null, 'F1', 'F2', 'F+', 'S1', 'G1', 'G2', 'S+'])), 5, 'F+ & S+ are not counted, spawning marks (G) are');
+  test.equal(lc.age(pts([null, 'F1', 'F2', 'G1', 'F+'])), 3, 'Freshwater spawning marks (G) are counted');
   test.equal(lc.age(pts([null, 'F+', 'S+'])), 0, 'Only plus-growth, no age');
   test.equal(lc.age(pts([null, null, null])), 0, 'Unlabelled points are not counted');
   test.equal(lc.age(pts([null, 'F1', 'F+', 'S1', 'S+', null])), 2, 'Unlabelled point after the edge is not counted');
+
+  test.equal(lc.age(charrPoints), 4, 'Mývatn charr is 4');
   test.end();
 });
 

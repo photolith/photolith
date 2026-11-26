@@ -1,84 +1,54 @@
 // For a set of axis_poly points, generate all possible values for the next.
-// Readings go F1..Fn, F+, S1..Sn, then optionally spawning marks (gotmerki) G1..Gn, ending with S+ at the edge,
-// e.g. "F1 F2 F+ S1 G1 S+". This matches Fishalysis .mei readings of both salmon & sea trout
+// Readings go F1..Fn, F+, then optionally S1..Sn, S+ for fish that went to sea. Either the freshwater (F) or sea (S)
+// years can be followed by spawning marks (gotmerki) G1..Gn before their plus-growth, e.g. "F1 F2 F+ S1 G1 S+".
+// The reading of a fish that never went to sea ends at F+, e.g. "F1 F2 F3 F+".
+// This matches Fishalysis .mei readings of salmon, trout & charr, both sea-run and freshwater
 function labelOptionsAnadromous (points) {
+  let baseStage = 'F'; // The stage we're in, or spawning marks are returning to
   let curStage = 'F';
   let curCount = 1;
   return points.map((p, i) => {
     // Centre never has a label
     if (i === 0) return [null];
 
-    const nextStage = curStage + curCount;
+    // S+ is the edge of the scale, nothing comes after it
+    if (curStage === 'E') return [null];
 
-    if (curStage === 'F') {
-      if (p[2] === 'F+') {
-        curStage = 'S';
-        curCount = 1;
-        return ['F+', nextStage];
-      }
-      curCount += 1;
-      return [nextStage, 'F+'];
+    const nextStage = curStage + curCount;
+    const plusStage = baseStage + '+';
+
+    // Plus-growth moves on to sea years, or ends the reading
+    if (p[2] === plusStage) {
+      // Spawning marks need at least one year of their stage before them
+      const options = [plusStage, nextStage, ...(curStage === baseStage && curCount > 1 ? ['G1'] : [])];
+      baseStage = curStage = baseStage === 'F' ? 'S' : 'E';
+      curCount = 1;
+      return options;
     }
 
-    if (curStage === 'S') {
-      // Spawning marks need at least one sea year before them
-      const spawnOptions = curCount > 1 ? ['G1'] : [];
-      if (p[2] === 'S+') {
-        curStage = 'E';
-        return ['S+', nextStage, ...spawnOptions];
+    if (curStage === baseStage) {
+      if (curCount === 1) {
+        curCount += 1;
+        return [nextStage, plusStage];
       }
-      if (p[2] === 'G1' && curCount > 1) {
+      if (p[2] === 'G1') {
         curStage = 'G';
         curCount = 2;
-        return ['G1', nextStage, 'S+'];
+        return ['G1', nextStage, plusStage];
       }
       curCount += 1;
-      return [nextStage, ...spawnOptions, 'S+'];
+      return [nextStage, 'G1', plusStage];
     }
 
-    if (curStage === 'G') {
-      if (p[2] === 'S+') {
-        curStage = 'E';
-        return ['S+', nextStage];
-      }
-      curCount += 1;
-      return [nextStage, 'S+'];
-    }
-
-    // curStage === 'E', S+ is the edge of the scale, nothing comes after it
-    return [null];
+    // curStage === 'G'
+    curCount += 1;
+    return [nextStage, plusStage];
   });
 }
 
 // For a set of points, count every labelled point apart from plus-growth (F+ / S+) as the age
 function ageAnadromous (points) {
   return points.filter((p) => p[2] && p[2] !== 'F+' && p[2] !== 'S+').length;
-}
-
-// For a set of axis_poly points, generate all possible values for the next, as labelOptionsAnadromous without sea (S) years
-function labelOptionsFreshwater (points) {
-  let curStage = 'F';
-  let curCount = 1;
-  return points.map((p, i) => {
-    // Centre never has a label
-    if (i === 0) return [null];
-
-    const nextStage = curStage + curCount;
-
-    if (curStage === 'F') {
-      if (p[2] === 'F+') {
-        curStage = 'G';
-        curCount = 1;
-        return ['F+', nextStage];
-      }
-      curCount += 1;
-      return [nextStage, 'F+'];
-    }
-
-    // curStage === 'G'
-    curCount += 1;
-    return [nextStage];
-  });
 }
 
 // For a set of axis_poly points, number each point, or E for the end
@@ -141,16 +111,14 @@ const backCalcs = {
 
 // Photolith tx_lifecycle. NB: Ids are our own, other users (e.g. photolith_import's mei.py) should copy these
 export const txLifecycle = [
-  { id: 1, en: 'Freshwater', is: 'Staðbundinn' },
-  { id: 2, en: 'Anadromous', is: 'Sjógenginn' }
+  { id: 1, en: 'Anadromous', is: 'Sjógenginn' }
 ];
 
 const lifecycleDefault = { labelOptions: labelOptionsDefault, age: ageDefault };
 
 // tx_lifecycle id -> lifecycle, anything not here uses lifecycleDefault
 const lifecycles = {
-  1: { labelOptions: labelOptionsFreshwater, age: ageAnadromous },
-  2: { labelOptions: labelOptionsAnadromous, age: ageAnadromous }
+  1: { labelOptions: labelOptionsAnadromous, age: ageAnadromous }
 };
 
 /**
