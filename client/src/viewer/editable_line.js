@@ -11,11 +11,11 @@ export function labelledPoint (x, y, label) {
   return out;
 }
 
-/** Circle with phLabel (if any) drawn inside it, as part of the circle */
+/** Circle with phLabel (if any, and phShowLabel) drawn inside it, as part of the circle */
 class LabelledCircle extends Circle {
   _render (ctx) {
     super._render(ctx);
-    if (this.phLabel === undefined) return;
+    if (!this.phShowLabel || this.phLabel === undefined) return;
 
     ctx.save();
     ctx.font = `${this.phLabelFontSize}px sans-serif`;
@@ -158,7 +158,9 @@ export default function (props = {}, circleProps = {}, opts = {}) {
     this.phNodes.forEach((obj, i) => {
       const endCap = i === 0 || i === (this.phNodes.length - 1);
       let radius = endCap ? endcapRadius : circleProps.radius;
-      if (obj.phLabel !== undefined) {
+      // NB: Hidden labels are still kept on the node, so they get synced
+      obj.phShowLabel = !!opts.show_labels;
+      if (obj.phShowLabel && obj.phLabel !== undefined) {
         // Grow to fit label, and fill so it's readable against the image
         radius = Math.max(radius, labelRadius(obj.phLabel));
         obj.fill = 'rgba(255, 255, 255, 0.7)';

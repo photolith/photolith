@@ -126,6 +126,13 @@
                 <span class="checked" title="{% translate 'Axis lines visible, click here to hide axis lines' %}">{% translate "Show/Hide axis line" %}</span>
               </label>
             </span>
+            <span class="form-check form-switch btn btn-link ms-4" style="color: var(--bs-body-color)">
+              <input type="checkbox" class="form-check-input pref-session" role="switch" id="ph-view-poly-show-labels" autocomplete="off">
+              <label for="ph-view-poly-show-labels">
+                <span class="unchecked" title="{% translate 'Point labels hidden, click here to show point labels' %}">{% translate "Show/Hide point labels" %}</span>
+                <span class="checked" title="{% translate 'Point labels visible, click here to hide point labels' %}">{% translate "Show/Hide point labels" %}</span>
+              </label>
+            </span>
         <button class="btn btn-danger btn-block float-end ph-delete d-none">{% translate 'Delete annotation' %}</button>
       {% endif %}
     </div>

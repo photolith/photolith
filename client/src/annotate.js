@@ -233,10 +233,10 @@ export function init (parent) {
 
     populateIndividualData(indData, window.document.querySelector('.individual-data tbody'));
 
-    document.querySelector('#ph-view-poly-show-axis').addEventListener('change', (event) => {
-      // Trigger addRemove so we update axis state
+    document.querySelectorAll('#ph-view-poly-show-axis, #ph-view-poly-show-labels').forEach((el) => el.addEventListener('change', (event) => {
+      // Trigger addRemove so we update axis / label state
       elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
-    });
+    }));
 
     parent.querySelectorAll('button#existing-tab').forEach((elExistingBtn) => {
       // Find matching editor button
