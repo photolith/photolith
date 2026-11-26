@@ -1,4 +1,6 @@
-// For a set of axis_poly points, generate all possible values for the next
+// For a set of axis_poly points, generate all possible values for the next.
+// Readings go F1..Fn, F+, S1..Sn, then optionally spawning marks (gotmerki) G1..Gn, ending with S+ at the edge,
+// e.g. "F1 F2 F+ S1 G1 S+". This matches Fishalysis .mei readings of both salmon & sea trout
 function labelOptionsAnadromous (points) {
   let curStage = 'F';
   let curCount = 1;
@@ -19,24 +21,38 @@ function labelOptionsAnadromous (points) {
     }
 
     if (curStage === 'S') {
+      // Spawning marks need at least one sea year before them
+      const spawnOptions = curCount > 1 ? ['G1'] : [];
       if (p[2] === 'S+') {
+        curStage = 'E';
+        return ['S+', nextStage, ...spawnOptions];
+      }
+      if (p[2] === 'G1' && curCount > 1) {
         curStage = 'G';
-        curCount = 1;
+        curCount = 2;
+        return ['G1', nextStage, 'S+'];
+      }
+      curCount += 1;
+      return [nextStage, ...spawnOptions, 'S+'];
+    }
+
+    if (curStage === 'G') {
+      if (p[2] === 'S+') {
+        curStage = 'E';
         return ['S+', nextStage];
       }
       curCount += 1;
       return [nextStage, 'S+'];
     }
 
-    // curStage === 'G'
-    curCount += 1;
-    return [nextStage];
+    // curStage === 'E', S+ is the edge of the scale, nothing comes after it
+    return [null];
   });
 }
 
-// For a set of points, count everything apart from the centre & plus-growth (F+ / S+) points as the age
+// For a set of points, count every labelled point apart from plus-growth (F+ / S+) as the age
 function ageAnadromous (points) {
-  return points.filter((p, i) => i > 0 && p[2] !== 'F+' && p[2] !== 'S+').length;
+  return points.filter((p) => p[2] && p[2] !== 'F+' && p[2] !== 'S+').length;
 }
 
 // For a set of axis_poly points, generate all possible values for the next, as labelOptionsAnadromous without sea (S) years
