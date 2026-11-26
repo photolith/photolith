@@ -725,7 +725,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "num_annotations": "0",
                 },
                 {
-                    "age": "10",
+                    "age": "6",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann12.id),
                     "authority": "80",
@@ -740,7 +740,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "num_annotations": "2",
                 },
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "20",
@@ -768,7 +768,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "num_annotations": "0",
                 },
                 {
-                    "age": "10",
+                    "age": "6",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann12.id),
                     "authority": "80",
@@ -814,7 +814,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             list(self.export(userA, "best")),
             [
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "0",
@@ -833,7 +833,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             list(self.export(userA, "best")),
             [
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "0",
