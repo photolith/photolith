@@ -4,7 +4,8 @@ import TomSelect from 'tom-select';
 
 import { init as initCroppedViewer } from './cropped_viewer.js';
 import { htmlFetch, jsonFetch } from './fetch.js';
-import { metaDTType, registerDTTypes, renderMetaLabel, renderMetaCell, populateSearchFilters } from './meta.js';
+import { metaDTType, registerDTTypes, renderMetaLabel, renderMetaCell, populateSearchFilters, updateAgeStages } from './meta.js';
+import { getLifecycle } from './lifecycle.js';
 import { getDTState, setDTState, removeDTState } from './datatables_state.js';
 
 function filterChange (elForm, elTarget) {
@@ -108,6 +109,7 @@ export function init (parent) {
         htmlFetch('/annotate/' + row.data().id + '/snippet/' + window.document.location.search).then((html) => {
           row.child(html);
           updateAnnotateUrl(row.child()[0]);
+          updateAgeStages(row.child()[0], getLifecycle(row.data()));
           initCroppedViewer(row.child()[0]);
         });
       }

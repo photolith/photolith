@@ -187,6 +187,7 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         resp = client.get("/annotate/%d/snippet/" % ind.id)
         self.assertEqual(resp.status_code, 200)
         content = resp.content.decode("utf8")
+        self.assertEqual(attr_json(content, "data-axis-poly"), [axis_poly])
         self.assertEqual(attr_json(content, "data-bounding-box"), [ind.bounding_box])
 
     def test_get_initial(self):
