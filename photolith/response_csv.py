@@ -38,7 +38,11 @@ class StreamingCsvResponse(StreamingHttpResponse):
                     if fieldnames is None:
                         fieldnames = [
                             k for k in row.keys() if k not in ("id", "__str__")
-                        ] + (force_cols or [])
+                        ]
+                        # NB: Skip any forced columns the first row already has
+                        fieldnames += [
+                            k for k in (force_cols or []) if k not in fieldnames
+                        ]
                         yield writer.writerow(
                             re.sub(r"^\w{2}_", "", f) for f in fieldnames
                         )

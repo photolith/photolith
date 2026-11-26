@@ -75,6 +75,16 @@ class StreamingCsvResponseTest(TestCase):
         self.assertEqual(result[1], ["Alice", ""])
         self.assertEqual(result[2], ["Bob", "bonus"])
 
+        # Columns already in the first row aren't repeated
+        rows = [
+            {"xx_name": "Alice", "xx_g1": "1"},
+            {"xx_name": "Bob", "xx_g1": "3", "xx_g2": "4"},
+        ]
+        result = self.do_scr(rows, force_cols=["xx_g1", "xx_g2", "xx_g3"])
+        self.assertEqual(result[0], ["name", "g1", "g2", "g3"])
+        self.assertEqual(result[1], ["Alice", "1", "", ""])
+        self.assertEqual(result[2], ["Bob", "3", "4", ""])
+
     def test_return_with_extra(self):
         def stuff(c):
             for i in range(c):
