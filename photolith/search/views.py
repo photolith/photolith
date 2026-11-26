@@ -12,6 +12,7 @@ from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, M
 from django.template.loader import render_to_string
 
 from ..errors import json_errors
+from ..lifecycle import age_stages, age_stages_individual_ids
 from ..models import (
     Annotation,
     Image,
@@ -158,7 +159,20 @@ class DataView(LoginRequiredMixin, View):
         else:
             raise BadRequest("Unknown annotations type '%s'" % with_annotations)
 
-        return self._rows(qs, with_annotations, with_image_url, with_associated_images)
+        # Only add age stage columns if some individuals have a lifecycle with stages
+        # NB: CSV headers come from the first row, so we need to know before we start
+        with_age_stages = (
+            with_annotations in ("all", "best")
+            and qs.filter(pk__in=age_stages_individual_ids()).exists()
+        )
+
+        return self._rows(
+            qs,
+            with_annotations,
+            with_image_url,
+            with_associated_images,
+            with_age_stages,
+        )
 
     def filter_query(self, qs):
         """Filter qs by the search in the request"""
@@ -259,8 +273,28 @@ class DataView(LoginRequiredMixin, View):
                 )
         return qs
 
-    def _rows(self, qs, with_annotations, with_image_url, with_associated_images):
+    def _rows(
+        self,
+        qs,
+        with_annotations,
+        with_image_url,
+        with_associated_images,
+        with_age_stages=False,
+    ):
         """Generator of rows from qs, returning any extra keys for the response"""
+
+        def age_stage_cols(ind_data, a):
+            """age_F / age_S / age_G for annotation (a), or no columns at all if not with_age_stages"""
+            if not with_age_stages:
+                return {}
+            # NB: Unreadable annotations have no age, so nothing to break down
+            stages = (
+                age_stages(ind_data, a.axis_poly)
+                if a is not None and a.age is not None
+                else None
+            ) or {}
+            return {"age_%s" % k: stages.get(k) for k in "FSG"}
+
         extra = {}
         annotation_alert = {}
         result_count = 0
@@ -307,6 +341,7 @@ class DataView(LoginRequiredMixin, View):
                         annotation_id=a.id,
                         project_id=a.project_id,
                         age=a.age,
+                        **age_stage_cols(out, a),
                         rating=a.rating,
                         authority=a.authority,
                         # NB: Username, as in CSV export (User isn't JSON-serialisable)
@@ -328,6 +363,7 @@ class DataView(LoginRequiredMixin, View):
                     annotation_id=None,
                     project_id=None,
                     age=None,
+                    **age_stage_cols(out, None),
                     rating=None,
                     authority=None,
                     annotated_by=None,

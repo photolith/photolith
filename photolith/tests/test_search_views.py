@@ -847,6 +847,97 @@ class ExportViewTest(RequiresUtils, TestCase):
             ],
         )
 
+    def test_call__age_stages(self):
+        """Anadromous annotations have their age broken down into F / S / G stages"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        img = self.create_image(scale_line=None, scale_mm=None)
+        anadromous = dict(
+            tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"}
+        )
+        ind_sea = self.create_individual(image=img, data=anadromous)
+        ann_sea = self.create_annotation(
+            ind_sea,
+            age=4,
+            axis_poly=[
+                [0, 0],
+                [1, 0, "F1"],
+                [2, 0, "F2"],
+                [3, 0, "F+"],
+                [4, 0, "S1"],
+                [5, 0, "G1"],
+                [6, 0, "S+"],
+            ],
+        )
+        ind_fresh = self.create_individual(image=img, data=anadromous)
+        ann_fresh = self.create_annotation(
+            ind_fresh,
+            age=2,
+            axis_poly=[[0, 0], [1, 0, "F1"], [2, 0, "F2"], [3, 0, "F+"]],
+        )
+        ind_unreadable = self.create_individual(image=img, data=anadromous)
+        ann_unreadable = self.create_annotation(
+            ind_unreadable, age=None, axis_poly=[], rating=Annotation.Rating.UNREADABLE
+        )
+        ind_default = self.create_individual(image=img)
+        ann_default = self.create_annotation(
+            ind_default, age=2, axis_poly=[[0, 0], [1, 0, "1"], [2, 0, "E"]]
+        )
+
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("age")
+                }
+                for r in self.export(userA, "all")
+            ],
+            [
+                dict(
+                    annotation_id=str(ann_sea.id),
+                    age="4",
+                    age_F="2",
+                    age_S="1",
+                    age_G="1",
+                ),
+                # No sea stage, so no age_S
+                dict(annotation_id=str(ann_fresh.id), age="2", age_F="2", age_G="0"),
+                # No age, so no stages
+                dict(annotation_id=str(ann_unreadable.id)),
+                # Default lifecycle has no stages
+                dict(annotation_id=str(ann_default.id), age="2"),
+            ],
+        )
+
+    def test_call__age_stages_hidden(self):
+        """Age stage columns are only present if some individuals have a lifecycle with stages"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+
+        def header(with_annotations="all"):
+            resp = client.get("/search/export/%s/" % with_annotations)
+            body = b"".join(resp.streaming_content).decode("utf-8-sig")
+            return next(csv.reader(body.split("\r\n")))
+
+        ind_default = self.create_individual()
+        self.create_annotation(ind_default, axis_poly=[[0, 0], [1, 1, "1"]])
+        self.assertIn("age", header())
+        self.assertNotIn("age_F", header())
+
+        # An anadromous individual, even without annotations, brings the columns back
+        self.create_individual(
+            data=dict(tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"})
+        )
+        self.assertEqual(
+            [c for c in header() if c.startswith("age")],
+            ["age", "age_F", "age_S", "age_G"],
+        )
+        self.assertEqual(
+            [c for c in header("best") if c.startswith("age")],
+            ["age", "age_F", "age_S", "age_G"],
+        )
+
     def test_call__project_annotations(self):
         """Annotations in open projects aren't visible to other readers"""
         owner = self.create_user("owner", groups=["General Annotation Editor"])
