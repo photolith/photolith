@@ -6,7 +6,7 @@ import unittest
 
 from django.test import TestCase
 
-from ..lifecycle import age_stages
+from ..lifecycle import age_stages, label_sort_key, point_labels
 
 ANADROMOUS = dict(tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"})
 LIFECYCLE_JS = (
@@ -87,4 +87,58 @@ class AgeStagesTest(TestCase):
         self.assertEqual(
             [age_stages(ind_data, axis_poly) for ind_data, axis_poly in cases],
             js_age_stages(cases),
+        )
+
+
+class PointLabelsTest(TestCase):
+    def test_point_labels(self):
+        self.assertEqual(point_labels(pts([])), [])
+        self.assertEqual(point_labels(pts([None])), [])
+        self.assertEqual(point_labels(pts([None, "1", "2", "E"])), ["1", "2", "E"])
+        # Unlabelled points numbered as labelOptionsDefault
+        self.assertEqual(point_labels(pts([None, None, None, None])), ["1", "2", "E"])
+        self.assertEqual(
+            point_labels(pts([None, "F1", "F+", "S1", "S+", None])),
+            ["F1", "F+", "S1", "S+", "E"],
+        )
+
+
+class LabelSortKeyTest(TestCase):
+    def test_label_sort_key(self):
+        self.assertEqual(
+            sorted(
+                [
+                    "S+",
+                    "E",
+                    "G2",
+                    "F10",
+                    "2",
+                    "S1",
+                    "F+",
+                    "G1",
+                    "10",
+                    "F2",
+                    "parp",
+                    "S2",
+                    "F1",
+                    "1",
+                ],
+                key=label_sort_key,
+            ),
+            [
+                "F1",
+                "F2",
+                "F10",
+                "F+",
+                "S1",
+                "S2",
+                "S+",
+                "G1",
+                "G2",
+                "1",
+                "2",
+                "10",
+                "E",
+                "parp",
+            ],
         )

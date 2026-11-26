@@ -734,7 +734,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_1": "2.0",
                     "growth_2": "4.0",
                     "growth_3": "6.0",
-                    "growth_4": "6.0",
+                    "growth_E": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
@@ -747,7 +747,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "comment": "Ekki mjög góð skýring",
                     "growth_1": "2.0",
-                    "growth_2": "4.0",
+                    "growth_E": "4.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
@@ -777,7 +777,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_1": "2.0",
                     "growth_2": "4.0",
                     "growth_3": "6.0",
-                    "growth_4": "6.0",
+                    "growth_E": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
@@ -839,7 +839,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "authority": "0",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "growth_1": "1.0",
-                    "growth_2": "2.0",
+                    "growth_E": "2.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "1",
@@ -936,6 +936,92 @@ class ExportViewTest(RequiresUtils, TestCase):
         self.assertEqual(
             [c for c in header("best") if c.startswith("age")],
             ["age", "age_F", "age_S", "age_G"],
+        )
+
+    def test_call__growth_labels(self):
+        """Growth columns are by label, in label order, the header has every column any row has"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+        # Scale should multiply distances by 2
+        img = self.create_image(scale_line=[(0, 0), (1, 0)], scale_mm=2)
+        anadromous = dict(
+            tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"}
+        )
+
+        # First individual has no annotations, but header should still have all columns
+        self.create_individual(image=img, data=anadromous)
+        ind_fresh = self.create_individual(image=img, data=anadromous)
+        ann_fresh = self.create_annotation(
+            ind_fresh,
+            axis_poly=[[0, 0], [1, 0, "F1"], [3, 0, "F2"], [4, 0, "F+"]],
+        )
+        ind_sea = self.create_individual(image=img, data=anadromous)
+        ann_sea = self.create_annotation(
+            ind_sea,
+            # NB: Unlabelled point at the end falls back to E
+            axis_poly=[
+                [0, 0],
+                [2, 0, "F1"],
+                [3, 0, "F+"],
+                [6, 0, "S1"],
+                [7, 0, "S+"],
+                [8, 0],
+            ],
+        )
+        ind_default = self.create_individual(image=img)
+        ann_default = self.create_annotation(
+            ind_default, axis_poly=[[0, 0], [1, 0, "1"], [2, 0, "2"], [4, 0, "E"]]
+        )
+
+        resp = client.get("/search/export/all/")
+        body = b"".join(resp.streaming_content).decode("utf-8-sig")
+        self.assertEqual(
+            [c for c in next(csv.reader(body.split("\r\n"))) if c.startswith("growth")],
+            [
+                "growth_F1",
+                "growth_F2",
+                "growth_F+",
+                "growth_S1",
+                "growth_S+",
+                "growth_1",
+                "growth_2",
+                "growth_E",
+            ],
+        )
+
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("growth")
+                }
+                for r in self.export(userA, "all")
+                if "annotation_id" in r
+            ],
+            [
+                dict(
+                    annotation_id=str(ann_fresh.id),
+                    growth_F1="2.0",
+                    growth_F2="4.0",
+                    **{"growth_F+": "2.0"},
+                ),
+                dict(
+                    annotation_id=str(ann_sea.id),
+                    growth_F1="4.0",
+                    **{"growth_F+": "2.0"},
+                    growth_S1="6.0",
+                    **{"growth_S+": "2.0"},
+                    growth_E="2.0",
+                ),
+                dict(
+                    annotation_id=str(ann_default.id),
+                    growth_1="2.0",
+                    growth_2="2.0",
+                    growth_E="4.0",
+                ),
+            ],
         )
 
     def test_call__project_annotations(self):

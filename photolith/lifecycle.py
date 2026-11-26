@@ -1,5 +1,7 @@
 """Server-side copies of client/src/lifecycle.js functions. NB: Keep these in sync, test_lifecycle.py checks they match"""
 
+import re
+
 from .models import MetaTx
 
 
@@ -16,6 +18,31 @@ def age_stages_anadromous(axis_poly):
     if any(x[0] == "S" for x in labels):
         return dict(F=count("F"), S=count("S"), G=count("G"))
     return dict(F=count("F"), G=count("G"))
+
+
+def point_labels(axis_poly):
+    """
+    Label for each point of (axis_poly) after the centre. Unlabelled points fall back to
+    labelOptionsDefault()'s numbering, i.e. 1..n then E for the end
+    """
+    return [
+        p[2] if len(p) > 2 and p[2] else "E" if i == len(axis_poly) - 1 else str(i)
+        for i, p in enumerate(axis_poly)
+        if i > 0
+    ]
+
+
+def label_sort_key(label):
+    """Sort key for labels of any lifecycle, i.e. F1..Fn, F+, S1..Sn, S+, G1..Gn, 1..n, E, then anything else"""
+    m = re.fullmatch(r"([FSG]?)(\d+|\+)", label)
+    if m:
+        stage, n = m.groups()
+        return (
+            "FSG".index(stage) if stage else 3,
+            float("inf") if n == "+" else int(n),
+            label,
+        )
+    return (3 if label == "E" else 4, float("inf"), label)
 
 
 # tx_lifecycle id -> ageStages function, anything not here has no stages
