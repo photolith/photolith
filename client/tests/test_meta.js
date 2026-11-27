@@ -379,6 +379,61 @@ test('populateIndividualData:num_annotations', function (test) {
   test.end();
 });
 
+test('populateIndividualData:two-column', function (test) {
+  const dom = setupDom(test, '<html lang="en-gb"></html>');
+
+  class UTMetadataApi extends MetadataApi {
+    constructor (lang) {
+      super(lang);
+      this.intlExtend(this._metaLabels, {
+        en: {
+          ch_slideLabel: 'Slide Label',
+          ch_individualLabel: 'Individual No.',
+          nm_length: 'Length'
+        }
+      });
+    }
+  }
+  dom.window.mApi = new UTMetadataApi('en-gb');
+
+  function pid (indData, tbodyClass) {
+    const elForm = dom.window.document.createElement('form');
+    elForm.innerHTML = `<table><tbody class="${tbodyClass}"></tbody></table>`;
+    populateIndividualData(indData, elForm.querySelector('tbody'), 'display');
+    return Array.from(elForm.querySelectorAll('tr')).map((elRow) => {
+      return Array.from(elRow.querySelectorAll('td')).map((elCell) => elCell.innerHTML.trim());
+    });
+  }
+
+  // No class: one key/value pair per row
+  test.deepEqual(pid({ ch_slideLabel: 'AB-01', ch_individualLabel: '12', nm_length: 34 }, ''), [
+    ['Slide Label', '<code>AB-01</code>'],
+    ['Individual No.', '<code>12</code>'],
+    ['Length', '<code>34</code>']
+  ]);
+
+  // No data: no rows, nothing to pad
+  test.deepEqual(pid({}, 'two-column'), []);
+
+  // Single item: padded with empty cells
+  test.deepEqual(pid({ ch_slideLabel: 'AB-01' }, 'two-column'), [
+    ['Slide Label', '<code>AB-01</code>', '', '']
+  ]);
+
+  // Even number of items: no padding needed
+  test.deepEqual(pid({ ch_slideLabel: 'AB-01', ch_individualLabel: '12' }, 'two-column'), [
+    ['Slide Label', '<code>AB-01</code>', 'Individual No.', '<code>12</code>']
+  ]);
+
+  // Odd number of items: final row padded
+  test.deepEqual(pid({ ch_slideLabel: 'AB-01', ch_individualLabel: '12', nm_length: 34 }, 'two-column'), [
+    ['Slide Label', '<code>AB-01</code>', 'Individual No.', '<code>12</code>'],
+    ['Length', '<code>34</code>', '', '']
+  ]);
+
+  test.end();
+});
+
 test('updateDataObject', function (test) {
   const dom = setupDom(test, '<html lang="en-gb" data-thousand-separator=":" data-decimal-separator="•"></html>');
   dom.window.mApi = new MetadataApi('en-gb');
