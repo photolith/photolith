@@ -1,4 +1,5 @@
 import test from 'tape';
+import { readFileSync } from 'fs';
 import { setupDom } from './util_dom.js';
 
 import MetadataApi from '../src/metadata_api/hafro.js';
@@ -180,6 +181,101 @@ test('MetadataApi(hafro):sampleDetail maps individuals', async function (test) {
 
   test.equal(out[1].tx_sex.id, 2, 'Female sex mapped from txHardcoded');
   test.equal(out[1].nm_length, 55, 'Length carried through');
+
+  test.end();
+});
+
+test('MetadataApi(hafro):sampleDetail with canned API response', async function (test) {
+  const mApi = setupHafroApi(test, {});
+
+  // Output of /biota/otolith/sample/512350/combined/filter?speciesNo=1, from biota.internal.hafogvatn.cloud
+  const cannedJson = JSON.parse(readFileSync(new URL('./fixtures/hafro_sample_512350_species_1.json', import.meta.url)));
+  global.window.fetch = mockFetch({
+    '/biota/otolith/sample/512350/combined/filter?speciesNo=1': { json: cannedJson }
+  });
+
+  const slideLabel = '512350 B12-2020/1438 1 11';
+  const common = {
+    ch_slideLabel: slideLabel,
+    tx_species: { id: 1, en: 'Cod [COD]', is: 'Þorskur [COD]' },
+    ch_cruise: 'B12-2020',
+    in_station: 1438,
+    dt_stationDate: '2020-11-04T00:00:00Z',
+    in_year: 2020,
+    in_month: 11,
+    ch_gear: '0312',
+    nm_meshSize: 40,
+    tx_sampleType: { id: 1, en: 'Otolith', is: 'Kvörn' },
+    in_sampleId: 512350
+  };
+  const male = { id: 1, en: 'Male [M]', is: 'Hængur' };
+  const female = { id: 2, en: 'Female [F]', is: 'Hrygna' };
+  const expected = [
+    { ...common, nm_length: 52, tx_sex: male, tx_maturity: { id: 5, en: 'COD/5', is: 'COD/5' }, in_measureId: 21268544, ch_individualLabel: '1' },
+    { ...common, nm_length: 64, tx_sex: female, tx_maturity: { id: 4, en: 'COD/4', is: 'COD/4' }, in_measureId: 21268537, ch_individualLabel: '2' },
+    { ...common, nm_length: 71, tx_sex: male, tx_maturity: { id: 4, en: 'COD/4', is: 'COD/4' }, in_measureId: 21268536, ch_individualLabel: '3' },
+    { ...common, nm_length: 27, tx_sex: female, tx_maturity: { id: 1, en: 'COD/1', is: 'COD/1' }, in_measureId: 21268507, ch_individualLabel: '4' },
+    { ...common, nm_length: 27, tx_sex: female, tx_maturity: { id: 1, en: 'COD/1', is: 'COD/1' }, in_measureId: 21268506, ch_individualLabel: '5' }
+  ];
+
+  test.deepEqual(await mApi.sampleDetail(slideLabel), expected, 'All individuals mapped from canned response');
+  test.equal(global.document.getElementById('alert-container').children.length, 0, 'No label mismatch warning');
+
+  // Partial label gets the rest from sampleResponse, and the full label is rebuilt
+  test.deepEqual(await mApi.sampleDetail('512350 1'), expected, 'Partial label filled in from sampleResponse');
+  const alerts = global.document.getElementById('alert-container').children;
+  test.equal(alerts.length, 1, 'Warning displayed for partial label');
+  test.ok(alerts[0].innerHTML.includes('512350 B12-2020/1438 1 11'), 'Warning shows the full label');
+
+  test.end();
+});
+
+test('MetadataApi(hafro):sampleDetail with canned API response, sexualMaturity', async function (test) {
+  const mApi = setupHafroApi(test, {});
+
+  // Output of /biota/otolith/sample/551229/combined/filter?speciesNo=3, from biota.internal.hafogvatn.cloud
+  const cannedJson = JSON.parse(readFileSync(new URL('./fixtures/hafro_sample_551229_species_3.json', import.meta.url)));
+  global.window.fetch = mockFetch({
+    '/biota/otolith/sample/551229/combined/filter?speciesNo=3': { json: cannedJson }
+  });
+
+  const slideLabel = '551229 AJUN-2024/14 3 06';
+  const common = {
+    ch_slideLabel: slideLabel,
+    tx_species: { id: 3, en: 'Saithe [POK]', is: 'Ufsi [POK]' },
+    ch_cruise: 'AJUN-2024',
+    in_station: 14,
+    dt_stationDate: '2024-06-13T00:00:00Z',
+    in_year: 2024,
+    in_month: 6,
+    ch_gear: '0910',
+    nm_meshSize: undefined, // NB: Not recorded for this sample
+    tx_sampleType: { id: 1, en: 'Otolith', is: 'Kvörn' },
+    in_sampleId: 551229
+  };
+  const sexes = {
+    1: { id: 1, en: 'Male [M]', is: 'Hængur' },
+    2: { id: 2, en: 'Female [F]', is: 'Hrygna' }
+  };
+
+  // NB: Unlike cod, sexualMaturityId differs from sexualMaturityNo, the label should use the latter
+  const maturityNo = { 19: 1, 20: 2, 22: 4, 27: 52 };
+  const out = await mApi.sampleDetail(slideLabel);
+  test.deepEqual(out, [
+    // [length, sexNo, sexualMaturityId]
+    [78, 2, 22], [75, 2, 19], [76, 1, 19], [82, 2, 27], [69, 1, 22],
+    [73, 2, 19], [73, 2, 19], [66, 2, 22], [75, 2, 19], [77, 1, 20],
+    [75, 2, 19], [72, 1, 22], [72, 1, 22], [65, 1, 22], [63, 2, 19],
+    [77, 2, 22], [77, 1, 22], [73, 2, 19], [66, 2, 19], [69, 2, 19]
+  ].map(([length, sexNo, maturityId], i) => ({
+    ...common,
+    nm_length: length,
+    tx_sex: sexes[sexNo],
+    tx_maturity: { id: maturityId, en: `POK/${maturityNo[maturityId]}`, is: `POK/${maturityNo[maturityId]}` },
+    in_measureId: 24432421 + i,
+    ch_individualLabel: (i + 1).toString()
+  })), 'All individuals mapped from canned response');
+  test.equal(global.document.getElementById('alert-container').children.length, 0, 'No label mismatch warning');
 
   test.end();
 });

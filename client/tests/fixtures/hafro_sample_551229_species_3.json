@@ -1,0 +1,2423 @@
+{
+  "otoliths": [
+    {
+      "measureId": 24432421,
+      "sampleId": 551229,
+      "serialNo": 1,
+      "age": 7,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 78.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 3862.0,
+        "gutted": 3417.0,
+        "liver": 221.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432421"
+        }
+      ]
+    },
+    {
+      "measureId": 24432422,
+      "sampleId": 551229,
+      "serialNo": 2,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 75.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3383.0,
+        "gutted": 2962.0,
+        "liver": 229.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432422"
+        }
+      ]
+    },
+    {
+      "measureId": 24432423,
+      "sampleId": 551229,
+      "serialNo": 3,
+      "age": 7,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 76.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3808.0,
+        "gutted": 3475.0,
+        "liver": 210.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432423"
+        }
+      ]
+    },
+    {
+      "measureId": 24432424,
+      "sampleId": 551229,
+      "serialNo": 4,
+      "age": 8,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 82.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 27,
+          "sexualMaturityNo": 52,
+          "descr": "Fiskur virðist hafa hrygnt áður en hrygnir ekki á komandi eða líðandi hrygningartíma",
+          "descrShort": "Kynþroska en sleppir hrygningu"
+        },
+        "maturity": {},
+        "weight": 4340.0,
+        "gutted": 3749.0,
+        "liver": 337.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432424"
+        }
+      ]
+    },
+    {
+      "measureId": 24432425,
+      "sampleId": 551229,
+      "serialNo": 5,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 69.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 2569.0,
+        "gutted": 2315.0,
+        "liver": 147.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432425"
+        }
+      ]
+    },
+    {
+      "measureId": 24432426,
+      "sampleId": 551229,
+      "serialNo": 6,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 73.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 2977.0,
+        "gutted": 2626.0,
+        "liver": 208.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432426"
+        }
+      ]
+    },
+    {
+      "measureId": 24432427,
+      "sampleId": 551229,
+      "serialNo": 7,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 73.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3217.0,
+        "gutted": 2817.0,
+        "liver": 210.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432427"
+        }
+      ]
+    },
+    {
+      "measureId": 24432428,
+      "sampleId": 551229,
+      "serialNo": 8,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 66.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 2224.0,
+        "gutted": 1946.0,
+        "liver": 84.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432428"
+        }
+      ]
+    },
+    {
+      "measureId": 24432429,
+      "sampleId": 551229,
+      "serialNo": 9,
+      "age": 7,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 75.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3500.0,
+        "gutted": 3088.0,
+        "liver": 234.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432429"
+        }
+      ]
+    },
+    {
+      "measureId": 24432430,
+      "sampleId": 551229,
+      "serialNo": 10,
+      "age": 7,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 77.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 20,
+          "sexualMaturityNo": 2,
+          "stage": "II. stig",
+          "descr": "Kynþroska, engin þroskuð hrogn eða svil",
+          "descrShort": "Kynþroska"
+        },
+        "maturity": {},
+        "weight": 3725.0,
+        "gutted": 3280.0,
+        "liver": 219.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432430"
+        }
+      ]
+    },
+    {
+      "measureId": 24432431,
+      "sampleId": 551229,
+      "serialNo": 11,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 75.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3535.0,
+        "gutted": 3130.0,
+        "liver": 225.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432431"
+        }
+      ]
+    },
+    {
+      "measureId": 24432432,
+      "sampleId": 551229,
+      "serialNo": 12,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 72.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 2860.0,
+        "gutted": 2570.0,
+        "liver": 151.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432432"
+        }
+      ]
+    },
+    {
+      "measureId": 24432433,
+      "sampleId": 551229,
+      "serialNo": 13,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 72.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 3220.0,
+        "gutted": 2765.0,
+        "liver": 323.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432433"
+        }
+      ]
+    },
+    {
+      "measureId": 24432434,
+      "sampleId": 551229,
+      "serialNo": 14,
+      "age": 5,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 65.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 2365.0,
+        "gutted": 2085.0,
+        "liver": 198.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432434"
+        }
+      ]
+    },
+    {
+      "measureId": 24432435,
+      "sampleId": 551229,
+      "serialNo": 15,
+      "age": 4,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 63.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 2325.0,
+        "gutted": 1960.0,
+        "liver": 218.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432435"
+        }
+      ]
+    },
+    {
+      "measureId": 24432436,
+      "sampleId": 551229,
+      "serialNo": 16,
+      "age": 8,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 77.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 3520.0,
+        "gutted": 3113.0,
+        "liver": 104.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432436"
+        }
+      ]
+    },
+    {
+      "measureId": 24432437,
+      "sampleId": 551229,
+      "serialNo": 17,
+      "age": 7,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 77.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 22,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthryngd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 3571.0,
+        "gutted": 3235.0,
+        "liver": 180.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432437"
+        }
+      ]
+    },
+    {
+      "measureId": 24432438,
+      "sampleId": 551229,
+      "serialNo": 18,
+      "age": 6,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 73.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 3396.0,
+        "gutted": 3038.0,
+        "liver": 200.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432438"
+        }
+      ]
+    },
+    {
+      "measureId": 24432439,
+      "sampleId": 551229,
+      "serialNo": 19,
+      "age": 5,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 66.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 2357.0,
+        "gutted": 2104.0,
+        "liver": 135.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432439"
+        }
+      ]
+    },
+    {
+      "measureId": 24432440,
+      "sampleId": 551229,
+      "serialNo": 20,
+      "age": 5,
+      "reader": "reader_b",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 69.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 19,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Kynthroska en þroskun kynvefs hefur ekki farið af stað á yfirstandandi vertíð.",
+          "descrShort": "Ókynþroska."
+        },
+        "maturity": {},
+        "weight": 2349.0,
+        "gutted": 2125.0,
+        "liver": 95.0,
+        "predator": {},
+        "loadSource": "biota.hafvog_fiskar_v",
+        "loadTegund": 3,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 3,
+        "name": "Ufsi",
+        "scientificName": "Pollachius virens",
+        "englishName": "Saithe",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "(Linnaeus, 1758)",
+        "foodNo": "poll vir",
+        "code3a": "POK",
+        "valid": true,
+        "taxocode": "1480401501",
+        "aphiaId": 126441,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126441?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126441"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126441"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126441?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 551229,
+        "station": {
+          "id": 345506,
+          "number": 14,
+          "stationDate": "2024-06-13T00:00:00Z",
+          "note": "skip 7882",
+          "cruise": {
+            "id": 20688,
+            "name": "AJUN-2024",
+            "type": "FISH",
+            "departure": "2024-06-01T00:00:00Z",
+            "arrival": "2024-06-30T00:00:00Z",
+            "project": "Landsýni",
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/0"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/115"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0910"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 2,
+          "descr": "Sýni tekin í landi í útibúum eða verstöð",
+          "valid": "1",
+          "engDescr": "Samples collected by MFRI"
+        },
+        "device": {},
+        "note": "Skip 7882",
+        "sampleNo": 1,
+        "sampleName": "Færi",
+        "haulingFrom": "A",
+        "loadSource": "biota.hafvog_stodvar",
+        "loadVeidarfaeri": 3
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/551229"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/24432440"
+        }
+      ]
+    }
+  ]
+}

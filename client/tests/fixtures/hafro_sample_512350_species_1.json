@@ -1,0 +1,694 @@
+{
+  "otoliths": [
+    {
+      "measureId": 21268544,
+      "sampleId": 512350,
+      "serialNo": 1,
+      "age": 3,
+      "reader": "reader_a",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 52.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 5,
+          "sexualMaturityNo": 5,
+          "stage": "V. stig",
+          "descr": "Kynþroskagreiningu sleppt vegna óvissu um kynþroskastig",
+          "descrShort": "Óvissa um kynþroskastig"
+        },
+        "maturity": {},
+        "weight": 1242.0,
+        "gutted": 1119.0,
+        "liver": 42.0,
+        "predator": {},
+        "stomachType": "FOOD",
+        "loadSource": "fiskar.kvarnir",
+        "loadTegund": 1,
+        "loadFlokkid": 740956,
+        "loadFaerslunumer": 740956,
+        "loadNote": "SEL1: kvarnir=lengdir",
+        "loadId": 22893574,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus, 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 512350,
+        "station": {
+          "id": 320407,
+          "number": 1438,
+          "stationDate": "2020-11-04T00:00:00Z",
+          "loadId": 428098,
+          "cruise": {
+            "id": 18645,
+            "name": "B12-2020",
+            "type": "FISH",
+            "departure": "2020-11-09T00:00:00Z",
+            "arrival": "2020-11-30T00:00:00Z",
+            "project": "Rannsóknir á íslenskri sumargotssíld",
+            "projectLeader": "Project Leader",
+            "loadId": 76,
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/1131"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/0"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 37,
+          "descr": "Stofnmæling innfjarðarrækju",
+          "valid": "1",
+          "engDescr": "Inshore shrimp survey"
+        },
+        "device": {},
+        "meshSize": 40,
+        "bridleLength": 13,
+        "towNo": 12,
+        "sampleName": "Varpa",
+        "speed": 2.1,
+        "distance": 1.5,
+        "direction": 92,
+        "timeMeasure": 44,
+        "verticalOpening": 4.2,
+        "horizontalOpening": 33.0,
+        "warpLength": 439,
+        "haulingFrom": "A",
+        "loadSource": "fiskar.stodvar",
+        "loadSynisid": 512350,
+        "loadSynaflokkur": 37,
+        "loadVeidarfaeri": 14
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/512350"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/21268544"
+        }
+      ]
+    },
+    {
+      "measureId": 21268537,
+      "sampleId": 512350,
+      "serialNo": 2,
+      "age": 5,
+      "reader": "reader_a",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 64.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 4,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthrygnd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 2271.0,
+        "gutted": 2008.0,
+        "liver": 102.0,
+        "predator": {},
+        "stomachType": "FOOD",
+        "loadSource": "fiskar.kvarnir",
+        "loadTegund": 1,
+        "loadFlokkid": 740957,
+        "loadFaerslunumer": 740957,
+        "loadNote": "SEL1: kvarnir=lengdir",
+        "loadId": 22893575,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus, 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 512350,
+        "station": {
+          "id": 320407,
+          "number": 1438,
+          "stationDate": "2020-11-04T00:00:00Z",
+          "loadId": 428098,
+          "cruise": {
+            "id": 18645,
+            "name": "B12-2020",
+            "type": "FISH",
+            "departure": "2020-11-09T00:00:00Z",
+            "arrival": "2020-11-30T00:00:00Z",
+            "project": "Rannsóknir á íslenskri sumargotssíld",
+            "projectLeader": "Project Leader",
+            "loadId": 76,
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/1131"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/0"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 37,
+          "descr": "Stofnmæling innfjarðarrækju",
+          "valid": "1",
+          "engDescr": "Inshore shrimp survey"
+        },
+        "device": {},
+        "meshSize": 40,
+        "bridleLength": 13,
+        "towNo": 12,
+        "sampleName": "Varpa",
+        "speed": 2.1,
+        "distance": 1.5,
+        "direction": 92,
+        "timeMeasure": 44,
+        "verticalOpening": 4.2,
+        "horizontalOpening": 33.0,
+        "warpLength": 439,
+        "haulingFrom": "A",
+        "loadSource": "fiskar.stodvar",
+        "loadSynisid": 512350,
+        "loadSynaflokkur": 37,
+        "loadVeidarfaeri": 14
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/512350"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/21268537"
+        }
+      ]
+    },
+    {
+      "measureId": 21268536,
+      "sampleId": 512350,
+      "serialNo": 3,
+      "age": 5,
+      "reader": "reader_a",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 71.0,
+        "sexNo": 1,
+        "sexualMaturity": {
+          "sexualMaturityId": 4,
+          "sexualMaturityNo": 4,
+          "stage": "IV. stig",
+          "descr": "Úthrygnd: hrognsekkir eða svil tóm",
+          "descrShort": "Hrygndur"
+        },
+        "maturity": {},
+        "weight": 3107.0,
+        "gutted": 2646.0,
+        "liver": 220.0,
+        "predator": {},
+        "stomachType": "EMPT",
+        "loadSource": "fiskar.kvarnir",
+        "loadTegund": 1,
+        "loadFlokkid": 740958,
+        "loadFaerslunumer": 740958,
+        "loadNote": "SEL1: kvarnir=lengdir",
+        "loadId": 22893576,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus, 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 512350,
+        "station": {
+          "id": 320407,
+          "number": 1438,
+          "stationDate": "2020-11-04T00:00:00Z",
+          "loadId": 428098,
+          "cruise": {
+            "id": 18645,
+            "name": "B12-2020",
+            "type": "FISH",
+            "departure": "2020-11-09T00:00:00Z",
+            "arrival": "2020-11-30T00:00:00Z",
+            "project": "Rannsóknir á íslenskri sumargotssíld",
+            "projectLeader": "Project Leader",
+            "loadId": 76,
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/1131"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/0"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 37,
+          "descr": "Stofnmæling innfjarðarrækju",
+          "valid": "1",
+          "engDescr": "Inshore shrimp survey"
+        },
+        "device": {},
+        "meshSize": 40,
+        "bridleLength": 13,
+        "towNo": 12,
+        "sampleName": "Varpa",
+        "speed": 2.1,
+        "distance": 1.5,
+        "direction": 92,
+        "timeMeasure": 44,
+        "verticalOpening": 4.2,
+        "horizontalOpening": 33.0,
+        "warpLength": 439,
+        "haulingFrom": "A",
+        "loadSource": "fiskar.stodvar",
+        "loadSynisid": 512350,
+        "loadSynaflokkur": 37,
+        "loadVeidarfaeri": 14
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/512350"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/21268536"
+        }
+      ]
+    },
+    {
+      "measureId": 21268507,
+      "sampleId": 512350,
+      "serialNo": 4,
+      "age": 1,
+      "reader": "reader_a",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 27.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 1,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Ókynþroska.",
+          "descrShort": "Ókynþroska"
+        },
+        "maturity": {},
+        "weight": 162.0,
+        "gutted": 150.0,
+        "liver": 1.0,
+        "predator": {},
+        "stomachType": "EMPT",
+        "loadSource": "fiskar.kvarnir",
+        "loadTegund": 1,
+        "loadFlokkid": 740959,
+        "loadFaerslunumer": 740959,
+        "loadNote": "SEL1: kvarnir=lengdir",
+        "loadId": 22893577,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus, 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 512350,
+        "station": {
+          "id": 320407,
+          "number": 1438,
+          "stationDate": "2020-11-04T00:00:00Z",
+          "loadId": 428098,
+          "cruise": {
+            "id": 18645,
+            "name": "B12-2020",
+            "type": "FISH",
+            "departure": "2020-11-09T00:00:00Z",
+            "arrival": "2020-11-30T00:00:00Z",
+            "project": "Rannsóknir á íslenskri sumargotssíld",
+            "projectLeader": "Project Leader",
+            "loadId": 76,
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/1131"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/0"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 37,
+          "descr": "Stofnmæling innfjarðarrækju",
+          "valid": "1",
+          "engDescr": "Inshore shrimp survey"
+        },
+        "device": {},
+        "meshSize": 40,
+        "bridleLength": 13,
+        "towNo": 12,
+        "sampleName": "Varpa",
+        "speed": 2.1,
+        "distance": 1.5,
+        "direction": 92,
+        "timeMeasure": 44,
+        "verticalOpening": 4.2,
+        "horizontalOpening": 33.0,
+        "warpLength": 439,
+        "haulingFrom": "A",
+        "loadSource": "fiskar.stodvar",
+        "loadSynisid": 512350,
+        "loadSynaflokkur": 37,
+        "loadVeidarfaeri": 14
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/512350"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/21268507"
+        }
+      ]
+    },
+    {
+      "measureId": 21268506,
+      "sampleId": 512350,
+      "serialNo": 5,
+      "age": 2,
+      "reader": "reader_a",
+      "lastUpdatedAt": "2026-10-28T12:47:14.756562Z",
+      "measureDTO": {
+        "measureType": "OTOL",
+        "count": 1,
+        "length": 27.0,
+        "sexNo": 2,
+        "sexualMaturity": {
+          "sexualMaturityId": 1,
+          "sexualMaturityNo": 1,
+          "stage": "I. stig",
+          "descr": "Ókynþroska.",
+          "descrShort": "Ókynþroska"
+        },
+        "maturity": {},
+        "weight": 166.0,
+        "gutted": 148.0,
+        "liver": 2.0,
+        "predator": {},
+        "stomachType": "FOOD",
+        "loadSource": "fiskar.kvarnir",
+        "loadTegund": 1,
+        "loadFlokkid": 740960,
+        "loadFaerslunumer": 740960,
+        "loadNote": "SEL1: kvarnir=lengdir",
+        "loadId": 22893578,
+        "links": []
+      },
+      "speciesDTO": {
+        "id": 1,
+        "name": "Þorskur",
+        "scientificName": "Gadus morhua",
+        "englishName": "Cod",
+        "kingdom": "Animalia",
+        "taxonRank": "Species",
+        "author": "Linnaeus, 1758",
+        "foodNo": "gadu mor",
+        "code3a": "COD",
+        "valid": true,
+        "taxocode": "1480400202",
+        "aphiaId": 126436,
+        "links": [
+          {
+            "rel": "Attributes",
+            "href": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/126436?include_inherited=false"
+          },
+          {
+            "rel": "Distribution",
+            "href": "https://www.marinespecies.org/rest/AphiaDistributionsByAphiaID/126436"
+          },
+          {
+            "rel": "Sources",
+            "href": "https://www.marinespecies.org/rest/AphiaSourcesByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Classification",
+            "href": "https://www.marinespecies.org/rest/AphiaClassificationByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic Record",
+            "href": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/126436"
+          },
+          {
+            "rel": "Taxonomic synonyms",
+            "href": "https://www.marinespecies.org/rest/AphiaSynonymsByAphiaID/126436?offset=1"
+          }
+        ]
+      },
+      "sampleResponse": {
+        "sampleId": 512350,
+        "station": {
+          "id": 320407,
+          "number": 1438,
+          "stationDate": "2020-11-04T00:00:00Z",
+          "loadId": 428098,
+          "cruise": {
+            "id": 18645,
+            "name": "B12-2020",
+            "type": "FISH",
+            "departure": "2020-11-09T00:00:00Z",
+            "arrival": "2020-11-30T00:00:00Z",
+            "project": "Rannsóknir á íslenskri sumargotssíld",
+            "projectLeader": "Project Leader",
+            "loadId": 76,
+            "stations": []
+          },
+          "vessel": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/vessel/1131"
+          },
+          "port": {
+            "rel": "self",
+            "href": "http://channel.internal.hafogvatn.cloud/channel/port/0"
+          }
+        },
+        "gear": {
+          "isscfgNo": "0312"
+        },
+        "sampleCategory": {
+          "sampleCategoryNo": 37,
+          "descr": "Stofnmæling innfjarðarrækju",
+          "valid": "1",
+          "engDescr": "Inshore shrimp survey"
+        },
+        "device": {},
+        "meshSize": 40,
+        "bridleLength": 13,
+        "towNo": 12,
+        "sampleName": "Varpa",
+        "speed": 2.1,
+        "distance": 1.5,
+        "direction": 92,
+        "timeMeasure": 44,
+        "verticalOpening": 4.2,
+        "horizontalOpening": 33.0,
+        "warpLength": 439,
+        "haulingFrom": "A",
+        "loadSource": "fiskar.stodvar",
+        "loadSynisid": 512350,
+        "loadSynaflokkur": 37,
+        "loadVeidarfaeri": 14
+      },
+      "links": [
+        {
+          "rel": "sample",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/sample/512350"
+        },
+        {
+          "rel": "minimal",
+          "href": "https://biota.internal.hafogvatn.cloud/biota/otolith/21268506"
+        }
+      ]
+    }
+  ]
+}
