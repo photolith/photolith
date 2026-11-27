@@ -120,7 +120,7 @@ test('MetadataApi(hafro):sampleDetail maps individuals', async function (test) {
             serialNo: 2,
             sampleId: 537572,
             measureId: 222,
-            measureDTO: { length: 55, sexNo: 2, sexualMaturity: { sexualMaturityId: 3 } },
+            measureDTO: { length: 55, sexNo: 2, sexualMaturity: { sexualMaturityId: 3, sexualMaturityNo: 3 } },
             speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
             sampleResponse: {
               station: {
@@ -136,7 +136,7 @@ test('MetadataApi(hafro):sampleDetail maps individuals', async function (test) {
             serialNo: 1,
             sampleId: 537572,
             measureId: 111,
-            measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+            measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
             speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
             sampleResponse: {
               station: {
@@ -163,7 +163,7 @@ test('MetadataApi(hafro):sampleDetail maps individuals', async function (test) {
     ch_slideLabel: '537572 TG1-2023/110 1 03',
     nm_length: 42,
     tx_sex: { id: 1, en: 'Male [M]', is: 'Hængur' },
-    tx_maturity: { id: 2, en: 'Unknown' },
+    tx_maturity: { id: 2, en: 'COD/2', is: 'COD/2' },
     tx_species: { id: 1, en: 'Cod [COD]', is: 'Þorskur [COD]' },
     ch_cruise: 'TG1-2023',
     in_station: 110,
@@ -194,7 +194,7 @@ test('MetadataApi(hafro):sampleDetail unknown sex falls back', async function (t
           serialNo: 1,
           sampleId: 537572,
           measureId: 111,
-          measureDTO: { length: 10, sexNo: 42, sexualMaturity: { sexualMaturityId: 1 } },
+          measureDTO: { length: 10, sexNo: 42, sexualMaturity: { sexualMaturityId: 1, sexualMaturityNo: 1 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
           sampleResponse: {
             station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
@@ -233,7 +233,7 @@ test('MetadataApi(hafro):sampleDetail missing maturity / gear', async function (
           serialNo: 2,
           sampleId: 537572,
           measureId: 112,
-          measureDTO: { length: 12, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          measureDTO: { length: 12, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
           sampleResponse: {
             station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
@@ -250,7 +250,7 @@ test('MetadataApi(hafro):sampleDetail missing maturity / gear', async function (
   test.equal(out[0].tx_maturity, undefined, 'No maturity when API has none');
   test.equal(out[0].ch_gear, undefined, 'No gear when API has none');
   test.equal(out[0].nm_length, 10, 'Rest of individual still mapped');
-  test.deepEqual(out[1].tx_maturity, { id: 2, en: 'Unknown' }, 'Maturity mapped when present');
+  test.deepEqual(out[1].tx_maturity, { id: 2, en: 'COD/2', is: 'COD/2' }, 'Maturity mapped when present');
   test.equal(out[1].ch_gear, 'PT1', 'Gear mapped when present');
 
   test.end();
@@ -266,7 +266,7 @@ test('MetadataApi(hafro):sampleDetail unwraps single-element array response', as
           serialNo: 1,
           sampleId: 537572,
           measureId: 111,
-          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
           sampleResponse: {
             station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
@@ -311,7 +311,7 @@ test('MetadataApi(hafro):sampleDetail too many otoliths throws', async function 
     serialNo: i + 1,
     sampleId: 537572,
     measureId: i + 1,
-    measureDTO: { length: 1, sexNo: 1, sexualMaturity: { sexualMaturityId: 1 } },
+    measureDTO: { length: 1, sexNo: 1, sexualMaturity: { sexualMaturityId: 1, sexualMaturityNo: 1 } },
     speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
     sampleResponse: {
       station: { cruise: { name: 'TG1-2023' }, number: 110, stationDate: '2023-03-15' },
@@ -345,7 +345,7 @@ test('MetadataApi(hafro):sampleDetail warns on mismatched reconstructed label', 
           serialNo: 1,
           sampleId: 537572,
           measureId: 111,
-          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
           sampleResponse: {
             station: { cruise: { name: 'TG1-2023' }, number: 999, stationDate: '2023-03-15' },
@@ -356,7 +356,7 @@ test('MetadataApi(hafro):sampleDetail warns on mismatched reconstructed label', 
           serialNo: 2,
           sampleId: 537572,
           measureId: 222,
-          measureDTO: { length: 43, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          measureDTO: { length: 43, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' },
           sampleResponse: {
             station: { cruise: { name: 'TG1-2023' }, number: 999, stationDate: '2023-03-15' },
@@ -388,7 +388,7 @@ test('MetadataApi(hafro):sampleDetail insufficient reconstruction info throws', 
           serialNo: 1,
           sampleId: 537572,
           measureId: 111,
-          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2 } },
+          measureDTO: { length: 42, sexNo: 1, sexualMaturity: { sexualMaturityId: 2, sexualMaturityNo: 2 } },
           speciesDTO: { id: 1, englishName: 'Cod', code3a: 'COD', name: 'Þorskur' }
           // No sampleResponse; label was partial "537572 1" so lbl also lacks cruise/station/month
         }]

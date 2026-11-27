@@ -270,8 +270,12 @@ export default class MetadataApi extends BaseMetadataApi {
           out.tx_sex = od.measureDTO.sexNo;
           out.tx_sex = this.txFor('sex')[out.tx_sex] || { id: out.tx_sex, en: 'Unknown' };
           if (od.measureDTO.sexualMaturity) {
-            // NB: We don't have a taxonomy for this yet
-            out.tx_maturity = { id: od.measureDTO.sexualMaturity.sexualMaturityId, en: 'Unknown' };
+            const maturityLabel = `${od.speciesDTO.code3a}/${od.measureDTO.sexualMaturity.sexualMaturityNo}`;
+            out.tx_maturity = {
+              id: od.measureDTO.sexualMaturity.sexualMaturityId,
+              en: maturityLabel,
+              is: maturityLabel
+            };
           }
         }
         if (od.speciesDTO) {
