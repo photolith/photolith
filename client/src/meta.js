@@ -248,6 +248,19 @@ export function populateIndividualData (indData, elTableBody, tableMode = 'displ
     return renderMetaRow(k, indData[k], tableMode, indData);
   }).join('\n');
 
+  // If requested, merge pairs of rows, so we have 2 key/value pairs per row
+  if (elTableBody.classList.contains('two-column')) {
+    Array.from(elTableBody.children).forEach((elRow, i, rows) => {
+      if (i % 2 === 1) {
+        rows[i - 1].append(...elRow.children);
+        elRow.remove();
+      } else if (i === rows.length - 1) {
+        // Pad final row so it has a full set of cells
+        elRow.append(elTableBody.ownerDocument.createElement('TD'), elTableBody.ownerDocument.createElement('TD'));
+      }
+    });
+  }
+
   // Populate add-new-metadata if present
   const elAddSelect = elTableBody.parentElement.querySelector(':scope select.add-new-metadata');
   if (elAddSelect) {
