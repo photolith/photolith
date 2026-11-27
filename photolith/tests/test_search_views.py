@@ -1024,6 +1024,70 @@ class ExportViewTest(RequiresUtils, TestCase):
             ],
         )
 
+    def test_call__back_calc(self):
+        """Individuals with a back-calculation have length columns by label, hidden if none do"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+
+        def length_header():
+            resp = client.get("/search/export/all/")
+            body = b"".join(resp.streaming_content).decode("utf-8-sig")
+            header = next(csv.reader(body.split("\r\n")))
+            return [c for c in header if c.startswith("length_")]
+
+        img = self.create_image()
+        scale = dict(tx_sampleType={"id": 2, "en": "Scale", "is": "Hreistur"})
+
+        ind_otolith = self.create_individual(
+            image=img,
+            data=dict(
+                nm_length=30, tx_sampleType={"id": 1, "en": "Otolith", "is": "Kvörn"}
+            ),
+        )
+        ann_otolith = self.create_annotation(
+            ind_otolith, axis_poly=[[0, 0], [3, 4, "1"], [6, 8, "E"]]
+        )
+        self.assertEqual(length_header(), [])
+
+        # First individual has no annotations, but header should still have all columns
+        self.create_individual(image=img, data=dict(scale, nm_length=30))
+        ind_scale = self.create_individual(image=img, data=dict(scale, nm_length=30))
+        ann_scale = self.create_annotation(
+            ind_scale,
+            axis_poly=[[0, 0], [3, 4, "F1"], [6, 8, "F+"], [9, 12, "S+"]],
+        )
+        ind_nolength = self.create_individual(image=img, data=scale)
+        ann_nolength = self.create_annotation(
+            ind_nolength, axis_poly=[[0, 0], [3, 4, "F1"], [6, 8, "F+"]]
+        )
+
+        self.assertEqual(
+            length_header(),
+            # NB: Otolith labels aren't included, they have no lengths
+            ["length_F1", "length_F+", "length_S+"],
+        )
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("length_")
+                }
+                for r in self.export(userA, "all")
+                if "annotation_id" in r
+            ],
+            [
+                dict(annotation_id=str(ann_otolith.id)),
+                dict(
+                    annotation_id=str(ann_scale.id),
+                    length_F1="10.0",
+                    **{"length_F+": "20.0", "length_S+": "30.0"},
+                ),
+                dict(annotation_id=str(ann_nolength.id)),
+            ],
+        )
+
     def test_call__project_annotations(self):
         """Annotations in open projects aren't visible to other readers"""
         owner = self.create_user("owner", groups=["General Annotation Editor"])

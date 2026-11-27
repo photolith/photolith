@@ -1,4 +1,5 @@
 import json
+import math
 import pathlib
 import shutil
 import subprocess
@@ -6,9 +7,11 @@ import unittest
 
 from django.test import TestCase
 
-from ..lifecycle import age_stages, label_sort_key, point_labels
+from ..lifecycle import age_stages, back_calc, label_sort_key, point_labels
 
 ANADROMOUS = dict(tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"})
+OTOLITH = dict(tx_sampleType={"id": 1, "en": "Otolith"})
+SCALE = dict(tx_sampleType={"id": 2, "en": "Scale"})
 LIFECYCLE_JS = (
     pathlib.Path(__file__).resolve().parents[2] / "client" / "src" / "lifecycle.js"
 )
@@ -49,6 +52,11 @@ def js_age_stages(cases):
     return js_lifecycle(cases, "return lc.ageStages ? lc.ageStages(points) : null;")
 
 
+def js_back_calc(cases):
+    """Run each (ind_data, axis_poly) in (cases) through lifecycle.js's backCalc()"""
+    return js_lifecycle(cases, "return lc.backCalc(points, indData);")
+
+
 # (ind_data, labels, expected age_stages)
 # NB: Anadromous are the same cases as lifecycleAnadromous:ageStages in test_lifecycle.js
 CASES = [
@@ -87,6 +95,40 @@ class AgeStagesTest(TestCase):
         self.assertEqual(
             [age_stages(ind_data, axis_poly) for ind_data, axis_poly in cases],
             js_age_stages(cases),
+        )
+
+
+# (ind_data, axis_poly, expected back_calc)
+# NB: Scale cases are as backCalc:dahlLea in test_lifecycle.js
+BACK_CALC_CASES = [
+    (dict(nm_length=30), [[0, 0], [3, 4], [6, 8]], None),
+    (dict(OTOLITH, nm_length=30), [[0, 0], [3, 4], [6, 8]], None),
+    (dict(tx_sampleType={}, nm_length=30), [[0, 0], [3, 4], [6, 8]], None),
+    (SCALE, [[0, 0], [3, 4], [6, 8]], None),
+    (dict(SCALE, nm_length=None), [[0, 0], [3, 4], [6, 8]], None),
+    (dict(SCALE, nm_length=30), [[0, 0], [3, 4], [6, 8], [9, 12]], [0, 10, 20, 30]),
+    (
+        dict(SCALE, nm_length=10),
+        [[0, 0], [3, 4, "F1"], [3, 9, "F+"]],
+        [0, 10 * 5 / math.sqrt(90), 10],
+    ),
+    (dict(SCALE, nm_length=30), [[0, 0], [0, 0]], [None, None]),
+    (dict(SCALE, nm_length=30), [], []),
+]
+
+
+class BackCalcTest(TestCase):
+    def test_back_calc(self):
+        for ind_data, axis_poly, expected in BACK_CALC_CASES:
+            self.assertEqual(back_calc(ind_data, axis_poly), expected, axis_poly)
+
+    @unittest.skipUnless(shutil.which("node"), "node not installed")
+    def test_back_calc__js_in_sync(self):
+        """Python back_calc() gives the same results as lifecycle.js"""
+        cases = [(ind_data, axis_poly) for ind_data, axis_poly, _ in BACK_CALC_CASES]
+        self.assertEqual(
+            [back_calc(ind_data, axis_poly) for ind_data, axis_poly in cases],
+            js_back_calc(cases),
         )
 
 

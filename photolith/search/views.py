@@ -15,6 +15,8 @@ from ..errors import json_errors
 from ..lifecycle import (
     age_stages,
     age_stages_individual_ids,
+    back_calc,
+    back_calc_individual_ids,
     label_sort_key,
     point_labels,
 )
@@ -98,7 +100,7 @@ class DataView(LoginRequiredMixin, View):
     ):
         """
         Check access & build the query for the request, returning a generator of rows.
-        If with_point_cols, every annotation row has all growth_x columns any row will have, for CSV headers.
+        If with_point_cols, every annotation row has all growth_x / length_x columns any row will have, for CSV headers.
         NB: Errors in the request are raised now, rather than once a streaming response has started
         """
         qs = Individual.objects
@@ -190,10 +192,17 @@ class DataView(LoginRequiredMixin, View):
                 key=label_sort_key,
             )
 
-        # Every growth_(label) column annotations of individuals in qs will have
-        growth_cols = None
+        # Every growth_(label) / length_(label) column annotations of individuals in qs will have
+        growth_cols = length_cols = None
         if with_point_cols and with_annotations in ("all", "best"):
             growth_cols = ["growth_%s" % x for x in labels(ann_qs)]
+            # NB: Only individuals with a back-calculation have lengths
+            length_cols = [
+                "length_%s" % x
+                for x in labels(
+                    ann_qs.filter(individual__in=back_calc_individual_ids())
+                )
+            ]
 
         return self._rows(
             qs,
@@ -202,6 +211,7 @@ class DataView(LoginRequiredMixin, View):
             with_associated_images,
             with_age_stages,
             growth_cols,
+            length_cols,
         )
 
     def filter_query(self, qs):
@@ -311,6 +321,7 @@ class DataView(LoginRequiredMixin, View):
         with_associated_images,
         with_age_stages=False,
         growth_cols=None,
+        length_cols=None,
     ):
         """Generator of rows from qs, returning any extra keys for the response"""
 
@@ -320,6 +331,16 @@ class DataView(LoginRequiredMixin, View):
             if px_to_mm and a is not None:
                 for x, d in zip(point_labels(a.axis_poly), a.axis_poly_dists()):
                     out["growth_%s" % x] = px_to_mm * d
+            return out
+
+        def length(ind_data, a):
+            """length_(label) columns for annotation (a), the back-calculated length at each point, if possible"""
+            out = {c: None for c in length_cols or []}
+            lengths = back_calc(ind_data, a.axis_poly) if a is not None else None
+            if lengths:
+                # NB: Centre is always 0, so has no column
+                for x, l in zip(point_labels(a.axis_poly), lengths[1:]):
+                    out["length_%s" % x] = l
             return out
 
         def age_stage_cols(ind_data, a):
@@ -388,6 +409,7 @@ class DataView(LoginRequiredMixin, View):
                         annotated_at=a.created_at,
                         comment=a.comment,
                         **growth(a, px_to_mm),
+                        **length(out, a),
                     )
 
                     yield {**out, **a_out}
@@ -407,6 +429,7 @@ class DataView(LoginRequiredMixin, View):
                     annotated_at=None,
                     comment=None,
                     **growth(None, None),
+                    **length(out, None),
                 )
 
                 yield {**out, **a_out}
