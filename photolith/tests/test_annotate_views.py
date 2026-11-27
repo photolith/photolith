@@ -1,4 +1,5 @@
 import datetime
+import html
 import json
 import random
 import re
@@ -163,6 +164,31 @@ class AnnotateViewTest(RequiresUtils, TestCase):
             )
         ann.refresh_from_db()
         self.assertEqual(ann.project, p1)
+
+    def test_render__json(self):
+        """Labelled axis_polys & bounding boxes are rendered as valid JSON"""
+        user = self.create_user(groups=["General Annotation Editor"])
+        ind = self.create_individual()
+        axis_poly = [[0, 0, "C"], [1, 1, "F1"], [2, 2, 'S"+']]
+        self.create_annotation(ind, user, axis_poly=axis_poly)
+        client = Client()
+        client.force_login(user)
+
+        def attr_json(content, name):
+            m = re.findall(r'%s="([^"]*)"' % name, content)
+            return [json.loads(html.unescape(x)) for x in m]
+
+        resp = client.get("/annotate/%d/" % ind.id)
+        self.assertEqual(resp.status_code, 200)
+        content = resp.content.decode("utf8")
+        self.assertEqual(attr_json(content, "data-axis-poly"), [axis_poly])
+        self.assertEqual(attr_json(content, "data-bounding-box"), [ind.bounding_box])
+
+        resp = client.get("/annotate/%d/snippet/" % ind.id)
+        self.assertEqual(resp.status_code, 200)
+        content = resp.content.decode("utf8")
+        self.assertEqual(attr_json(content, "data-axis-poly"), [axis_poly])
+        self.assertEqual(attr_json(content, "data-bounding-box"), [ind.bounding_box])
 
     def test_get_initial(self):
         user1 = self.create_user(
@@ -383,6 +409,19 @@ class AnnotateViewTest(RequiresUtils, TestCase):
         # user4 still not part of the project
         with self.assertRaisesRegex(PermissionDenied, "administrator"):
             get_all_annotations(ind, project=p, user=user4),
+
+        # base_user's most recent annotation is unreadable, with no points, so nothing to copy
+        self.create_annotation(ind, user1, created_delta=dict(days=-1), axis_poly=[])
+        self.assertEqual(
+            get_all_annotations(
+                ind,
+                project=dict(
+                    created_by=user3, base_user=user1, team=[user1, user2, user3]
+                ),
+                user=user3,
+            ),
+            [],
+        )
 
     def test_get_individual(self):
         def get_ind(individual, user=None):

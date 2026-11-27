@@ -118,8 +118,8 @@ class RequiresUtils:
         out = Annotation.objects.create(
             individual=individual,
             created_by=created_by,
-            rating=Annotation.Rating.GOOD,
-            age=10,
+            rating=rating,
+            age=age,
             axis_poly=axis_poly,
             authority=authority,
             comment=comment,

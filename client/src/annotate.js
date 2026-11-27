@@ -1,10 +1,11 @@
 import { Point } from 'fabric';
 
 import { displayAlert } from './alert';
-import { formUnloadWarning } from './events';
+import { changeEvent, formUnloadWarning } from './events';
 import { setDefaultValue } from './utils';
 import { jsonFetch } from './fetch';
-import { populateIndividualData } from './meta';
+import { attribEscape, htmlEscape, populateIndividualData, renderAgeStages, updateAgeStages } from './meta';
+import { getLifecycle } from './lifecycle';
 
 const existingPallete = [
   '230, 159, 0',
@@ -15,7 +16,7 @@ const existingPallete = [
   '204, 121, 167'
 ];
 
-function formRefresh (pxMmRatio, event) {
+function formRefresh (pxMmRatio, lifecycle, indData, event) {
   function pxToMM (px) {
     const mm = px * pxMmRatio;
     return Math.round(mm * 100) / 100;
@@ -23,28 +24,81 @@ function formRefresh (pxMmRatio, event) {
 
   if (event.target.name === 'axis_poly') {
     const elTableBody = window.document.querySelector('#axis_poly_table tbody');
-    const pointData = JSON.parse(event.target.value || '[]').map((p) => new Point(p[0], p[1]));
+    const rawPoints = JSON.parse(event.target.value || '[]');
+    const pointData = rawPoints.map((p) => new Point(p[0], p[1]));
     let totalDist = 0;
+
+    // Replace any labels that aren't possible with the first option, one at a time as each affects the next
+    let labelOptions;
+    let labelsChanged = false;
+    while (true) {
+      labelOptions = lifecycle.labelOptions(rawPoints);
+      const i = rawPoints.findIndex((p, i) => !labelOptions[i].includes(p.length > 2 ? p[2] : null));
+      if (i < 0) break;
+
+      rawPoints[i] = rawPoints[i].slice(0, 2);
+      if (labelOptions[i][0] !== null) rawPoints[i].push(labelOptions[i][0]);
+      labelsChanged = true;
+    }
+    if (labelsChanged) {
+      if (event.formReset) {
+        // Form was just reset, update the default & reset again so we don't trigger onbeforeunload
+        setDefaultValue(event.target, JSON.stringify(rawPoints));
+        event.target.form.reset();
+      } else {
+        // Labels changed, update axis_poly & let the change event update viewer / table
+        event.target.value = JSON.stringify(rawPoints);
+        event.target.dispatchEvent(changeEvent());
+      }
+      return;
+    }
+
+    // Select box of possible labels for point (i)
+    function pointLabelSelect (i) {
+      return `<select class="form-select form-select-sm ph-point-label" data-idx="${i}">${labelOptions[i].filter((l) => l !== null).map((l) =>
+        `<option value="${attribEscape(l)}"${l === rawPoints[i][2] ? ' selected' : ''}>${htmlEscape(l)}</option>`
+      ).join('')}</select>`;
+    }
 
     // Find currently selected point
     let selectedIdx = event.target.form.selection.value.match(/^axis_poly\[(\d+)\]$/);
     selectedIdx = selectedIdx ? parseInt(selectedIdx[1], 10) : null;
 
+    // Back-calculated lengths, only show the column if there are any
+    const backCalc = lifecycle.backCalc(rawPoints, indData);
+    window.document.querySelector('#axis_poly_table thead .ph-back-calc').classList.toggle('d-none', !backCalc);
+
     elTableBody.innerHTML = pointData.map((p, i) => i === 0
       ? ''
-      : `<tr class="${i === selectedIdx ? 'table-info' : ''}">
-      <td>${i === pointData.length - 1 ? 'E' : i}</td>
+      : `<tr class="${i === selectedIdx ? 'table-info' : ''}" data-idx="${i}">
+      <td>${pointLabelSelect(i)}</td>
       <td>${pxToMM(p.distanceFrom(pointData[i - 1]))}</td>
       <td>${pxToMM(totalDist += p.distanceFrom(pointData[i - 1]))}</td>
+      ${backCalc ? `<td>${backCalc[i] === null ? '' : Math.round(backCalc[i] * 100) / 100}</td>` : ''}
     </tr>`).join('\n');
 
-    // Count ring markers and use that as age value
-    event.target.form.age.value = pointData.length - 2;
+    event.target.form.age.value = lifecycle.age(rawPoints);
+
+    if (lifecycle.ageStages) {
+      event.target.form.querySelector('.ph-age-stages output').innerHTML = renderAgeStages(lifecycle.ageStages(rawPoints));
+    }
+  }
+
+  if (event.target.classList.contains('ph-point-label')) {
+    // Write new label back into axis_poly, and let the viewer / table update from that
+    const elAxisPoly = event.target.form.axis_poly;
+    const rawPoints = JSON.parse(elAxisPoly.value || '[]');
+    const i = parseInt(event.target.getAttribute('data-idx'), 10);
+
+    rawPoints[i] = rawPoints[i].slice(0, 2);
+    if (event.target.value) rawPoints[i].push(event.target.value);
+    elAxisPoly.value = JSON.stringify(rawPoints);
+    elAxisPoly.dispatchEvent(changeEvent());
   }
 
   if (event.target.name === 'selection') {
     // Refresh the form
-    formRefresh(pxMmRatio, { target: event.target.form.axis_poly });
+    formRefresh(pxMmRatio, lifecycle, indData, { target: event.target.form.axis_poly });
   }
 }
 
@@ -82,7 +136,7 @@ function allAnnotationsClick (elForm, event) {
       // NB: Wait until after the change event has auto-updated the age
       window.setTimeout((newVal) => {
         setDefaultValue(elForm.elements.age, newVal);
-      }, 100, elSelected.querySelector('.val-age').textContent);
+      }, 100, elSelected.querySelector('.val-age').getAttribute('data-value'));
 
       setDefaultValue(elForm.elements.rating, elSelected.querySelector('.val-rating').getAttribute('data-value'));
       setDefaultValue(elForm.elements.authority, elSelected.querySelector('.val-authority').getAttribute('data-value'));
@@ -149,7 +203,8 @@ function existingAnnotationsPopulate (elForm, tableEl) {
     const col = existingPallete[i % existingPallete.length];
 
     el.style.borderColor = `rgb(${col})`;
-    return `<input type="hidden" name="view_poly:${i}" data-stroke="${col}" value="${el.getAttribute('data-axis-poly')}" />`;
+    // NB: axis_poly labels are strings, so the JSON contains quotes
+    return `<input type="hidden" name="view_poly:${i}" data-stroke="${col}" value="${attribEscape(el.getAttribute('data-axis-poly'))}" />`;
   }).join('\n');
   elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
 }
@@ -158,18 +213,40 @@ export function init (parent) {
   parent.querySelectorAll('form.annotate-form').forEach((elForm) => {
     const indData = JSON.parse(document.getElementById('ind_data').textContent);
 
-    elForm.addEventListener('change', formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm'))));
+    const refresh = formRefresh.bind(elForm, parseFloat(elForm.getAttribute('data-px-mm')), getLifecycle(indData), indData);
+    elForm.addEventListener('change', refresh);
+    elForm.addEventListener('reset', (event) => {
+      // NB: A form reset event fires before value is updated, so wait until it has
+      window.setTimeout(() => refresh({ formReset: true, target: elForm.elements.axis_poly }), 0);
+    });
+
+    // Lifecycles with stages calculate the age from labels, so show the stages instead of an editable age
+    const hasAgeStages = !!getLifecycle(indData).ageStages;
+    elForm.querySelector('.ph-age-input').classList.toggle('d-none', hasAgeStages);
+    elForm.querySelector('.ph-age-stages').classList.toggle('d-none', !hasAgeStages);
+    updateAgeStages(document.querySelector('.ph-all-annotations'), getLifecycle(indData));
 
     formUnloadWarning(elForm);
+
+    // Select a point by clicking on its row in axis_poly_table
+    elForm.querySelector('#axis_poly_table').addEventListener('click', (event) => {
+      const elRow = event.target.closest('tbody > tr[data-idx]');
+      if (!elRow || event.target.closest('select')) return;
+
+      const newVal = `axis_poly[${elRow.getAttribute('data-idx')}]`;
+      if (elForm.selection.value === newVal) return;
+      elForm.selection.value = newVal;
+      elForm.selection.dispatchEvent(changeEvent());
+    });
 
     document.querySelector('.ph-all-annotations').addEventListener('click', allAnnotationsClick.bind(document.querySelector('.ph-all-annotations'), elForm));
 
     populateIndividualData(indData, window.document.querySelector('.individual-data tbody'));
 
-    document.querySelector('#ph-view-poly-show-axis').addEventListener('change', (event) => {
-      // Trigger addRemove so we update axis state
+    document.querySelectorAll('#ph-view-poly-show-axis, #ph-view-poly-show-labels').forEach((el) => el.addEventListener('change', (event) => {
+      // Trigger addRemove so we update axis / label state
       elForm.dispatchEvent(new window.CustomEvent('element_addremove'));
-    });
+    }));
 
     parent.querySelectorAll('button#existing-tab').forEach((elExistingBtn) => {
       // Find matching editor button

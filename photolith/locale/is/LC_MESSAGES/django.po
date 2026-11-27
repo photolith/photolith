@@ -517,6 +517,19 @@ msgid "Axis lines visible, click here to hide axis lines"
 msgstr "Lestrarás sýnilegur. Smelltu hér til að fela lestrarás"
 
 #: photolith/templates/annotate/annotate.html
+msgid "Point labels hidden, click here to show point labels"
+msgstr "Merkimiðar punkta faldir. Smelltu hér til að sýna merkimiða punkta"
+
+#: photolith/templates/annotate/annotate.html
+#: photolith/templates/annotate/annotate.html
+msgid "Show/Hide point labels"
+msgstr "Sýna/fela merkimiða punkta"
+
+#: photolith/templates/annotate/annotate.html
+msgid "Point labels visible, click here to hide point labels"
+msgstr "Merkimiðar punkta sýnilegir. Smelltu hér til að fela merkimiða punkta"
+
+#: photolith/templates/annotate/annotate.html
 msgid "Delete annotation"
 msgstr "Eyða aldursmerkingu"
 
@@ -566,6 +579,10 @@ msgstr "Lengd á milli árhringja (mm)"
 #: photolith/templates/annotate/annotate.html
 msgid "Cumulative (mm)"
 msgstr "Samtals lengd (mm)"
+
+#: photolith/templates/annotate/annotate.html
+msgid "Back-calculated length"
+msgstr "Bakreiknuð lengd"
 
 #: photolith/templates/annotate/annotate.html
 msgid "Press <kbd>Next</kbd> to start"
@@ -943,7 +960,9 @@ msgstr "Endurstilla"
 #: photolith/token_auth/admin.py
 #, python-format
 msgid "API token key: %(key)s (copy this now, it will not be shown again)"
-msgstr "API-aðgangslykill: %(key)s (afritaðu hann núna, hann verður ekki birtur aftur)"
+msgstr ""
+"API-aðgangslykill: %(key)s (afritaðu hann núna, hann verður ekki birtur "
+"aftur)"
 
 #: photolith/token_auth/models.py
 msgid "Name"

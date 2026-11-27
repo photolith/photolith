@@ -46,6 +46,7 @@ export class PhAnnotate extends PhSyncingViewer {
     const els = Array.from((this.elSyncForm || { elements: [] }).elements);
     // NB: Not using phPrefs, element isn't part of form so syncing doesn't happen, and it won't trigger addremove anyway.
     const showAxis = (document.getElementById('ph-view-poly-show-axis') || { checked: true }).checked;
+    const showLabels = (document.getElementById('ph-view-poly-show-labels') || { checked: false }).checked;
     els.reverse(); // NB: Reverse so we draw the polys in table order
     els.forEach((el) => {
       const m = el.name.match(/^(axis_poly|view_poly):?(\d*)$/);
@@ -62,7 +63,8 @@ export class PhAnnotate extends PhSyncingViewer {
         selectable: m[1] === 'axis_poly'
       }, {
         // All should update the focal point if origin changes
-        origin_is_focal_point: true
+        origin_is_focal_point: true,
+        show_labels: m[1] === 'view_poly' && showLabels
       });
       this.fabCanvas.add(obj);
     });

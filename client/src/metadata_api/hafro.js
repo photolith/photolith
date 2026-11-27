@@ -50,7 +50,13 @@ const metaLabels = {
     nm_meshSize: 'Mesh Size',
     num_annotations: '# Annotations',
     in_measureId: 'Measurement Id',
-    dt_created_at: 'Uploaded'
+    dt_created_at: 'Uploaded',
+    tx_freshwater: 'Freshwater (River/Lake)',
+    ch_freshwaterlocation: 'Freshwater location (Pool)',
+    in_freshwaterspecimen: 'Specimen No.',
+    tx_lifecycle: 'Lifecycle',
+    tx_morph: 'Morph',
+    tx_cameraScale: 'Camera / Scale'
   },
   is: {
     in_sampleId: 'Raðnúmer (id)',
@@ -72,7 +78,13 @@ const metaLabels = {
     nm_meshSize: 'Möskvastærð',
     num_annotations: 'Fjöldi aldursmerkinga',
     in_measureId: 'Mæling Id',
-    dt_created_at: 'Fært inn'
+    dt_created_at: 'Fært inn',
+    tx_freshwater: 'Vatn',
+    ch_freshwaterlocation: 'Staðsetning',
+    in_freshwaterspecimen: 'Fiskur nr.',
+    tx_lifecycle: 'Lífsferill',
+    tx_morph: 'Afbrigði',
+    tx_cameraScale: 'Myndavél / Kvarði'
   }
 };
 

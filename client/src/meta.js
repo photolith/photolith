@@ -14,9 +14,25 @@ export function htmlEscape (s) {
   return (new window.Option(s)).innerHTML;
 }
 
-function attribEscape (s) {
+export function attribEscape (s) {
   // NB: [^"] rather than ., as attribute values can contain newlines
   return (new window.Option('', s)).outerHTML.match(/value="([^"]*)"/)[1];
+}
+
+/** Render a lifecycle's ageStages(), e.g. { F: 3, S: 1, G: 0 } as "3 : 1 : 0", with the stages ("F : S : G") as a tooltip */
+export function renderAgeStages (ageStages) {
+  return `<code title="${attribEscape(Object.keys(ageStages).join(' : '))}">${Object.values(ageStages).join(' : ')}</code>`;
+}
+
+/** Replace annotation ages (.ph-age) in (containerEl) with their stages, if (lifecycle) has them. NB: axis_poly is a data-axis-poly in the same row */
+export function updateAgeStages (containerEl, lifecycle) {
+  if (!lifecycle.ageStages) return;
+  containerEl.querySelectorAll('.ph-age').forEach((el) => {
+    // NB: Unreadable annotations have no age, so nothing to break down
+    if (!el.textContent.trim()) return;
+    const axisPoly = JSON.parse(el.closest('tr').querySelector('[data-axis-poly]').getAttribute('data-axis-poly'));
+    el.innerHTML = renderAgeStages(lifecycle.ageStages(axisPoly));
+  });
 }
 
 /** DataTables type for column (k), so DT doesn't have to scan all data to detect it. NB: Needs registerDTTypes() */

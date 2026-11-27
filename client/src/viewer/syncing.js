@@ -1,6 +1,7 @@
 import { Point, Polyline, Textbox, util } from 'fabric';
 
 import { changeEvent } from '../events';
+import { labelledPoint } from './editable_line';
 import { PhFilteringViewer } from './filtering';
 
 export class PhSyncingViewer extends PhFilteringViewer {
@@ -61,6 +62,21 @@ export class PhSyncingViewer extends PhFilteringViewer {
         return;
       }
 
+      // Select the object the form has selected, e.g. from clicking on a table row
+      if (event.target.name === 'selection') {
+        const activeObj = this.fabCanvas.getActiveObject();
+        if ((activeObj?.id || '') === event.target.value) return;
+
+        const obj = this.fabCanvas.getObjects().find((obj) => obj.id && obj.id === event.target.value);
+        if (obj) {
+          this.fabCanvas.setActiveObject(obj);
+        } else {
+          this.fabCanvas.discardActiveObject();
+        }
+        this.fabCanvas.requestRenderAll();
+        return;
+      }
+
       this.reverseSyncForm({ target: this.fabCanvas.getObjects().find((obj) => obj.id === event.target.name) });
     });
 
@@ -100,8 +116,11 @@ export class PhSyncingViewer extends PhFilteringViewer {
     if (obj instanceof Polyline) {
       const objToCanvas = obj.calcTransformMatrix();
 
-      newVal = obj.points.map((p) => {
-        return roundPoint(toCanvas(util.transformPoint(p, objToCanvas)));
+      newVal = obj.points.map((p, i) => {
+        const out = roundPoint(toCanvas(util.transformPoint(p, objToCanvas)));
+        // Keep any label, as [x, y, label]
+        const label = obj.phNodes && obj.phNodes[i] ? obj.phNodes[i].phLabel : undefined;
+        return out && label !== undefined ? [...out, label] : out;
       });
     } else if (obj instanceof Textbox) {
       const p = obj.getPositionByOrigin('left', 'top');
@@ -154,7 +173,7 @@ export class PhSyncingViewer extends PhFilteringViewer {
       // Empty value --> form hasn't been populated yet. Do opposite
       this.syncForm({ target: obj });
     } else if (obj instanceof Polyline && obj.phSetPoints) {
-      obj.phSetPoints(val.map((x) => new Point(x[0], x[1])), true);
+      obj.phSetPoints(val.map((x) => labelledPoint(x[0], x[1], x[2])), true);
     } else {
       const invGroupTransform = obj.group ? util.invertTransform(obj.group.calcTransformMatrix()) : undefined;
       const fromCanvas = (p) => invGroupTransform ? util.transformPoint(p, invGroupTransform) : p;

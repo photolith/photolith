@@ -12,6 +12,14 @@ from django.db.models import Count, Exists, OuterRef, Prefetch, Subquery, Min, M
 from django.template.loader import render_to_string
 
 from ..errors import json_errors
+from ..lifecycle import (
+    age_stages,
+    age_stages_individual_ids,
+    back_calc,
+    back_calc_individual_ids,
+    label_sort_key,
+    point_labels,
+)
 from ..models import (
     Annotation,
     Image,
@@ -84,10 +92,15 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 class DataView(LoginRequiredMixin, View):
     def query(
-        self, with_annotations="", with_image_url=False, with_associated_images=False
+        self,
+        with_annotations="",
+        with_image_url=False,
+        with_associated_images=False,
+        with_point_cols=False,
     ):
         """
         Check access & build the query for the request, returning a generator of rows.
+        If with_point_cols, every annotation row has all growth_x / length_x columns any row will have, for CSV headers.
         NB: Errors in the request are raised now, rather than once a streaming response has started
         """
         qs = Individual.objects
@@ -158,7 +171,48 @@ class DataView(LoginRequiredMixin, View):
         else:
             raise BadRequest("Unknown annotations type '%s'" % with_annotations)
 
-        return self._rows(qs, with_annotations, with_image_url, with_associated_images)
+        # Only add age stage columns if some individuals have a lifecycle with stages
+        # NB: CSV headers come from the first row, so we need to know before we start
+        with_age_stages = (
+            with_annotations in ("all", "best")
+            and qs.filter(pk__in=age_stages_individual_ids()).exists()
+        )
+
+        def labels(ann_qs):
+            """Every point label of annotations in (ann_qs) of individuals in qs, in label_sort_key order"""
+            return sorted(
+                set(
+                    x
+                    for ap in ann_qs.filter(individual__in=qs.values("pk"))
+                    .order_by()
+                    .values_list("axis_poly", flat=True)
+                    if ap
+                    for x in point_labels(ap)
+                ),
+                key=label_sort_key,
+            )
+
+        # Every growth_(label) / length_(label) column annotations of individuals in qs will have
+        growth_cols = length_cols = None
+        if with_point_cols and with_annotations in ("all", "best"):
+            growth_cols = ["growth_%s" % x for x in labels(ann_qs)]
+            # NB: Only individuals with a back-calculation have lengths
+            length_cols = [
+                "length_%s" % x
+                for x in labels(
+                    ann_qs.filter(individual__in=back_calc_individual_ids())
+                )
+            ]
+
+        return self._rows(
+            qs,
+            with_annotations,
+            with_image_url,
+            with_associated_images,
+            with_age_stages,
+            growth_cols,
+            length_cols,
+        )
 
     def filter_query(self, qs):
         """Filter qs by the search in the request"""
@@ -259,8 +313,48 @@ class DataView(LoginRequiredMixin, View):
                 )
         return qs
 
-    def _rows(self, qs, with_annotations, with_image_url, with_associated_images):
+    def _rows(
+        self,
+        qs,
+        with_annotations,
+        with_image_url,
+        with_associated_images,
+        with_age_stages=False,
+        growth_cols=None,
+        length_cols=None,
+    ):
         """Generator of rows from qs, returning any extra keys for the response"""
+
+        def growth(a, px_to_mm):
+            """growth_(label) columns for annotation (a), the distance from the previous point in mm"""
+            out = {c: None for c in growth_cols or []}
+            if px_to_mm and a is not None:
+                for x, d in zip(point_labels(a.axis_poly), a.axis_poly_dists()):
+                    out["growth_%s" % x] = px_to_mm * d
+            return out
+
+        def length(ind_data, a):
+            """length_(label) columns for annotation (a), the back-calculated length at each point, if possible"""
+            out = {c: None for c in length_cols or []}
+            lengths = back_calc(ind_data, a.axis_poly) if a is not None else None
+            if lengths:
+                # NB: Centre is always 0, so has no column
+                for x, l in zip(point_labels(a.axis_poly), lengths[1:]):
+                    out["length_%s" % x] = l
+            return out
+
+        def age_stage_cols(ind_data, a):
+            """age_F / age_S / age_G for annotation (a), or no columns at all if not with_age_stages"""
+            if not with_age_stages:
+                return {}
+            # NB: Unreadable annotations have no age, so nothing to break down
+            stages = (
+                age_stages(ind_data, a.axis_poly)
+                if a is not None and a.age is not None
+                else None
+            ) or {}
+            return {"age_%s" % k: stages.get(k) for k in "FSG"}
+
         extra = {}
         annotation_alert = {}
         result_count = 0
@@ -307,16 +401,16 @@ class DataView(LoginRequiredMixin, View):
                         annotation_id=a.id,
                         project_id=a.project_id,
                         age=a.age,
+                        **age_stage_cols(out, a),
                         rating=a.rating,
                         authority=a.authority,
                         # NB: Username, as in CSV export (User isn't JSON-serialisable)
                         annotated_by=a.created_by.username if a.created_by else None,
                         annotated_at=a.created_at,
                         comment=a.comment,
+                        **growth(a, px_to_mm),
+                        **length(out, a),
                     )
-                    if px_to_mm:
-                        for i, x in enumerate(a.axis_poly_dists()):
-                            a_out["growth_%d" % (i + 1)] = px_to_mm * x
 
                     yield {**out, **a_out}
                     if with_annotations == "best":
@@ -328,11 +422,14 @@ class DataView(LoginRequiredMixin, View):
                     annotation_id=None,
                     project_id=None,
                     age=None,
+                    **age_stage_cols(out, None),
                     rating=None,
                     authority=None,
                     annotated_by=None,
                     annotated_at=None,
                     comment=None,
+                    **growth(None, None),
+                    **length(out, None),
                 )
 
                 yield {**out, **a_out}
@@ -369,7 +466,6 @@ class ExportView(DataView):
             self.query(
                 with_annotations=self.kwargs["with_annotations"],
                 with_image_url=True,
+                with_point_cols=True,
             ),
-            # NB: Cheat and assume fish are at most 20 years old, we don't know at this point
-            force_cols=["growth_%d" % i for i in range(1, 21)],
         )

@@ -23,20 +23,28 @@ def default_storage():
     return storages["default"]
 
 
-def _is_point_list(v, length=None):
-    """True iff v is a non-empty [[x, y], ...] list of points, of length if given"""
+def _is_point_list(v, length=None, labelled=False):
+    """
+    True iff v is a non-empty [[x, y], ...] list of points, of length if given.
+    If labelled, points can also be [x, y, label], with a string label
+    """
 
     def is_number(x):
         return isinstance(x, numbers.Real) and not isinstance(x, bool)
+
+    def is_point(p):
+        return (
+            isinstance(p, list)
+            and (len(p) == 2 or (labelled and len(p) == 3 and isinstance(p[2], str)))
+            and is_number(p[0])
+            and is_number(p[1])
+        )
 
     return (
         isinstance(v, list)
         and len(v) > 0
         and (length is None or len(v) == length)
-        and all(
-            isinstance(p, list) and len(p) == 2 and all(is_number(x) for x in p)
-            for p in v
-        )
+        and all(is_point(p) for p in v)
     )
 
 
@@ -612,10 +620,15 @@ class Annotation(models.Model):
         ]
 
     def set_axis_poly(self, axis_poly):
-        """Set axis_poly, a [[x, y], ...] list of points. NB: Doesn't save"""
-        if not _is_point_list(axis_poly):
+        """
+        Set axis_poly, a [[x, y], ...] list of points. Points can also be
+        [x, y, label], the label currently isn't used. NB: Doesn't save
+        """
+        if not _is_point_list(axis_poly, labelled=True):
             raise ValidationError(
-                "axis_poly should be [[x, y], ...], not %s" % axis_poly, code=400
+                "axis_poly should be [[x, y], ...] or [[x, y, label], ...], not %s"
+                % axis_poly,
+                code=400,
             )
         self.axis_poly = axis_poly
 
@@ -712,8 +725,11 @@ class Project(models.Model):
                 .order_by("-created_at")
                 .first()
             )
-            if a:
+            if a and a.axis_poly:
                 # Create copy without age assignment, intermediate nodes
+                # NB: Labels are kept for now. Once the UI knows the individual's lifecycle,
+                #     copying should be hidden for labelled annotations
+                # NB: Unreadable annotations can have no points to copy
                 a.pk = None
                 a.age = 0
                 a.axis_poly = [a.axis_poly[0], a.axis_poly[-1]]

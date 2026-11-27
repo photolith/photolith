@@ -725,7 +725,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "num_annotations": "0",
                 },
                 {
-                    "age": "10",
+                    "age": "6",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann12.id),
                     "authority": "80",
@@ -734,20 +734,20 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_1": "2.0",
                     "growth_2": "4.0",
                     "growth_3": "6.0",
-                    "growth_4": "6.0",
+                    "growth_E": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
                 },
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "20",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "comment": "Ekki mjög góð skýring",
                     "growth_1": "2.0",
-                    "growth_2": "4.0",
+                    "growth_E": "4.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
@@ -768,7 +768,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "num_annotations": "0",
                 },
                 {
-                    "age": "10",
+                    "age": "6",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann12.id),
                     "authority": "80",
@@ -777,7 +777,7 @@ class ExportViewTest(RequiresUtils, TestCase):
                     "growth_1": "2.0",
                     "growth_2": "4.0",
                     "growth_3": "6.0",
-                    "growth_4": "6.0",
+                    "growth_E": "6.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "2",
@@ -814,7 +814,7 @@ class ExportViewTest(RequiresUtils, TestCase):
             list(self.export(userA, "best")),
             [
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "0",
@@ -833,17 +833,258 @@ class ExportViewTest(RequiresUtils, TestCase):
             list(self.export(userA, "best")),
             [
                 {
-                    "age": "10",
+                    "age": "3",
                     "annotated_by": "annotator",
                     "annotation_id": str(ann11.id),
                     "authority": "0",
                     "bounding_box": "[[0, 0], [1, 1]]",
                     "growth_1": "1.0",
-                    "growth_2": "2.0",
+                    "growth_E": "2.0",
                     "image__content__url": img.content.url,
                     "rating": "100",
                     "num_annotations": "1",
                 }
+            ],
+        )
+
+    def test_call__age_stages(self):
+        """Anadromous annotations have their age broken down into F / S / G stages"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        img = self.create_image(scale_line=None, scale_mm=None)
+        anadromous = dict(
+            tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"}
+        )
+        ind_sea = self.create_individual(image=img, data=anadromous)
+        ann_sea = self.create_annotation(
+            ind_sea,
+            age=4,
+            axis_poly=[
+                [0, 0],
+                [1, 0, "F1"],
+                [2, 0, "F2"],
+                [3, 0, "F+"],
+                [4, 0, "S1"],
+                [5, 0, "G1"],
+                [6, 0, "S+"],
+            ],
+        )
+        ind_fresh = self.create_individual(image=img, data=anadromous)
+        ann_fresh = self.create_annotation(
+            ind_fresh,
+            age=2,
+            axis_poly=[[0, 0], [1, 0, "F1"], [2, 0, "F2"], [3, 0, "F+"]],
+        )
+        ind_unreadable = self.create_individual(image=img, data=anadromous)
+        ann_unreadable = self.create_annotation(
+            ind_unreadable, age=None, axis_poly=[], rating=Annotation.Rating.UNREADABLE
+        )
+        ind_default = self.create_individual(image=img)
+        ann_default = self.create_annotation(
+            ind_default, age=2, axis_poly=[[0, 0], [1, 0, "1"], [2, 0, "E"]]
+        )
+
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("age")
+                }
+                for r in self.export(userA, "all")
+            ],
+            [
+                dict(
+                    annotation_id=str(ann_sea.id),
+                    age="4",
+                    age_F="2",
+                    age_S="1",
+                    age_G="1",
+                ),
+                # No sea stage, so no age_S
+                dict(annotation_id=str(ann_fresh.id), age="2", age_F="2", age_G="0"),
+                # No age, so no stages
+                dict(annotation_id=str(ann_unreadable.id)),
+                # Default lifecycle has no stages
+                dict(annotation_id=str(ann_default.id), age="2"),
+            ],
+        )
+
+    def test_call__age_stages_hidden(self):
+        """Age stage columns are only present if some individuals have a lifecycle with stages"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+
+        def header(with_annotations="all"):
+            resp = client.get("/search/export/%s/" % with_annotations)
+            body = b"".join(resp.streaming_content).decode("utf-8-sig")
+            return next(csv.reader(body.split("\r\n")))
+
+        ind_default = self.create_individual()
+        self.create_annotation(ind_default, axis_poly=[[0, 0], [1, 1, "1"]])
+        self.assertIn("age", header())
+        self.assertNotIn("age_F", header())
+
+        # An anadromous individual, even without annotations, brings the columns back
+        self.create_individual(
+            data=dict(tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"})
+        )
+        self.assertEqual(
+            [c for c in header() if c.startswith("age")],
+            ["age", "age_F", "age_S", "age_G"],
+        )
+        self.assertEqual(
+            [c for c in header("best") if c.startswith("age")],
+            ["age", "age_F", "age_S", "age_G"],
+        )
+
+    def test_call__growth_labels(self):
+        """Growth columns are by label, in label order, the header has every column any row has"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+        # Scale should multiply distances by 2
+        img = self.create_image(scale_line=[(0, 0), (1, 0)], scale_mm=2)
+        anadromous = dict(
+            tx_lifecycle={"id": 1, "en": "Anadromous", "is": "Sjógenginn"}
+        )
+
+        # First individual has no annotations, but header should still have all columns
+        self.create_individual(image=img, data=anadromous)
+        ind_fresh = self.create_individual(image=img, data=anadromous)
+        ann_fresh = self.create_annotation(
+            ind_fresh,
+            axis_poly=[[0, 0], [1, 0, "F1"], [3, 0, "F2"], [4, 0, "F+"]],
+        )
+        ind_sea = self.create_individual(image=img, data=anadromous)
+        ann_sea = self.create_annotation(
+            ind_sea,
+            # NB: Unlabelled point at the end falls back to E
+            axis_poly=[
+                [0, 0],
+                [2, 0, "F1"],
+                [3, 0, "F+"],
+                [6, 0, "S1"],
+                [7, 0, "S+"],
+                [8, 0],
+            ],
+        )
+        ind_default = self.create_individual(image=img)
+        ann_default = self.create_annotation(
+            ind_default, axis_poly=[[0, 0], [1, 0, "1"], [2, 0, "2"], [4, 0, "E"]]
+        )
+
+        resp = client.get("/search/export/all/")
+        body = b"".join(resp.streaming_content).decode("utf-8-sig")
+        self.assertEqual(
+            [c for c in next(csv.reader(body.split("\r\n"))) if c.startswith("growth")],
+            [
+                "growth_F1",
+                "growth_F2",
+                "growth_F+",
+                "growth_S1",
+                "growth_S+",
+                "growth_1",
+                "growth_2",
+                "growth_E",
+            ],
+        )
+
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("growth")
+                }
+                for r in self.export(userA, "all")
+                if "annotation_id" in r
+            ],
+            [
+                dict(
+                    annotation_id=str(ann_fresh.id),
+                    growth_F1="2.0",
+                    growth_F2="4.0",
+                    **{"growth_F+": "2.0"},
+                ),
+                dict(
+                    annotation_id=str(ann_sea.id),
+                    growth_F1="4.0",
+                    **{"growth_F+": "2.0"},
+                    growth_S1="6.0",
+                    **{"growth_S+": "2.0"},
+                    growth_E="2.0",
+                ),
+                dict(
+                    annotation_id=str(ann_default.id),
+                    growth_1="2.0",
+                    growth_2="2.0",
+                    growth_E="4.0",
+                ),
+            ],
+        )
+
+    def test_call__back_calc(self):
+        """Individuals with a back-calculation have length columns by label, hidden if none do"""
+        userA = self.create_user("userA", groups=["General Annotation Editor"])
+        client = Client()
+        client.force_login(userA)
+
+        def length_header():
+            resp = client.get("/search/export/all/")
+            body = b"".join(resp.streaming_content).decode("utf-8-sig")
+            header = next(csv.reader(body.split("\r\n")))
+            return [c for c in header if c.startswith("length_")]
+
+        img = self.create_image()
+        scale = dict(tx_sampleType={"id": 2, "en": "Scale", "is": "Hreistur"})
+
+        ind_otolith = self.create_individual(
+            image=img,
+            data=dict(
+                nm_length=30, tx_sampleType={"id": 1, "en": "Otolith", "is": "Kvörn"}
+            ),
+        )
+        ann_otolith = self.create_annotation(
+            ind_otolith, axis_poly=[[0, 0], [3, 4, "1"], [6, 8, "E"]]
+        )
+        self.assertEqual(length_header(), [])
+
+        # First individual has no annotations, but header should still have all columns
+        self.create_individual(image=img, data=dict(scale, nm_length=30))
+        ind_scale = self.create_individual(image=img, data=dict(scale, nm_length=30))
+        ann_scale = self.create_annotation(
+            ind_scale,
+            axis_poly=[[0, 0], [3, 4, "F1"], [6, 8, "F+"], [9, 12, "S+"]],
+        )
+        ind_nolength = self.create_individual(image=img, data=scale)
+        ann_nolength = self.create_annotation(
+            ind_nolength, axis_poly=[[0, 0], [3, 4, "F1"], [6, 8, "F+"]]
+        )
+
+        self.assertEqual(
+            length_header(),
+            # NB: Otolith labels aren't included, they have no lengths
+            ["length_F1", "length_F+", "length_S+"],
+        )
+        self.assertEqual(
+            [
+                {
+                    k: v
+                    for k, v in r.items()
+                    if k == "annotation_id" or k.startswith("length_")
+                }
+                for r in self.export(userA, "all")
+                if "annotation_id" in r
+            ],
+            [
+                dict(annotation_id=str(ann_otolith.id)),
+                dict(
+                    annotation_id=str(ann_scale.id),
+                    length_F1="10.0",
+                    **{"length_F+": "20.0", "length_S+": "30.0"},
+                ),
+                dict(annotation_id=str(ann_nolength.id)),
             ],
         )
 

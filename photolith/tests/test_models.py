@@ -98,6 +98,7 @@ class ImageTest(RequiresUtils, TestCase):
         for scale_line, scale_mm, err in [
             ([[0, 0]], 5, "scale_line should be"),
             ([[0, 0], [1, 2, 3]], 5, "scale_line should be"),
+            ([[0, 0], [1, 2, "label"]], 5, "scale_line should be"),
             ([[0, 0], ["1", 2]], 5, "scale_line should be"),
             ([[0, 0], [True, 2]], 5, "scale_line should be"),
             ("[[0, 0], [1, 1]]", 5, "scale_line should be"),
@@ -311,6 +312,7 @@ class IndividualTest(RequiresUtils, TestCase):
             [],
             [0, 0],
             [[0, 0], [1, 2, 3]],
+            [[0, 0], [1, 2, "label"]],
             [[0, 0], ["1", 2]],
             [[0, 0], [True, 2]],
             "[[0, 0], [1, 1]]",
@@ -488,6 +490,11 @@ class AnnotationTest(RequiresUtils, TestCase):
             axis_poly_dists([(20, 20), (30, 30), (40, 40)]),
             [14.142135623730951, 14.142135623730951],
         )
+        # Labels are ignored
+        self.assertAlmostEqualList(
+            axis_poly_dists([[20, 20, "C"], [30, 30, "F1"], [40, 40, "S+"]]),
+            [14.142135623730951, 14.142135623730951],
+        )
 
     def test_set_axis_poly(self):
         ind = self.create_individual()
@@ -501,19 +508,43 @@ class AnnotationTest(RequiresUtils, TestCase):
         ann.set_axis_poly([[1, 1], [2, 2], [3, 3]])
         self.assertEqual(ann.axis_poly, [[1, 1], [2, 2], [3, 3]])
 
+        # Points can be labelled, or not
+        ann.set_axis_poly([[0, 0, "C"], [1, 1, "F1"], [2, 2]])
+        self.assertEqual(ann.axis_poly, [[0, 0, "C"], [1, 1, "F1"], [2, 2]])
+        ann.set_axis_poly([[1, 1], [2, 2], [3, 3]])
+
         # Invalid values aren't set
         for axis_poly in [
             None,
             [],
             [0, 0],
             [[0, 0], [1, 2, 3]],
+            [[0, 0], [1, 2, None]],
+            [[0, 0], [1, 2, "F1", "x"]],
             [[0, 0], ["1", 2]],
+            [[0, 0], ["1", 2, "F1"]],
             [[0, 0], [True, 2]],
             "[[0, 0], [1, 1]]",
         ]:
             with self.assertRaisesRegex(ValidationError, "axis_poly should be"):
                 ann.set_axis_poly(axis_poly)
         self.assertEqual(ann.axis_poly, [[1, 1], [2, 2], [3, 3]])
+
+    def test_project_annotations_for__base_user(self):
+        """The base_user's annotation is copied as a start & end point, keeping labels"""
+        base_user = self.create_user("base")
+        ind = self.create_individual()
+        self.create_annotation(
+            ind, base_user, axis_poly=[[0, 0, "C"], [5, 5, "F1"], [10, 10, "S+"]]
+        )
+        p = self.create_project(
+            base_user=base_user, team=[base_user], individuals=[ind]
+        )
+
+        out = p.annotations_for(ind.id, self.create_user("reader"))
+        self.assertEqual(
+            [(a.age, a.axis_poly) for a in out], [(0, [[0, 0, "C"], [10, 10, "S+"]])]
+        )
 
 
 class UserProfileTest(RequiresUtils, TestCase):
