@@ -77,64 +77,95 @@ test('lifecycleAnadromous:labelOptions', function (test) {
 
   test.deepEqual(lc.labelOptions([]), [], 'No points, no options');
   test.deepEqual(lc.labelOptions(pts([null])), [[null]], 'Centre never has a label');
+  test.deepEqual(lc.labelOptions(pts([null, null])), [[null], ['F+']], 'Single line ends at F+');
   test.deepEqual(
     lc.labelOptions(pts([null, null, null, null])),
-    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+']],
-    'Unlabelled points continue counting freshwater years, spawning marks (G) can follow at least one'
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F+']],
+    'Unlabelled points continue counting freshwater years, spawning marks (G) can follow at least one, ending at F+'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+']],
-    'F+ moves on to sea (S) years'
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1'], ['S+']],
+    'F+ moves on to sea (S) years, ending at S+'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F4', 'F+'])),
-    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+', 'F5', 'G1']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+']],
     'No sea (S) years, the reading ends at F+ (CHARR_Mývatn_2007_000047_0047.mei)'
   );
   test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F4', 'F5', 'G1', 'G2', 'G3', 'F+'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F5', 'G1', 'F+'], ['G1', 'F6', 'F+'], ['G2', 'F6', 'F+'], ['G3', 'F6', 'F+'], ['F+']],
+    'Freshwater spawning marks end at F+ (TROUT_Bæjartjörn_2025_000001_0001.mei)'
+  );
+  test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'G1', null, 'F+', null])),
-    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['G1', 'F3', 'F+'], ['G2', 'F+'], ['F+', 'G3'], ['S1', 'S+']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['G1', 'F3', 'F+'], ['G2', 'F3', 'F+'], ['F+', 'G3', 'F3'], ['S+']],
     'Freshwater spawning marks return to F+, then sea (S) years'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['S3', 'G1', 'S+']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1'], ['S2', 'G1'], ['S+']],
     'Spawning marks (G) can follow at least one sea year'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', 'G1', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['G3', 'S+']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1'], ['G1', 'S2'], ['G2', 'S2'], ['S+']],
     'G1 moves on to spawning marks, keeping G1 as first option'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F+', 'S1', 'S+', null, null])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S+', 'S2', 'G1'], [null], [null]],
-    'S+ is the edge, nothing comes after it'
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1'], ['S2', 'G1'], ['S3', 'G1'], ['S+']],
+    'S+ is the edge, so only allowed as the final point'
+  );
+  test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'F+', 'S1', 'F+'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F+', 'F3', 'G1'], ['S1'], ['S+']],
+    'Final point after sea years has to be S+, not F+'
+  );
+  test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'G1', 'G2'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['G1', 'F3', 'F+'], ['F+']],
+    'Final point after spawning marks is plus-growth, not another spawning mark'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F4', 'F+', 'S1', 'G1', 'G2', 'S+'])),
-    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+', 'F5', 'G1'], ['S1', 'S+'], ['G1', 'S2', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F4', 'G1', 'F+'], ['F+', 'F5', 'G1'], ['S1'], ['G1', 'S2'], ['G2', 'S2'], ['S+']],
     'SALMON_Kjarrá_2011_000217_0001.mei is valid'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F+', 'S1', 'S2', 'G1', 'G2', 'S+'])),
-    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F+', 'F4', 'G1'], ['S1', 'S+'], ['S2', 'G1', 'S+'], ['G1', 'S3', 'S+'], ['G2', 'S+'], ['S+', 'G3']],
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F+', 'F4', 'G1'], ['S1'], ['S2', 'G1'], ['G1', 'S3'], ['G2', 'S3'], ['S+']],
     'SEATROUT_Ölfusá_2012_000005_0001.mei is valid'
   );
   test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F+', 'S1', 'G1', 'S2', 'S+'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F+', 'F4', 'G1'], ['S1'], ['G1', 'S2'], ['S2', 'G2'], ['S+']],
+    'Sea years can follow spawning marks, continuing their count (SEATROUT_Ytri-Rangá_2010_000022_0001.mei)'
+  );
+  test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'F2', 'F3', 'F+', 'S1', 'S2', 'G1', 'S3', 'S+'])),
+    [[null], ['F1', 'F+'], ['F2', 'G1', 'F+'], ['F3', 'G1', 'F+'], ['F+', 'F4', 'G1'], ['S1'], ['S2', 'G1'], ['G1', 'S3'], ['S3', 'G2'], ['S+']],
+    'SEATROUT_Úlfarsá_2009_000015_0001.mei is valid'
+  );
+  test.deepEqual(
+    lc.labelOptions(pts([null, 'F1', 'G1', 'F2', 'G2', 'F+'])),
+    [[null], ['F1', 'F+'], ['G1', 'F2', 'F+'], ['F2', 'G2', 'F+'], ['G2', 'F3', 'F+'], ['F+']],
+    'Freshwater years can follow spawning marks, which continue their count'
+  );
+  test.deepEqual(
     lc.labelOptions(pts([null, 'G1', 'F+', 'G1', 'S+'])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1', 'S+'], ['S+', 'S2', 'G1']],
+    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1'], ['S1'], ['S+']],
     'No spawning marks before a freshwater or sea year'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'F+', 'S+'])),
-    [[null], ['F+', 'F1'], ['S+', 'S1']],
+    [[null], ['F+', 'F1'], ['S+']],
     'Counts restart at 1 for each stage'
   );
   test.deepEqual(
     lc.labelOptions(pts([null, 'S+', 'F+'])),
-    [[null], ['F1', 'F+'], ['F+', 'F2', 'G1']],
+    [[null], ['F1', 'F+'], ['F+']],
     'S+ in freshwater stage does not move on'
   );
   test.end();
