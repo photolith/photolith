@@ -44,6 +44,7 @@ function formRefresh (pxMmRatio, lifecycle, indData, event) {
       if (event.formReset) {
         // Form was just reset, update the default & reset again so we don't trigger onbeforeunload
         setDefaultValue(event.target, JSON.stringify(rawPoints));
+        setDefaultValue(event.target.form.age, lifecycle.age(rawPoints));
         event.target.form.reset();
       } else {
         // Labels changed, update axis_poly & let the change event update viewer / table
@@ -77,7 +78,8 @@ function formRefresh (pxMmRatio, lifecycle, indData, event) {
       ${backCalc ? `<td>${backCalc[i] === null ? '' : Math.round(backCalc[i] * 100) / 100}</td>` : ''}
     </tr>`).join('\n');
 
-    event.target.form.age.value = lifecycle.age(rawPoints);
+    // NB: After a reset, keep the age the form was reset to, e.g. that of an existing annotation
+    if (!event.formReset) event.target.form.age.value = lifecycle.age(rawPoints);
 
     if (lifecycle.ageStages) {
       event.target.form.querySelector('.ph-age-stages output').innerHTML = renderAgeStages(lifecycle.ageStages(rawPoints));
@@ -219,6 +221,8 @@ export function init (parent) {
       // NB: A form reset event fires before value is updated, so wait until it has
       window.setTimeout(() => refresh({ formReset: true, target: elForm.elements.axis_poly }), 0);
     });
+    // Populate axis_poly_table from the initial axis_poly, as if the form was just reset
+    refresh({ formReset: true, target: elForm.elements.axis_poly });
 
     // Lifecycles with stages calculate the age from labels, so show the stages instead of an editable age
     const hasAgeStages = !!getLifecycle(indData).ageStages;
