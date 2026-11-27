@@ -1,48 +1,48 @@
 // For a set of axis_poly points, generate all possible values for the next.
 // Readings go F1..Fn, F+, then optionally S1..Sn, S+ for fish that went to sea. Either the freshwater (F) or sea (S)
-// years can be followed by spawning marks (gotmerki) G1..Gn before their plus-growth, e.g. "F1 F2 F+ S1 G1 S+".
+// years can be interspersed with spawning marks (gotmerki) G1..Gn, e.g. "F1 F2 F+ S1 G1 S+" or "F1 F+ S1 G1 S2 S+".
 // The reading of a fish that never went to sea ends at F+, e.g. "F1 F2 F3 F+".
+// The final point is the edge of the scale, so is always the plus-growth of the stage before it, F+ or S+.
 // This matches Fishalysis .mei readings of salmon, trout & charr, both sea-run and freshwater
 function labelOptionsAnadromous (points) {
   let baseStage = 'F'; // The stage we're in, or spawning marks are returning to
-  let curStage = 'F';
-  let curCount = 1;
+  let baseCount = 1; // Number of the next year in baseStage
+  let spawnCount = 1; // Number of the next spawning mark within baseStage
+  let spawning = false; // Was the previous point a spawning mark?
   return points.map((p, i) => {
     // Centre never has a label
     if (i === 0) return [null];
 
-    // S+ is the edge of the scale, nothing comes after it
-    if (curStage === 'E') return [null];
-
-    const nextStage = curStage + curCount;
+    const baseNext = baseStage + baseCount;
+    const spawnNext = 'G' + spawnCount;
     const plusStage = baseStage + '+';
 
-    // Plus-growth moves on to sea years, or ends the reading
-    if (p[2] === plusStage) {
-      // Spawning marks need at least one year of their stage before them
-      const options = [plusStage, nextStage, ...(curStage === baseStage && curCount > 1 ? ['G1'] : [])];
-      baseStage = curStage = baseStage === 'F' ? 'S' : 'E';
-      curCount = 1;
-      return options;
-    }
+    // Final point is the edge of the scale, plus-growth of whichever stage we're in
+    if (i === points.length - 1) return [plusStage];
 
-    if (curStage === baseStage) {
-      if (curCount === 1) {
-        curCount += 1;
-        return [nextStage, plusStage];
-      }
-      if (p[2] === 'G1') {
-        curStage = 'G';
-        curCount = 2;
-        return ['G1', nextStage, plusStage];
-      }
-      curCount += 1;
-      return [nextStage, 'G1', plusStage];
-    }
+    // Spawning marks carry on from a previous spawning mark, or need at least one year of their stage before them
+    const options = spawning
+      ? [spawnNext, baseNext]
+      : [baseNext, ...(baseCount > 1 ? [spawnNext] : [])];
+    // S+ only appears at the edge, so before then we only offer F+
+    if (baseStage === 'F') options.push(plusStage);
 
-    // curStage === 'G'
-    curCount += 1;
-    return [nextStage, plusStage];
+    // Use the current label if possible, otherwise the first option. Either way it's first in the list
+    const label = options.includes(p[2]) ? p[2] : options[0];
+
+    if (label === plusStage) {
+      // F+ before the edge moves on to sea years
+      baseStage = 'S';
+      baseCount = spawnCount = 1;
+      spawning = false;
+    } else if (label === spawnNext) {
+      spawnCount += 1;
+      spawning = true;
+    } else {
+      baseCount += 1;
+      spawning = false;
+    }
+    return [label, ...options.filter((o) => o !== label)];
   });
 }
 
